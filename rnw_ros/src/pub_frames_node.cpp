@@ -161,12 +161,11 @@ int main( int argc, char** argv ) {
 
   ros::init(argc,argv,"sdk_test_node");
 
-  ros::NodeHandle nh;
+  ros::NodeHandle nh("~");
 
-  ros::Subscriber sub = nh.subscribe<sensor_msgs::Imu>("/djiros/imu",10,on_imu);
-  ros::Subscriber sub_odom = nh.subscribe<nav_msgs::Odometry>("/uwb_vicon_odom",10,on_odom);
-  ros::Subscriber sub_vins = nh.subscribe<nav_msgs::Odometry>("/vins_estimator/imu_propagate",10,on_vins);
-  ros::Subscriber sub_local = nh.subscribe<nav_msgs::Odometry>("/pos_vel_mocap/odom_TA",10,on_odom);
+  ros::Subscriber sub = nh.subscribe<sensor_msgs::Imu>("imu",10,on_imu);
+  ros::Subscriber sub_odom = nh.subscribe<nav_msgs::Odometry>("vicon",10,on_odom);
+  ros::Subscriber sub_vins = nh.subscribe<nav_msgs::Odometry>("vins",10,on_vins);
 
   pub_rpy_imu = nh.advertise<geometry_msgs::Vector3>("/uav/rpy_imu",1);
   pub_rpy_odom = nh.advertise<geometry_msgs::Vector3>("/uav/rpy_odom",1);
