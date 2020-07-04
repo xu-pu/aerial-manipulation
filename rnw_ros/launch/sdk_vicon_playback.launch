@@ -1,0 +1,11 @@
+<launch>
+
+    <node pkg="rnw_ros" type="sdk_test_node" name="sdk_test_node" required="true" output="screen"/>
+
+    <node pkg="rqt_multiplot" type="rqt_multiplot" name="rqt_multiplot"
+          args="--multiplot-config $(find rnw_ros)/rqt_multiplot.xml --multiplot-run-all"/>
+
+<!--    <node name="rosbag" pkg="rosbag" type="play" respawn="false" required="true"-->
+<!--          args="&#45;&#45;queue=1000 /home/sheep/rnw_ws/src/rnw_ros/bags/2020-05-27-00-28-56.bag" />-->
+
+</launch>
