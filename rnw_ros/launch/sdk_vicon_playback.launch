@@ -17,6 +17,6 @@
           args="--multiplot-config $(find rnw_ros)/rqt_multiplot.xml --multiplot-run-all"/>
 
     <node name="rosbag" pkg="rosbag" type="play" respawn="false" required="true"
-          args="-s 10 --queue=1000 /home/sheep/rnw_ws/src/rnw_ros/bags/2020-05-27-00-28-56.bag" />
+          args="--queue=1000 /home/sheep/Desktop/correct.bag"/>
 
 </launch>
