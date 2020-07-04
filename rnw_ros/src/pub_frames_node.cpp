@@ -159,7 +159,7 @@ void on_imu( sensor_msgs::ImuConstPtr const & imu ){
 
 int main( int argc, char** argv ) {
 
-  ros::init(argc,argv,"sdk_test_node");
+  ros::init(argc,argv,"pub_frames_node");
 
   ros::NodeHandle nh("~");
 
