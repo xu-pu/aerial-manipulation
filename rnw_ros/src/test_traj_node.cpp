@@ -92,6 +92,22 @@ void pub_setpoint(){
 
 }
 
+vector<Vector3d> gen_waypoint_zigzag( size_t cycles, double step_x, double step_y ){
+
+  vector<Vector3d> dst;
+  dst.emplace_back(0,0,0);
+
+  for ( size_t i=0; i<cycles; i++ ) {
+    dst.emplace_back((2*i+1)*step_x,step_y,0);
+    dst.emplace_back((2*i+2)*step_x,-step_y,0);
+  }
+
+  dst.emplace_back((2*cycles+1)*step_x,0,0);
+
+  return dst;
+
+}
+
 int main( int argc, char** argv ) {
 
   ros::init(argc,argv,"pub_frames_node");
@@ -100,12 +116,7 @@ int main( int argc, char** argv ) {
 
   pub_path_setpoint = nh.advertise<nav_msgs::Path>("/traj/setpoint",10);
 
-  vector<Vector3d> waypoints = {
-          Vector3d {0,0,0},
-          Vector3d {0.5,0.1,0},
-          Vector3d {1,-0.1,0},
-          Vector3d {1.5,0.1,0}
-  };
+  vector<Vector3d> waypoints = gen_waypoint_zigzag(5,0.25,0.5);
 
   MatrixXd POS = toXd(waypoints);
   VectorXd TIMES = gen_time_intervals(1,waypoints);
