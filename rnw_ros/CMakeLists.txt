@@ -121,7 +121,9 @@ catkin_package(
 ## Your package locations should be listed before other locations
 include_directories(
   ${PROJECT_SOURCE_DIR}/include
-  ${catkin_INCLUDE_DIRS} /usr/include/eigen3
+  ${catkin_INCLUDE_DIRS}
+  /usr/include/eigen3
+  /home/sheep/am_ws/devel/include
 )
 
 ## Declare a C++ library
@@ -143,12 +145,14 @@ add_executable(rnw_odom_node src/rnw_odom.cpp)
 add_executable(pub_frames_node src/pub_frames_node.cpp)
 add_executable(test_traj_node src/test_traj_node.cpp)
 add_executable(traj_server_node src/traj_server_node.cpp)
+add_executable(yaw_command_node src/yaw_command_node.cpp)
 
 target_link_libraries(rnw_open_loop_node ${catkin_LIBRARIES})
 target_link_libraries(rnw_odom_node ${catkin_LIBRARIES})
 target_link_libraries(pub_frames_node ${catkin_LIBRARIES})
 target_link_libraries(test_traj_node ${catkin_LIBRARIES})
 target_link_libraries(traj_server_node ${catkin_LIBRARIES})
+target_link_libraries(yaw_command_node ${catkin_LIBRARIES})
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the

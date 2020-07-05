@@ -9,6 +9,7 @@
 #include <nav_msgs/Path.h>
 #include <Eigen/Dense>
 
+#include "quadrotor_msgs//PositionCommand.h"
 #include "poly_traj/polynomial_traj.h"
 
 using namespace std;
@@ -45,6 +46,14 @@ VectorXd gen_time_intervals( double dt, vector<Vector3d> const & waypoints ){
 
 geometry_msgs::Point eigen2ros( Vector3d const & src ){
   geometry_msgs::Point dst;
+  dst.x = src.x();
+  dst.y = src.y();
+  dst.z = src.z();
+  return dst;
+}
+
+geometry_msgs::Vector3 eigen2rosv( Vector3d const & src ){
+  geometry_msgs::Vector3 dst;
   dst.x = src.x();
   dst.y = src.y();
   dst.z = src.z();
