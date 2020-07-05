@@ -1,55 +1,8 @@
-//
-// Created by sheep on 2020/7/5.
-//
-#include <ros/ros.h>
-#include <nav_msgs/Path.h>
-
-#include <Eigen/Dense>
-
-#include "poly_traj/polynomial_traj.h"
-
-using namespace std;
-
-using Eigen::Vector3d;
-using Eigen::MatrixXd;
-using Eigen::VectorXd;
+#include "rnw_ros/traj_uitls.h"
 
 PolynomialTraj traj;
 
 ros::Publisher pub_path_setpoint;
-
-MatrixXd toXd( vector<Vector3d> const & src ){
-  MatrixXd dst(src.size(),3);
-  for ( size_t i=0; i<src.size(); i++ ) {
-    dst.block<1,3>(i,0) = src.at(i).transpose();
-  }
-  return dst;
-}
-
-VectorXd toXd( vector<double> const & src ){
-  VectorXd dst(src.size());
-  for ( size_t i=0; i<src.size(); i++ ){
-    dst(i) = src.at(i);
-  }
-  return dst;
-}
-
-VectorXd gen_time_intervals( double dt, vector<Vector3d> const & waypoints ){
-  size_t N = waypoints.size() - 1;
-  VectorXd dst(N);
-  for ( size_t i=0; i<N; i++ ){
-    dst(i) = dt;
-  }
-  return dst;
-}
-
-geometry_msgs::Point eigen2ros( Vector3d const & src ){
-  geometry_msgs::Point dst;
-  dst.x = src.x();
-  dst.y = src.y();
-  dst.z = src.z();
-  return dst;
-}
 
 void pub_setpoint(){
 
@@ -58,7 +11,6 @@ void pub_setpoint(){
 
   static nav_msgs::Path path;
   path.header.frame_id = "world";
-
 
   if (!init) {
     init_time = ros::Time::now();
@@ -89,22 +41,6 @@ void pub_setpoint(){
   else {
     ROS_INFO_STREAM("Traj Complete");
   }
-
-}
-
-vector<Vector3d> gen_waypoint_zigzag( size_t cycles, double step_x, double step_y ){
-
-  vector<Vector3d> dst;
-  dst.emplace_back(0,0,0);
-
-  for ( size_t i=0; i<cycles; i++ ) {
-    dst.emplace_back((2*i+1)*step_x,step_y,0);
-    dst.emplace_back((2*i+2)*step_x,-step_y,0);
-  }
-
-  dst.emplace_back((2*cycles+1)*step_x,0,0);
-
-  return dst;
 
 }
 
