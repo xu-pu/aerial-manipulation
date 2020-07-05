@@ -9,7 +9,7 @@
 #include <nav_msgs/Path.h>
 #include <Eigen/Dense>
 
-#include "quadrotor_msgs//PositionCommand.h"
+#include "quadrotor_msgs/PositionCommand.h"
 #include "poly_traj/polynomial_traj.h"
 
 using namespace std;

@@ -124,6 +124,7 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
   /usr/include/eigen3
   /home/sheep/am_ws/devel/include
+  /home/dji/am_ws/devel/include
 )
 
 ## Declare a C++ library
