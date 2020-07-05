@@ -14,6 +14,7 @@ find_package(catkin REQUIRED COMPONENTS
         sensor_msgs
         nav_msgs
         std_msgs
+        poly_traj
 )
 
 ## System dependencies are found with CMake's conventions
@@ -140,10 +141,12 @@ include_directories(
 add_executable(rnw_open_loop_node src/rnw_open_loop.cpp)
 add_executable(rnw_odom_node src/rnw_odom.cpp)
 add_executable(pub_frames_node src/pub_frames_node.cpp)
+add_executable(test_traj_node src/test_traj_node.cpp)
 
 target_link_libraries(rnw_open_loop_node ${catkin_LIBRARIES})
 target_link_libraries(rnw_odom_node ${catkin_LIBRARIES})
 target_link_libraries(pub_frames_node ${catkin_LIBRARIES})
+target_link_libraries(test_traj_node ${catkin_LIBRARIES})
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the

@@ -167,6 +167,8 @@ PolynomialTraj minSnapTraj(const Eigen::MatrixXd& Pos, const Eigen::Vector3d& st
     poly_traj.addSegment(cx, cy, cz, ts);
   }
 
+  poly_traj.init();
+
   return poly_traj;
 }
 
