@@ -1,4 +1,5 @@
 #include "rnw_ros/traj_uitls.h"
+#include "rnw_ros/pose_utils.h"
 
 PolynomialTraj traj;
 
@@ -46,11 +47,15 @@ void pub_setpoint(){
 
 int main( int argc, char** argv ) {
 
-  ros::init(argc,argv,"pub_frames_node");
+  ros::init(argc,argv,"traj_server_node");
 
   ros::NodeHandle nh("~");
 
   pub_path_setpoint = nh.advertise<nav_msgs::Path>("/traj/setpoint",10);
+
+//  ros::Subscriber sub = nh.subscribe<sensor_msgs::Imu>("imu",10,on_imu);
+//  ros::Subscriber sub_odom = nh.subscribe<nav_msgs::Odometry>("vicon",10,on_odom);
+//  ros::Subscriber sub_vins = nh.subscribe<nav_msgs::Odometry>("vins",10,on_vins);
 
   vector<Vector3d> waypoints = gen_waypoint_zigzag(5,0.25,0.5);
 
