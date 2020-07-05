@@ -8,6 +8,7 @@ Panels:
         - /Status1
         - /TF1
         - /TF1/Frames1
+        - /Path2
       Splitter Ratio: 0.421474367
     Tree Height: 750
   - Class: rviz/Selection
@@ -95,6 +96,29 @@ Visualization Manager:
       Topic: /traj/setpoint
       Unreliable: false
       Value: true
+    - Alpha: 1
+      Buffer Length: 1
+      Class: rviz/Path
+      Color: 29; 0; 255
+      Enabled: true
+      Head Diameter: 0.300000012
+      Head Length: 0.200000003
+      Length: 0.300000012
+      Line Style: Lines
+      Line Width: 0.0299999993
+      Name: Path
+      Offset:
+        X: 0
+        Y: 0
+        Z: 0
+      Pose Color: 255; 85; 255
+      Pose Style: None
+      Radius: 0.0299999993
+      Shaft Diameter: 0.100000001
+      Shaft Length: 0.100000001
+      Topic: /traj/plant
+      Unreliable: false
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -135,10 +159,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 0.604797184
+      Pitch: 0.689797282
       Target Frame: ekf
       Value: ThirdPersonFollower (rviz)
-      Yaw: 3.71732259
+      Yaw: 2.88232207
     Saved: ~
 Window Geometry:
   Displays:

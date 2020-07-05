@@ -1,46 +1,96 @@
 #include "rnw_ros/traj_uitls.h"
 #include "rnw_ros/pose_utils.h"
 
-PolynomialTraj traj;
-
 ros::Publisher pub_path_setpoint;
+ros::Publisher pub_path_plant;
 
-void pub_setpoint(){
+PolynomialTraj minsnap( vector<Vector3d> const & waypoints, double interval ){
+  MatrixXd POS = toXd(waypoints);
+  VectorXd TIMES = gen_time_intervals(interval,waypoints);
+  return minSnapTraj(POS,Vector3d::Zero(),Vector3d::Zero(),Vector3d::Zero(),Vector3d::Zero(),TIMES);
+}
 
-  static ros::Time init_time;
-  static bool init = false;
+PoseStamped eigen2pathpoint( Vector3d const & T ){
+  geometry_msgs::PoseStamped pose;
+  pose.header.stamp = ros::Time::now();
+  pose.pose.position = eigen2ros(T);
+  return pose;
+}
 
-  static nav_msgs::Path path;
-  path.header.frame_id = "world";
+struct traj_server_t {
 
-  if (!init) {
-    init_time = ros::Time::now();
-    init = true;
-  }
+    nav_msgs::Odometry base_odom; // trajectory is defined in this reference frame, FLU
 
-  auto cur_time = ros::Time::now();
-  double dt = ( cur_time - init_time ).toSec();
+    PolynomialTraj traj;
 
-  if ( dt < traj.getTimeSum() ) {
+    bool initialized = false;
 
-    Vector3d x = traj.evaluate(dt);
-    Vector3d x_dot = traj.evaluateVel(dt);
-    Vector3d x_dot_dot = traj.evaluateAcc(dt);
+    void init( OdometryConstPtr const & msg ){
 
-    ROS_INFO_STREAM(dt);
-    ROS_INFO_STREAM(x);
+      base_odom = *msg;
 
-    geometry_msgs::PoseStamped pose;
-    pose.header.stamp = cur_time;
-    pose.pose.position = eigen2ros(x);
+      ROS_INFO_STREAM(base_odom);
 
-    path.poses.push_back(pose);
+      Matrix3d R = odom2R(msg);
+      Vector3d T = odom2T(msg);
 
-    pub_path_setpoint.publish(path);
+      vector<Vector3d> waypoints = gen_waypoint_zigzag(5,0.25,0.5);
 
+      vector<Vector3d> wps = transform_pts(waypoints,R,T);
+
+      traj = minsnap(wps,1);
+
+      initialized = true;
+
+    }
+
+    ros::Time init_t;
+
+    bool init_t_init = false;
+
+    double dt() {
+      if (!init_t_init) {
+        init_t = ros::Time::now();
+        init_t_init = true;
+      }
+      return (ros::Time::now()-init_t).toSec();
+    }
+
+};
+
+traj_server_t traj_server;
+
+void on_odom( OdometryConstPtr const & odom ) {
+
+  static nav_msgs::Path path_setpoint;
+  static nav_msgs::Path path_plant;
+  path_setpoint.header.frame_id = "world";
+  path_plant.header.frame_id = "world";
+
+  if ( !traj_server.initialized ) {
+    traj_server.init(odom);
   }
   else {
-    ROS_INFO_STREAM("Traj Complete");
+    double dt = traj_server.dt();
+    if ( dt < traj_server.traj.getTimeSum() ) {
+
+      Vector3d x = traj_server.traj.evaluate(dt);
+      Vector3d x_dot = traj_server.traj.evaluateVel(dt);
+      Vector3d x_dot_dot = traj_server.traj.evaluateAcc(dt);
+
+//      ROS_INFO_STREAM(dt);
+//      ROS_INFO_STREAM(x);
+
+      path_setpoint.poses.emplace_back(eigen2pathpoint(x));
+      path_plant.poses.emplace_back(eigen2pathpoint(odom2T(odom)));
+
+      pub_path_setpoint.publish(path_setpoint);
+      pub_path_plant.publish(path_plant);
+
+    }
+    else {
+      ROS_INFO_STREAM("Traj Complete");
+    }
   }
 
 }
@@ -52,30 +102,11 @@ int main( int argc, char** argv ) {
   ros::NodeHandle nh("~");
 
   pub_path_setpoint = nh.advertise<nav_msgs::Path>("/traj/setpoint",10);
+  pub_path_plant = nh.advertise<nav_msgs::Path>("/traj/plant",10);
 
-//  ros::Subscriber sub = nh.subscribe<sensor_msgs::Imu>("imu",10,on_imu);
-//  ros::Subscriber sub_odom = nh.subscribe<nav_msgs::Odometry>("vicon",10,on_odom);
-//  ros::Subscriber sub_vins = nh.subscribe<nav_msgs::Odometry>("vins",10,on_vins);
+  ros::Subscriber sub_odom = nh.subscribe<nav_msgs::Odometry>("vicon",10,on_odom);
 
-  vector<Vector3d> waypoints = gen_waypoint_zigzag(5,0.25,0.5);
-
-  MatrixXd POS = toXd(waypoints);
-  VectorXd TIMES = gen_time_intervals(1,waypoints);
-  PolynomialTraj test_traj = minSnapTraj(POS,Vector3d::Zero(),Vector3d::Zero(),Vector3d::Zero(),Vector3d::Zero(),TIMES);
-
-  traj = test_traj;
-
-  ros::Rate rate(100);
-
-  while (ros::ok()) {
-
-    pub_setpoint();
-
-    ros::spinOnce();
-
-    rate.sleep();
-
-  }
+  ros::spin();
 
   ros::shutdown();
 

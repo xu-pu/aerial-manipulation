@@ -1,23 +1,16 @@
 <launch>
-
-<!--    <arg name="imu_topic" default="/djiros/imu"/>-->
 <!--    <arg name="vicon_topic" value="/pos_vel_mocap/odom_TA"/>-->
-
-    <arg name="imu_topic" default="/dji_sdk_1/dji_sdk/imu"/>
     <arg name="vicon_topic" value="/uwb_vicon_odom"/>
-    <arg name="vins_topic" value="/vins_estimator/imu_propagate"/>
 
     <node pkg="rnw_ros" type="traj_server_node" name="traj_server_node" output="screen">
-        <remap from="~imu" to="$(arg imu_topic)"/>
         <remap from="~vicon" to="$(arg vicon_topic)"/>
-        <remap from="~vins" to="$(arg vins_topic)"/>
     </node>
 
 <!--    <node pkg="rqt_multiplot" type="rqt_multiplot" name="rqt_multiplot"-->
 <!--          args="&#45;&#45;multiplot-config $(find rnw_ros)/rqt_multiplot.xml &#45;&#45;multiplot-run-all"/>-->
 
     <node name="rosbag" pkg="rosbag" type="play" respawn="false" required="true"
-          args="--queue=1000 /home/sheep/Desktop/correct.bag"/>
+          args="-s 25 --queue=1000 /home/sheep/Desktop/correct.bag"/>
 
     <node name="rviz_traj" pkg="rviz" type="rviz" output="log" args="-d $(find rnw_ros)/config/traj.rviz" />
 
