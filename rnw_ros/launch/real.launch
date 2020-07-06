@@ -1,0 +1,36 @@
+<launch>
+
+	<arg name="uavname" default="fpv" />
+    <arg name="odom_topic" value="/uwb_vicon_odom" />
+    <arg name="imu_topic" default="/djiros/imu"/>
+
+	<node pkg="n3ctrl" type="n3ctrl_node" name="n3ctrl" output="screen">
+		<remap from="~joy" to="/djiros/rc" />
+        <remap from="~odom" to="$(arg odom_topic)" />
+		<remap from="~imu" to="/djiros/imu" />
+		<remap from="~cmd" to="/position_cmd" />
+
+		<remap from="~desire_pose" to="/desire_pose" />
+		<remap from="~traj_start_trigger" to="/traj_start_trigger" />
+		<remap from="~ctrl" to="/djiros/ctrl" />
+
+        <rosparam command="load" file="$(find n3ctrl)/config/ctrl_param_$(arg uavname).yaml" />
+        <param name="work_mode" value="real-time" />
+        <param name="js_ctrl_mode" value="feedback" />
+	</node>
+
+    <node pkg="rnw_ros" type="traj_server_node" name="traj_server_node" output="screen">
+        <remap from="~vicon" to="$(arg odom_topic)"/>
+    </node>
+
+    <node pkg="rnw_ros" type="pub_frames_node" name="pub_frames_node" output="screen">
+        <remap from="~imu" to="$(arg imu_topic)"/>
+        <remap from="~vicon" to="$(arg odom_topic)"/>
+        <remap from="~vins" to="/vins_estimator/imu_propagate"/>
+    </node>
+
+    <node name="rviz_traj" pkg="rviz" type="rviz" output="log" args="-d $(find rnw_ros)/config/traj.rviz" />
+
+    <node name="rosbag record" pkg="rosbag" type="record" output="screen" args="-a" />
+
+</launch>
