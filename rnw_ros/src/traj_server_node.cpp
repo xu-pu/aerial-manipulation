@@ -3,6 +3,7 @@
 
 ros::Publisher pub_path_setpoint;
 ros::Publisher pub_path_plant;
+ros::Publisher pub_pos_cmd;
 
 PolynomialTraj minsnap( vector<Vector3d> const & waypoints, double interval ){
   MatrixXd POS = toXd(waypoints);
@@ -25,6 +26,8 @@ struct traj_server_t {
 
     bool initialized = false;
 
+    double base_yaw;
+
     void init( OdometryConstPtr const & msg ){
 
       base_odom = *msg;
@@ -33,6 +36,8 @@ struct traj_server_t {
 
       Matrix3d R = odom2R(msg);
       Vector3d T = odom2T(msg);
+
+      base_yaw = quat2eulers(Quaterniond(R)).z();
 
       vector<Vector3d> waypoints = gen_waypoint_zigzag(5,0.25,0.5);
 
@@ -81,11 +86,27 @@ void on_odom( OdometryConstPtr const & odom ) {
 //      ROS_INFO_STREAM(dt);
 //      ROS_INFO_STREAM(x);
 
+      // path
+
       path_setpoint.poses.emplace_back(eigen2pathpoint(x));
       path_plant.poses.emplace_back(eigen2pathpoint(odom2T(odom)));
 
       pub_path_setpoint.publish(path_setpoint);
       pub_path_plant.publish(path_plant);
+
+      // position command
+
+      quadrotor_msgs::PositionCommand cmd;
+      cmd.position = eigen2ros(x);
+      cmd.velocity = eigen2rosv(x_dot);
+      cmd.acceleration = eigen2rosv(x_dot_dot);
+      cmd.yaw = traj_server.base_yaw;
+      cmd.yaw_dot = 0;
+
+      cmd.trajectory_flag = cmd.TRAJECTORY_STATUS_READY;
+      cmd.trajectory_id = 2;
+
+      pub_pos_cmd.publish(cmd);
 
     }
     else {
@@ -103,6 +124,7 @@ int main( int argc, char** argv ) {
 
   pub_path_setpoint = nh.advertise<nav_msgs::Path>("/traj/setpoint",10);
   pub_path_plant = nh.advertise<nav_msgs::Path>("/traj/plant",10);
+  pub_pos_cmd = nh.advertise<quadrotor_msgs::PositionCommand>("/position_cmd",10);
 
   ros::Subscriber sub_odom = nh.subscribe<nav_msgs::Odometry>("vicon",10,on_odom);
 

@@ -2,7 +2,7 @@
 <!--    <arg name="vicon_topic" value="/pos_vel_mocap/odom_TA"/>-->
     <arg name="vicon_topic" value="/uwb_vicon_odom"/>
 
-    <node pkg="rnw_ros" type="yaw_command_node" name="yaw_command_node" output="screen">
+    <node pkg="rnw_ros" type="traj_server_node" name="traj_server_node" output="screen">
         <remap from="~vicon" to="$(arg vicon_topic)"/>
     </node>
 
