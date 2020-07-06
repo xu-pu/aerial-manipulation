@@ -66,7 +66,7 @@ struct traj_server_t {
       vector<Vector3d> waypoints = gen_waypoint_zigzag(5,0.25,0.5);
       vector<Vector3d> wps = transform_pts(waypoints,R,T);
 
-      traj = minsnap(wps,1);
+      traj = minsnap(wps,3);
 
       traj_available = true;
 
