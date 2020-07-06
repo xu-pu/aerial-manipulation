@@ -30,7 +30,7 @@ struct traj_server_t {
 
     PolynomialTraj traj;
 
-    bool initialized = false;
+    bool traj_available = false;
 
     void init( OdometryConstPtr const & msg ){
 
@@ -51,20 +51,20 @@ struct traj_server_t {
 
       traj = minsnap(wps,1);
 
-      initialized = true;
+      traj_available = true;
 
     }
 
-    ros::Time init_t;
+    ros::Time traj_start_time;
 
-    bool init_t_init = false;
+    bool traj_started = false;
 
     double dt() {
-      if (!init_t_init) {
-        init_t = ros::Time::now();
-        init_t_init = true;
+      if (!traj_started) {
+        traj_start_time = ros::Time::now();
+        traj_started = true;
       }
-      return (ros::Time::now()-init_t).toSec();
+      return (ros::Time::now() - traj_start_time).toSec();
     }
 
 };
@@ -78,7 +78,7 @@ void on_odom( OdometryConstPtr const & odom ) {
   path_setpoint.header.frame_id = "world";
   path_plant.header.frame_id = "world";
 
-  if ( !traj_server.initialized ) {
+  if ( !traj_server.traj_available ) {
     traj_server.init(odom);
   }
   else {
