@@ -1,10 +1,10 @@
 <launch>
 
-<!--    <arg name="imu_topic" default="/djiros/imu"/>-->
-    <arg name="vicon_topic" value="/pos_vel_mocap/odom_TA"/>
+    <arg name="imu_topic" default="/djiros/imu"/>
+<!--    <arg name="vicon_topic" value="/pos_vel_mocap/odom_TA"/>-->
 
-    <arg name="imu_topic" default="/dji_sdk_1/dji_sdk/imu"/>
-<!--    <arg name="vicon_topic" value="/uwb_vicon_odom"/>-->
+<!--    <arg name="imu_topic" default="/dji_sdk_1/dji_sdk/imu"/>-->
+    <arg name="vicon_topic" value="/uwb_vicon_odom"/>
     <arg name="vins_topic" value="/vins_estimator/imu_propagate"/>
 
     <node pkg="rnw_ros" type="pub_frames_node" name="pub_frames_node" output="screen">
