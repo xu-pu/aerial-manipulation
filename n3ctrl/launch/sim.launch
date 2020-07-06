@@ -1,0 +1,32 @@
+<launch>
+
+	<arg name="uavname" default="fpv" />
+    <arg name="odom_topic" value="/uwb_vicon_odom" />
+    <arg name="sim_odom_topic" value="/sim/odom" />
+
+	<node pkg="n3ctrl" type="n3ctrl_node" name="n3ctrl" output="screen">
+		<remap from="~joy" to="/djiros/rc" />
+        <remap from="~odom" to="$(arg odom_topic)" />
+		<remap from="~imu" to="/djiros/imu" />
+		<remap from="~cmd" to="/position_cmd" />
+
+		<remap from="~desire_pose" to="/desire_pose" />
+		<remap from="~traj_start_trigger" to="/traj_start_trigger" />
+		<remap from="~ctrl" to="/djiros/ctrl" />
+
+        <rosparam command="load" file="$(find n3ctrl)/config/ctrl_param_$(arg uavname).yaml" />
+        <param name="work_mode" value="real-time" />
+        <param name="js_ctrl_mode" value="feedback" />
+	</node>
+
+    <node pkg="n3ctrl" type="n1_sim_helper.py" name="n1_sim_helper" output="screen">
+
+        <remap from="~velo" to="/djiros/velo" />
+        <remap from="~gps" to="/djiros/gps" />
+        <remap from="~imu" to="/djiros/imu" />
+
+        <remap from="~odom" to="/uwb_vicon_odom" />
+
+    </node>
+
+</launch>
