@@ -2,7 +2,7 @@
 
 	<arg name="uavname" default="fpv" />
     <arg name="odom_topic" value="/uwb_vicon_odom" />
-    <arg name="sim_odom_topic" value="/sim/odom" />
+    <arg name="imu_topic" default="/djiros/imu"/>
 
 	<node pkg="n3ctrl" type="n3ctrl_node" name="n3ctrl" output="screen">
 		<remap from="~joy" to="/djiros/rc" />
@@ -28,5 +28,17 @@
         <remap from="~odom" to="/uwb_vicon_odom" />
 
     </node>
+
+    <node pkg="rnw_ros" type="traj_server_node" name="traj_server_node" output="screen">
+        <remap from="~vicon" to="$(arg odom_topic)"/>
+    </node>
+
+    <node pkg="rnw_ros" type="pub_frames_node" name="pub_frames_node" output="screen">
+        <remap from="~imu" to="$(arg imu_topic)"/>
+        <remap from="~vicon" to="$(arg odom_topic)"/>
+        <remap from="~vins" to="/vins_estimator/imu_propagate"/>
+    </node>
+
+    <node name="rviz_traj" pkg="rviz" type="rviz" output="log" args="-d $(find rnw_ros)/config/traj.rviz" />
 
 </launch>
