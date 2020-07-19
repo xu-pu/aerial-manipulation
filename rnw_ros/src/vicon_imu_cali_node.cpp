@@ -21,13 +21,18 @@ inline double deg2rad( double deg ){
   return M_PI/180.*deg;
 }
 
+inline double rad2deg( double rad ){
+  return 180./M_PI*rad;
+}
+
 struct cali_sampler_t {
 
     vector<Vector3d> samples_rpy;
     vector<sensor_msgs::Imu> samples_imu;
     vector<nav_msgs::Odometry> samples_odom;
 
-    static constexpr size_t sample_threshold = 200;
+    static constexpr size_t sample_threshold = 50;
+    static constexpr double deg_threshold = 1;
 
     bool check_rpy( Vector3d const & rpy ){
 
@@ -35,7 +40,7 @@ struct cali_sampler_t {
 
         double dist = (rpy-pt).norm();
 
-        if ( dist < deg2rad(5) ) {
+        if ( dist < deg2rad(deg_threshold) ) {
           return false;
         }
 
@@ -137,9 +142,11 @@ void calibrate_vicon_imu( cali_sampler_t & sample ){
 
   ceres::Solver::Summary summary;
   ceres::Solve(options, &problem, &summary);
-  std::cout << "end ceres" << std::endl;
 
   std::cout << summary.FullReport() << std::endl;
+
+  ROS_INFO_STREAM("R_MARKER_FLU: " << R_MARKER_FLU.coeffs().transpose() );
+  ROS_INFO_STREAM("Magnitude: " << rad2deg(Eigen::AngleAxisd(R_MARKER_FLU).angle()) );
 
 }
 
@@ -152,6 +159,7 @@ void sync_callback( sensor_msgs::ImuConstPtr const & imu, nav_msgs::OdometryCons
 
   if ( cali_sampler.enough_samples() ) {
     ROS_INFO_STREAM("DO CERES CALIBRATION");
+    calibrate_vicon_imu(cali_sampler);
     ros::shutdown();
   }
 
