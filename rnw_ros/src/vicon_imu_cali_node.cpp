@@ -10,6 +10,8 @@
 #include <sensor_msgs/Imu.h>
 #include <nav_msgs/Odometry.h>
 
+#include <ceres/ceres.h>
+
 #include "rnw_ros/pose_utils.h"
 
 using sensor_msgs::ImuConstPtr;
@@ -64,6 +66,84 @@ struct cali_sampler_t {
 
 cali_sampler_t cali_sampler;
 
+
+struct ViconImuAlignError {
+
+    Quaterniond R_VICON_MARKER;
+
+    double imu_roll;
+    double imu_pitch;
+
+    ViconImuAlignError( sensor_msgs::Imu const & imu, nav_msgs::Odometry const & odom ){
+      R_VICON_MARKER.x() = odom.pose.pose.orientation.x;
+      R_VICON_MARKER.y() = odom.pose.pose.orientation.y;
+      R_VICON_MARKER.z() = odom.pose.pose.orientation.z;
+      R_VICON_MARKER.w() = odom.pose.pose.orientation.w;
+      Vector3d imu_rpy = imu2rpy(imu);
+      imu_roll = imu_rpy(0);
+      imu_pitch = imu_rpy(1);
+    }
+
+    bool operator()( const double * const params, double * residual ) const {
+
+      Eigen::Quaterniond R_MARKER_FLU(params[3],params[0],params[1],params[2]);
+
+      Eigen::Quaterniond R_VICON_FLU = R_VICON_MARKER * R_MARKER_FLU;
+
+      Vector3d rpy = odom2rpy(R_VICON_FLU);
+
+      residual[0] = imu_roll - rpy.x(); // err_roll
+      residual[1] = imu_pitch - rpy.y(); // err_pitch
+
+      return true;
+
+    }
+
+};
+
+void calibrate_vicon_imu( cali_sampler_t & sample ){
+
+  using namespace ceres;
+
+  assert( sample.enough_samples() );
+
+  ceres::Problem problem;
+
+  Quaterniond R_MARKER_FLU = Quaterniond::Identity();
+
+  double * data = R_MARKER_FLU.coeffs().data();
+
+  for ( size_t i=0; i<sample.samples_rpy.size(); i++ ) {
+
+    auto const & imu = sample.samples_imu.at(i);
+    auto const & odom = sample.samples_odom.at(i);
+
+    ceres::CostFunction * costFunction = new NumericDiffCostFunction<ViconImuAlignError,CENTRAL,2,4>(new ViconImuAlignError(imu,odom));
+
+    //ceres::LossFunction* lossFunction = new ceres::CauchyLoss(1.0);
+    problem.AddResidualBlock(costFunction,nullptr,data);
+
+  }
+
+  ceres::LocalParameterization* quaternionParameterization =
+          new ceres::EigenQuaternionParameterization;
+
+  problem.SetParameterization(data,quaternionParameterization);
+
+  ceres::Solver::Options options;
+  options.max_num_iterations = 1000;
+  options.num_threads = 1;
+  options.minimizer_progress_to_stdout = true;
+
+  ceres::Solver::Summary summary;
+  ceres::Solve(options, &problem, &summary);
+  std::cout << "end ceres" << std::endl;
+
+  std::cout << summary.FullReport() << std::endl;
+
+}
+
+
 void sync_callback( sensor_msgs::ImuConstPtr const & imu, nav_msgs::OdometryConstPtr const & odom ){
 
   if ( !cali_sampler.enough_samples() ) {
@@ -72,6 +152,7 @@ void sync_callback( sensor_msgs::ImuConstPtr const & imu, nav_msgs::OdometryCons
 
   if ( cali_sampler.enough_samples() ) {
     ROS_INFO_STREAM("DO CERES CALIBRATION");
+    ros::shutdown();
   }
 
 }

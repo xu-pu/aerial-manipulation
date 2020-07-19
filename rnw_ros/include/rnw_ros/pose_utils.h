@@ -40,14 +40,14 @@ inline Eigen::Matrix3d rpy2rot( Vector3d const & rpy ){
                  .toRotationMatrix();
 }
 
-Vector3d imu2rpy( ImuConstPtr const & imu ){
+Vector3d imu2rpy( sensor_msgs::Imu const & imu ){
 
   Eigen::Matrix3d R_FLU2FRD;
   R_FLU2FRD << 1, 0, 0, 0, -1, 0, 0, 0, -1;
   Eigen::Matrix3d R_ENU2NED;
   R_ENU2NED << 0, 1, 0, 1, 0, 0, 0, 0, -1;
 
-  auto const & quat = imu->orientation;
+  auto const & quat = imu.orientation;
 
   Eigen::Quaterniond q(quat.w, quat.x, quat.y, quat.z);
   Eigen::Matrix3d RFLU2ENU = q.toRotationMatrix();
@@ -55,6 +55,10 @@ Vector3d imu2rpy( ImuConstPtr const & imu ){
   q = Eigen::Quaterniond(R_ENU2NED*RFLU2ENU*R_FLU2FRD.transpose());
   return quat2eulers(q);
 
+}
+
+Vector3d imu2rpy( ImuConstPtr const & imu ){
+  return imu2rpy(*imu);
 }
 
 Vector3d odom2rpy( OdometryConstPtr const & odom ){
@@ -67,6 +71,18 @@ Vector3d odom2rpy( OdometryConstPtr const & odom ){
   auto const & quat = odom->pose.pose.orientation;
   Eigen::Quaterniond q(quat.w, quat.x, quat.y, quat.z);
   Matrix3d FLU2NED = R_ENU2NED*q.toRotationMatrix()*R_FLU2FRD.transpose();
+  return quat2eulers(Quaterniond(FLU2NED));
+
+}
+
+Vector3d odom2rpy( Quaterniond const & odom ){
+
+  Eigen::Matrix3d R_FLU2FRD;
+  R_FLU2FRD << 1, 0, 0, 0, -1, 0, 0, 0, -1;
+  Eigen::Matrix3d R_ENU2NED;
+  R_ENU2NED << 0, 1, 0, 1, 0, 0, 0, 0, -1;
+
+  Matrix3d FLU2NED = R_ENU2NED*odom.toRotationMatrix()*R_FLU2FRD.transpose();
   return quat2eulers(Quaterniond(FLU2NED));
 
 }

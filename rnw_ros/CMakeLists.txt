@@ -17,6 +17,8 @@ find_package(catkin REQUIRED COMPONENTS
         poly_traj
 )
 
+find_package(Ceres REQUIRED)
+
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
@@ -153,7 +155,7 @@ target_link_libraries(rnw_odom_node ${catkin_LIBRARIES})
 target_link_libraries(pub_frames_node ${catkin_LIBRARIES})
 target_link_libraries(test_traj_node ${catkin_LIBRARIES})
 target_link_libraries(traj_server_node ${catkin_LIBRARIES})
-target_link_libraries(vicon_imu_cali_node ${catkin_LIBRARIES})
+target_link_libraries(vicon_imu_cali_node ${catkin_LIBRARIES} ${CERES_LIBRARIES})
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
