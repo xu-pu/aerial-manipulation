@@ -1,0 +1,12 @@
+<launch>
+
+    <node pkg="rosserial_python" type="serial_node.py" name="serial_node" output="screen">
+        <param name="port" value="/dev/ttyACM0"/>
+        <param name="baud" value="115200"/>
+    </node>
+
+    <node name="rockwalk_kinematics_node" pkg="rockwalk_kinematics" type="rockwalk_kinematics_node.py" output="screen"/>
+
+    <node name="rviz_rnw" pkg="rviz" type="rviz" output="log" args="-d $(find rockwalk_kinematics)/config/config.rviz"/>
+
+</launch>
