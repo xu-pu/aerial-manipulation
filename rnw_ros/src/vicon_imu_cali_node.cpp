@@ -31,7 +31,7 @@ struct cali_sampler_t {
     vector<sensor_msgs::Imu> samples_imu;
     vector<nav_msgs::Odometry> samples_odom;
 
-    static constexpr size_t sample_threshold = 50;
+    static constexpr size_t sample_threshold = 500;
     static constexpr double deg_threshold = 1;
 
     bool check_rpy( Vector3d const & rpy ){
@@ -146,7 +146,15 @@ void calibrate_vicon_imu( cali_sampler_t & sample ){
   std::cout << summary.FullReport() << std::endl;
 
   ROS_INFO_STREAM("R_MARKER_FLU: " << R_MARKER_FLU.coeffs().transpose() );
+  ROS_INFO_STREAM("Eigen::Quat: " << R_MARKER_FLU.w() << ", " << R_MARKER_FLU.x() << ", " << R_MARKER_FLU.y() << ", " << R_MARKER_FLU.z());
   ROS_INFO_STREAM("Magnitude: " << rad2deg(Eigen::AngleAxisd(R_MARKER_FLU).angle()) );
+
+  cout << "yaml:" << endl;
+  cout << "R_MARKER_FLU:\n"
+          << "   x: " << R_MARKER_FLU.x() << '\n'
+          << "   y: " << R_MARKER_FLU.y() << '\n'
+          << "   z: " << R_MARKER_FLU.z() << '\n'
+          << "   w: " << R_MARKER_FLU.w() << '\n' << endl;
 
 }
 
