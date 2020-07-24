@@ -6,13 +6,10 @@
         <param name="work_mode" value="real-time" />
         <param name="js_ctrl_mode" value="feedback" />
     </node>
-    <node pkg="pos_vel_mocap" type="pos_vel_mocap" name="pos_vel_mocap" output="screen"/>
-	<node pkg="mocap_optitrack"
-          type="mocap_node"
-          name="mocap_node"
-          respawn="false"
-          launch-prefix=""
-          required="true" output="log">
+    <node pkg="pos_vel_mocap" type="pos_vel_mocap" name="pos_vel_mocap" output="screen" required="true">
+        <rosparam file="$(find pos_vel_mocap)/config/calib.yaml" command="load" />
+    </node>
+	<node pkg="mocap_optitrack" type="mocap_node" name="mocap_node" respawn="false" launch-prefix="" required="true" output="log">
         <rosparam file="$(find mocap_optitrack)/config/mocap.yaml" command="load" />
     </node>
 </launch>

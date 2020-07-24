@@ -21,6 +21,8 @@ Eigen::Vector3d    Vi0, Vi1, Vi2, Vi3, Vi4, Vo0;
 
 nav_msgs::Path run_path;
 
+Eigen::Quaterniond R_MARKER_FLU;
+
 void pose_callback( const geometry_msgs::PoseStamped::ConstPtr msg )
 {
     if ( !init_ok )
@@ -94,6 +96,9 @@ void pose_callback( const geometry_msgs::PoseStamped::ConstPtr msg )
 
 
         /*********************/
+
+        Q_w = Q_w * R_MARKER_FLU;
+
         nav_msgs::Odometry odom;
         odom.header.stamp = now_t;
         odom.header.frame_id = "world";
@@ -168,14 +173,29 @@ void vins_callback( const nav_msgs::Odometry::ConstPtr msg )
               << "\n\nnow_y :" << now_y << "\nvins_y:" << vin_y << "\n\n\n\n";
 }
 
+template<typename T>
+T get_param_default( ros::NodeHandle & nh, string const & key, T const & default_val ){
+  T val;
+  if ( !nh.getParam(key,val) ) {
+    val = default_val;
+  }
+  return val;
+}
+
 int main( int argc, char **argv )
 {
     ros::init( argc, argv, "pos_vel_mocap" );
     ros::NodeHandle n( "~" );
 
+    R_MARKER_FLU.x() = get_param_default(n,"R_MARKER_FLU/x",0.);
+    R_MARKER_FLU.y() = get_param_default(n,"R_MARKER_FLU/y",0.);
+    R_MARKER_FLU.z() = get_param_default(n,"R_MARKER_FLU/z",0.);
+    R_MARKER_FLU.w() = get_param_default(n,"R_MARKER_FLU/w",1.);
+
+    ROS_INFO_STREAM("Load R_MARKER_FLU: " << R_MARKER_FLU.coeffs().transpose());
+
     ros::Subscriber s1 = n.subscribe( "/uav/pose", 100, pose_callback );
-    ros::Subscriber s2 =
-        n.subscribe( "/vins_estimator/odometry", 10, vins_callback );
+    ros::Subscriber s2 = n.subscribe( "/vins_estimator/odometry", 10, vins_callback );
 
     pub_odom = n.advertise< nav_msgs::Odometry >( "odom_TA", 100 );
     //pub_path = n.advertise< nav_msgs::Path >( "/mocap_path", 10 );
