@@ -22,6 +22,7 @@ using geometry_msgs::PoseStamped;
 using geometry_msgs::PoseStampedConstPtr;
 using nav_msgs::OdometryConstPtr;
 using sensor_msgs::ImuConstPtr;
+using geometry_msgs::PoseStampedConstPtr;
 
 inline Eigen::Vector3d quat2eulers(const Eigen::Quaterniond & quat) {
   Eigen::Vector3d rpy;
@@ -61,6 +62,17 @@ Vector3d imu2rpy( ImuConstPtr const & imu ){
   return imu2rpy(*imu);
 }
 
+inline Matrix3d pose2R( geometry_msgs::Pose const & pose ){
+  auto const & quat = pose.orientation;
+  Eigen::Quaterniond q(quat.w, quat.x, quat.y, quat.z);
+  return q.toRotationMatrix();
+}
+
+inline Vector3d pose2T( geometry_msgs::Pose const & pose ){
+  auto const & pos = pose.position;
+  return { pos.x, pos.y, pos.z };
+}
+
 Vector3d odom2rpy( OdometryConstPtr const & odom ){
 
   Eigen::Matrix3d R_FLU2FRD;
@@ -88,14 +100,11 @@ Vector3d odom2rpy( Quaterniond const & odom ){
 }
 
 Matrix3d odom2R( OdometryConstPtr const & odom ){
-  auto const & quat = odom->pose.pose.orientation;
-  Eigen::Quaterniond q(quat.w, quat.x, quat.y, quat.z);
-  return q.toRotationMatrix();
+  return pose2R(odom->pose.pose);
 }
 
 Vector3d odom2T( OdometryConstPtr const & odom ){
-  auto const & pos = odom->pose.pose.position;
-  return { pos.x, pos.y, pos.z };
+  return pose2T(odom->pose.pose);
 }
 
 Matrix3d imu2R( ImuConstPtr const & imu ){
