@@ -4,6 +4,6 @@
         <rosparam file="$(find mocap_optitrack)/config/mocap.yaml" command="load" />
     </node>
 
-    <node pkg="rnw_ros" type="cone_test_node" name="cone_test_node" output="screen"/>
+    <node pkg="rnw_ros" type="cone_tip_calib_node" name="cone_tip_calib_node" output="screen"/>
 
 </launch>
