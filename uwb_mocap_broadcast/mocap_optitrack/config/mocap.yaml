@@ -6,6 +6,11 @@ rigid_bodies:
     '1':
         pose: uav/pose
         pose2d: uav/ground_pose
-        child_frame_id: body
+        child_frame_id: uav
         parent_frame_id: world
+    '2':
+      pose: cone/pose
+      pose2d: cone/ground_pose
+      child_frame_id: cone
+      parent_frame_id: world
 
