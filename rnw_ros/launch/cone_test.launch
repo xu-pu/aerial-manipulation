@@ -1,0 +1,9 @@
+<launch>
+
+    <node pkg="mocap_optitrack" type="mocap_node" name="mocap_node" respawn="false" launch-prefix="" required="true" output="log">
+        <rosparam file="$(find mocap_optitrack)/config/mocap.yaml" command="load" />
+    </node>
+
+    <node pkg="rnw_ros" type="cone_test_node" name="cone_test_node" output="screen"/>
+
+</launch>
