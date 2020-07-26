@@ -1,7 +1,9 @@
 <launch>
     <arg name="odom_topic" value="/uwb_vicon_odom"/>
+    <arg name="odom_cone_topic" value="/uwb_vicon_odom_cone"/>
     <node pkg="uart_odom" type="uart_odom" name="uart_odom_client" output="screen">
         <remap from="~out_odom" to="$(arg odom_topic)"/>
+        <remap from="~out_odom_cone" to="$(arg odom_cone_topic)"/>
         <rosparam command="load" file="$(find uart_odom)/config/uart_odom_config.yaml"/>
         <param name="work_mode" value="real-time"/>
         <param name="js_ctrl_mode" value="feedback"/>
