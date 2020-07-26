@@ -35,7 +35,7 @@
 
     <node pkg="rnw_ros" type="pub_frames_node" name="pub_frames_node" output="screen">
         <remap from="~imu" to="$(arg imu_topic)"/>
-        <remap from="~vicon" to="$(arg odom_topic)"/>
+        <remap from="~uav" to="$(arg odom_topic)"/>
         <remap from="~vins" to="/vins_estimator/imu_propagate"/>
     </node>
 
