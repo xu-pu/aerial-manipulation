@@ -64,7 +64,7 @@ class Uart_odom
     ros::Subscriber m_sub_odom;
     ros::Publisher  m_pub_odom;
     ros::Publisher  m_pub_odom_test;
-    Mini_odom< float, int > m_mini_odom, m_read_mini_odom;
+    Mini_odom< float, int > m_read_mini_odom;
     nav_msgs::Odometry m_init_odom, m_current_odom, m_uard_read_odom, m_current_odom_cone;
     int                m_if_odom_init = 0;
     int                m_idx_odom;
@@ -77,10 +77,12 @@ class Uart_odom
         if(IF_USING_MINI_ODOM)
         {
             m_serial_send_pack.id = m_para_odom_packet_id;
-            int odom_packet_size = sizeof(     Mini_odom< float, int > );
-            m_serial_send_pack.data_length = odom_packet_size;
+            m_serial_send_pack.data_length = sizeof(mini_odom_t) * 2;
+            mini_odom_t m_mini_odom, m_mini_odom_cone;
             odom_to_miniodom<float, int>( m_current_odom, m_mini_odom );
-            memcpy( ( char * ) m_serial_send_pack.data, ( char * ) &m_mini_odom, odom_packet_size );
+            odom_to_miniodom<float, int>( m_current_odom_cone, m_mini_odom_cone );
+            memcpy(m_serial_send_pack.data, (char*)&m_mini_odom, sizeof(mini_odom_t));
+            memcpy(m_serial_send_pack.data + sizeof(mini_odom_t), (char*)&m_mini_odom_cone, sizeof(mini_odom_t));
             m_send_current_time = ros::Time::now().toSec();
         }
         else
