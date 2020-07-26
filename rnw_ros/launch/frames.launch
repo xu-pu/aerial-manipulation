@@ -9,7 +9,7 @@
     <node pkg="uart_odom" type="uart_odom" name="uart_odom_client" output="screen">
         <remap from="~out_odom_uav" to="$(arg uav_topic)"/>
         <remap from="~out_odom_cone" to="$(arg cone_topic)"/>
-        <rosparam command="load" file="$(find uart_odom)/config/uart_odom_config.yaml"/>
+        <rosparam command="load" file="$(find uart_odom)/config/uart_odom_config_client.yaml"/>
         <param name="work_mode" value="real-time"/>
         <param name="js_ctrl_mode" value="feedback"/>
     </node>
@@ -19,6 +19,7 @@
         <remap from="~uav" to="$(arg uav_topic)"/>
         <remap from="~cone" to="$(arg cone_topic)"/>
         <remap from="~vins" to="$(arg vins_topic)"/>
+        <rosparam command="load" file="$(find rnw_ros)/config/cone.yaml"/>
     </node>
 
     <node pkg="rqt_multiplot" type="rqt_multiplot" name="rqt_multiplot"

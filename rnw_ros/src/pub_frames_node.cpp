@@ -72,7 +72,7 @@ int main( int argc, char** argv ) {
 
   pub_rpy_imu = nh.advertise<geometry_msgs::Vector3>("/uav/rpy_imu",1);
   pub_rpy_odom = nh.advertise<geometry_msgs::Vector3>("/uav/rpy_odom",1);
-  pub_cone_tip = nh.advertise<geometry_msgs::PoseStamped>("/cone/tip",1);
+  pub_cone_tip = nh.advertise<geometry_msgs::PointStamped>("/cone/tip",1);
 
   ros::spin();
 

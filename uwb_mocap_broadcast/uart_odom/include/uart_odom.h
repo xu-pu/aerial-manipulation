@@ -62,6 +62,7 @@ class Uart_odom
 
     ros::NodeHandle m_ros_nh;
     ros::Subscriber m_sub_odom;
+    ros::Subscriber m_sub_odom_cone;
     ros::Publisher  m_pub_odom;
     ros::Publisher  m_pub_odom_cone;
     ros::Publisher  m_pub_odom_test;
@@ -289,7 +290,7 @@ class Uart_odom
 #endif
 
         m_sub_odom = m_ros_nh.subscribe( "odom", 1, &Uart_odom::odom_callback, this,  ros::TransportHints().tcpNoDelay() );
-        m_sub_odom = m_ros_nh.subscribe( "odom_cone", 1, &Uart_odom::odom_cone_callback, this,  ros::TransportHints().tcpNoDelay() );
+        m_sub_odom_cone = m_ros_nh.subscribe( "odom_cone", 1, &Uart_odom::odom_cone_callback, this,  ros::TransportHints().tcpNoDelay() );
         // m_timer_test_read = m_ros_nh.createTimer( ros::Duration( 1.0 / m_para_read_timer_frequency ), &Uart_odom::read_serive_eval_stability, this );
 
         m_pub_odom_test = nh.advertise< nav_msgs::Odometry >( "test_odom", 100 );
