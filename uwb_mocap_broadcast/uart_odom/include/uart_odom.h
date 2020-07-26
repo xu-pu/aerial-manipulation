@@ -78,10 +78,10 @@ class Uart_odom
         {
             m_serial_send_pack.id = m_para_odom_packet_id;
             m_serial_send_pack.data_length = sizeof(mini_odom_t) * 2;
-            mini_odom_t m_mini_odom, m_mini_odom_cone;
-            odom_to_miniodom<float, int>( m_current_odom, m_mini_odom );
+            mini_odom_t m_mini_odom_uav, m_mini_odom_cone;
+            odom_to_miniodom<float, int>(m_current_odom, m_mini_odom_uav );
             odom_to_miniodom<float, int>( m_current_odom_cone, m_mini_odom_cone );
-            memcpy(m_serial_send_pack.data, (char*)&m_mini_odom, sizeof(mini_odom_t));
+            memcpy(m_serial_send_pack.data, (char*)&m_mini_odom_uav, sizeof(mini_odom_t));
             memcpy(m_serial_send_pack.data + sizeof(mini_odom_t), (char*)&m_mini_odom_cone, sizeof(mini_odom_t));
             m_send_current_time = ros::Time::now().toSec();
         }
@@ -234,11 +234,11 @@ class Uart_odom
                 char temp_buffer[ 2048 ] = { 0 };
                 if(IF_USING_MINI_ODOM)
                 {
-                    mini_odom_t m_read_mini_odom, m_read_mini_odom_cone;
-                    memcpy(&m_read_mini_odom, temp_serial_pack.data, sizeof(m_read_mini_odom));
-                    memcpy(&m_read_mini_odom, temp_serial_pack.data+sizeof(mini_odom_t), sizeof(mini_odom_t));
+                    mini_odom_t m_read_mini_odom_uav, m_read_mini_odom_cone;
+                    memcpy(&m_read_mini_odom_uav, temp_serial_pack.data, sizeof(mini_odom_t));
+                    memcpy(&m_read_mini_odom_cone, temp_serial_pack.data+sizeof(mini_odom_t), sizeof(mini_odom_t));
                     nav_msgs::Odometry odom_uav, odom_cone;
-                    miniodom_to_odom(m_read_mini_odom, odom_uav);
+                    miniodom_to_odom(m_read_mini_odom_uav, odom_uav);
                     miniodom_to_odom(m_read_mini_odom_cone, odom_cone);
                     odom_uav.header.frame_id = "world";
                     odom_cone.header.frame_id = "world";
@@ -293,7 +293,7 @@ class Uart_odom
         // m_timer_test_read = m_ros_nh.createTimer( ros::Duration( 1.0 / m_para_read_timer_frequency ), &Uart_odom::read_serive_eval_stability, this );
 
         m_pub_odom_test = nh.advertise< nav_msgs::Odometry >( "test_odom", 100 );
-        m_pub_odom = nh.advertise< nav_msgs::Odometry >( "out_odom", 100 );
+        m_pub_odom = nh.advertise< nav_msgs::Odometry >( "out_odom_uav", 100 );
         m_pub_odom_cone = nh.advertise< nav_msgs::Odometry >( "out_odom_cone", 100 );
         m_timer_test_read = nh.createTimer( ros::Duration( 1.0 / m_para_read_timer_frequency ), &Uart_odom::read_serive_eval_stability, this );
 
