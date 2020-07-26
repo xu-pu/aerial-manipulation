@@ -99,37 +99,29 @@ struct traj_server_t {
 
       if ( traj_available ) {
 
-        double dt = this->dt();
+        double dt = std::min( this->dt(), traj.getTimeSum() );
 
-        if ( dt <  traj.getTimeSum() ){
-          Vector3d x = traj.evaluate(dt);
-          Vector3d x_dot = traj.evaluateVel(dt);
-          Vector3d x_dot_dot = traj.evaluateAcc(dt);
+        Vector3d x = traj.evaluate(dt);
+        Vector3d x_dot = traj.evaluateVel(dt);
+        Vector3d x_dot_dot = traj.evaluateAcc(dt);
 
-          // path
-          path_setpoint.poses.emplace_back(eigen2pathpoint(x));
-          path_plant.poses.emplace_back(eigen2pathpoint(odom2T(odom)));
-          pub_path_setpoint.publish(path_setpoint);
-          pub_path_plant.publish(path_plant);
+        // path
+        path_setpoint.poses.emplace_back(eigen2pathpoint(x));
+        path_plant.poses.emplace_back(eigen2pathpoint(odom2T(odom)));
+        pub_path_setpoint.publish(path_setpoint);
+        pub_path_plant.publish(path_plant);
 
-          // position command
-          quadrotor_msgs::PositionCommand cmd;
-          cmd.position = eigen2ros(x);
-          cmd.velocity = eigen2rosv(x_dot);
-          cmd.acceleration = eigen2rosv(x_dot_dot);
-          cmd.yaw = base_yaw;
-          cmd.yaw_dot = 0;
-          cmd.trajectory_flag = cmd.TRAJECTORY_STATUS_READY;
-          cmd.trajectory_id = traj_id;
+        // position command
+        quadrotor_msgs::PositionCommand cmd;
+        cmd.position = eigen2ros(x);
+        cmd.velocity = eigen2rosv(x_dot);
+        cmd.acceleration = eigen2rosv(x_dot_dot);
+        cmd.yaw = base_yaw;
+        cmd.yaw_dot = 0;
+        cmd.trajectory_flag = cmd.TRAJECTORY_STATUS_READY;
+        cmd.trajectory_id = traj_id;
 
-          pub_pos_cmd.publish(cmd);
-
-        }
-        else {
-          ROS_INFO_STREAM("Traj Complete");
-          on_cleanup();
-        }
-
+        pub_pos_cmd.publish(cmd);
 
       }
 

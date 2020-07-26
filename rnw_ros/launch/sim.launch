@@ -30,7 +30,7 @@
 
     </node>
 
-    <node pkg="rnw_ros" type="traj_server_node" name="traj_server_node" output="screen">
+    <node pkg="rnw_ros" type="rnw_traj_server_node" name="rnw_traj_server_node" output="screen">
         <remap from="~vicon" to="$(arg odom_topic)"/>
     </node>
 
