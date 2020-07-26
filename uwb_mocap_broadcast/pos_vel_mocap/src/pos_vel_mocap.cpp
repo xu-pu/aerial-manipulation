@@ -10,6 +10,7 @@ using namespace std;
 using namespace Eigen;
 
 ros::Publisher pub_odom;
+ros::Publisher pub_odom_cone;
 ros::Publisher pub_path;
 
 bool init_ok = false;
@@ -139,38 +140,35 @@ void pose_callback( const geometry_msgs::PoseStamped::ConstPtr msg )
     }
 }
 
-void vins_callback( const nav_msgs::Odometry::ConstPtr msg )
-{
-    vins_Q.w() = msg->pose.pose.orientation.w;
-    vins_Q.x() = msg->pose.pose.orientation.x;
-    vins_Q.y() = msg->pose.pose.orientation.y;
-    vins_Q.z() = msg->pose.pose.orientation.z;
+void pose_cone_callback( const geometry_msgs::PoseStamped::ConstPtr msg ) {
 
-    Matrix3d vins_R = vins_Q.toRotationMatrix();
-    Matrix3d now_R = last_Q.toRotationMatrix();
+  Eigen::Vector3d    now_P, P_w;
+  Eigen::Quaterniond now_Q, Q_w;
+  now_P.x() = msg->pose.position.x;
+  now_P.y() = msg->pose.position.y;
+  now_P.z() = msg->pose.position.z;
+  now_Q.w() = msg->pose.orientation.w;
+  now_Q.x() = msg->pose.orientation.x;
+  now_Q.y() = msg->pose.orientation.y;
+  now_Q.z() = msg->pose.orientation.z;
 
-    Vector3d n = vins_R.col( 0 );
-    Vector3d o = vins_R.col( 1 );
-    Vector3d a = vins_R.col( 2 );
+  Q_w = now_Q.normalized().toRotationMatrix();
+  P_w = now_P;
 
-    double vin_y = atan2( n( 1 ), n( 0 ) );
-    double vin_p = atan2( -n( 2 ), n( 0 ) * cos( vin_y ) + n( 1 ) * sin( vin_y ) );
-    double vin_r = atan2( a( 0 ) * sin( vin_y ) - a( 1 ) * cos( vin_y ),
-                          -o( 0 ) * sin( vin_y ) + o( 1 ) * cos( vin_y ) );
+  /*********************/
 
-    n = vins_R.col( 0 );
-    o = vins_R.col( 1 );
-    a = vins_R.col( 2 );
+  nav_msgs::Odometry odom;
+  odom.header.stamp = msg->header.stamp;
+  odom.header.frame_id = "world";
+  odom.pose.pose.position.x = P_w.x();
+  odom.pose.pose.position.y = P_w.y();
+  odom.pose.pose.position.z = P_w.z();
+  odom.pose.pose.orientation.w = Q_w.w();
+  odom.pose.pose.orientation.x = Q_w.x();
+  odom.pose.pose.orientation.y = Q_w.y();
+  odom.pose.pose.orientation.z = Q_w.z();
+  pub_odom_cone.publish( odom );
 
-    double now_y = atan2( n( 1 ), n( 0 ) );
-    double now_p = atan2( -n( 2 ), n( 0 ) * cos( now_y ) + n( 1 ) * sin( now_y ) );
-    double now_r = atan2( a( 0 ) * sin( now_y ) - a( 1 ) * cos( now_y ),
-                          -o( 0 ) * sin( now_y ) + o( 1 ) * cos( now_y ) );
-
-    std::cout << "compare\n"
-              << "now_r :" << now_r << "\nvins_r:" << vin_r
-              << "\n\n now_p :" << now_p << "\nvins_p:" << vin_p
-              << "\n\nnow_y :" << now_y << "\nvins_y:" << vin_y << "\n\n\n\n";
 }
 
 template<typename T>
@@ -195,9 +193,10 @@ int main( int argc, char **argv )
     ROS_INFO_STREAM("Load R_MARKER_FLU: " << R_MARKER_FLU.coeffs().transpose());
 
     ros::Subscriber s1 = n.subscribe( "/uav/pose", 100, pose_callback );
-    ros::Subscriber s2 = n.subscribe( "/vins_estimator/odometry", 10, vins_callback );
+    ros::Subscriber s3 = n.subscribe( "/cone/pose", 100, pose_cone_callback );
 
     pub_odom = n.advertise< nav_msgs::Odometry >( "odom_TA", 100 );
+    pub_odom_cone = n.advertise< nav_msgs::Odometry >( "odom_cone", 100 );
     //pub_path = n.advertise< nav_msgs::Path >( "/mocap_path", 10 );
 
     ros::spin();
