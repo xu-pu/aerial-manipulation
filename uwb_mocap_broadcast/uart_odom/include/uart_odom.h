@@ -14,6 +14,9 @@
 #define IF_USING_MINI_ODOM 1
 #define IF_UART_ODOM_DEBUG 0
 using namespace std;
+
+using mini_odom_t = Mini_odom<float,int>;
+
 class Uart_odom
 {
     enum e_role
@@ -62,7 +65,7 @@ class Uart_odom
     ros::Publisher  m_pub_odom;
     ros::Publisher  m_pub_odom_test;
     Mini_odom< float, int > m_mini_odom, m_read_mini_odom;
-    nav_msgs::Odometry m_init_odom, m_current_odom, m_uard_read_odom;
+    nav_msgs::Odometry m_init_odom, m_current_odom, m_uard_read_odom, m_current_odom_cone;
     int                m_if_odom_init = 0;
     int                m_idx_odom;
 
@@ -120,6 +123,10 @@ class Uart_odom
         //  ROS_INFO( "[ODOM][%d]:  odom ", m_idx_odom );
         //  cout <<"=== position === \n" <<msg.pose.pose.position << endl;
         //  cout  <<"=== orientation === \n" << msg.pose.pose.orientation <<endl;
+    };
+
+    void odom_cone_callback( const nav_msgs::Odometry &msg ) {
+      m_current_odom_cone = msg;
     };
 
     void send_service_eval_stability( const ros::TimerEvent &event )
@@ -274,6 +281,7 @@ class Uart_odom
 #endif
 
         m_sub_odom = m_ros_nh.subscribe( "odom", 1, &Uart_odom::odom_callback, this,  ros::TransportHints().tcpNoDelay() );
+        m_sub_odom = m_ros_nh.subscribe( "odom_cone", 1, &Uart_odom::odom_cone_callback, this,  ros::TransportHints().tcpNoDelay() );
         // m_timer_test_read = m_ros_nh.createTimer( ros::Duration( 1.0 / m_para_read_timer_frequency ), &Uart_odom::read_serive_eval_stability, this );
 
         m_pub_odom_test = nh.advertise< nav_msgs::Odometry >( "test_odom", 100 );
