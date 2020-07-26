@@ -27,11 +27,26 @@ Vector3d ros2eigen( geometry_msgs::Point const & pos ){
 
 }
 
+double odom2yaw( nav_msgs::Odometry const & odom ){
+  Matrix3d R = ros2eigen(odom.pose.pose.orientation).toRotationMatrix();
+  return quat2eulers(Quaterniond(R)).z();
+}
+
 struct traj_server_t {
+
+    // current msgs
+
+    geometry_msgs::PointStamped cur_tip;
+
+    nav_msgs::Odometry cur_uav_odom;
+
+    //
 
     geometry_msgs::PoseStamped trigger_pose;
 
-    uint32_t traj_id;
+    inline uint32_t traj_id() const {
+      return trigger_pose.header.seq;
+    }
 
     PolynomialTraj traj;
 
@@ -55,8 +70,6 @@ struct traj_server_t {
     }
 
     void on_planning( OdometryConstPtr const & msg ){
-
-      traj_id = trigger_pose.header.seq;
 
       Matrix3d R = ros2eigen(msg->pose.pose.orientation).toRotationMatrix();
       Vector3d T = ros2eigen(msg->pose.pose.position);
@@ -92,10 +105,13 @@ struct traj_server_t {
 
     void on_odom( OdometryConstPtr const & odom ){
 
-      if ( triggered ){
-        triggered = false;
-        on_planning(odom);
-      }
+      cur_uav_odom = *odom;
+
+//      if ( triggered ){
+//        triggered = false;
+//        //on_planning(odom);
+//        on_trigger_go_to_tip();
+//      }
 
       if ( traj_available ) {
 
@@ -119,11 +135,31 @@ struct traj_server_t {
         cmd.yaw = base_yaw;
         cmd.yaw_dot = 0;
         cmd.trajectory_flag = cmd.TRAJECTORY_STATUS_READY;
-        cmd.trajectory_id = traj_id;
+        cmd.trajectory_id = traj_id();
 
         pub_pos_cmd.publish(cmd);
 
       }
+
+    }
+
+    void on_trigger_go_to_tip(){
+
+      on_cleanup();
+
+      Vector3d pt1 = pose2T(cur_uav_odom.pose.pose);
+      Vector3d pt2(cur_tip.point.x,cur_tip.point.y,cur_tip.point.z);
+      // 159.45mm + 43.692mm + margin(3cm)
+      Vector3d offset(0,0,0.23);
+      pt2 = pt2+offset;
+
+      constexpr double speed = 0.5;
+      double t = (pt1-pt2).norm()/speed;
+      Vector3d mid_pt = (pt1+pt2)/2;
+
+      traj = minsnap({pt1,mid_pt,pt2},t);
+      traj_available = true;
+      base_yaw = odom2yaw(cur_uav_odom);
 
     }
 
@@ -150,6 +186,11 @@ void on_trigger( geometry_msgs::PoseStampedConstPtr const & msg ){
 
 void on_trigger_tip(std_msgs::HeaderConstPtr const & msg ){
   ROS_INFO_STREAM("Trigger: Go to the tip");
+  traj_server.on_trigger_go_to_tip();
+}
+
+void on_tip( geometry_msgs::PointStampedConstPtr const & msg ){
+  traj_server.cur_tip = *msg;
 }
 
 int main( int argc, char** argv ) {
@@ -164,8 +205,8 @@ int main( int argc, char** argv ) {
 
   ros::Subscriber sub_odom = nh.subscribe<nav_msgs::Odometry>("/uwb_vicon_odom",10,on_odom);
   ros::Subscriber sub_trigger = nh.subscribe<geometry_msgs::PoseStamped>("/traj_start_trigger",10,on_trigger);
-
-  ros::Subscriber sub_trigger_tip = nh.subscribe<std_msgs::Header>("/rnw/triggers/tip", 10, on_trigger_tip);
+  ros::Subscriber sub_tip = nh.subscribe<geometry_msgs::PointStamped>("/cone/tip",1,on_tip);
+  ros::Subscriber sub_trigger_tip = nh.subscribe<std_msgs::Header>("/rnw/trigger/go_to_tip", 10, on_trigger_tip);
 
   ros::spin();
 
