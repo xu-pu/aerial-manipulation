@@ -28,7 +28,7 @@ void on_point( geometry_msgs::PointConstPtr const & msg ){
   Vector3d X_vicon ( msg->x, -msg->z, msg->y );
   Vector3d X_body = R.transpose() * ( X_vicon - T );
   cout << "Tip point in body frame (yaml)\n"
-       << "X_tip_body:\n"
+       << "point:\n"
        << "   x: " << X_body.x() << endl
        << "   y: " << X_body.y() << endl
        << "   z: " << X_body.z() << endl

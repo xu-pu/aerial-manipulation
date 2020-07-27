@@ -19,7 +19,7 @@
         <remap from="~uav" to="$(arg uav_topic)"/>
         <remap from="~cone" to="$(arg cone_topic)"/>
         <remap from="~vins" to="$(arg vins_topic)"/>
-        <rosparam command="load" file="$(find rnw_ros)/config/cone.yaml"/>
+        <rosparam command="load" file="$(find rnw_ros)/config/rnw_config.yaml"/>
     </node>
 
     <node pkg="rqt_multiplot" type="rqt_multiplot" name="rqt_multiplot"

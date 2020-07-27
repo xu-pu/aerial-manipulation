@@ -39,7 +39,7 @@
         <remap from="~uav" to="$(arg odom_topic)"/>
         <remap from="~cone" to="$(arg cone_topic)"/>
         <remap from="~vins" to="/vins_estimator/imu_propagate"/>
-        <rosparam command="load" file="$(find rnw_ros)/config/cone.yaml"/>
+        <rosparam command="load" file="$(find rnw_ros)/config/rnw_config.yaml"/>
     </node>
 
     <node name="rviz_traj" pkg="rviz" type="rviz" output="log" args="-d $(find rnw_ros)/config/traj.rviz" />
