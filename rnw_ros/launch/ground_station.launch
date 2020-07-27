@@ -21,8 +21,16 @@
         <rosparam command="load" file="$(find rnw_ros)/config/rnw_config.yaml"/>
     </node>
 
-    <node pkg="rqt_multiplot" type="rqt_multiplot" name="rqt_multiplot"
-          args="--multiplot-config $(find rnw_ros)/config/multiplot_insert.xml --multiplot-run-all"/>
+    <node pkg="uart_odom" type="uart_odom" name="uart_odom" output="screen">
+        <remap from="~odom" to="$(arg uav_topic)" />
+        <remap from="~odom_cone" to="$(arg cone_topic)" />
+        <rosparam command="load" file="$(find uart_odom)/config/uart_odom_config.yaml" />
+        <param name="work_mode" value="real-time" />
+        <param name="js_ctrl_mode" value="feedback" />
+    </node>
+
+<!--    <node pkg="rqt_multiplot" type="rqt_multiplot" name="rqt_multiplot"-->
+<!--          args="&#45;&#45;multiplot-config $(find rnw_ros)/config/multiplot_insert.xml &#45;&#45;multiplot-run-all"/>-->
 
     <node name="rviz_traj" pkg="rviz" type="rviz" output="log" args="-d $(find rnw_ros)/config/traj.rviz" />
 
