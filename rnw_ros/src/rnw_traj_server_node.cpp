@@ -214,6 +214,26 @@ struct traj_server_t {
 
     }
 
+    void on_trigger_go_to_point( Vector3d const & pt ){
+
+      on_cleanup();
+
+      Matrix3d R = pose2R(cur_uav_odom.pose.pose);
+      Vector3d T = pose2T(cur_uav_odom.pose.pose);
+
+      Vector3d pt1 = pose2T(cur_uav_odom.pose.pose);
+      Vector3d pt2 = R * pt + T;
+      Vector3d mid_pt = (pt1+pt2)/2;
+
+      constexpr double speed = 0.5;
+      double t = (pt1-pt2).norm()/speed;
+
+      traj = minsnap({pt1,mid_pt,pt2},t);
+      traj_available = true;
+      base_yaw = odom2yaw(cur_uav_odom);
+
+    }
+
     double dt() {
       if (!traj_started) {
         traj_start_time = ros::Time::now();
@@ -255,6 +275,12 @@ void on_trigger_rock_walk(std_msgs::HeaderConstPtr const & msg ){
   traj_server.on_trigger_rock_walk();
 }
 
+void on_trigger_go_to_point( geometry_msgs::PointConstPtr const & msg ){
+  Vector3d pt(msg->x,msg->y,msg->z);
+  ROS_INFO_STREAM("Trigger: Go to point " << pt.transpose() );
+  traj_server.on_trigger_go_to_point(pt);
+}
+
 void on_tip( geometry_msgs::PointStampedConstPtr const & msg ){
   traj_server.cur_tip = *msg;
 }
@@ -277,6 +303,7 @@ int main( int argc, char** argv ) {
   ros::Subscriber sub_trigger_insert = nh.subscribe<std_msgs::Header>("/rnw/trigger/insert", 10, on_trigger_insert);
   ros::Subscriber sub_trigger_rock = nh.subscribe<std_msgs::Header>("/rnw/trigger/rock", 10, on_trigger_rock);
   ros::Subscriber sub_trigger_rock_walk = nh.subscribe<std_msgs::Header>("/rnw/trigger/rock_walk", 10, on_trigger_rock_walk);
+  ros::Subscriber sub_trigger_go_to_point = nh.subscribe<geometry_msgs::Point>("/rnw/trigger/go_to_point",1,on_trigger_go_to_point);
 
   ros::spin();
 
