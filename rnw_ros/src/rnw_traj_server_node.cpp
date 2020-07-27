@@ -162,6 +162,8 @@ struct traj_server_t {
       constexpr double rock_dist = 0.1;
       constexpr size_t cycles = 3;
 
+      on_cleanup();
+
       Matrix3d R = pose2R(cur_uav_odom.pose.pose);
       Vector3d T = pose2T(cur_uav_odom.pose.pose);
 
@@ -182,6 +184,7 @@ struct traj_server_t {
     }
 
     void on_trigger_rock_walk(){
+      on_cleanup();
       Matrix3d R = pose2R(cur_uav_odom.pose.pose);
       Vector3d T = pose2T(cur_uav_odom.pose.pose);
       base_yaw = quat2eulers(Quaterniond(R)).z();
