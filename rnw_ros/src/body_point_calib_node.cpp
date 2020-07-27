@@ -24,7 +24,8 @@ void on_pose( PoseStampedConstPtr const & msg ){
 }
 
 void on_point( geometry_msgs::PointConstPtr const & msg ){
-  Vector3d X_vicon ( msg->x, msg->y, msg->z );
+  // OptiTrack's cord is in (x,z,-y)
+  Vector3d X_vicon ( msg->x, -msg->z, msg->y );
   Vector3d X_body = R.transpose() * ( X_vicon - T );
   cout << "Tip point in body frame (yaml)\n"
        << "X_tip_body:\n"
@@ -36,16 +37,16 @@ void on_point( geometry_msgs::PointConstPtr const & msg ){
 
 int main( int argc, char** argv ) {
 
-  ros::init(argc,argv,"cone_tip_calib_node");
+  ros::init(argc,argv,"body_point_calib_node");
 
   ros::NodeHandle nh("~");
 
-  ros::Subscriber sub_odom = nh.subscribe<geometry_msgs::PoseStamped>("/cone/pose",10,on_pose);
-  ros::Subscriber sub_point = nh.subscribe<geometry_msgs::Point>("/cmd/point",10,on_point);
+  ros::Subscriber sub_odom = nh.subscribe<geometry_msgs::PoseStamped>("body",10,on_pose);
+  ros::Subscriber sub_point = nh.subscribe<geometry_msgs::Point>("point",10,on_point);
 
   ROS_INFO_STREAM("Send coordinates through command line:");
   ROS_INFO_STREAM("rostopic pub /cmd/point geometry_msgs/Point '{ x: 1, y: 2, z: 3 }'");
-  ROS_INFO_STREAM("Note that OptiTrack's coordinates are in (x,z,-y)");
+  ROS_INFO_STREAM("x, y, z is in the order OptiTrack shows, we will handle it");
 
   ros::spin();
 

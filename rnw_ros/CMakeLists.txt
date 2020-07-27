@@ -149,7 +149,7 @@ add_executable(pub_frames_node src/pub_frames_node.cpp)
 add_executable(test_traj_node src/test_traj_node.cpp)
 add_executable(traj_server_node src/traj_server_node.cpp)
 add_executable(vicon_imu_cali_node src/vicon_imu_cali_node.cpp)
-add_executable(cone_tip_calib_node src/cone_tip_calib_node.cpp)
+add_executable(body_point_calib_node src/body_point_calib_node.cpp)
 add_executable(rnw_traj_server_node src/rnw_traj_server_node.cpp)
 
 target_link_libraries(rnw_open_loop_node ${catkin_LIBRARIES})
@@ -158,7 +158,7 @@ target_link_libraries(pub_frames_node ${catkin_LIBRARIES})
 target_link_libraries(test_traj_node ${catkin_LIBRARIES})
 target_link_libraries(traj_server_node ${catkin_LIBRARIES})
 target_link_libraries(vicon_imu_cali_node ${catkin_LIBRARIES} ${CERES_LIBRARIES})
-target_link_libraries(cone_tip_calib_node ${catkin_LIBRARIES})
+target_link_libraries(body_point_calib_node ${catkin_LIBRARIES})
 target_link_libraries(rnw_traj_server_node ${catkin_LIBRARIES})
 
 ## Rename C++ executable without prefix
