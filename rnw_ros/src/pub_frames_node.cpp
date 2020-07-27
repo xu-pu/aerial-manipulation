@@ -19,6 +19,22 @@ Vector3d last_t;
 Vector3d X_tip_body;
 Vector3d X_tcp_cage;
 
+Matrix3d calc_intermediate_R( double yaw ){
+
+  Eigen::Matrix3d R_FLU2FRD;
+  R_FLU2FRD << 1, 0, 0, 0, -1, 0, 0, 0, -1;
+  Eigen::Matrix3d R_ENU2NED;
+  R_ENU2NED << 0, 1, 0, 1, 0, 0, 0, 0, -1;
+
+  Vector3d yaw_only = Vector3d::Zero();
+  yaw_only.z() = yaw;
+  Matrix3d R = rpy2rot(yaw_only);
+
+  return R_ENU2NED.transpose() * R * R_FLU2FRD;
+
+}
+
+
 void on_odom( OdometryConstPtr const & odom ){
   Eigen::Matrix3d R_FLU2FRD;
   R_FLU2FRD << 1, 0, 0, 0, -1, 0, 0, 0, -1;
@@ -32,7 +48,10 @@ void on_odom( OdometryConstPtr const & odom ){
   publish_frame(R,T,"uav_odom","world");
   last_t = T;
 
-  Vector3d X_tcp = R * X_tcp_cage + T;
+  Matrix3d R_intermediate = calc_intermediate_R(rpy.z());
+
+  Vector3d X_tcp = R_intermediate * X_tcp_cage + T;
+  //Vector3d X_tcp = R * X_tcp_cage + T;
   geometry_msgs::PointStamped tcp_msg;
   tcp_msg.header = odom->header;
   tcp_msg.point.x = X_tcp.x();
