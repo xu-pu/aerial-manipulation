@@ -14,8 +14,10 @@
 ros::Publisher pub_rpy_imu;
 ros::Publisher pub_rpy_odom;
 ros::Publisher pub_cone_tip;
+ros::Publisher pub_cage_tcp;
 Vector3d last_t;
 Vector3d X_tip_body;
+Vector3d X_tcp_cage;
 
 void on_odom( OdometryConstPtr const & odom ){
   Eigen::Matrix3d R_FLU2FRD;
@@ -24,8 +26,20 @@ void on_odom( OdometryConstPtr const & odom ){
   R_ENU2NED << 0, 1, 0, 1, 0, 0, 0, 0, -1;
   Vector3d rpy = odom2rpy(odom);
   pub_rpy_odom.publish(eigen2ros(rpy));
-  publish_frame(odom2R(odom),odom2T(odom),"uav_odom","world");
-  last_t = odom2T(odom);
+
+  Matrix3d R = odom2R(odom);
+  Vector3d T = odom2T(odom);
+  publish_frame(R,T,"uav_odom","world");
+  last_t = T;
+
+  Vector3d X_tcp = R * X_tcp_cage + T;
+  geometry_msgs::PointStamped tcp_msg;
+  tcp_msg.header = odom->header;
+  tcp_msg.point.x = X_tcp.x();
+  tcp_msg.point.y = X_tcp.y();
+  tcp_msg.point.z = X_tcp.z();
+  pub_cage_tcp.publish(tcp_msg);
+
 }
 
 void on_cone( OdometryConstPtr const & odom ){
@@ -65,6 +79,10 @@ int main( int argc, char** argv ) {
   X_tip_body.y() = get_param_default(nh,"X_tip_body/y",0.);
   X_tip_body.z() = get_param_default(nh,"X_tip_body/z",0.);
 
+  X_tcp_cage.x() = get_param_default(nh,"X_tcp_cage/x",0.);
+  X_tcp_cage.y() = get_param_default(nh,"X_tcp_cage/y",0.);
+  X_tcp_cage.z() = get_param_default(nh,"X_tcp_cage/z",0.);
+
   ros::Subscriber sub_imu = nh.subscribe<sensor_msgs::Imu>("imu",10,on_imu);
   ros::Subscriber sub_odom = nh.subscribe<nav_msgs::Odometry>("uav",10,on_odom);
   ros::Subscriber sub_cone = nh.subscribe<nav_msgs::Odometry>("cone",10,on_cone);
@@ -73,6 +91,7 @@ int main( int argc, char** argv ) {
   pub_rpy_imu = nh.advertise<geometry_msgs::Vector3>("/uav/rpy_imu",1);
   pub_rpy_odom = nh.advertise<geometry_msgs::Vector3>("/uav/rpy_odom",1);
   pub_cone_tip = nh.advertise<geometry_msgs::PointStamped>("/cone/tip",1);
+  pub_cage_tcp = nh.advertise<geometry_msgs::PointStamped>("/uav/tcp",1);
 
   ros::spin();
 
