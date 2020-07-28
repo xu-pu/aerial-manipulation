@@ -23,19 +23,24 @@ Eigen::Vector3d    Vi0, Vi1, Vi2, Vi3, Vi4, Vo0;
 nav_msgs::Path run_path;
 
 Eigen::Quaterniond R_MARKER_FLU;
+Eigen::Vector3d T_MARKER_FLU;
 
-void pose_callback( const geometry_msgs::PoseStamped::ConstPtr msg )
-{
+void pose_callback( const geometry_msgs::PoseStamped::ConstPtr msg ) {
+
+  auto const & msg_quat = msg->pose.orientation;
+  auto const & msg_pos = msg->pose.position;
+
+  Quaterniond R_VICON_MARKER = Quaterniond(msg_quat.w,msg_quat.x,msg_quat.y,msg_quat.z).normalized();
+  Vector3d T_VICON_MARKER(msg_pos.x,msg_pos.y,msg_pos.z);
+
+  Quaterniond R_VICON_FLU = R_VICON_MARKER * R_MARKER_FLU;
+  Vector3d T_VICON_FLU = R_VICON_MARKER * T_MARKER_FLU + T_VICON_MARKER;
+
     if ( !init_ok )
     {
         init_ok = true;
-        init_Q.w() = msg->pose.orientation.w;
-        init_Q.x() = msg->pose.orientation.x;
-        init_Q.y() = msg->pose.orientation.y;
-        init_Q.z() = msg->pose.orientation.z;
-        init_P.x() = msg->pose.position.x;
-        init_P.y() = msg->pose.position.y;
-        init_P.z() = msg->pose.position.z;
+        init_Q = R_VICON_FLU;
+        init_P = T_VICON_FLU;
         last_P = init_P;
         last_Q = init_Q;
         last_odom_t = msg->header.stamp;
@@ -46,13 +51,9 @@ void pose_callback( const geometry_msgs::PoseStamped::ConstPtr msg )
 
         Eigen::Vector3d    now_P, P_w;
         Eigen::Quaterniond now_Q, Q_w;
-        now_P.x() = msg->pose.position.x;
-        now_P.y() = msg->pose.position.y;
-        now_P.z() = msg->pose.position.z;
-        now_Q.w() = msg->pose.orientation.w;
-        now_Q.x() = msg->pose.orientation.x;
-        now_Q.y() = msg->pose.orientation.y;
-        now_Q.z() = msg->pose.orientation.z;
+
+        now_Q = R_VICON_FLU;
+        now_P = T_VICON_FLU;
 
         //std::cout << "x :" << msg->pose.position.x << "y:" << msg->pose.position.y
         //          << " z :" << msg->pose.position.z << std::endl;
@@ -97,8 +98,6 @@ void pose_callback( const geometry_msgs::PoseStamped::ConstPtr msg )
 
 
         /*********************/
-
-        Q_w = Q_w * R_MARKER_FLU;
 
         nav_msgs::Odometry odom;
         odom.header.stamp = now_t;
@@ -191,6 +190,12 @@ int main( int argc, char **argv )
     R_MARKER_FLU.w() = get_param_default(n,"R_MARKER_FLU/w",1.);
 
     ROS_INFO_STREAM("Load R_MARKER_FLU: " << R_MARKER_FLU.coeffs().transpose());
+
+    T_MARKER_FLU.x() = get_param_default(n,"T_MARKER_FLU/x",0.);
+    T_MARKER_FLU.y() = get_param_default(n,"T_MARKER_FLU/y",0.);
+    T_MARKER_FLU.z() = get_param_default(n,"T_MARKER_FLU/z",0.);
+
+    ROS_INFO_STREAM("Load T_MARKER_FLU: " << T_MARKER_FLU.transpose());
 
     ros::Subscriber s1 = n.subscribe( "/uav/pose", 100, pose_callback );
     ros::Subscriber s3 = n.subscribe( "/cone/pose", 100, pose_cone_callback );
