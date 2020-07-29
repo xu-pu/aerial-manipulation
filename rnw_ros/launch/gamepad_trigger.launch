@@ -1,0 +1,7 @@
+<launch>
+
+    <node pkg="joy" type="joy_node" name="joy_node" output="screen">
+        <param name="~autorepeat_rate" value="0" />
+    </node>
+
+</launch>
