@@ -146,6 +146,7 @@ include_directories(
 add_executable(rnw_open_loop_node src/rnw_open_loop.cpp)
 add_executable(rnw_odom_node src/rnw_odom.cpp)
 add_executable(pub_frames_node src/pub_frames_node.cpp)
+add_executable(pub_euler_angles_node src/pub_euler_angles_node.cpp)
 add_executable(test_traj_node src/test_traj_node.cpp)
 add_executable(traj_server_node src/traj_server_node.cpp)
 add_executable(vicon_imu_cali_node src/vicon_imu_cali_node.cpp)
@@ -162,6 +163,7 @@ target_link_libraries(vicon_imu_cali_node ${catkin_LIBRARIES} ${CERES_LIBRARIES}
 target_link_libraries(body_point_calib_node ${catkin_LIBRARIES})
 target_link_libraries(rnw_traj_server_node ${catkin_LIBRARIES})
 target_link_libraries(gamepad_trigger_node ${catkin_LIBRARIES})
+target_link_libraries(pub_euler_angles_node ${catkin_LIBRARIES})
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
