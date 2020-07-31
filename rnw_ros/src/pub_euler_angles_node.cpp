@@ -32,8 +32,8 @@ int main( int argc, char** argv ) {
   ros::Subscriber sub_imu = nh.subscribe<sensor_msgs::Imu>("imu",10,on_imu);
   ros::Subscriber sub_odom = nh.subscribe<nav_msgs::Odometry>("uav",10,on_odom);
 
-  pub_rpy_imu = nh.advertise<geometry_msgs::Vector3>("/uav/rpy_imu",1);
-  pub_rpy_odom = nh.advertise<geometry_msgs::Vector3>("/uav/rpy_odom",1);
+  pub_rpy_imu = nh.advertise<geometry_msgs::Vector3>("/rpy/imu",1);
+  pub_rpy_odom = nh.advertise<geometry_msgs::Vector3>("/rpy/odom",1);
 
   ros::spin();
 
