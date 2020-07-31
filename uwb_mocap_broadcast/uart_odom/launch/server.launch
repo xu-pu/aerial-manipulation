@@ -7,6 +7,7 @@
         <rosparam command="load" file="$(find uart_odom)/config/uart_odom_config.yaml" />
         <param name="work_mode" value="real-time" />
         <param name="js_ctrl_mode" value="feedback" />
+        <param name="serial_port" value="/dev/tty.uwb.master"/>
     </node>
     <node pkg="pos_vel_mocap" type="pos_vel_mocap" name="pos_vel_mocap" output="screen" required="true">
         <rosparam file="$(find pos_vel_mocap)/config/calib.yaml" command="load" />

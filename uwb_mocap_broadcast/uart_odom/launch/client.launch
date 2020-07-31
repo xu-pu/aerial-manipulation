@@ -7,6 +7,7 @@
         <rosparam command="load" file="$(find uart_odom)/config/uart_odom_config.yaml"/>
         <param name="work_mode" value="real-time"/>
         <param name="js_ctrl_mode" value="feedback"/>
+        <param name="serial_port" value="/dev/tty.uwb.slave"/>	
     </node>
     <node pkg="uart_odom" type="pub_tf_node" name="pub_tf_node" output="screen"/>
 </launch>

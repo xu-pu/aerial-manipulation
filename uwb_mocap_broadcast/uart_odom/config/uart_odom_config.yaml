@@ -1,4 +1,3 @@
-serial_port: "/dev/ttyUSB0"
 #baud_rate: 57600
 baud_rate: 921600
 #baud_rate: 12000000
