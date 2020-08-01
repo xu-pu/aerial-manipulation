@@ -112,7 +112,7 @@ find_package(Ceres REQUIRED)
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES rnw_ros
-  CATKIN_DEPENDS poly_traj quadrotor_msgs
+#  CATKIN_DEPENDS other_catkin_pkg
 #  DEPENDS system_lib
 )
 
