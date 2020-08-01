@@ -126,6 +126,7 @@ include_directories(
   ${PROJECT_SOURCE_DIR}/include
   ${catkin_INCLUDE_DIRS}
   /usr/include/eigen3
+  /home/sheep/am_ws/devel/include # for clion only
 )
 
 ## Declare a C++ library
