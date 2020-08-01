@@ -50,10 +50,8 @@
   <!--   <doc_depend>doxygen</doc_depend> -->
   <buildtool_depend>catkin</buildtool_depend>
 
-    <build_depend>poly_traj</build_depend>
-    <build_depend>quadrotor_msgs</build_depend>
-    <exec_depend>poly_traj</exec_depend>
-    <exec_depend>quadrotor_msgs</exec_depend>
+  <depend>poly_traj</depend>
+  <depend>quadrotor_msgs</depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>
