@@ -16,7 +16,7 @@
         <param name="align_with_fmu" type="bool" value="false"/>
     </node>
 
-    <node pkg="uart_odom" type="uart_odom" name="uart_odom_client" output="log">
+    <node pkg="uart_odom" type="uart_odom" name="uart_odom_client" output="log" respawn="true">
         <remap from="~out_odom_uav" to="$(arg odom_topic)"/>
         <remap from="~out_odom_cone" to="$(arg cone_topic)"/>
         <rosparam command="load" file="$(find uart_odom)/config/uart_odom_config.yaml"/>
