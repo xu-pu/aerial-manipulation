@@ -33,8 +33,8 @@
         <rosparam command="load" file="$(find rnw_ros)/config/rnw_config.yaml"/>
     </node>
     
-    <node name="rviz_traj" pkg="rviz" type="rviz" output="log" args="-d $(find rnw_ros)/config/traj.rviz" />
+<!--    <node name="rviz_traj" pkg="rviz" type="rviz" output="log" args="-d $(find rnw_ros)/config/traj.rviz" />-->
 
-    <node name="record" pkg="rosbag" type="record" output="screen" args="-a" />
+    <node name="record" pkg="rosbag" type="record" output="screen" args="-a -x '/traj/(.*)'" />
 
 </launch>

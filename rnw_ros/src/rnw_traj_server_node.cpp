@@ -201,7 +201,8 @@ struct traj_server_t {
       Vector3d pt1 = pose2T(cur_uav_odom.pose.pose);
       Vector3d pt2(cur_tip.point.x,cur_tip.point.y,cur_tip.point.z);
       // 159.45mm + 43.692mm + margin(3cm)
-      Vector3d offset(0,0,0.23);
+      //Vector3d offset(0,0,0.23);
+      Vector3d offset(0,0,0.123+0.05);
       pt2 = pt2+offset;
 
       constexpr double speed = 0.5;
