@@ -14,6 +14,7 @@ find_package(catkin REQUIRED COMPONENTS
         sensor_msgs
         nav_msgs
         std_msgs
+        quadrotor_msgs
         poly_traj
 )
 
@@ -111,7 +112,7 @@ find_package(Ceres REQUIRED)
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES rnw_ros
-#  CATKIN_DEPENDS other_catkin_pkg
+  CATKIN_DEPENDS poly_traj quadrotor_msgs
 #  DEPENDS system_lib
 )
 
