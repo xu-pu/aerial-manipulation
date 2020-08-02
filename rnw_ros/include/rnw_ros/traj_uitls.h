@@ -7,6 +7,9 @@
 
 #include <ros/ros.h>
 #include <nav_msgs/Path.h>
+#include <geometry_msgs/Vector3Stamped.h>
+#include <geometry_msgs/PointStamped.h>
+
 #include <Eigen/Dense>
 
 #include "quadrotor_msgs/PositionCommand.h"
@@ -57,6 +60,24 @@ geometry_msgs::Vector3 eigen2rosv( Vector3d const & src ){
   dst.x = src.x();
   dst.y = src.y();
   dst.z = src.z();
+  return dst;
+}
+
+geometry_msgs::PointStamped eigen2ros( Vector3d const & src, std_msgs::Header const & header ){
+  geometry_msgs::PointStamped dst;
+  dst.header = header;
+  dst.point.x = src.x();
+  dst.point.y = src.y();
+  dst.point.z = src.z();
+  return dst;
+}
+
+geometry_msgs::Vector3Stamped eigen2rosv( Vector3d const & src, std_msgs::Header const & header ){
+  geometry_msgs::Vector3Stamped dst;
+  dst.header = header;
+  dst.vector.x = src.x();
+  dst.vector.y = src.y();
+  dst.vector.z = src.z();
   return dst;
 }
 

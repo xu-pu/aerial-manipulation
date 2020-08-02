@@ -17,14 +17,6 @@
 using sensor_msgs::ImuConstPtr;
 using nav_msgs::OdometryConstPtr;
 
-inline double deg2rad( double deg ){
-  return M_PI/180.*deg;
-}
-
-inline double rad2deg( double rad ){
-  return 180./M_PI*rad;
-}
-
 struct cali_sampler_t {
 
     vector<Vector3d> samples_rpy;

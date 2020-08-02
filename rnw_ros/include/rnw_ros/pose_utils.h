@@ -24,6 +24,14 @@ using nav_msgs::OdometryConstPtr;
 using sensor_msgs::ImuConstPtr;
 using geometry_msgs::PoseStampedConstPtr;
 
+inline double deg2rad( double deg ){
+  return M_PI/180.*deg;
+}
+
+inline double rad2deg( double rad ){
+  return 180./M_PI*rad;
+}
+
 inline Eigen::Vector3d quat2eulers(const Eigen::Quaterniond & quat) {
   Eigen::Vector3d rpy;
   rpy.x() = atan2(2 * (quat.w() * quat.x() + quat.y() * quat.z()),

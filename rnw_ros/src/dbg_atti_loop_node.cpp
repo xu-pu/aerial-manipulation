@@ -2,25 +2,26 @@
 
 #include <ros/ros.h>
 #include <geometry_msgs/Vector3.h>
+#include <sensor_msgs/Joy.h>
 
 #include "rnw_ros/pose_utils.h"
 #include "rnw_ros/traj_uitls.h"
 
 ros::Publisher pub_rpy_imu;
-ros::Publisher pub_rpy_odom;
+ros::Publisher pub_rpy_ctrl;
 
-void on_odom( OdometryConstPtr const & odom ){
-  Eigen::Matrix3d R_FLU2FRD;
-  R_FLU2FRD << 1, 0, 0, 0, -1, 0, 0, 0, -1;
-  Eigen::Matrix3d R_ENU2NED;
-  R_ENU2NED << 0, 1, 0, 1, 0, 0, 0, 0, -1;
-  Vector3d rpy = odom2rpy(odom);
-  pub_rpy_odom.publish(eigen2ros(rpy));
+void on_joy_ctrl(sensor_msgs::JoyConstPtr const & joy ){
+  double roll = joy->axes.at(0);
+  double pitch = joy->axes.at(1);
+  double thrust = joy->axes.at(2);
+  double yaw = joy->axes.at(3);
+  Vector3d rpy( deg2rad(roll), deg2rad(pitch), deg2rad(yaw) );
+  pub_rpy_ctrl.publish(eigen2rosv(rpy,joy->header));
 }
 
 void on_imu( sensor_msgs::ImuConstPtr const & imu ){
   Vector3d rpy = imu2rpy(imu);
-  pub_rpy_imu.publish(eigen2ros(rpy));
+  pub_rpy_imu.publish(eigen2rosv(rpy,imu->header));
 }
 
 int main( int argc, char** argv ) {
@@ -29,11 +30,11 @@ int main( int argc, char** argv ) {
 
   ros::NodeHandle nh("~");
 
-  ros::Subscriber sub_imu = nh.subscribe<sensor_msgs::Imu>("imu",10,on_imu);
-  ros::Subscriber sub_odom = nh.subscribe<nav_msgs::Odometry>("uav",10,on_odom);
+  ros::Subscriber sub_imu = nh.subscribe<sensor_msgs::Imu>("imu",100000,on_imu);
+  ros::Subscriber sub_ctrl = nh.subscribe<sensor_msgs::Joy>("joy_ctrl", 100000, on_joy_ctrl);
 
-  pub_rpy_imu = nh.advertise<geometry_msgs::Vector3>("/rpy/imu",1);
-  pub_rpy_odom = nh.advertise<geometry_msgs::Vector3>("/rpy/odom",1);
+  pub_rpy_imu = nh.advertise<geometry_msgs::Vector3Stamped>("/dbg/atti/imu",100000);
+  pub_rpy_ctrl = nh.advertise<geometry_msgs::Vector3Stamped>("/dbg/atti/ctrl",100000);
 
   ros::spin();
 

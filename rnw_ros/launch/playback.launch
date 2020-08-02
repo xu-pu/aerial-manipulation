@@ -4,18 +4,18 @@
 
     <arg name="imu_topic" default="/djiros/imu"/>
     <arg name="vicon_topic" value="/uwb_vicon_odom"/>
-    <arg name="vins_topic" value="/vins_estimator/imu_propagate"/>
+    <arg name="joy_ctrl_topic" value="/djiros/ctrl"/>
 
-    <node pkg="rnw_ros" type="pub_euler_angles_node" name="pub_euler_angles_node" output="screen">
+    <node pkg="rnw_ros" type="dbg_atti_loop_node" name="dbg_atti_loop_node" output="screen">
         <remap from="~imu" to="$(arg imu_topic)"/>
-        <remap from="~vicon" to="$(arg vicon_topic)"/>
-        <remap from="~vins" to="$(arg vins_topic)"/>
+        <remap from="~joy_ctrl" to="$(arg joy_ctrl_topic)"/>
     </node>
 
 <!--    <node pkg="rqt_multiplot" type="rqt_multiplot" name="rqt_multiplot"-->
 <!--          args="&#45;&#45;multiplot-config $(find rnw_ros)/rqt_multiplot.xml &#45;&#45;multiplot-run-all"/>-->
 
-<!--    <node name="rosbag" pkg="rosbag" type="play" respawn="false" required="true"-->
-<!--          args="&#45;&#45;queue=1000 /home/sheep/Desktop/2020-07-29-20-09-10.bag"/>-->
+    <node name="rosbag_play" pkg="rosbag" type="play" respawn="false" required="true" args="-r 10 /home/sheep/Dropbox/rosbags/interval3_reduced.bag"/>
+
+    <node name="rosbag_record" pkg="rosbag" type="record" respawn="false" required="true" args="-o /home/sheep/ -a" output="screen"/>
 
 </launch>
