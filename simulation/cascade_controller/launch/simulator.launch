@@ -157,7 +157,7 @@
     </node>
 
     <node name="rviz" pkg="rviz" type="rviz" output="log"
-          args="-d /home/sheep/ttr_ws/src/Teach-Repeat-Replan/global_planner/config/rviz_config.rviz">
+          args="-d $(find cascade_controller)/cfg/rviz_config.rviz">
     </node>
 
 </launch>
