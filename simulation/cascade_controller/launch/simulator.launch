@@ -156,9 +156,7 @@
         <param name="id" value="$(arg drone_number)"/>
     </node>
 
-    <node name="rviz" pkg="rviz" type="rviz" output="log"
-          args="-d $(find cascade_controller)/cfg/rviz_config.rviz">
-    </node>
+    <node name="rviz" pkg="rviz" type="rviz" output="log" required="true" args="-d $(find cascade_controller)/cfg/rviz_config.rviz"/>
 
     <node pkg="joy" type="joy_node" name="joy_node" output="screen">
         <param name="~autorepeat_rate" value="0" />

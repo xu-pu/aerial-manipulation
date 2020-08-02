@@ -330,19 +330,6 @@ Visualization Manager:
           Value: true
       Enabled: true
       Name: Sensors
-    - Alpha: 0.200000003
-      BoundColor: 255; 0; 0
-      Class: decomp_rviz_plugins/PolyhedronArray
-      Enabled: true
-      MeshColor: 0; 170; 255
-      Name: PolyhedronArray
-      Scale: 0.100000001
-      State: Mesh
-      Topic: /tr_node/polyhedron_corridor_mesh
-      Unreliable: false
-      Value: true
-      VsColor: 0; 255; 0
-      VsScale: 1
   Enabled: true
   Global Options:
     Background Color: 255; 255; 127
