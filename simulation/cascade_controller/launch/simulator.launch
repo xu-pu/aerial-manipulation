@@ -154,6 +154,7 @@
         <param name="covariance_scale" value="100.0"/>
         <param name="drone_scale" value="0.8"/>
         <param name="id" value="$(arg drone_number)"/>
+        <param name="mesh_resource" value="package://odom_visualization/meshes/hkust_swarm.STL"/>
     </node>
 
     <node name="rviz" pkg="rviz" type="rviz" output="log" required="true" args="-d $(find cascade_controller)/cfg/rviz_config.rviz"/>
