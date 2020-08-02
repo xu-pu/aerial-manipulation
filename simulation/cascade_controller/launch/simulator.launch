@@ -160,4 +160,8 @@
           args="-d $(find cascade_controller)/cfg/rviz_config.rviz">
     </node>
 
+    <node pkg="joy" type="joy_node" name="joy_node" output="screen">
+        <param name="~autorepeat_rate" value="0" />
+    </node>
+
 </launch>
