@@ -27,6 +27,7 @@
         <rosparam command="load" file="$(find uart_odom)/config/uart_odom_config.yaml" />
         <param name="work_mode" value="real-time" />
         <param name="js_ctrl_mode" value="feedback" />
+        <param name="serial_port" value="/dev/tty.uwb.master"/>
     </node>
 
 <!--    <node pkg="rqt_multiplot" type="rqt_multiplot" name="rqt_multiplot"-->
