@@ -17,8 +17,10 @@
     </node>
 
     <node pkg="uart_odom" type="uart_odom" name="uart_odom_client" output="log" respawn="true">
+        <!--publishers-->
         <remap from="~out_odom_uav" to="$(arg odom_topic)"/>
         <remap from="~out_odom_cone" to="$(arg cone_topic)"/>
+        <!--params-->
         <rosparam command="load" file="$(find uart_odom)/config/uart_odom_config.yaml"/>
         <param name="work_mode" value="real-time"/>
         <param name="js_ctrl_mode" value="feedback"/>
@@ -26,16 +28,20 @@
     </node>
 
     <node pkg="n3ctrl" type="n3ctrl_node" name="n3ctrl" output="screen" required="true">
+        <!--subscribers-->
 		<remap from="~joy" to="/djiros/rc" />
         <remap from="~odom" to="$(arg odom_topic)" />
 		<remap from="~imu" to="/djiros/imu" />
 		<remap from="~cmd" to="/position_cmd" />
+        <!--publishers-->
 		<remap from="~desire_pose" to="/desire_pose" />
 		<remap from="~traj_start_trigger" to="/traj_start_trigger" />
 		<remap from="~ctrl" to="/djiros/ctrl" />
+        <!--params-->
         <rosparam command="load" file="$(find n3ctrl)/config/ctrl_param_$(arg uavname).yaml" />
         <param name="work_mode" value="real-time" />
         <param name="js_ctrl_mode" value="feedback" />
+        <param name="pub_debug_msgs" type="bool" value="true"/>
 	</node>
 
     <node pkg="rnw_ros" type="rnw_traj_server_node" name="rnw_traj_server_node" output="screen">
@@ -43,14 +49,14 @@
     </node>
 
     <node pkg="rnw_ros" type="pub_frames_node" name="pub_frames_node" output="screen">
+        <!--subscribers-->
         <remap from="~imu" to="$(arg imu_topic)"/>
         <remap from="~uav" to="$(arg odom_topic)"/>
         <remap from="~cone" to="$(arg cone_topic)"/>
         <remap from="~vins" to="/vins_estimator/imu_propagate"/>
+        <!--params-->
         <rosparam command="load" file="$(find rnw_ros)/config/rnw_config.yaml"/>
     </node>
-    
-<!--    <node name="rviz_traj" pkg="rviz" type="rviz" output="log" args="-d $(find rnw_ros)/config/traj.rviz" />-->
 
     <node name="record" pkg="rosbag" type="record" output="screen" args="-a -x '/traj/(.*)'" />
 

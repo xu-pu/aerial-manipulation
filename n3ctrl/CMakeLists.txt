@@ -85,6 +85,7 @@ include_directories(
   ${EIGEN_INCLUDE_DIRS}
   include/${PROJECT_NAME}
   include
+  /home/sheep/am_ws/devel/include # for clion only
 )
 
 # message(STATUS "*************catkin_INCLUDE_DIRS=" ${catkin_INCLUDE_DIRS})
