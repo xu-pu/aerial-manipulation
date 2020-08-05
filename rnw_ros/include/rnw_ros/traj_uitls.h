@@ -47,6 +47,16 @@ VectorXd gen_time_intervals( double dt, vector<Vector3d> const & waypoints ){
   return dst;
 }
 
+VectorXd gen_time_intervals( vector<double> const & intervals, vector<Vector3d> const & waypoints ){
+  assert( waypoints.size()-1 == intervals.size() );
+  size_t N = intervals.size();
+  VectorXd dst(N);
+  for ( size_t i=0; i<N; i++ ){
+    dst(i) = intervals.at(i);
+  }
+  return dst;
+}
+
 geometry_msgs::Point eigen2ros( Vector3d const & src ){
   geometry_msgs::Point dst;
   dst.x = src.x();

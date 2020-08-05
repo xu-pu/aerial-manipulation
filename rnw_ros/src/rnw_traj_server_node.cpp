@@ -14,6 +14,19 @@ PolynomialTraj minsnap( vector<Vector3d> const & waypoints, double interval ){
   return minSnapTraj(POS,Vector3d::Zero(),Vector3d::Zero(),Vector3d::Zero(),Vector3d::Zero(),TIMES);
 }
 
+/**
+ * N waypoints, N-1 time intervals.
+ * i-th interval is time between i-th and (i+1)-th waypoints
+ * @param waypoints
+ * @param intervals
+ * @return
+ */
+PolynomialTraj minsnap( vector<Vector3d> const & waypoints, vector<double> intervals ){
+  MatrixXd POS = toXd(waypoints);
+  VectorXd TIMES = gen_time_intervals(intervals,waypoints);
+  return minSnapTraj(POS,Vector3d::Zero(),Vector3d::Zero(),Vector3d::Zero(),Vector3d::Zero(),TIMES);
+}
+
 PoseStamped eigen2pathpoint( Vector3d const & T ){
   geometry_msgs::PoseStamped pose;
   pose.header.stamp = ros::Time::now();
