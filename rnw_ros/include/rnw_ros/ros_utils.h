@@ -6,6 +6,12 @@
 #define SRC_ROS_UTILS_H
 
 #include <ros/ros.h>
+#include <Eigen/Dense>
+#include <Eigen/Geometry>
+
+using Eigen::Matrix3d;
+using Eigen::Vector3d;
+using Eigen::Quaterniond;
 
 using namespace std;
 

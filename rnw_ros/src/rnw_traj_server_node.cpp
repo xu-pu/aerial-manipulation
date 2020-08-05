@@ -1,5 +1,6 @@
 #include "rnw_ros/traj_uitls.h"
 #include "rnw_ros/pose_utils.h"
+#include "rnw_ros/rnw_utils.h"
 
 ros::Publisher pub_path_setpoint;
 ros::Publisher pub_path_plant;

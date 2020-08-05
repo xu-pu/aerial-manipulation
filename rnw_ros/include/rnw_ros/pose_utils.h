@@ -5,18 +5,11 @@
 #ifndef SRC_POSE_UTILS_H
 #define SRC_POSE_UTILS_H
 
+#include "rnw_ros/ros_utils.h"
+
 #include <sensor_msgs/Imu.h>
 #include <nav_msgs/Odometry.h>
 #include <tf/transform_broadcaster.h>
-
-#include <Eigen/Dense>
-#include <Eigen/Geometry>
-
-using Eigen::Matrix3d;
-using Eigen::Vector3d;
-using Eigen::Quaterniond;
-
-using namespace std;
 
 using geometry_msgs::PoseStamped;
 using geometry_msgs::PoseStampedConstPtr;
