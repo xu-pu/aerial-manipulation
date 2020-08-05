@@ -201,18 +201,19 @@ struct traj_server_t {
 
       on_cleanup();
 
-      Vector3d pt1 = pose2T(cur_uav_odom.pose.pose);
-      Vector3d pt2(cur_tip.point.x,cur_tip.point.y,cur_tip.point.z);
-      // 159.45mm + 43.692mm + margin(3cm)
-      //Vector3d offset(0,0,0.23);
-      Vector3d offset(0,0,0.123+0.05);
-      pt2 = pt2+offset;
+      Vector3d pt_uav = pose2T(cur_uav_odom.pose.pose);
+      Vector3d pt_tip(cur_tip.point.x, cur_tip.point.y, cur_tip.point.z);
+
+      double z_planned_tcp = pt_tip.z() + rnw_config.hover_above_tip;
+      double z_planned_uav = z_planned_tcp - rnw_config.X_tcp_cage.z(); // offset between imu and tcp
+
+      Vector3d pt_tgt = pt_tip + Vector3d(0,0,z_planned_uav);
 
       constexpr double speed = 0.5;
-      double t = (pt1-pt2).norm()/speed;
-      Vector3d mid_pt = (pt1+pt2)/2;
+      double t = (pt_uav - pt_tgt).norm() / speed;
+      Vector3d mid_pt = (pt_uav + pt_tgt) / 2;
 
-      traj = minsnap({pt1,mid_pt,pt2},t);
+      traj = minsnap({pt_uav, mid_pt, pt_tgt}, t);
       traj_available = true;
       base_yaw = odom2yaw(cur_uav_odom);
 
