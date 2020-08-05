@@ -56,8 +56,8 @@ idling:
     lowest_thrust:          0.05
 
 rc:
-    hori_velo_scale:   3.0
-    vert_velo_scale:   3.0
+    hori_velo_scale:   1.0
+    vert_velo_scale:   1.0
     # rad 30~0.523 45~0.785 60~1.047
     yaw_scale:         0.523
     attitude_scale:    0.523
