@@ -43,7 +43,10 @@
     </node>
 
     <node pkg="rnw_ros" type="rnw_traj_server_node" name="rnw_traj_server_node" output="screen">
+        <!--subscribers-->
         <remap from="~vicon" to="$(arg odom_topic)"/>
+        <!--params-->
+        <rosparam command="load" file="$(find rnw_ros)/config/rnw_config.yaml"/>
     </node>
 
     <node pkg="rnw_ros" type="pub_frames_node" name="pub_frames_node" output="screen">

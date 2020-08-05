@@ -6,6 +6,8 @@ ros::Publisher pub_path_setpoint;
 ros::Publisher pub_path_plant;
 ros::Publisher pub_pos_cmd;
 
+rnw_config_t rnw_config;
+
 PolynomialTraj minsnap( vector<Vector3d> const & waypoints, double interval ){
   MatrixXd POS = toXd(waypoints);
   VectorXd TIMES = gen_time_intervals(interval,waypoints);
@@ -292,6 +294,8 @@ int main( int argc, char** argv ) {
   ros::init(argc,argv,"rnw_traj_server_node");
 
   ros::NodeHandle nh("~");
+
+  rnw_config.load_from_ros(nh);
 
   pub_path_setpoint = nh.advertise<nav_msgs::Path>("/traj/setpoint",10);
   pub_path_plant = nh.advertise<nav_msgs::Path>("/traj/plant",10);

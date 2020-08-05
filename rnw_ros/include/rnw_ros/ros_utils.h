@@ -20,6 +20,7 @@ T get_param_default( ros::NodeHandle & nh, string const & key, T const & default
   T val;
   if ( !nh.getParam(key,val) ) {
     val = default_val;
+    ROS_ERROR_STREAM("Parameter \'" << key << "\' not found, using default value " << default_val << "!");
   }
   return val;
 }
