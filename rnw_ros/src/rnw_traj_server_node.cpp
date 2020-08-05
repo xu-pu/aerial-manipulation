@@ -123,10 +123,10 @@ struct traj_server_t {
 
       cur_uav_odom = *odom;
 
-      if ( triggered ){
-        triggered = false;
-        on_trigger_go_to_tip();
-      }
+//      if ( triggered ){
+//        triggered = false;
+//        on_trigger_go_to_tip();
+//      }
 
       if ( traj_available ) {
 
@@ -160,15 +160,27 @@ struct traj_server_t {
 
     void on_trigger_insert(){
       on_cleanup();
-      Matrix3d R = pose2R(cur_uav_odom.pose.pose);
-      Vector3d T = pose2T(cur_uav_odom.pose.pose);
-      Vector3d pt1(0,0,0);
-      Vector3d pt2(0,0,-0.03);
-      Vector3d pt3(0,0,-0.06);
-      vector<Vector3d> waypoints = transform_pts({pt1,pt2,pt3},R,T);
-      traj = minsnap(waypoints,1);
+
+      Vector3d pt_uav = pose2T(cur_uav_odom.pose.pose);
+      Vector3d pt_tip(cur_tip.point.x, cur_tip.point.y, cur_tip.point.z);
+
+      double z_planned_tcp = pt_tip.z() + rnw_config.hover_above_tip;
+      double z_planned_uav = z_planned_tcp - rnw_config.X_tcp_cage.z(); // offset between imu and tcp
+
+      Vector3d pt_tgt = pt_tip;
+      pt_tgt.z() = z_planned_uav;
+
+      Vector3d pt_inserted = pt_tgt;
+      pt_inserted.z()  = pt_inserted.z() - rnw_config.hover_above_tip - rnw_config.insert_below_tip;
+
+      constexpr double speed = 0.5;
+      double t = (pt_uav - pt_tgt).norm() / speed;
+      Vector3d mid_pt = (pt_uav + pt_tgt) / 2;
+
+      traj = minsnap({pt_uav,mid_pt,pt_tgt,pt_inserted}, {t,t,1});
       traj_available = true;
       base_yaw = odom2yaw(cur_uav_odom);
+
     }
 
     void on_trigger_rock(){
