@@ -123,11 +123,10 @@ struct traj_server_t {
 
       cur_uav_odom = *odom;
 
-//      if ( triggered ){
-//        triggered = false;
-//        //on_planning(odom);
-//        on_trigger_go_to_tip();
-//      }
+      if ( triggered ){
+        triggered = false;
+        on_trigger_go_to_tip();
+      }
 
       if ( traj_available ) {
 
@@ -220,7 +219,8 @@ struct traj_server_t {
       double z_planned_tcp = pt_tip.z() + rnw_config.hover_above_tip;
       double z_planned_uav = z_planned_tcp - rnw_config.X_tcp_cage.z(); // offset between imu and tcp
 
-      Vector3d pt_tgt = pt_tip + Vector3d(0,0,z_planned_uav);
+      Vector3d pt_tgt = pt_tip;
+      pt_tgt.z() = z_planned_uav;
 
       constexpr double speed = 0.5;
       double t = (pt_uav - pt_tgt).norm() / speed;
