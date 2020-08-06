@@ -30,6 +30,7 @@ void Controller::config_gain(const Parameter_t::Gain& gain)
 {
 	Kp.setZero();
 	Kv.setZero();
+	Kvi.setZero();
 	Ka.setZero();
 	Kp(0,0) = gain.Kp0;
 	Kp(1,1) = gain.Kp1;
