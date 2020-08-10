@@ -232,30 +232,18 @@ class Uart_odom
                 }
 
                 //cout << __FUNCTION__ << "  " << __LINE__ << endl;
-                char temp_buffer[ 2048 ] = { 0 };
-                if(IF_USING_MINI_ODOM)
-                {
-                    mini_odom_t m_read_mini_odom_uav, m_read_mini_odom_cone;
-                    memcpy(&m_read_mini_odom_uav, temp_serial_pack.data, sizeof(mini_odom_t));
-                    memcpy(&m_read_mini_odom_cone, temp_serial_pack.data+sizeof(mini_odom_t), sizeof(mini_odom_t));
-                    nav_msgs::Odometry odom_uav, odom_cone;
-                    miniodom_to_odom(m_read_mini_odom_uav, odom_uav);
-                    miniodom_to_odom(m_read_mini_odom_cone, odom_cone);
-                    odom_uav.header.frame_id = "world";
-                    odom_cone.header.frame_id = "world";
-                    m_pub_odom.publish(odom_uav);
-                    m_pub_odom_cone.publish(odom_cone);
-                }
-                else
-                {
-                    memcpy( temp_buffer, temp_serial_pack.data, 20 );
-                    int bias = 50;
-                    memcpy( ( char * ) ( temp_buffer + bias ), ( char * ) ( temp_serial_pack.data + bias ), sizeof( nav_msgs::Odometry ) - bias );
-                    nav_msgs::Odometry temp_odom = ( *( nav_msgs::Odometry * ) ( &temp_buffer[ 0 ] ) );
-                    temp_odom.header.stamp = ros::Time::now();
-                    temp_odom.header.frame_id = "world";
-                    m_pub_odom.publish( temp_odom );
-                }
+
+                mini_odom_t m_read_mini_odom_uav, m_read_mini_odom_cone;
+                memcpy(&m_read_mini_odom_uav, temp_serial_pack.data, sizeof(mini_odom_t));
+                memcpy(&m_read_mini_odom_cone, temp_serial_pack.data+sizeof(mini_odom_t), sizeof(mini_odom_t));
+                nav_msgs::Odometry odom_uav, odom_cone;
+                miniodom_to_odom(m_read_mini_odom_uav, odom_uav);
+                miniodom_to_odom(m_read_mini_odom_cone, odom_cone);
+                odom_uav.header.frame_id = "world";
+                odom_cone.header.frame_id = "world";
+                m_pub_odom.publish(odom_uav);
+                m_pub_odom_cone.publish(odom_cone);
+
                 //cout << "Finish publish" << endl;
             }
             else
