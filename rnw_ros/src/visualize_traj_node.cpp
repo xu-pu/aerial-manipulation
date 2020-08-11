@@ -323,13 +323,16 @@ struct traj_visualizer_t {
     explicit traj_visualizer_t( ros::NodeHandle & nh ) {
 
       pub_marker_traj = nh.advertise<visualization_msgs::Marker>("/markers/traj", 1);
-      pub_marker_acc = nh.advertise<visualization_msgs::MarkerArray>("/markers/acc", 10);
+      pub_marker_acc = nh.advertise<visualization_msgs::MarkerArray>("/markers/acc", 1);
 
     }
 
     void on_traj(  quadrotor_msgs::PolynomialTrajectoryConstPtr const & msg  ){
       latest_msg = *msg;
       poly_traj = poly_traj_t(latest_msg);
+
+      clear_acc_markers();
+      pub_marker_acc.publish(gen_marker_acc());
       pub_marker_traj.publish(gen_marker_traj());
 
       init = true;
@@ -380,6 +383,61 @@ struct traj_visualizer_t {
 
       return marker;
 
+    }
+
+
+    visualization_msgs::MarkerArray gen_marker_acc(){
+
+      constexpr int id = 0;
+      constexpr double epsi = 0.08;
+
+      visualization_msgs::Marker marker;
+      visualization_msgs::MarkerArray accMarkers;
+
+      marker.id = id;
+      marker.header.stamp = ros::Time::now();
+      marker.header.frame_id = "world";
+      marker.pose.orientation.w = 1.00;
+      marker.action = visualization_msgs::Marker::ADD;
+      marker.type = visualization_msgs::Marker::ARROW;
+      marker.header.stamp = ros::Time::now();
+      marker.ns = "viz_traj";
+      marker.color.r = 255.0 / 255.0;
+      marker.color.g = 20.0 / 255.0;
+      marker.color.b = 147.0 / 255.0;
+      marker.color.a = 1.0;
+      marker.scale.x = 0.05;
+      marker.scale.y = 0.15;
+      marker.scale.z = 0.30;
+
+      for (double t = 0; t < poly_traj.duration(); t += epsi){
+        marker.id += 3;
+        marker.points.clear();
+        geometry_msgs::Point point;
+        Vector3d X = poly_traj.eval_pos(t);
+        point.x = X(0);
+        point.y = X(1);
+        point.z = X(2);
+        marker.points.push_back(point);
+        X += poly_traj.eval_acc(t);
+        //X += Vector3d {0,0,1};
+        point.x = X(0);
+        point.y = X(1);
+        point.z = X(2);
+        marker.points.push_back(point);
+        accMarkers.markers.push_back(marker);
+      }
+
+      return accMarkers;
+
+    }
+
+    void clear_acc_markers(){
+      visualization_msgs::MarkerArray accMarkers;
+      visualization_msgs::Marker accMarker;
+      accMarker.action = visualization_msgs::Marker::DELETEALL;
+      accMarkers.markers.push_back(accMarker);
+      pub_marker_acc.publish(accMarkers);
     }
 
     void clear_markers(){
