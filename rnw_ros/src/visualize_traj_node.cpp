@@ -114,6 +114,59 @@ struct poly_traj_t {
       dt = 1;
     }
 
+    /**
+     * Evaluate the polynomial at idx-th segment and time t
+     * @param idx - segment idx
+     * @param t - segment time [0,1]
+     * @param x
+     * @param x_dot
+     * @param x_dot_dot
+     * @param y
+     * @param y_dot
+     * @param y_dot_dot
+     * @param z
+     * @param z_dot
+     * @param z_dot_dot
+     */
+    void eval( int idx, double t,
+               double & x, double & x_dot, double & x_dot_dot,
+               double & y, double & y_dot, double & y_dot_dot,
+               double & z, double & z_dot, double & z_dot_dot)
+    {
+
+      x = 0.0;
+      y = 0.0;
+      z = 0.0;
+      x_dot = 0.0;
+      y_dot = 0.0;
+      z_dot = 0.0;
+      x_dot_dot = 0.0;
+      y_dot_dot = 0.0;
+      z_dot_dot = 0.0;
+
+      // calculate x, x_dot, x_dot_dot
+
+      int cur_order = orders[idx];
+      int cur_poly_num = cur_order + 1;
+
+      for (int i = 0; i < cur_poly_num; i++) {
+        x += coefs[DIM_X].col(idx)(i) * pow(t, i);
+        y += coefs[DIM_Y].col(idx)(i) * pow(t, i);
+        z += coefs[DIM_Z].col(idx)(i) * pow(t, i);
+        if (i < (cur_poly_num - 1)){
+          x_dot += (i + 1) * coefs[DIM_X].col(idx)(i + 1) * pow(t, i) / times[idx];
+          y_dot += (i + 1) * coefs[DIM_Y].col(idx)(i + 1) * pow(t, i) / times[idx];
+          z_dot += (i + 1) * coefs[DIM_Z].col(idx)(i + 1) * pow(t, i) / times[idx];
+        }
+        if (i < (cur_poly_num - 2)){
+          x_dot_dot += (i + 2) * (i + 1) * coefs[DIM_X].col(idx)(i + 2) * pow(t, i) / times[idx] / times[idx];
+          y_dot_dot += (i + 2) * (i + 1) * coefs[DIM_Y].col(idx)(i + 2) * pow(t, i) / times[idx] / times[idx];
+          z_dot_dot += (i + 2) * (i + 1) * coefs[DIM_Z].col(idx)(i + 2) * pow(t, i) / times[idx] / times[idx];
+        }
+      }
+
+    }
+
     void gen_pos_cmd( quadrotor_msgs::PositionCommand & _cmd, const nav_msgs::Odometry & _odom ){
 
       _cmd.header.stamp = _odom.header.stamp;
@@ -132,36 +185,10 @@ struct poly_traj_t {
       int idx; double t;
       calc_segment_t(_t,idx,t);
 
-      _cmd.position.x = 0.0;
-      _cmd.position.y = 0.0;
-      _cmd.position.z = 0.0;
-      _cmd.velocity.x = 0.0;
-      _cmd.velocity.y = 0.0;
-      _cmd.velocity.z = 0.0;
-      _cmd.acceleration.x = 0.0;
-      _cmd.acceleration.y = 0.0;
-      _cmd.acceleration.z = 0.0;
-
-      // calculate x, x_dot, x_dot_dot
-
-      int cur_order = orders[idx];
-      int cur_poly_num = cur_order + 1;
-
-      for (int i = 0; i < cur_poly_num; i++) {
-        _cmd.position.x += coefs[DIM_X].col(idx)(i) * pow(t, i);
-        _cmd.position.y += coefs[DIM_Y].col(idx)(i) * pow(t, i);
-        _cmd.position.z += coefs[DIM_Z].col(idx)(i) * pow(t, i);
-        if (i < (cur_poly_num - 1)){
-          _cmd.velocity.x += (i + 1) * coefs[DIM_X].col(idx)(i + 1) * pow(t, i) / times[idx];
-          _cmd.velocity.y += (i + 1) * coefs[DIM_Y].col(idx)(i + 1) * pow(t, i) / times[idx];
-          _cmd.velocity.z += (i + 1) * coefs[DIM_Z].col(idx)(i + 1) * pow(t, i) / times[idx];
-        }
-        if (i < (cur_poly_num - 2)){
-          _cmd.acceleration.x += (i + 2) * (i + 1) * coefs[DIM_X].col(idx)(i + 2) * pow(t, i) / times[idx] / times[idx];
-          _cmd.acceleration.y += (i + 2) * (i + 1) * coefs[DIM_Y].col(idx)(i + 2) * pow(t, i) / times[idx] / times[idx];
-          _cmd.acceleration.z += (i + 2) * (i + 1) * coefs[DIM_Z].col(idx)(i + 2) * pow(t, i) / times[idx] / times[idx];
-        }
-      }
+      eval(idx,t,
+           _cmd.position.x,_cmd.position.y,_cmd.position.z,
+           _cmd.velocity.x,_cmd.velocity.y,_cmd.velocity.z,
+           _cmd.acceleration.x,_cmd.acceleration.y,_cmd.acceleration.z);
 
       //_cmd.yaw = _start_yaw + (_final_yaw - _start_yaw) * t / ((_final_time - _start_time).toSec() + 1e-9);
       _cmd.yaw = atan2(_cmd.velocity.y, _cmd.velocity.x);
