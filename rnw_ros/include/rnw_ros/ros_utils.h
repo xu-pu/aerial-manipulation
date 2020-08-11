@@ -5,9 +5,12 @@
 #ifndef SRC_ROS_UTILS_H
 #define SRC_ROS_UTILS_H
 
-#include <ros/ros.h>
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
+
+#include <ros/ros.h>
+#include <nav_msgs/Odometry.h>
+#include <tf/transform_broadcaster.h>
 
 using Eigen::Matrix3d;
 using Eigen::Vector3d;
