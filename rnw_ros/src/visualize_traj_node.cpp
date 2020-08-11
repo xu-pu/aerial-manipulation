@@ -37,6 +37,10 @@ struct poly_traj_t {
     ros::Time final_time = ros::TIME_MIN;
     ros::Time start_time = ros::TIME_MAX;
 
+    double duration() const {
+      return (final_time - start_time).toSec();
+    }
+
     double start_yaw = 0.0;
     double final_yaw = 0.0;
 
@@ -83,6 +87,22 @@ struct poly_traj_t {
 
     }
 
+    double calc_segment_t(double t, int & idx, double & dt){
+      dt = t;
+      for ( idx = 0; idx < n_segment; ++idx) {
+        // find the segment idx
+        if (dt > times[idx] && idx + 1 < n_segment) {
+          dt -= times[idx];
+        }
+        else {
+          dt /= times[idx];
+          break;
+        }
+      }
+      //!!TODO fix here
+      assert(false);
+    }
+
     void gen_pos_cmd( quadrotor_msgs::PositionCommand & _cmd, const nav_msgs::Odometry & _odom ){
 
       _cmd.header.stamp = _odom.header.stamp;
@@ -91,59 +111,51 @@ struct poly_traj_t {
       _cmd.trajectory_flag = traj_flag;
       _cmd.trajectory_id = traj_id;
 
-      double t = max(0.0, (_odom.header.stamp - start_time).toSec()) / mag_coeff;
+      double _t = max(0.0, (_odom.header.stamp - start_time).toSec()) / mag_coeff;
 
       //cout<<"t: "<<t<<endl;
 
       // #3. calculate the desired states
       //ROS_WARN("[SERVER] the time : %.3lf\n, n = %d, m = %d", t, _n_order, _n_segment);
-      for (int idx = 0; idx < n_segment; ++idx) {
-        // find the segment idx
-        if (t > times[idx] && idx + 1 < n_segment) {
-          t -= times[idx];
+
+      int idx; double t;
+      calc_segment_t(_t,idx,t);
+
+      _cmd.position.x = 0.0;
+      _cmd.position.y = 0.0;
+      _cmd.position.z = 0.0;
+      _cmd.velocity.x = 0.0;
+      _cmd.velocity.y = 0.0;
+      _cmd.velocity.z = 0.0;
+      _cmd.acceleration.x = 0.0;
+      _cmd.acceleration.y = 0.0;
+      _cmd.acceleration.z = 0.0;
+
+      // calculate x, x_dot, x_dot_dot
+
+      int cur_order = orders[idx];
+      int cur_poly_num = cur_order + 1;
+
+      for (int i = 0; i < cur_poly_num; i++) {
+        _cmd.position.x += coefs[DIM_X].col(idx)(i) * pow(t, i);
+        _cmd.position.y += coefs[DIM_Y].col(idx)(i) * pow(t, i);
+        _cmd.position.z += coefs[DIM_Z].col(idx)(i) * pow(t, i);
+        if (i < (cur_poly_num - 1)){
+          _cmd.velocity.x += (i + 1) * coefs[DIM_X].col(idx)(i + 1) * pow(t, i) / times[idx];
+          _cmd.velocity.y += (i + 1) * coefs[DIM_Y].col(idx)(i + 1) * pow(t, i) / times[idx];
+          _cmd.velocity.z += (i + 1) * coefs[DIM_Z].col(idx)(i + 1) * pow(t, i) / times[idx];
         }
-        else {
-          t /= times[idx];
-
-          _cmd.position.x = 0.0;
-          _cmd.position.y = 0.0;
-          _cmd.position.z = 0.0;
-          _cmd.velocity.x = 0.0;
-          _cmd.velocity.y = 0.0;
-          _cmd.velocity.z = 0.0;
-          _cmd.acceleration.x = 0.0;
-          _cmd.acceleration.y = 0.0;
-          _cmd.acceleration.z = 0.0;
-
-          // calculate x, x_dot, x_dot_dot
-
-          int cur_order = orders[idx];
-          int cur_poly_num = cur_order + 1;
-
-          for (int i = 0; i < cur_poly_num; i++) {
-            _cmd.position.x += coefs[DIM_X].col(idx)(i) * pow(t, i);
-            _cmd.position.y += coefs[DIM_Y].col(idx)(i) * pow(t, i);
-            _cmd.position.z += coefs[DIM_Z].col(idx)(i) * pow(t, i);
-            if (i < (cur_poly_num - 1)){
-              _cmd.velocity.x += (i + 1) * coefs[DIM_X].col(idx)(i + 1) * pow(t, i) / times[idx];
-              _cmd.velocity.y += (i + 1) * coefs[DIM_Y].col(idx)(i + 1) * pow(t, i) / times[idx];
-              _cmd.velocity.z += (i + 1) * coefs[DIM_Z].col(idx)(i + 1) * pow(t, i) / times[idx];
-            }
-            if (i < (cur_poly_num - 2)){
-              _cmd.acceleration.x += (i + 2) * (i + 1) * coefs[DIM_X].col(idx)(i + 2) * pow(t, i) / times[idx] / times[idx];
-              _cmd.acceleration.y += (i + 2) * (i + 1) * coefs[DIM_Y].col(idx)(i + 2) * pow(t, i) / times[idx] / times[idx];
-              _cmd.acceleration.z += (i + 2) * (i + 1) * coefs[DIM_Z].col(idx)(i + 2) * pow(t, i) / times[idx] / times[idx];
-            }
-          }
-
-          //_cmd.yaw = _start_yaw + (_final_yaw - _start_yaw) * t / ((_final_time - _start_time).toSec() + 1e-9);
-          _cmd.yaw = atan2(_cmd.velocity.y, _cmd.velocity.x);
-
-          gen_yaw_dot(_cmd,_odom);
-
-          break;
+        if (i < (cur_poly_num - 2)){
+          _cmd.acceleration.x += (i + 2) * (i + 1) * coefs[DIM_X].col(idx)(i + 2) * pow(t, i) / times[idx] / times[idx];
+          _cmd.acceleration.y += (i + 2) * (i + 1) * coefs[DIM_Y].col(idx)(i + 2) * pow(t, i) / times[idx] / times[idx];
+          _cmd.acceleration.z += (i + 2) * (i + 1) * coefs[DIM_Z].col(idx)(i + 2) * pow(t, i) / times[idx] / times[idx];
         }
       }
+
+      //_cmd.yaw = _start_yaw + (_final_yaw - _start_yaw) * t / ((_final_time - _start_time).toSec() + 1e-9);
+      _cmd.yaw = atan2(_cmd.velocity.y, _cmd.velocity.x);
+
+      gen_yaw_dot(_cmd,_odom);
 
     }
 
