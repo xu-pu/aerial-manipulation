@@ -5,10 +5,14 @@
 #include <quadrotor_msgs/PolynomialTrajectory.h>
 #include <quadrotor_msgs/PositionCommand.h>
 #include <tf/transform_broadcaster.h>
+#include <visualization_msgs/Marker.h>
+#include <visualization_msgs/MarkerArray.h>
 
 #include <Eigen/Dense>
 
 using namespace std;
+
+using Eigen::Vector3d;
 
 struct poly_traj_t {
 
@@ -41,8 +45,16 @@ struct poly_traj_t {
      * This is the max value of t for eval(), regardless of mag_coeff
      * @return
      */
-    double duration() const {
+    double poly_duration() const {
       return (final_time - start_time).toSec();
+    }
+
+    /**
+     * trajectory execution time, beware of mag_coeff
+     * @return
+     */
+    double duration() const {
+      return (final_time - start_time).toSec() * mag_coeff;
     }
 
     double start_yaw = 0.0;
@@ -98,7 +110,7 @@ struct poly_traj_t {
      * @param dt - normalized time inside the segment, [0,1]
      */
     void calc_segment_t(double t, int & idx, double & dt){
-      dt = min(t,duration());
+      dt = min(t, poly_duration());
       for ( idx = 0; idx < n_segment; ++idx) {
         // find the segment idx
         if (dt > times[idx] && idx + 1 < n_segment) {
@@ -166,6 +178,59 @@ struct poly_traj_t {
       }
 
     }
+
+    Vector3d eval_pos( double T ){
+
+      int idx;
+      double t;
+      calc_segment_t(T,idx,t);
+
+      double x = 0.0;
+      double y = 0.0;
+      double z = 0.0;
+
+      // calculate x, x_dot, x_dot_dot
+
+      int cur_order = orders[idx];
+      int cur_poly_num = cur_order + 1;
+
+      for (int i = 0; i < cur_poly_num; i++) {
+        x += coefs[DIM_X].col(idx)(i) * pow(t, i);
+        y += coefs[DIM_Y].col(idx)(i) * pow(t, i);
+        z += coefs[DIM_Z].col(idx)(i) * pow(t, i);
+      }
+
+      return {x,y,z};
+
+    }
+
+    Vector3d eval_acc( double T ){
+
+      int idx;
+      double t;
+      calc_segment_t(T,idx,t);
+
+      double x_dot_dot = 0.0;
+      double y_dot_dot = 0.0;
+      double z_dot_dot = 0.0;
+
+      // calculate x, x_dot, x_dot_dot
+
+      int cur_order = orders[idx];
+      int cur_poly_num = cur_order + 1;
+
+      for (int i = 0; i < cur_poly_num; i++) {
+        if (i < (cur_poly_num - 2)){
+          x_dot_dot += (i + 2) * (i + 1) * coefs[DIM_X].col(idx)(i + 2) * pow(t, i) / times[idx] / times[idx];
+          y_dot_dot += (i + 2) * (i + 1) * coefs[DIM_Y].col(idx)(i + 2) * pow(t, i) / times[idx] / times[idx];
+          z_dot_dot += (i + 2) * (i + 1) * coefs[DIM_Z].col(idx)(i + 2) * pow(t, i) / times[idx] / times[idx];
+        }
+      }
+
+      return {x_dot_dot,y_dot_dot,z_dot_dot};
+
+    }
+
 
     void gen_pos_cmd( quadrotor_msgs::PositionCommand & _cmd, const nav_msgs::Odometry & _odom ){
 
@@ -238,16 +303,92 @@ struct poly_traj_t {
     }
 
 
+
+
 };
 
+struct traj_visualizer_t {
+
+    static constexpr double clear_after_n_sec = 1;
+
+    quadrotor_msgs::PolynomialTrajectory latest_msg;
+
+    poly_traj_t poly_traj;
+
+    bool init = false;
+
+    ros::Publisher pub_marker_traj;
+    ros::Publisher pub_marker_acc;
+
+    explicit traj_visualizer_t( ros::NodeHandle & nh ) {
+
+      pub_marker_traj = nh.advertise<visualization_msgs::Marker>("/markers/traj", 1);
+      pub_marker_acc = nh.advertise<visualization_msgs::MarkerArray>("/markers/acc", 10);
+
+    }
+
+    void on_traj(  quadrotor_msgs::PolynomialTrajectoryConstPtr const & msg  ){
+      latest_msg = *msg;
+      poly_traj = poly_traj_t(latest_msg);
+      pub_marker_traj.publish(gen_marker_traj());
+
+      init = true;
+    }
+
+    void on_spin( const ros::TimerEvent &event ){
+      if ( !init ) { return; }
+      if ( (ros::Time::now() - latest_msg.header.stamp).toSec() > poly_traj.duration() + clear_after_n_sec ) {
+        clear_markers();
+      }
+    }
 
 
+    visualization_msgs::Marker gen_marker_traj(){
 
+      constexpr int id = 0;
+      constexpr double dt = 0.01;
 
-void on_traj( quadrotor_msgs::PolynomialTrajectoryConstPtr const & msg ) {
+      visualization_msgs::Marker marker;
 
+      marker.id = id;
+      marker.type = visualization_msgs::Marker::LINE_LIST;
+      marker.header.stamp = ros::Time::now();
+      marker.header.frame_id = "world";
+      marker.pose.orientation.w = 1.00;
+      marker.action = visualization_msgs::Marker::ADD;
+      marker.ns = "test";
+      marker.scale.x = 0.15;
+      marker.color.r = 0.00;
+      marker.color.g = 1.00;
+      marker.color.b = 0.00;
+      marker.color.a = 1.00;
 
-}
+      Vector3d lastX = poly_traj.eval_pos(0);
+      for (double t = dt; t < poly_traj.poly_duration(); t += dt){
+        geometry_msgs::Point point;
+        Vector3d X = poly_traj.eval_pos(t);
+        point.x = lastX(0);
+        point.y = lastX(1);
+        point.z = lastX(2);
+        marker.points.push_back(point);
+        point.x = X(0);
+        point.y = X(1);
+        point.z = X(2);
+        marker.points.push_back(point);
+        lastX = X;
+      }
+
+      return marker;
+
+    }
+
+    void clear_markers(){
+
+    }
+
+};
+
+void on_spin(){}
 
 int main( int argc, char** argv ) {
 
@@ -255,9 +396,18 @@ int main( int argc, char** argv ) {
 
   ros::NodeHandle nh("~");
 
-  ros::Subscriber sub_traj = nh.subscribe<quadrotor_msgs::PolynomialTrajectory>("/poly_traj_test",100,on_traj);
+  traj_visualizer_t traj_viz(nh);
+
+  constexpr size_t spin_hz = 10;
+
+  auto timer = nh.createTimer( ros::Duration( 1.0 / spin_hz ), &traj_visualizer_t::on_spin, &traj_viz );
+
+  ros::Subscriber sub_traj = nh.subscribe<quadrotor_msgs::PolynomialTrajectory>(
+          "/poly_traj_test", 100, &traj_visualizer_t::on_traj, &traj_viz );
 
   ros::spin();
+
+  traj_viz.clear_markers();
 
   ros::shutdown();
 

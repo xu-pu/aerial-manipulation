@@ -4,8 +4,11 @@
            args="-d $(find am_traj)/config/traj.rviz">
     </node>
 
-    <node pkg="am_traj" type="am_traj_node" name="example0" output="screen">
+    <node pkg="am_traj" type="am_traj_node" name="example0" output="log">
         <!-- node parameters -->
         <rosparam file="$(find am_traj)/config/example0_params.yaml" command="load" />
     </node>
+
+    <node pkg="rnw_ros" type="visualize_traj_node" name="visualize_traj_node" output="screen" required="true"/>
+
 </launch>
