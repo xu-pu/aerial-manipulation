@@ -37,6 +37,10 @@ struct poly_traj_t {
     ros::Time final_time = ros::TIME_MIN;
     ros::Time start_time = ros::TIME_MAX;
 
+    /**
+     * This is the max value of t for eval(), regardless of mag_coeff
+     * @return
+     */
     double duration() const {
       return (final_time - start_time).toSec();
     }
@@ -87,8 +91,14 @@ struct poly_traj_t {
 
     }
 
-    double calc_segment_t(double t, int & idx, double & dt){
-      dt = t;
+    /**
+     * Convert from relative time to segment time
+     * @param t - seconds since the starting point
+     * @param idx - index of the current segment
+     * @param dt - normalized time inside the segment, [0,1]
+     */
+    void calc_segment_t(double t, int & idx, double & dt){
+      dt = min(t,duration());
       for ( idx = 0; idx < n_segment; ++idx) {
         // find the segment idx
         if (dt > times[idx] && idx + 1 < n_segment) {
@@ -96,11 +106,12 @@ struct poly_traj_t {
         }
         else {
           dt /= times[idx];
-          break;
+          return;
         }
       }
-      //!!TODO fix here
-      assert(false);
+      // the end point
+      idx = n_segment-1;
+      dt = 1;
     }
 
     void gen_pos_cmd( quadrotor_msgs::PositionCommand & _cmd, const nav_msgs::Odometry & _odom ){
