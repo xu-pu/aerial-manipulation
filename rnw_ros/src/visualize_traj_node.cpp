@@ -319,11 +319,13 @@ struct traj_visualizer_t {
 
     ros::Publisher pub_marker_traj;
     ros::Publisher pub_marker_acc;
+    ros::Publisher pub_marker_lift;
 
     explicit traj_visualizer_t( ros::NodeHandle & nh ) {
 
       pub_marker_traj = nh.advertise<visualization_msgs::Marker>("/markers/traj", 1);
       pub_marker_acc = nh.advertise<visualization_msgs::MarkerArray>("/markers/acc", 1);
+      pub_marker_lift = nh.advertise<visualization_msgs::MarkerArray>("/markers/lift", 1);
 
     }
 
@@ -331,8 +333,10 @@ struct traj_visualizer_t {
       latest_msg = *msg;
       poly_traj = poly_traj_t(latest_msg);
 
-      clear_acc_markers();
-      pub_marker_acc.publish(gen_marker_acc());
+      //clear_acc_markers();
+      clear_lift_markers();
+      //pub_marker_acc.publish(gen_marker_acc());
+      pub_marker_lift.publish(gen_marker_lift());
       pub_marker_traj.publish(gen_marker_traj());
 
       init = true;
@@ -344,7 +348,6 @@ struct traj_visualizer_t {
         clear_markers();
       }
     }
-
 
     visualization_msgs::Marker gen_marker_traj(){
 
@@ -384,7 +387,6 @@ struct traj_visualizer_t {
       return marker;
 
     }
-
 
     visualization_msgs::MarkerArray gen_marker_acc(){
 
@@ -432,12 +434,69 @@ struct traj_visualizer_t {
 
     }
 
+    visualization_msgs::MarkerArray gen_marker_lift(){
+
+      constexpr int id = 0;
+      constexpr double epsi = 0.15;
+
+      Vector3d g = { 0, 0, -9.8 };
+
+      visualization_msgs::Marker marker;
+      visualization_msgs::MarkerArray accMarkers;
+
+      marker.id = id;
+      marker.header.stamp = ros::Time::now();
+      marker.header.frame_id = "world";
+      marker.pose.orientation.w = 1.00;
+      marker.action = visualization_msgs::Marker::ADD;
+      marker.type = visualization_msgs::Marker::ARROW;
+      marker.header.stamp = ros::Time::now();
+      marker.ns = "viz_lift";
+      marker.color.r = 255.0 / 255.0;
+      marker.color.g = 20.0 / 255.0;
+      marker.color.b = 147.0 / 255.0;
+      marker.color.a = 1.0;
+      marker.scale.x = 0.05;
+      marker.scale.y = 0.15;
+      marker.scale.z = 0.30;
+
+      for (double t = 0; t < poly_traj.duration(); t += epsi){
+        marker.id += 3;
+        marker.points.clear();
+        geometry_msgs::Point point;
+        Vector3d X = poly_traj.eval_pos(t);
+        point.x = X(0);
+        point.y = X(1);
+        point.z = X(2);
+        marker.points.push_back(point);
+        Vector3d lift = poly_traj.eval_acc(t) - g;
+        X += lift;
+        //X += Vector3d {0,0,1};
+        point.x = X(0);
+        point.y = X(1);
+        point.z = X(2);
+        marker.points.push_back(point);
+        accMarkers.markers.push_back(marker);
+      }
+
+      return accMarkers;
+
+    }
+
     void clear_acc_markers(){
       visualization_msgs::MarkerArray accMarkers;
       visualization_msgs::Marker accMarker;
       accMarker.action = visualization_msgs::Marker::DELETEALL;
       accMarkers.markers.push_back(accMarker);
       pub_marker_acc.publish(accMarkers);
+    }
+
+    void clear_lift_markers(){
+      visualization_msgs::MarkerArray accMarkers;
+      visualization_msgs::Marker accMarker;
+      accMarker.action = visualization_msgs::Marker::DELETEALL;
+      accMarkers.markers.push_back(accMarker);
+      pub_marker_lift.publish(accMarkers);
     }
 
     void clear_markers(){
