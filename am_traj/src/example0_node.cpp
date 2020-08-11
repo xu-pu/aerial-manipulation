@@ -10,9 +10,62 @@
 #include <visualization_msgs/Marker.h>
 #include <visualization_msgs/MarkerArray.h>
 
+#include <quadrotor_msgs/PolynomialTrajectory.h>
+
 using namespace std;
 using namespace ros;
 using namespace Eigen;
+
+void to_ros_msg( Trajectory const & traj, quadrotor_msgs::PolynomialTrajectory & trajMsg, Time const & iniStamp ){
+  trajMsg.header.stamp = iniStamp;
+  static uint32_t traj_id = 0;
+  traj_id++;
+  trajMsg.trajectory_id = traj_id;
+  trajMsg.action = quadrotor_msgs::PolynomialTrajectory::ACTION_ADD;
+  trajMsg.num_order = traj[0].getOrder();
+  trajMsg.num_segment = traj.getPieceNum();
+  Eigen::Vector3d initialVel, finalVel;
+  initialVel = traj.getVel(0.0);
+  finalVel = traj.getVel(traj.getTotalDuration());
+  trajMsg.start_yaw = atan2(initialVel(1), initialVel(0));
+  trajMsg.final_yaw = atan2(finalVel(1), finalVel(0));
+
+  for (size_t p = 0; p < (size_t)traj.getPieceNum(); p++) {
+    trajMsg.time.push_back(traj[p].getDuration());
+    trajMsg.order.push_back(traj[p].getCoeffMat().cols() - 1);
+
+    Eigen::VectorXd linearTr(2);
+    linearTr << 0.0, trajMsg.time[p];
+    std::vector<Eigen::VectorXd> linearTrCoeffs;
+    linearTrCoeffs.emplace_back(1);
+    linearTrCoeffs[0] << 1;
+    for (size_t k = 0; k < trajMsg.order[p]; k++) {
+      linearTrCoeffs.push_back(RootFinder::polyConv(linearTrCoeffs[k], linearTr));
+    }
+
+    Eigen::MatrixXd coefMat(3, traj[p].getCoeffMat().cols());
+    for (int i = 0; i < coefMat.cols(); i++) {
+      coefMat.col(i) = traj[p].getCoeffMat().col(coefMat.cols() - i - 1).head<3>();
+    }
+    coefMat.col(0) = coefMat.col(0).eval();
+
+    for (int i = 0; i < coefMat.cols(); i++) {
+      double coefx(0.0), coefy(0.0), coefz(0.0);
+      for (int j = i; j < coefMat.cols(); j++) {
+        coefx += coefMat(0, j) * linearTrCoeffs[j](i);
+        coefy += coefMat(1, j) * linearTrCoeffs[j](i);
+        coefz += coefMat(2, j) * linearTrCoeffs[j](i);
+      }
+      trajMsg.coef_x.push_back(coefx);
+      trajMsg.coef_y.push_back(coefy);
+      trajMsg.coef_z.push_back(coefz);
+    }
+  }
+
+  trajMsg.mag_coeff = 1.0;
+  trajMsg.debug_info = "";
+
+}
 
 class Config
 {
@@ -278,6 +331,8 @@ int main(int argc, char **argv)
     ros::init(argc, argv, "example0_node");
     ros::NodeHandle nh_, nh_priv("~");
 
+    ros::Publisher pub_poly_traj = nh_.advertise<quadrotor_msgs::PolynomialTrajectory>("/poly_traj_test",10);
+
     Config config(nh_priv);
     Visualizer viz(config, nh_);
     RandomRouteGenerator routeGen(Array3d(-16, -16, -16), Array3d(16, 16, 16));
@@ -295,6 +350,11 @@ int main(int argc, char **argv)
         {
             route = routeGen.generate(i);
             traj = amTrajOpt.genOptimalTrajDTC(route, zeroVec, zeroVec, zeroVec, zeroVec);
+
+            quadrotor_msgs::PolynomialTrajectory msg;
+            to_ros_msg(traj,msg,ros::Time::now());
+            pub_poly_traj.publish(msg);
+
             viz.visualize(traj, route, 0);
             std::cout << "---------------------------------------------------------------------------------------" << std::endl;
             std::cout << "RED:  Constrained Spatial-Temporal Optimal Trajectory" << std::endl

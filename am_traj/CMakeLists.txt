@@ -11,12 +11,14 @@ find_package(Eigen3 REQUIRED)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   visualization_msgs
+  quadrotor_msgs
 )
 
 include_directories(
     include
     ${catkin_INCLUDE_DIRS}
     ${EIGEN3_INCLUDE_DIRS}
+    /home/sheep/am_ws/devel/include # for clion only
 )
 
 catkin_package(
