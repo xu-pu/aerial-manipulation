@@ -183,7 +183,7 @@ struct traj_visualizer_t {
 
     }
 
-    void clear_acc_markers(){
+    void clear_acc_markers() const {
       visualization_msgs::MarkerArray accMarkers;
       visualization_msgs::Marker accMarker;
       accMarker.action = visualization_msgs::Marker::DELETEALL;
@@ -191,7 +191,7 @@ struct traj_visualizer_t {
       pub_marker_acc.publish(accMarkers);
     }
 
-    void clear_lift_markers(){
+    void clear_lift_markers() const {
       visualization_msgs::MarkerArray accMarkers;
       visualization_msgs::Marker accMarker;
       accMarker.action = visualization_msgs::Marker::DELETEALL;
@@ -199,8 +199,9 @@ struct traj_visualizer_t {
       pub_marker_lift.publish(accMarkers);
     }
 
-    void clear_markers(){
-
+    void clear_markers() const {
+      clear_lift_markers();
+      clear_acc_markers();
     }
 
 };
