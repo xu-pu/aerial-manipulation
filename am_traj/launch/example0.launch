@@ -9,6 +9,8 @@
         <rosparam file="$(find am_traj)/config/example0_params.yaml" command="load" />
     </node>
 
-    <node pkg="rnw_ros" type="visualize_traj_node" name="visualize_traj_node" output="screen" required="true"/>
+    <node pkg="rnw_ros" type="visualize_traj_node" name="traj_visualization" output="screen" required="true">
+        <remap from="~poly_traj" to="/poly_traj_test"/>
+    </node>
 
 </launch>

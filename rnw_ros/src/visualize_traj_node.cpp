@@ -9,7 +9,11 @@ using Eigen::Vector3d;
 
 struct traj_visualizer_t {
 
-    static constexpr double clear_after_n_sec = 1;
+    double clear_after_n_sec = 1;
+
+    double lift_dt = 0.15;
+
+    double acc_dt = 0.15;
 
     quadrotor_msgs::PolynomialTrajectory latest_msg;
 
@@ -22,10 +26,13 @@ struct traj_visualizer_t {
     ros::Publisher pub_marker_lift;
 
     explicit traj_visualizer_t( ros::NodeHandle & nh ) {
+      pub_marker_traj = nh.advertise<visualization_msgs::Marker>("markers/traj", 1);
+      pub_marker_acc = nh.advertise<visualization_msgs::MarkerArray>("markers/acc", 1);
+      pub_marker_lift = nh.advertise<visualization_msgs::MarkerArray>("markers/lift", 1);
 
-      pub_marker_traj = nh.advertise<visualization_msgs::Marker>("/markers/traj", 1);
-      pub_marker_acc = nh.advertise<visualization_msgs::MarkerArray>("/markers/acc", 1);
-      pub_marker_lift = nh.advertise<visualization_msgs::MarkerArray>("/markers/lift", 1);
+      clear_after_n_sec = get_param_default(nh,"clear_after_n_sec",1);
+      lift_dt = get_param_default(nh,"lift_dt",0.15);
+      acc_dt = get_param_default(nh,"acc_dt",0.15);
 
     }
 
@@ -91,7 +98,6 @@ struct traj_visualizer_t {
     visualization_msgs::MarkerArray gen_marker_acc(){
 
       constexpr int id = 0;
-      constexpr double epsi = 0.08;
 
       visualization_msgs::Marker marker;
       visualization_msgs::MarkerArray accMarkers;
@@ -112,7 +118,7 @@ struct traj_visualizer_t {
       marker.scale.y = 0.15;
       marker.scale.z = 0.30;
 
-      for (double t = 0; t < poly_traj.duration(); t += epsi){
+      for (double t = 0; t < poly_traj.duration(); t += acc_dt){
         marker.id += 3;
         marker.points.clear();
         geometry_msgs::Point point;
@@ -137,7 +143,6 @@ struct traj_visualizer_t {
     visualization_msgs::MarkerArray gen_marker_lift(){
 
       constexpr int id = 0;
-      constexpr double epsi = 0.15;
 
       Vector3d g = { 0, 0, -9.8 };
 
@@ -160,7 +165,7 @@ struct traj_visualizer_t {
       marker.scale.y = 0.15;
       marker.scale.z = 0.30;
 
-      for (double t = 0; t < poly_traj.duration(); t += epsi){
+      for (double t = 0; t < poly_traj.duration(); t += lift_dt){
         marker.id += 3;
         marker.points.clear();
         geometry_msgs::Point point;
@@ -220,8 +225,7 @@ int main( int argc, char** argv ) {
 
   auto timer = nh.createTimer( ros::Duration( 1.0 / spin_hz ), &traj_visualizer_t::on_spin, &traj_viz );
 
-  ros::Subscriber sub_traj = nh.subscribe<quadrotor_msgs::PolynomialTrajectory>(
-          "/poly_traj_test", 100, &traj_visualizer_t::on_traj, &traj_viz );
+  ros::Subscriber sub_traj = nh.subscribe<quadrotor_msgs::PolynomialTrajectory>("poly_traj", 100, &traj_visualizer_t::on_traj, &traj_viz );
 
   ros::spin();
 
