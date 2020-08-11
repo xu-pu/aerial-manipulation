@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<launch>
+    <node name="rviz" pkg="rviz" type="rviz" output="screen"
+           args="-d $(find am_traj)/config/traj.rviz">
+    </node>
+
+    <node pkg="am_traj" type="am_traj_node" name="example0" output="screen">
+        <!-- node parameters -->
+        <rosparam file="$(find am_traj)/config/example0_params.yaml" command="load" />
+    </node>
+</launch>

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8.3)
 
-project(example0)
+project(am_traj)
 
 set(CMAKE_CXX_FLAGS "-std=c++11")
 set(CMAKE_BUILD_TYPE "Release")
@@ -14,13 +14,13 @@ find_package(catkin REQUIRED COMPONENTS
 )
 
 include_directories(
+    include
     ${catkin_INCLUDE_DIRS}
     ${EIGEN3_INCLUDE_DIRS}
-    ../include
 )
 
 catkin_package(
-#  INCLUDE_DIRS include
+  INCLUDE_DIRS include
 #  LIBRARIES image_receiver
 #  CATKIN_DEPENDS roscpp rospy std_msgs
 #  DEPENDS system_lib
