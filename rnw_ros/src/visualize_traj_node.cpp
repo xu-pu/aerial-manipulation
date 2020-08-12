@@ -15,6 +15,8 @@ struct traj_visualizer_t {
 
     double acc_dt = 0.15;
 
+    double length_g = 1;
+
     quadrotor_msgs::PolynomialTrajectory latest_msg;
 
     poly_traj_t poly_traj;
@@ -33,6 +35,7 @@ struct traj_visualizer_t {
       clear_after_n_sec = get_param_default(nh,"clear_after_n_sec",1);
       lift_dt = get_param_default(nh,"lift_dt",0.15);
       acc_dt = get_param_default(nh,"acc_dt",0.15);
+      length_g = get_param_default(nh,"length_g",1);
 
     }
 
@@ -70,7 +73,9 @@ struct traj_visualizer_t {
       marker.pose.orientation.w = 1.00;
       marker.action = visualization_msgs::Marker::ADD;
       marker.ns = "test";
-      marker.scale.x = 0.15;
+      marker.scale.x = 0.03;
+      marker.scale.y = 0.03;
+      marker.scale.z = 0.03;
       marker.color.r = 0.00;
       marker.color.g = 1.00;
       marker.color.b = 0.00;
@@ -161,9 +166,9 @@ struct traj_visualizer_t {
       marker.color.g = 20.0 / 255.0;
       marker.color.b = 147.0 / 255.0;
       marker.color.a = 1.0;
-      marker.scale.x = 0.05;
-      marker.scale.y = 0.15;
-      marker.scale.z = 0.30;
+      marker.scale.x = 0.01;
+      marker.scale.y = 0.03;
+      marker.scale.z = 0.10;
 
       for (double t = 0; t < poly_traj.duration(); t += lift_dt){
         marker.id += 3;
@@ -174,7 +179,7 @@ struct traj_visualizer_t {
         point.y = X(1);
         point.z = X(2);
         marker.points.push_back(point);
-        Vector3d lift = poly_traj.eval_acc(t) - g;
+        Vector3d lift = (poly_traj.eval_acc(t) - g)/abs(g.z())*length_g;
         X += lift;
         //X += Vector3d {0,0,1};
         point.x = X(0);

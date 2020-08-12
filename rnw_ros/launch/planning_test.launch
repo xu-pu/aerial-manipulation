@@ -5,10 +5,12 @@
 <!--    <node pkg="am_traj" type="am_traj_node" name="example0" output="log">-->
 <!--        <rosparam file="$(find am_traj)/config/example0_params.yaml" command="load" />-->
 <!--    </node>-->
+    <node pkg="rnw_ros" type="test_traj_node" name="test_traj_node"/>
 
     <node pkg="rnw_ros" type="visualize_traj_node" name="traj_visualization" output="screen" required="true">
         <remap from="~poly_traj" to="/poly_traj_test"/>
-        <param name="lift_dt" type="double" value="0.08"/>
+        <param name="lift_dt" type="double" value="0.05"/>
+        <param name="length_g" type="double" value="1"/>
     </node>
 
 </launch>
