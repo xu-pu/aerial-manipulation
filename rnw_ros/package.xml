@@ -50,6 +50,7 @@
   <!--   <doc_depend>doxygen</doc_depend> -->
   <buildtool_depend>catkin</buildtool_depend>
 
+  <depend>am_traj</depend>
   <depend>poly_traj</depend>
   <depend>quadrotor_msgs</depend>
 

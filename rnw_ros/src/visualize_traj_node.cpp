@@ -223,7 +223,7 @@ int main( int argc, char** argv ) {
 
   constexpr size_t spin_hz = 10;
 
-  auto timer = nh.createTimer( ros::Duration( 1.0 / spin_hz ), &traj_visualizer_t::on_spin, &traj_viz );
+  //auto timer = nh.createTimer( ros::Duration( 1.0 / spin_hz ), &traj_visualizer_t::on_spin, &traj_viz );
 
   ros::Subscriber sub_traj = nh.subscribe<quadrotor_msgs::PolynomialTrajectory>("poly_traj", 100, &traj_visualizer_t::on_traj, &traj_viz );
 

@@ -16,6 +16,7 @@ find_package(catkin REQUIRED COMPONENTS
         std_msgs
         quadrotor_msgs
         poly_traj
+        am_traj
 )
 
 find_package(Ceres REQUIRED)

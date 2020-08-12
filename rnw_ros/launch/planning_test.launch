@@ -1,36 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
 <launch>
+    <node name="rviz" pkg="rviz" type="rviz" output="screen" args="-d $(find am_traj)/config/traj.rviz"/>
 
-	<arg name="uavname" default="fpv" />
-    <arg name="odom_topic" value="/uwb_vicon_odom" />
-    <arg name="cone_topic" value="/uwb_vicon_odom_cone" />
-    <arg name="imu_topic" default="/djiros/imu"/>
+<!--    <node pkg="am_traj" type="am_traj_node" name="example0" output="log">-->
+<!--        <rosparam file="$(find am_traj)/config/example0_params.yaml" command="load" />-->
+<!--    </node>-->
 
-    <node pkg="n3ctrl" type="n1_sim_helper.py" name="n1_sim_helper" output="screen" required="true">
-        <!--subscribers-->
-        <remap from="~velo" to="/djiros/velo" />
-        <remap from="~gps" to="/djiros/gps" />
-        <remap from="~imu" to="/djiros/imu" />
-        <!--publishers-->
-        <remap from="~odom" to="/uwb_vicon_odom" />
+    <node pkg="rnw_ros" type="visualize_traj_node" name="traj_visualization" output="screen" required="true">
+        <remap from="~poly_traj" to="/poly_traj_test"/>
+        <param name="lift_dt" type="double" value="0.08"/>
     </node>
-
-    <node pkg="rnw_ros" type="rnw_traj_server_node" name="rnw_traj_server_node" output="screen">
-        <!--subscribers-->
-        <remap from="~vicon" to="$(arg odom_topic)"/>
-        <!--params-->
-        <rosparam command="load" file="$(find rnw_ros)/config/rnw_config.yaml"/>
-    </node>
-
-    <node pkg="rnw_ros" type="pub_frames_node" name="pub_frames_node" output="screen">
-        <remap from="~imu" to="$(arg imu_topic)"/>
-        <remap from="~uav" to="$(arg odom_topic)"/>
-        <remap from="~cone" to="$(arg cone_topic)"/>
-        <remap from="~vins" to="/vins_estimator/imu_propagate"/>
-        <rosparam command="load" file="$(find rnw_ros)/config/rnw_config.yaml"/>
-    </node>
-
-    <node name="rviz_traj" pkg="rviz" type="rviz" output="log" args="-d $(find rnw_ros)/config/traj.rviz" />
-
-    <node pkg="rostopic" type="rostopic" name="rostopic" args="pub -r 10 /uwb_vicon_odom_cone nav_msgs/Odometry '{ header: { frame_id: world }, pose: { pose: { orientation: { w: 1 } } } }'"/>
 
 </launch>
