@@ -10,7 +10,7 @@
     <node pkg="rnw_ros" type="visualize_traj_node" name="traj_visualization" output="screen" required="true">
         <remap from="~poly_traj" to="/poly_traj_test"/>
         <param name="lift_dt" type="double" value="0.05"/>
-        <param name="length_g" type="double" value="1"/>
+        <param name="length_g" type="double" value="0.5"/>
     </node>
 
 </launch>

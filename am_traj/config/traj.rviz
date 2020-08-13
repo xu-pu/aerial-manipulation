@@ -6,6 +6,7 @@ Panels:
       Expanded:
         - /Global Options1
         - /Status1
+        - /Axes1
         - /MarkerArray1
       Splitter Ratio: 0.485106379
     Tree Height: 722
@@ -35,9 +36,9 @@ Visualization Manager:
   Displays:
     - Class: rviz/Axes
       Enabled: true
-      Length: 3
+      Length: 0.300000012
       Name: Axes
-      Radius: 0.100000001
+      Radius: 0.0299999993
       Reference Frame: <Fixed Frame>
       Value: true
     - Alpha: 0.5
@@ -131,7 +132,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 36.4661446
+      Distance: 4.28832197
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
@@ -146,10 +147,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 0.770398498
+      Pitch: 0.299797535
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 2.47040033
+      Yaw: 3.38857293
     Saved: ~
 Window Geometry:
   Displays:

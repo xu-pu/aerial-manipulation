@@ -7,7 +7,7 @@
 
 int main( int argc, char** argv ) {
 
-  sleep(5);
+  sleep(3);
 
   ros::init(argc,argv,"test_traj_node");
 
@@ -21,6 +21,8 @@ int main( int argc, char** argv ) {
   wpts.emplace_back(2,0,1);
   wpts.emplace_back(0,0,0.5);
   wpts.emplace_back(0,0,0.5-0.05);
+  wpts.emplace_back(0.5,1,0.5-0.05);
+  wpts.emplace_back(0.5,-1,0.5-0.05);
 
   Vector3d v0 = Vector3d::Zero();
 
