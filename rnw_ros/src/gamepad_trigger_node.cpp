@@ -24,23 +24,11 @@ struct gamepad_handler_t {
     static constexpr size_t BUTTON_B = 2;
     static constexpr size_t BUTTON_Y = 3;
 
-    std::string topic_A;
-
-    std::string topic_B;
-
-    std::string topic_X;
-
-    std::string topic_Y;
-
     explicit gamepad_handler_t( ros::NodeHandle & nh ){
-      topic_A = get_param_default<string>(nh,"topic_A","A");
-      topic_B = get_param_default<string>(nh,"topic_B","B");
-      topic_X = get_param_default<string>(nh,"topic_X","X");
-      topic_Y = get_param_default<string>(nh,"topic_Y","Y");
-      pub_A = nh.advertise<std_msgs::Header>(topic_A,10,false);
-      pub_B = nh.advertise<std_msgs::Header>(topic_B,10,false);
-      pub_X = nh.advertise<std_msgs::Header>(topic_X,10,false);
-      pub_Y = nh.advertise<std_msgs::Header>(topic_Y,10,false);
+      pub_A = nh.advertise<std_msgs::Header>("A",10,false);
+      pub_B = nh.advertise<std_msgs::Header>("B",10,false);
+      pub_X = nh.advertise<std_msgs::Header>("X",10,false);
+      pub_Y = nh.advertise<std_msgs::Header>("Y",10,false);
     }
 
     void on_joystick( sensor_msgs::JoyConstPtr const & msg ){
@@ -56,22 +44,22 @@ struct gamepad_handler_t {
       latest_joy = *msg;
 
       if ( pre_msg.buttons.at(BUTTON_A) > cur_msg.buttons.at(BUTTON_A) ) {
-        ROS_INFO_STREAM(topic_A << " triggered!");
+        ROS_INFO_STREAM("Button A triggered!");
         pub_A.publish(std_msgs::Header());
       }
 
       if ( pre_msg.buttons.at(BUTTON_B) > cur_msg.buttons.at(BUTTON_B) ) {
-        ROS_INFO_STREAM(topic_B << " triggered!");
+        ROS_INFO_STREAM("Button B triggered!");
         pub_B.publish(std_msgs::Header());
       }
 
       if ( pre_msg.buttons.at(BUTTON_X) > cur_msg.buttons.at(BUTTON_X) ) {
-        ROS_INFO_STREAM(topic_X << " triggered!");
+        ROS_INFO_STREAM("Button X triggered!");
         pub_X.publish(std_msgs::Header());
       }
 
       if ( pre_msg.buttons.at(BUTTON_Y) > cur_msg.buttons.at(BUTTON_Y) ) {
-        ROS_INFO_STREAM(topic_Y << " triggered!");
+        ROS_INFO_STREAM("Button Y triggered!");
         pub_Y.publish(std_msgs::Header());
       }
 

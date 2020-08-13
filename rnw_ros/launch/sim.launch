@@ -57,6 +57,29 @@
         <rosparam command="load" file="$(find rnw_ros)/config/rnw_config.yaml"/>
     </node>
 
+    <arg name="topic_trigger_insert" value="/rnw/trigger/insert" />
+    <arg name="topic_poly_traj" value="/rnw/poly_traj" />
+
+    <node pkg="joy" type="joy_node" name="joy_node" output="screen">
+        <param name="~autorepeat_rate" value="0" />
+    </node>
+
+    <node pkg="rnw_ros" type="gamepad_trigger_node" name="gamepad_trigger_node" output="screen">
+        <remap from="~A" to="$(arg topic_trigger_insert)"/>
+    </node>
+
+    <node pkg="rnw_ros" type="rnw_controller_node" name="rnw_controller_node" output="screen">
+        <remap from="~trigger_insert" to="$(arg topic_trigger_insert)"/>
+        <remap from="~poly_traj" to="$(arg topic_poly_traj)"/>
+        <rosparam command="load" file="$(find rnw_ros)/config/rnw_config.yaml"/>
+    </node>
+
+    <node pkg="rnw_ros" type="visualize_traj_node" name="traj_visualization" output="screen" required="true">
+        <remap from="~poly_traj" to="$(arg topic_poly_traj)"/>
+        <param name="lift_dt" type="double" value="0.05"/>
+        <param name="length_g" type="double" value="0.5"/>
+    </node>
+
     <node name="rviz_traj" pkg="rviz" type="rviz" output="log" args="-d $(find rnw_ros)/config/traj.rviz" />
 
     <node pkg="rostopic" type="rostopic" name="rostopic" args="pub -r 10 /uwb_vicon_odom_cone nav_msgs/Odometry '{ header: { frame_id: world }, pose: { pose: { orientation: { w: 1 } } } }'"/>
