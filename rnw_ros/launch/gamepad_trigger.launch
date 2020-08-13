@@ -4,4 +4,8 @@
         <param name="~autorepeat_rate" value="0" />
     </node>
 
+    <node pkg="rnw_ros" type="gamepad_trigger_node" name="gamepad_trigger_node" output="screen">
+
+    </node>
+
 </launch>

@@ -37,11 +37,19 @@ struct gamepad_handler_t {
       topic_B = get_param_default<string>(nh,"topic_B","B");
       topic_X = get_param_default<string>(nh,"topic_X","X");
       topic_Y = get_param_default<string>(nh,"topic_Y","Y");
+      pub_A = nh.advertise<std_msgs::Header>(topic_A,10,false);
+      pub_B = nh.advertise<std_msgs::Header>(topic_B,10,false);
+      pub_X = nh.advertise<std_msgs::Header>(topic_X,10,false);
+      pub_Y = nh.advertise<std_msgs::Header>(topic_Y,10,false);
     }
 
     void on_joystick( sensor_msgs::JoyConstPtr const & msg ){
 
-      if ( !init ) { latest_joy = *msg; return; }
+      if ( !init ) {
+        init = true;
+        latest_joy = *msg;
+        return;
+      }
 
       sensor_msgs::Joy pre_msg = latest_joy;
       sensor_msgs::Joy cur_msg = *msg;
