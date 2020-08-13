@@ -157,6 +157,7 @@ add_executable(gamepad_trigger_node src/gamepad_trigger_node.cpp)
 add_executable(dbg_atti_loop_node src/dbg_atti_loop_node.cpp)
 add_executable(pub_traj_marker_node src/pub_traj_marker_node.cpp)
 add_executable(visualize_traj_node src/visualize_traj_node.cpp)
+add_executable(rnw_controller_node src/rnw_controller_node.cpp)
 
 target_link_libraries(rnw_open_loop_node ${catkin_LIBRARIES})
 target_link_libraries(rnw_odom_node ${catkin_LIBRARIES})
@@ -171,6 +172,7 @@ target_link_libraries(pub_euler_angles_node ${catkin_LIBRARIES})
 target_link_libraries(dbg_atti_loop_node ${catkin_LIBRARIES})
 target_link_libraries(pub_traj_marker_node ${catkin_LIBRARIES})
 target_link_libraries(visualize_traj_node ${catkin_LIBRARIES})
+target_link_libraries(rnw_controller_node ${catkin_LIBRARIES})
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
