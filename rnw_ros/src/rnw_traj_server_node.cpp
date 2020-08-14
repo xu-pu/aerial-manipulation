@@ -48,7 +48,7 @@ struct traj_server_t {
 
     geometry_msgs::PoseStamped trigger_pose;
 
-    uint32_t traj_id = 0;
+    uint32_t traj_id = 1;
 
     double base_yaw;
 
