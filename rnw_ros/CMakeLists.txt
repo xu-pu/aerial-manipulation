@@ -17,6 +17,7 @@ find_package(catkin REQUIRED COMPONENTS
         quadrotor_msgs
         poly_traj
         am_traj
+        n3ctrl
 )
 
 find_package(Ceres REQUIRED)

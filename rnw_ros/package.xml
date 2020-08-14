@@ -53,6 +53,7 @@
   <depend>am_traj</depend>
   <depend>poly_traj</depend>
   <depend>quadrotor_msgs</depend>
+  <depend>n3ctrl</depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>

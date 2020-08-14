@@ -2,6 +2,7 @@
 #include "rnw_ros/pose_utils.h"
 #include "rnw_ros/rnw_utils.h"
 #include "rnw_ros/poly_traj.h"
+#include "n3ctrl/N3CtrlState.h"
 
 ros::Publisher pub_path_setpoint;
 ros::Publisher pub_path_plant;
@@ -44,6 +45,8 @@ struct traj_server_t {
 
     quadrotor_msgs::PolynomialTrajectory latest_poly_traj;
 
+    n3ctrl::N3CtrlState latest_n3ctrl_state;
+
     nav_msgs::Odometry cur_uav_odom;
 
     geometry_msgs::PoseStamped trigger_pose;
@@ -66,10 +69,10 @@ struct traj_server_t {
     }
 
     void on_trigger( geometry_msgs::PoseStampedConstPtr const & msg ){
-      ROS_INFO_STREAM("Traj Server Triggered, traj_id: " << msg->header.seq);
       on_cleanup();
       trigger_pose = *msg;
-      traj_id = max(traj_id,trigger_pose.header.seq);
+      traj_id = latest_n3ctrl_state.last_traj_id+1;
+      ROS_INFO_STREAM("[Traj Server] Triggered, last_traj_id: #" << latest_n3ctrl_state.last_traj_id);
     }
 
     void on_cleanup(){
@@ -120,10 +123,30 @@ struct traj_server_t {
     }
 
     void on_poly_traj( quadrotor_msgs::PolynomialTrajectoryConstPtr const & msg ){
-      on_cleanup();
-      poly_traj = poly_traj_t(*msg);
-      latest_poly_traj = *msg;
-      base_yaw = odom2yaw(cur_uav_odom);
+
+      if ( latest_n3ctrl_state.state == n3ctrl::N3CtrlState::STATE_CMD_HOVER ||
+           latest_n3ctrl_state.state == n3ctrl::N3CtrlState::STATE_CMD_CTRL )
+      {
+        on_cleanup();
+        poly_traj = poly_traj_t(*msg);
+        latest_poly_traj = *msg;
+        base_yaw = odom2yaw(cur_uav_odom);
+        traj_id = latest_n3ctrl_state.last_traj_id+1;
+        ROS_INFO_STREAM("[Traj Server] Start new trajectory with id #" << traj_id);
+      } else {
+        ROS_ERROR_STREAM("[Traj Server] Do not accept trajectory at current state of n3ctrl!");
+      }
+
+    }
+
+    void on_n3ctrl_state( n3ctrl::N3CtrlStateConstPtr const & msg ){
+      latest_n3ctrl_state = *msg;
+      // when accident happens in n3ctrl, the old trajectory is aborted,
+      // and last_traj_id will increase
+      if ( poly_traj.available && latest_n3ctrl_state.last_traj_id >= traj_id ) {
+        ROS_ERROR_STREAM("[Traj Server] Traj #" << traj_id << " aborted by n3ctrl!");
+        on_cleanup();
+      }
     }
 
 };
@@ -143,6 +166,7 @@ int main( int argc, char** argv ) {
   ros::Subscriber sub_odom = nh.subscribe<nav_msgs::Odometry>("/uwb_vicon_odom",10,&traj_server_t::on_odom,&traj_server);
   ros::Subscriber sub_trigger = nh.subscribe<geometry_msgs::PoseStamped>("/traj_start_trigger",10,&traj_server_t::on_trigger,&traj_server);
   ros::Subscriber sub_poly_traj = nh.subscribe<quadrotor_msgs::PolynomialTrajectory>("poly_traj",10,&traj_server_t::on_poly_traj,&traj_server);
+  ros::Subscriber sub_n3ctrl_state = nh.subscribe<n3ctrl::N3CtrlState>("/n3ctrl/n3ctrl_state",10,&traj_server_t::on_n3ctrl_state,&traj_server);
 
   ros::spin();
 

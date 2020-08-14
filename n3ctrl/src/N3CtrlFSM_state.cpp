@@ -115,7 +115,7 @@ void N3CtrlFSM::determine_state(const ros::Time& now_time) {
             }
         } else if (state == CMD_HOVER) {
             if (exit_cmd_js_satisfied) {
-                go_to_state(DIRECT_CTRL);
+                go_to_state(JS_CTRL);
             } else if (!rc_data.is_command_mode) {
                 go_to_state(JS_CTRL);
                 continue;
@@ -132,7 +132,8 @@ void N3CtrlFSM::determine_state(const ros::Time& now_time) {
             }
         } else if (state == CMD_CTRL) {
             if (exit_cmd_js_satisfied) {
-                go_to_state(DIRECT_CTRL);
+              leave_state(CMD_CTRL);
+              go_to_state(JS_CTRL);
             } else if (!rc_data.is_command_mode) {
                 leave_state(CMD_CTRL);
                 go_to_state(JS_CTRL);
