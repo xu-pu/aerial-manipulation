@@ -134,7 +134,7 @@ struct traj_server_t {
         traj_id = latest_n3ctrl_state.last_traj_id+1;
         ROS_INFO_STREAM("[Traj Server] Start new trajectory with id #" << traj_id);
       } else {
-        ROS_ERROR_STREAM("[Traj Server] Do not accept trajectory at current state of n3ctrl!");
+        ROS_WARN_STREAM("[Traj Server] Do not accept trajectory at current state of n3ctrl!");
       }
 
     }
@@ -144,7 +144,7 @@ struct traj_server_t {
       // when accident happens in n3ctrl, the old trajectory is aborted,
       // and last_traj_id will increase
       if ( poly_traj.available && latest_n3ctrl_state.last_traj_id >= traj_id ) {
-        ROS_ERROR_STREAM("[Traj Server] Traj #" << traj_id << " aborted by n3ctrl!");
+        ROS_WARN_STREAM("[Traj Server] Traj #" << traj_id << " aborted by n3ctrl!");
         on_cleanup();
       }
     }
