@@ -49,6 +49,7 @@ find_package(Eigen REQUIRED) # try to find manually installed eigen (Usually in 
 add_message_files(
   FILES
   ControllerDebug.msg
+  N3CtrlState.msg
 )
 
 generate_messages(

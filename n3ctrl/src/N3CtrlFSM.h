@@ -34,6 +34,7 @@ public:
 	ros::Publisher fsm_dbg_pub;
 	ros::Publisher des_pose_pub;
 	ros::Publisher traj_start_trigger_pub;
+	ros::Publisher state_pub;
 
 	Eigen::Vector4d hover_pose;
 	uint32_t last_command_id;
@@ -127,6 +128,9 @@ private:
 	void set_hov_with_odom();
 	std::string state_to_str();
 	std::string axis_state_to_str();
+
+	// ---- XU PU ----
+	void publish_state();
 
 };
 

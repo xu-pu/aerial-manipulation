@@ -1,5 +1,6 @@
 #include "N3CtrlFSM.h"
 #include <uav_utils/converters.h>
+#include <n3ctrl/N3CtrlState.h>
 
 using namespace Eigen;
 using std::cout;
@@ -104,6 +105,7 @@ void N3CtrlFSM::process()
 	determine_idling(now_time);
 	determine_state(now_time);
 	process_control(now_time);
+  publish_state();
 
 	if (state == CMD_HOVER || state == CMD_CTRL)
 	{
@@ -300,4 +302,11 @@ void N3CtrlFSM::set_js_ctrl_mode(JS_CTRL_Mode_t mode)
 	{
 		ROS_ASSERT(false && "INVALID LOGIC BRANCH.");
 	}
+}
+
+void N3CtrlFSM::publish_state(){
+  n3ctrl::N3CtrlState msg;
+  msg.header.stamp = ros::Time::now();
+  msg.state = this->state;
+  state_pub.publish(msg);
 }

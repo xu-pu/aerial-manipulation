@@ -9,6 +9,8 @@
 #include <signal.h>
 
 #include <n3ctrl/ControllerDebug.h>
+#include <n3ctrl/N3CtrlState.h>
+
 N3CtrlFSM* pFSM;
 
 void mySigintHandler(int sig) {
@@ -142,6 +144,8 @@ int main(int argc, char* argv[]) {
     fsm.des_pose_pub = nh.advertise<geometry_msgs::PoseStamped>("desire_pose", 10);
 
     fsm.fsm_dbg_pub = nh.advertise<std_msgs::Header>("fsm_dbg", 10);
+
+    fsm.state_pub = nh.advertise<n3ctrl::N3CtrlState>("n3ctrl_state",10);
 
     fsm.traj_start_trigger_pub = nh.advertise<geometry_msgs::PoseStamped>("traj_start_trigger", 10);
 
