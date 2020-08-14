@@ -1,5 +1,6 @@
 #include "rnw_ros/traj_uitls.h"
 #include "rnw_ros/pose_utils.h"
+#include "rnw_ros/ros_utils.h"
 
 ros::Publisher pub_path_setpoint;
 ros::Publisher pub_path_plant;
@@ -16,15 +17,6 @@ PoseStamped eigen2pathpoint( Vector3d const & T ){
   pose.header.stamp = ros::Time::now();
   pose.pose.position = eigen2ros(T);
   return pose;
-}
-
-Quaterniond ros2eigen( geometry_msgs::Quaternion const & quat ){
-  return { quat.w, quat.x, quat.y, quat.z };
-}
-
-Vector3d ros2eigen( geometry_msgs::Point const & pos ){
-  return { pos.x, pos.y, pos.z };
-
 }
 
 struct traj_server_t {

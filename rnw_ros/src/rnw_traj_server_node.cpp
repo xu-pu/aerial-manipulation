@@ -33,15 +33,6 @@ PoseStamped eigen2pathpoint( Vector3d const & T ){
   return pose;
 }
 
-Quaterniond ros2eigen( geometry_msgs::Quaternion const & quat ){
-  return { quat.w, quat.x, quat.y, quat.z };
-}
-
-Vector3d ros2eigen( geometry_msgs::Point const & pos ){
-  return { pos.x, pos.y, pos.z };
-
-}
-
 double odom2yaw( nav_msgs::Odometry const & odom ){
   Matrix3d R = ros2eigen(odom.pose.pose.orientation).toRotationMatrix();
   return quat2eulers(Quaterniond(R)).z();
@@ -129,6 +120,7 @@ struct traj_server_t {
     }
 
     void on_poly_traj( quadrotor_msgs::PolynomialTrajectoryConstPtr const & msg ){
+      on_cleanup();
       poly_traj = poly_traj_t(*msg);
       latest_poly_traj = *msg;
       base_yaw = odom2yaw(cur_uav_odom);

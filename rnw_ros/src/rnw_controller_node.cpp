@@ -77,6 +77,20 @@ struct rnw_controller_t {
 
     void on_trigger_rock( std_msgs::HeaderConstPtr const & msg ){}
 
+    void on_trigger_zigzag( std_msgs::HeaderConstPtr const & msg ) const {
+
+      Matrix3d R = ros2eigen(latest_uav_odom.pose.pose.orientation).toRotationMatrix();
+      Vector3d T = ros2eigen(latest_uav_odom.pose.pose.position);
+
+      vector<Vector3d> waypoints = gen_waypoint_zigzag(5,0.25,0.5);
+      vector<Vector3d> wps = transform_pts(waypoints,R,T);
+
+      Vector3d v0 = Vector3d::Zero();
+      Trajectory traj = traj_generator.genOptimalTrajDTC(wps,v0,v0,v0,v0);
+      pub_poly_traj.publish(to_ros_msg(traj,ros::Time::now()));
+
+    }
+
 };
 
 int main( int argc, char** argv ) {
@@ -97,6 +111,7 @@ int main( int argc, char** argv ) {
   ros::Subscriber sub_trigger_tip = nh.subscribe<std_msgs::Header>("trigger_go_to_tip", 10, &rnw_controller_t::on_trigger_go_to_tip, &rnw_controller);
   ros::Subscriber sub_trigger_insert = nh.subscribe<std_msgs::Header>("trigger_insert", 10, &rnw_controller_t::on_trigger_insert, &rnw_controller);
   ros::Subscriber sub_trigger_rock = nh.subscribe<std_msgs::Header>("trigger_rock", 10, &rnw_controller_t::on_trigger_rock, &rnw_controller);
+  ros::Subscriber sub_trigger_zigzag = nh.subscribe<std_msgs::Header>("trigger_zigzag", 10, &rnw_controller_t::on_trigger_zigzag, &rnw_controller);
 
   ros::spin();
 
