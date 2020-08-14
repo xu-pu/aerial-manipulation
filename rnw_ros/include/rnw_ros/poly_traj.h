@@ -16,6 +16,8 @@ struct poly_traj_t {
     static constexpr int DIM_Y = 1;
     static constexpr int DIM_Z = 2;
 
+    bool available = false;
+
     quadrotor_msgs::PolynomialTrajectory msg;
 
     // configuration for trajectory
@@ -65,7 +67,7 @@ struct poly_traj_t {
       traj_flag = quadrotor_msgs::PositionCommand::TRAJECTORY_STATUS_READY;
       traj_id = traj.trajectory_id;
       n_segment = traj.num_segment;
-      final_time = start_time = traj.header.stamp;
+      final_time = start_time = ros::Time::now();
       times.resize(n_segment);
 
       orders.clear();
@@ -77,7 +79,7 @@ struct poly_traj_t {
 
       start_yaw = traj.start_yaw;
       final_yaw = traj.final_yaw;
-      mag_coeff = traj.mag_coeff;
+      mag_coeff = 1;
 
       int max_order = *max_element(begin(orders), end(orders));
 
@@ -96,6 +98,8 @@ struct poly_traj_t {
         }
         shift += (order + 1);
       }
+
+      available = true;
 
     }
 
@@ -228,33 +232,25 @@ struct poly_traj_t {
     }
 
 
-    void gen_pos_cmd( quadrotor_msgs::PositionCommand & _cmd, const nav_msgs::Odometry & _odom ){
+    void gen_pos_cmd( quadrotor_msgs::PositionCommand & _cmd, const nav_msgs::Odometry & _odom, ros::Time const & _cur_t ){
 
-      _cmd.header.stamp = _odom.header.stamp;
+      _cmd.header.stamp = _cur_t;
 
-      _cmd.header.frame_id = "odom";
-      _cmd.trajectory_flag = traj_flag;
-      _cmd.trajectory_id = traj_id;
+      ros::Time cur_t = min(final_time,_cur_t);
 
-      double _t = max(0.0, (_odom.header.stamp - start_time).toSec()) / mag_coeff;
-
-      //cout<<"t: "<<t<<endl;
+      double dt = max(0.0, (cur_t - start_time).toSec());
 
       // #3. calculate the desired states
-      //ROS_WARN("[SERVER] the time : %.3lf\n, n = %d, m = %d", t, _n_order, _n_segment);
 
-      int idx; double t;
-      calc_segment_t(_t,idx,t);
+      int idx; double t; calc_segment_t(dt, idx, t);
+
+      ROS_INFO_STREAM("[gen_pos_cmd] idx: " << idx << ", t: " << t);
 
       eval(idx,t,
-           _cmd.position.x,_cmd.position.y,_cmd.position.z,
-           _cmd.velocity.x,_cmd.velocity.y,_cmd.velocity.z,
-           _cmd.acceleration.x,_cmd.acceleration.y,_cmd.acceleration.z);
-
-      //_cmd.yaw = _start_yaw + (_final_yaw - _start_yaw) * t / ((_final_time - _start_time).toSec() + 1e-9);
-      _cmd.yaw = atan2(_cmd.velocity.y, _cmd.velocity.x);
-
-      gen_yaw_dot(_cmd,_odom);
+           _cmd.position.x, _cmd.velocity.x, _cmd.acceleration.x,
+           _cmd.position.y,_cmd.velocity.y,_cmd.acceleration.y,
+           _cmd.position.z,_cmd.velocity.z,_cmd.acceleration.z
+      );
 
     }
 
