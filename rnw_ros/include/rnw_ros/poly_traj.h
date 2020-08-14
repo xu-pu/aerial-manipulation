@@ -244,7 +244,7 @@ struct poly_traj_t {
 
       int idx; double t; calc_segment_t(dt, idx, t);
 
-      ROS_INFO_STREAM("[gen_pos_cmd] idx: " << idx << ", t: " << t);
+      //ROS_INFO_STREAM("[gen_pos_cmd] idx: " << idx << ", t: " << t);
 
       eval(idx,t,
            _cmd.position.x, _cmd.velocity.x, _cmd.acceleration.x,
