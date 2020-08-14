@@ -308,5 +308,6 @@ void N3CtrlFSM::publish_state(){
   n3ctrl::N3CtrlState msg;
   msg.header.stamp = ros::Time::now();
   msg.state = this->state;
+  msg.last_traj_id = last_command_id;
   state_pub.publish(msg);
 }

@@ -9,3 +9,5 @@ uint8 STATE_CMD_CTRL = 5
 uint8 STATE_CMD_NO_CTRL = 6
 uint8 STATE_CMD_RESET_POS_CTRL = 7
 uint8 state
+
+uint32 last_traj_id
