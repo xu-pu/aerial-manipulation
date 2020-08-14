@@ -48,9 +48,7 @@ struct traj_server_t {
 
     geometry_msgs::PoseStamped trigger_pose;
 
-    inline uint32_t traj_id() const {
-      return trigger_pose.header.seq;
-    }
+    uint32_t traj_id = 0;
 
     double base_yaw;
 
@@ -58,25 +56,26 @@ struct traj_server_t {
 
     nav_msgs::Path path_plant;
 
-    bool triggered = false;
-
     explicit traj_server_t(){
       path_setpoint.header.frame_id = "world";
       path_plant.header.frame_id = "world";
+    }
+
+    void on_completion(){
+      traj_id++;
     }
 
     void on_trigger( geometry_msgs::PoseStampedConstPtr const & msg ){
       ROS_INFO_STREAM("Traj Server Triggered, traj_id: " << msg->header.seq);
       on_cleanup();
       trigger_pose = *msg;
-      triggered = true;
+      traj_id = max(traj_id,trigger_pose.header.seq);
     }
 
     void on_cleanup(){
       poly_traj = poly_traj_t();
       path_setpoint.poses.clear();
       path_plant.poses.clear();
-      triggered = false;
     }
 
     void on_odom( OdometryConstPtr const & odom ){
@@ -93,7 +92,7 @@ struct traj_server_t {
         cmd.yaw = base_yaw;
         cmd.yaw_dot = 0;
         cmd.trajectory_flag = cmd.TRAJECTORY_STATUS_READY;
-        cmd.trajectory_id = traj_id();
+        cmd.trajectory_id = traj_id;
         pub_pos_cmd.publish(cmd);
 
         //path
@@ -110,9 +109,10 @@ struct traj_server_t {
         cmd.yaw = base_yaw;
         cmd.yaw_dot = 0;
         cmd.trajectory_flag = cmd.TRAJECTORY_STATUS_COMPLETED;
-        cmd.trajectory_id = traj_id();
+        cmd.trajectory_id = traj_id;
         pub_pos_cmd.publish(cmd);
         on_cleanup();
+        on_completion();
       }
       else {
         // idle
