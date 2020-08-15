@@ -66,7 +66,7 @@ Vector3d imu2rpy( ImuConstPtr const & imu ){
 inline Matrix3d pose2R( geometry_msgs::Pose const & pose ){
   auto const & quat = pose.orientation;
   Eigen::Quaterniond q(quat.w, quat.x, quat.y, quat.z);
-  return q.toRotationMatrix();
+  return q.normalized().toRotationMatrix();
 }
 
 inline Vector3d pose2T( geometry_msgs::Pose const & pose ){
