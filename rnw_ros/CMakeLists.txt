@@ -18,6 +18,7 @@ find_package(catkin REQUIRED COMPONENTS
         poly_traj
         am_traj
         n3ctrl
+        message_generation
 )
 
 find_package(Ceres REQUIRED)
@@ -54,6 +55,17 @@ find_package(Ceres REQUIRED)
 ##     and list every .msg/.srv/.action file to be processed
 ##   * uncomment the generate_messages entry below
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
+
+add_message_files(
+        FILES
+        ConeState.msg
+)
+
+generate_messages(
+        DEPENDENCIES
+        geometry_msgs
+        nav_msgs
+)
 
 ## Generate messages in the 'msg' folder
 # add_message_files(
@@ -156,6 +168,7 @@ add_executable(dbg_atti_loop_node src/dbg_atti_loop_node.cpp)
 add_executable(pub_traj_marker_node src/pub_traj_marker_node.cpp)
 add_executable(visualize_traj_node src/visualize_traj_node.cpp)
 add_executable(rnw_controller_node src/rnw_controller_node.cpp)
+add_executable(pub_cone_state_node src/pub_cone_state_node.cpp)
 
 target_link_libraries(pub_frames_node ${catkin_LIBRARIES})
 target_link_libraries(test_traj_node ${catkin_LIBRARIES})
@@ -168,6 +181,7 @@ target_link_libraries(dbg_atti_loop_node ${catkin_LIBRARIES})
 target_link_libraries(pub_traj_marker_node ${catkin_LIBRARIES})
 target_link_libraries(visualize_traj_node ${catkin_LIBRARIES})
 target_link_libraries(rnw_controller_node ${catkin_LIBRARIES})
+target_link_libraries(pub_cone_state_node ${catkin_LIBRARIES})
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the

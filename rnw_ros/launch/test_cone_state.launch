@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<launch>
+
+    <arg name="topic_odom_cone" value="/pos_vel_mocap/odom_cone" />
+
+    <node name="rviz" pkg="rviz" type="rviz" output="screen" args="-d $(find am_traj)/config/traj.rviz"/>
+
+    <node pkg="rnw_ros" type="pub_cone_state_node" name="pub_cone_state_node" required="true" output="screen">
+        <remap from="~odom" to="$(arg topic_odom_cone)"/>
+    </node>
+
+</launch>

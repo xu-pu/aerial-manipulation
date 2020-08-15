@@ -18,6 +18,11 @@ using Eigen::Quaterniond;
 
 using namespace std;
 
+template<typename Derived>
+double msg_time_diff( Derived const & from, Derived const & to ){
+  return (to.header.stamp - from.header.stamp).toSec();
+}
+
 template<typename T>
 T get_param_default( ros::NodeHandle & nh, string const & key, T const & default_val ){
   T val;
