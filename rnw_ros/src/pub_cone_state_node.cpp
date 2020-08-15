@@ -57,9 +57,15 @@ struct cone_state_estimator_t {
 
     bool init = false;
 
+    bool cut_euler_velocity = false;
+
+    double max_euler_velocity = numeric_limits<double>::max();
+
     explicit cone_state_estimator_t( ros::NodeHandle & nh ){
       pub_cone_state = nh.advertise<rnw_ros::ConeState>("state",10);
       pub_odom_dt = nh.advertise<quadrotor_msgs::Float64Stamped>("dt",10);
+      cut_euler_velocity = get_param_default(nh,"cut_euler_velocity",false);
+      max_euler_velocity = get_param_default(nh,"max_euler_velocity",numeric_limits<double>::max());
     }
 
     void on_odom( nav_msgs::OdometryConstPtr const & msg ){
@@ -103,6 +109,15 @@ struct cone_state_estimator_t {
       //ROS_INFO_STREAM("after: " << euler_diff.transpose());
 
       Vector3d euler_vel = euler_diff/dt;
+
+      if ( cut_euler_velocity ) {
+        euler_vel(0) = min(euler_vel(0),max_euler_velocity);
+        euler_vel(1) = min(euler_vel(1),max_euler_velocity);
+        euler_vel(2) = min(euler_vel(2),max_euler_velocity);
+        euler_vel(0) = max(euler_vel(0),-max_euler_velocity);
+        euler_vel(1) = max(euler_vel(1),-max_euler_velocity);
+        euler_vel(2) = max(euler_vel(2),-max_euler_velocity);
+      }
 
       rnw_ros::ConeState msg_cone;
       msg_cone.header.stamp = msg->header.stamp;
