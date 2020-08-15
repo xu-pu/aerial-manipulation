@@ -3,6 +3,9 @@
 #include <ros/ros.h>
 #include <geometry_msgs/Vector3.h>
 #include <std_msgs/Float64.h>
+#include <quadrotor_msgs/Float64Stamped.h>
+
+#include "uav_utils/geometry_utils.h"
 
 #include "rnw_ros/pose_utils.h"
 #include "rnw_ros/traj_uitls.h"
@@ -56,7 +59,7 @@ struct cone_state_estimator_t {
 
     explicit cone_state_estimator_t( ros::NodeHandle & nh ){
       pub_cone_state = nh.advertise<rnw_ros::ConeState>("state",10);
-      pub_odom_dt = nh.advertise<std_msgs::Float64>("dt",10);
+      pub_odom_dt = nh.advertise<quadrotor_msgs::Float64Stamped>("dt",10);
     }
 
     void on_odom( nav_msgs::OdometryConstPtr const & msg ){
@@ -84,16 +87,25 @@ struct cone_state_estimator_t {
 
       double dt = msg_time_diff(pre,cur);
 
-      std_msgs::Float64 msg_dt;
-      msg_dt.data = dt;
+      quadrotor_msgs::Float64Stamped msg_dt;
+      msg_dt.header.stamp = msg->header.stamp;
+      msg_dt.value = dt;
       pub_odom_dt.publish(msg_dt);
 
       Vector3d euler_cur = cone_rot2euler(odom2R(cur));
       Vector3d euler_pre = cone_rot2euler(odom2R(pre));
 
-      Vector3d euler_vel = ( euler_cur - euler_pre )/dt;
+      Vector3d euler_diff = euler_cur - euler_pre;
+      //ROS_INFO_STREAM("before " << euler_diff.transpose());
+      euler_diff(0) = uav_utils::normalize_angle(euler_diff(0));
+      euler_diff(1) = uav_utils::normalize_angle(euler_diff(1));
+      euler_diff(2) = uav_utils::normalize_angle(euler_diff(2));
+      //ROS_INFO_STREAM("after: " << euler_diff.transpose());
+
+      Vector3d euler_vel = euler_diff/dt;
 
       rnw_ros::ConeState msg_cone;
+      msg_cone.header.stamp = msg->header.stamp;
       msg_cone.odom = cur;
       msg_cone.euler_angles = eigen2rosv(euler_cur);
       msg_cone.euler_angles_velocity = eigen2rosv(euler_vel);

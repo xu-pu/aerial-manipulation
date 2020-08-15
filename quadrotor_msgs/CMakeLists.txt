@@ -39,6 +39,7 @@ add_message_files(
   Replan.msg
   SwarmOdometry.msg
   SwarmInfo.msg
+  Float64Stamped.msg
 )
 
 generate_messages(

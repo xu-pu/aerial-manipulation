@@ -19,6 +19,7 @@ find_package(catkin REQUIRED COMPONENTS
         am_traj
         n3ctrl
         message_generation
+        uav_utils
 )
 
 find_package(Ceres REQUIRED)
