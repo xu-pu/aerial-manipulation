@@ -5,7 +5,7 @@
     </node>
 
     <node pkg="rnw_ros" type="body_point_calib_node" name="body_point_calib_node" output="screen">
-        <remap from="~body" to="/uav/pose" />
+        <remap from="~body" to="/cone/pose" />
         <remap from="~point" to="/calib/point" />
     </node>
 
