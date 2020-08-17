@@ -34,6 +34,34 @@ Toolbars:
 Visualization Manager:
   Class: ""
   Displays:
+    - Class: rviz/TF
+      Enabled: true
+      Frame Timeout: 15
+      Frames:
+        All Enabled: true
+        cone_odom:
+          Value: true
+        imu:
+          Value: true
+        uav_odom:
+          Value: true
+        world:
+          Value: true
+      Marker Scale: 1
+      Name: TF
+      Show Arrows: true
+      Show Axes: true
+      Show Names: true
+      Tree:
+        world:
+          cone_odom:
+            {}
+          imu:
+            {}
+          uav_odom:
+            {}
+      Update Interval: 0
+      Value: true
     - Class: rviz/Axes
       Enabled: true
       Length: 0.300000012
@@ -91,53 +119,29 @@ Visualization Manager:
         {}
       Queue Size: 100
       Value: false
-    - Class: rviz/MarkerArray
-      Enabled: true
-      Marker Topic: /traj_visualization/markers/lift
-      Name: MarkerArray
-      Namespaces:
-        {}
-      Queue Size: 100
-      Value: true
     - Class: rviz/Marker
       Enabled: true
       Marker Topic: /traj_visualization/markers/traj
       Name: Marker
       Namespaces:
-        {}
+        test: true
       Queue Size: 100
       Value: true
-    - Class: rviz/TF
+    - Class: rviz/MarkerArray
       Enabled: true
-      Frame Timeout: 15
-      Frames:
-        All Enabled: true
-        cone:
-          Value: true
-        cone_odom:
-          Value: true
-        uav:
-          Value: true
-        uav_odom:
-          Value: true
-        world:
-          Value: true
-      Marker Scale: 1
-      Name: TF
-      Show Arrows: true
-      Show Axes: true
-      Show Names: true
-      Tree:
-        world:
-          cone:
-            {}
-          cone_odom:
-            {}
-          uav:
-            {}
-          uav_odom:
-            {}
-      Update Interval: 0
+      Marker Topic: /traj_visualization/markers/lift
+      Name: MarkerArray
+      Namespaces:
+        viz_lift: true
+      Queue Size: 100
+      Value: true
+    - Class: rviz/MarkerArray
+      Enabled: true
+      Marker Topic: /traj_visualization/markers/acc
+      Name: MarkerArray
+      Namespaces:
+        viz_traj: true
+      Queue Size: 100
       Value: true
   Enabled: true
   Global Options:
@@ -164,25 +168,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 4.0247345
+      Distance: 4.76404715
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0
-        Y: 0
-        Z: 0
+        X: 0.796882272
+        Y: -1.00271809
+        Z: 0.267242402
       Focal Shape Fixed Size: false
       Focal Shape Size: 0.0500000007
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 0.414797366
+      Pitch: 0.38979739
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 2.6185782
+      Yaw: 3.66358447
     Saved: ~
 Window Geometry:
   Displays:

@@ -8,6 +8,8 @@
         <remap from="~poly_traj" to="$(arg topic_poly_traj)"/>
         <param name="lift_dt" type="double" value="0.05"/>
         <param name="length_g" type="double" value="0.5"/>
+        <param name="clear_after_n_sec" type="double" value="0"/>
+        <param name="use_sim_time" type="bool" value="true"/>
     </node>
 
 </launch>

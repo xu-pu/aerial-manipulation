@@ -52,7 +52,7 @@ struct poly_traj_t {
      * @return
      */
     double duration() const {
-      return (final_time - start_time).toSec() * mag_coeff;
+      return (final_time - start_time).toSec();
     }
 
     double start_yaw = 0.0;

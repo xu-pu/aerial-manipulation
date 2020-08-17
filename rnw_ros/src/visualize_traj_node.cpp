@@ -9,13 +9,24 @@ using Eigen::Vector3d;
 
 struct traj_visualizer_t {
 
-    double clear_after_n_sec = 1;
+    double clear_after_n_sec = numeric_limits<double>::max();
 
     double lift_dt = 0.15;
 
     double acc_dt = 0.15;
 
     double length_g = 1;
+
+    static constexpr double arrow_scale_x = 0.01;
+
+    static constexpr double arrow_scale_y = 0.03;
+
+    static constexpr double arrow_scale_z = 0.10;
+
+    /**
+     * record the receiving time using ros::Time::now() so it works in rosbag playback
+     */
+    ros::Time latest_time;
 
     quadrotor_msgs::PolynomialTrajectory latest_msg;
 
@@ -32,7 +43,7 @@ struct traj_visualizer_t {
       pub_marker_acc = nh.advertise<visualization_msgs::MarkerArray>("markers/acc", 1);
       pub_marker_lift = nh.advertise<visualization_msgs::MarkerArray>("markers/lift", 1);
 
-      clear_after_n_sec = get_param_default(nh,"clear_after_n_sec",1);
+      clear_after_n_sec = get_param_default(nh,"clear_after_n_sec",numeric_limits<double>::max());
       lift_dt = get_param_default(nh,"lift_dt",0.15);
       acc_dt = get_param_default(nh,"acc_dt",0.15);
       length_g = get_param_default(nh,"length_g",1);
@@ -42,10 +53,11 @@ struct traj_visualizer_t {
     void on_traj(  quadrotor_msgs::PolynomialTrajectoryConstPtr const & msg  ){
       latest_msg = *msg;
       poly_traj = poly_traj_t(latest_msg);
+      latest_time = ros::Time::now();
 
-      //clear_acc_markers();
+      clear_acc_markers();
       clear_lift_markers();
-      //pub_marker_acc.publish(gen_marker_acc());
+      pub_marker_acc.publish(gen_marker_acc());
       pub_marker_lift.publish(gen_marker_lift());
       pub_marker_traj.publish(gen_marker_traj());
 
@@ -54,7 +66,7 @@ struct traj_visualizer_t {
 
     void on_spin( const ros::TimerEvent &event ){
       if ( !init ) { return; }
-      if ( (ros::Time::now() - latest_msg.header.stamp).toSec() > poly_traj.duration() + clear_after_n_sec ) {
+      if ( (ros::Time::now() - latest_time).toSec() > poly_traj.duration() + clear_after_n_sec ) {
         clear_markers();
       }
     }
@@ -117,11 +129,11 @@ struct traj_visualizer_t {
       marker.ns = "viz_traj";
       marker.color.r = 255.0 / 255.0;
       marker.color.g = 20.0 / 255.0;
-      marker.color.b = 147.0 / 255.0;
+      marker.color.b = 0;
       marker.color.a = 1.0;
-      marker.scale.x = 0.05;
-      marker.scale.y = 0.15;
-      marker.scale.z = 0.30;
+      marker.scale.x = arrow_scale_x;
+      marker.scale.y = arrow_scale_y;
+      marker.scale.z = arrow_scale_z;
 
       for (double t = 0; t < poly_traj.duration(); t += acc_dt){
         marker.id += 3;
@@ -166,9 +178,9 @@ struct traj_visualizer_t {
       marker.color.g = 20.0 / 255.0;
       marker.color.b = 147.0 / 255.0;
       marker.color.a = 1.0;
-      marker.scale.x = 0.01;
-      marker.scale.y = 0.03;
-      marker.scale.z = 0.10;
+      marker.scale.x = arrow_scale_x;
+      marker.scale.y = arrow_scale_y;
+      marker.scale.z = arrow_scale_z;
 
       for (double t = 0; t < poly_traj.duration(); t += lift_dt){
         marker.id += 3;
@@ -216,8 +228,6 @@ struct traj_visualizer_t {
 
 };
 
-void on_spin(){}
-
 int main( int argc, char** argv ) {
 
   ros::init(argc,argv,"visualize_traj_node");
@@ -228,7 +238,7 @@ int main( int argc, char** argv ) {
 
   constexpr size_t spin_hz = 10;
 
-  //auto timer = nh.createTimer( ros::Duration( 1.0 / spin_hz ), &traj_visualizer_t::on_spin, &traj_viz );
+  auto timer = nh.createTimer( ros::Duration( 1.0 / spin_hz ), &traj_visualizer_t::on_spin, &traj_viz );
 
   ros::Subscriber sub_traj = nh.subscribe<quadrotor_msgs::PolynomialTrajectory>("poly_traj", 100, &traj_visualizer_t::on_traj, &traj_viz );
 
