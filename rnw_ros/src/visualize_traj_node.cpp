@@ -205,6 +205,12 @@ struct traj_visualizer_t {
 
     }
 
+    void clear_traj_markers() const {
+      visualization_msgs::Marker marker;
+      marker.action = visualization_msgs::Marker::DELETEALL;
+      pub_marker_traj.publish(marker);
+    }
+
     void clear_acc_markers() const {
       visualization_msgs::MarkerArray accMarkers;
       visualization_msgs::Marker accMarker;
@@ -222,6 +228,7 @@ struct traj_visualizer_t {
     }
 
     void clear_markers() const {
+      clear_traj_markers();
       clear_lift_markers();
       clear_acc_markers();
     }
