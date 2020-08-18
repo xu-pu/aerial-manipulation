@@ -2,9 +2,6 @@
 <launch>
     <node name="rviz" pkg="rviz" type="rviz" output="screen" args="-d $(find am_traj)/config/traj.rviz"/>
 
-<!--    <node pkg="am_traj" type="am_traj_node" name="example0" output="log">-->
-<!--        <rosparam file="$(find am_traj)/config/example0_params.yaml" command="load" />-->
-<!--    </node>-->
     <node pkg="rnw_ros" type="test_traj_node" name="test_traj_node"/>
 
     <node pkg="rnw_ros" type="visualize_traj_node" name="traj_visualization" output="screen" required="true">

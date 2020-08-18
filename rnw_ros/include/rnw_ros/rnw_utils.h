@@ -34,4 +34,30 @@ struct rnw_config_t {
 
 };
 
+/**
+ * insertion waypoints in the local frame of the cone tip
+ * @param hover_above
+ * @param insert_below
+ * @param head_room
+ * @param topple_forward
+ * @return
+ */
+inline vector<Vector3d> gen_topple_waypoints_local(
+        double hover_above = 0.05,
+        double insert_below = 0.03,
+        double head_room = 0.2,
+        double topple_forward = 0.2 )
+{
+  vector<Vector3d> wpts;
+  wpts.emplace_back(head_room,0,hover_above); // ahead
+  wpts.emplace_back(0,0,hover_above); // above tip
+  wpts.emplace_back(0,0,0); // tip point
+  wpts.emplace_back(0,0,-insert_below); // inserted
+  wpts.emplace_back(topple_forward*0.25,0,-insert_below); // start topple
+  wpts.emplace_back(topple_forward*0.5,0,-insert_below); // topple
+  wpts.emplace_back(topple_forward*0.75,0,-insert_below); // topple
+  wpts.emplace_back(topple_forward,0,-insert_below); // toppled
+  return wpts;
+}
+
 #endif //SRC_RNW_UTILS_H

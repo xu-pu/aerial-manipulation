@@ -5,9 +5,9 @@
 #include "am_traj/am_traj.hpp"
 #include "am_traj/ros_msgs.h"
 
-int main( int argc, char** argv ) {
+#include "rnw_ros/rnw_utils.h"
 
-  sleep(3);
+int main( int argc, char** argv ) {
 
   ros::init(argc,argv,"test_traj_node");
 
@@ -17,22 +17,31 @@ int main( int argc, char** argv ) {
 
   AmTraj amTrajOpt(1024,16,0.4,1,1,23,0.02);
 
-  vector<Vector3d> wpts;
-  wpts.emplace_back(2,0,1);
-  wpts.emplace_back(0,0,0.5);
-  wpts.emplace_back(0,0,0.5-0.05);
-  wpts.emplace_back(0.5,1,0.5-0.05);
-  wpts.emplace_back(0.5,-1,0.5-0.05);
+  Matrix3d R_tip = Matrix3d::Identity();
+  Vector3d T_tip = {0,0,1};
+
+  Vector3d cur_pos = {2,3,1};
+
+  vector<Vector3d> wpts = gen_topple_waypoints_local();
+
+  vector<Vector3d> waypoints = transform_pts(wpts,R_tip,T_tip);
+
+  waypoints.insert(waypoints.begin(),cur_pos);
 
   Vector3d v0 = Vector3d::Zero();
 
-  Trajectory traj = amTrajOpt.genOptimalTrajDTC(wpts,v0,v0,v0,v0);
+  Trajectory traj = amTrajOpt.genOptimalTrajDTC(waypoints,v0,v0,v0,v0);
   ROS_INFO_STREAM("traj generated");
 
   auto msg = to_ros_msg(traj,ros::Time::now());
-  pub_poly_traj.publish(msg);
 
-  ros::spin();
+  ros::Rate rate(1);
+
+  while(ros::ok()){
+    pub_poly_traj.publish(msg);
+    ros::spinOnce();
+    rate.sleep();
+  }
 
   ros::shutdown();
 
