@@ -67,7 +67,7 @@ struct rnw_controller_t {
     void on_trigger_topple( std_msgs::HeaderConstPtr const & msg ) const {
 
       Matrix3d R_tip = odom2R(latest_cone_odom);
-      Vector3d T_tip = odom2T(latest_cone_odom);
+      Vector3d T_tip = ros2eigen(latest_cone_tip.point);
       Vector3d cur_pos = odom2T(latest_uav_odom);
 
       auto wpts_local = gen_topple_waypoints_local();
