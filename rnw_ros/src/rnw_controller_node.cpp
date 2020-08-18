@@ -71,9 +71,8 @@ struct rnw_controller_t {
       Vector3d cur_pos = odom2T(latest_uav_odom);
 
       auto wpts_local = gen_topple_waypoints_local(rnw_config.hover_above_tip,rnw_config.insert_below_tip);
-      auto waypoints = transform_pts(wpts_local,R_tip,T_tip);
+      auto waypoints = transform_pts(transform_pts(wpts_local,R_tip,T_tip),Matrix3d::Identity(),-rnw_config.X_tcp_cage);
       waypoints.insert(waypoints.begin(),cur_pos);
-
       Vector3d v0 = Vector3d::Zero();
       Trajectory traj = traj_generator.genOptimalTrajDTC(waypoints, v0, v0, v0, v0);
       pub_poly_traj.publish(to_ros_msg(traj,ros::Time::now()));

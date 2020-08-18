@@ -3,8 +3,8 @@ X_tip_body:
   y: 0.0123065
   z: 0.662619
 X_tcp_cage:
-  x: -0.00299649
-  y: 0.00214184
+  x: 0
+  y: 0
   z: -0.123926
 hover_above_tip: 0.08
 insert_below_tip: 0.03
