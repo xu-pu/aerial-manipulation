@@ -108,6 +108,10 @@ Matrix3d odom2R( nav_msgs::Odometry const & odom ){
   return pose2R(odom.pose.pose);
 }
 
+Vector3d odom2T( nav_msgs::Odometry const & odom ){
+  return pose2T(odom.pose.pose);
+}
+
 Vector3d odom2T( OdometryConstPtr const & odom ){
   return pose2T(odom->pose.pose);
 }

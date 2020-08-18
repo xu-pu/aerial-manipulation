@@ -15,6 +15,8 @@ struct rnw_controller_t {
 
     nav_msgs::Odometry latest_uav_odom;
 
+    nav_msgs::Odometry latest_cone_odom;
+
     geometry_msgs::PointStamped latest_cone_tip;
 
     rnw_config_t rnw_config;
@@ -30,6 +32,10 @@ struct rnw_controller_t {
 
     void on_uav_odom( nav_msgs::OdometryConstPtr const & msg ){
       latest_uav_odom = *msg;
+    }
+
+    void on_cone_odom( nav_msgs::OdometryConstPtr const & msg ){
+      latest_cone_odom = *msg;
     }
 
     void on_cone_tip( geometry_msgs::PointStampedConstPtr const & msg ){
@@ -54,6 +60,22 @@ struct rnw_controller_t {
 
       Vector3d v0 = Vector3d::Zero();
       Trajectory traj = traj_generator.genOptimalTrajDTC({pt_uav, pt_tgt, pt_inserted}, v0, v0, v0, v0);
+      pub_poly_traj.publish(to_ros_msg(traj,ros::Time::now()));
+
+    }
+
+    void on_trigger_topple( std_msgs::HeaderConstPtr const & msg ) const {
+
+      Matrix3d R_tip = odom2R(latest_cone_odom);
+      Vector3d T_tip = odom2T(latest_cone_odom);
+      Vector3d cur_pos = odom2T(latest_uav_odom);
+
+      auto wpts_local = gen_topple_waypoints_local();
+      auto waypoints = transform_pts(wpts_local,R_tip,T_tip);
+      waypoints.insert(waypoints.begin(),cur_pos);
+
+      Vector3d v0 = Vector3d::Zero();
+      Trajectory traj = traj_generator.genOptimalTrajDTC(waypoints, v0, v0, v0, v0);
       pub_poly_traj.publish(to_ros_msg(traj,ros::Time::now()));
 
     }
@@ -104,6 +126,7 @@ int main( int argc, char** argv ) {
   rnw_controller_t rnw_controller(nh);
 
   ros::Subscriber sub_uav_odom = nh.subscribe<nav_msgs::Odometry>("/uwb_vicon_odom",10,&rnw_controller_t::on_uav_odom,&rnw_controller);
+  ros::Subscriber sub_cone_odom = nh.subscribe<nav_msgs::Odometry>("/uwb_vicon_odom_cone",10,&rnw_controller_t::on_cone_odom,&rnw_controller);
   ros::Subscriber sub_cone_tip = nh.subscribe<geometry_msgs::PointStamped>("/cone/tip",1,&rnw_controller_t::on_cone_tip,&rnw_controller);
 
   ros::Subscriber sub_trigger = nh.subscribe<geometry_msgs::PoseStamped>("/traj_start_trigger",10,&rnw_controller_t::on_trigger_n3ctrl,&rnw_controller);
@@ -112,6 +135,7 @@ int main( int argc, char** argv ) {
   ros::Subscriber sub_trigger_insert = nh.subscribe<std_msgs::Header>("trigger_insert", 10, &rnw_controller_t::on_trigger_insert, &rnw_controller);
   ros::Subscriber sub_trigger_rock = nh.subscribe<std_msgs::Header>("trigger_rock", 10, &rnw_controller_t::on_trigger_rock, &rnw_controller);
   ros::Subscriber sub_trigger_zigzag = nh.subscribe<std_msgs::Header>("trigger_zigzag", 10, &rnw_controller_t::on_trigger_zigzag, &rnw_controller);
+  ros::Subscriber sub_trigger_topple = nh.subscribe<std_msgs::Header>("trigger_topple", 10, &rnw_controller_t::on_trigger_topple, &rnw_controller);
 
   ros::spin();
 
