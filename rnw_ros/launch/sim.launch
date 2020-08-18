@@ -52,6 +52,7 @@
 
     <arg name="topic_trigger_insert" value="/rnw/trigger/insert" />
     <arg name="topic_trigger_zigzag" value="/rnw/trigger/zigzag" />
+    <arg name="topic_trigger_topple" value="/rnw/trigger/topple" />
     <arg name="topic_poly_traj" value="/rnw/poly_traj" />
 
     <node pkg="joy" type="joy_node" name="joy_node" output="screen">
@@ -61,11 +62,13 @@
     <node pkg="rnw_ros" type="gamepad_trigger_node" name="gamepad_trigger_node" output="screen">
         <remap from="~A" to="$(arg topic_trigger_insert)"/>
         <remap from="~X" to="$(arg topic_trigger_zigzag)"/>
+        <remap from="~Y" to="$(arg topic_trigger_topple)"/>
     </node>
 
     <node pkg="rnw_ros" type="rnw_controller_node" name="rnw_controller_node" output="screen">
         <remap from="~trigger_insert" to="$(arg topic_trigger_insert)"/>
         <remap from="~trigger_zigzag" to="$(arg topic_trigger_zigzag)"/>
+        <remap from="~trigger_topple" to="$(arg topic_trigger_topple)"/>
         <remap from="~poly_traj" to="$(arg topic_poly_traj)"/>
         <rosparam command="load" file="$(find rnw_ros)/config/rnw_config.yaml"/>
     </node>
