@@ -53,10 +53,7 @@ inline vector<Vector3d> gen_topple_waypoints_local(
   wpts.emplace_back(0,0,hover_above); // above tip
   wpts.emplace_back(0,0,0); // tip point
   wpts.emplace_back(0,0,-insert_below); // inserted
-  wpts.emplace_back(topple_forward*0.25,0,-insert_below); // start topple
-  wpts.emplace_back(topple_forward*0.5,0,-insert_below); // topple
-  wpts.emplace_back(topple_forward*0.75,0,-insert_below); // topple
-  wpts.emplace_back(topple_forward,0,-insert_below); // toppled
+  wpts.emplace_back(topple_forward,0,-insert_below-0.03); // toppled
   return wpts;
 }
 
