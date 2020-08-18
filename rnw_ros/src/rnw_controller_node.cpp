@@ -24,7 +24,7 @@ struct rnw_controller_t {
     AmTraj traj_generator;
 
     explicit rnw_controller_t(ros::NodeHandle & nh)
-            : traj_generator(1024, 16, 0.4, 1, 1, 23, 0.02)
+            : traj_generator(1024, 16, 0.4, 1, 0.5, 23, 0.02)
     {
       pub_poly_traj = nh.advertise<quadrotor_msgs::PolynomialTrajectory>("poly_traj",10,true);
       rnw_config.load_from_ros(nh);
@@ -70,7 +70,7 @@ struct rnw_controller_t {
       Vector3d T_tip = ros2eigen(latest_cone_tip.point);
       Vector3d cur_pos = odom2T(latest_uav_odom);
 
-      auto wpts_local = gen_topple_waypoints_local();
+      auto wpts_local = gen_topple_waypoints_local(rnw_config.hover_above_tip,rnw_config.insert_below_tip);
       auto waypoints = transform_pts(wpts_local,R_tip,T_tip);
       waypoints.insert(waypoints.begin(),cur_pos);
 
@@ -104,7 +104,7 @@ struct rnw_controller_t {
       Matrix3d R = ros2eigen(latest_uav_odom.pose.pose.orientation).toRotationMatrix();
       Vector3d T = ros2eigen(latest_uav_odom.pose.pose.position);
 
-      vector<Vector3d> waypoints = gen_waypoint_zigzag(5,0.25,0.5);
+      vector<Vector3d> waypoints = gen_waypoint_zigzag(5,0.1,0.2);
       vector<Vector3d> wps = transform_pts(waypoints,R,T);
 
       Vector3d v0 = Vector3d::Zero();
