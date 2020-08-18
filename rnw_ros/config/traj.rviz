@@ -4,6 +4,7 @@ Panels:
     Name: Displays
     Property Tree Widget:
       Expanded:
+        - /TF1
         - /TF1/Frames1
       Splitter Ratio: 0.421474367
     Tree Height: 750
@@ -36,18 +37,20 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: false
-        body:
-          Value: true
         cone_odom:
+          Value: false
+        ekf:
           Value: true
         imu:
+          Value: false
+        tag:
           Value: true
-        intermediate:
+        test_euler:
           Value: true
         uav_odom:
-          Value: true
+          Value: false
         world:
-          Value: true
+          Value: false
       Marker Scale: 1
       Name: TF
       Show Arrows: true
@@ -55,13 +58,15 @@ Visualization Manager:
       Show Names: true
       Tree:
         world:
-          body:
-            {}
           cone_odom:
+            {}
+          ekf:
             {}
           imu:
             {}
-          intermediate:
+          tag:
+            {}
+          test_euler:
             {}
           uav_odom:
             {}
@@ -207,7 +212,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/ThirdPersonFollower
-      Distance: 2.06226492
+      Distance: 2.24585176
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
@@ -222,10 +227,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 0.474797577
+      Pitch: 0.519796729
       Target Frame: vicon
       Value: ThirdPersonFollower (rviz)
-      Yaw: 5.54859209
+      Yaw: 2.60858774
     Saved: ~
 Window Geometry:
   Displays:

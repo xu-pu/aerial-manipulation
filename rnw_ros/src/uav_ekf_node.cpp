@@ -9,6 +9,8 @@
 #include <tf/transform_broadcaster.h>
 #include <Eigen/Eigen>
 
+#include "rnw_ros/pose_utils.h"
+
 using namespace std;
 using namespace Eigen;
 ros::Publisher odom_pub;
@@ -23,40 +25,11 @@ using Vector6d = Matrix<double,6,1>;
 using Matrix6d = Matrix<double,6,6>;
 
 Vector3d rot2euler( Matrix3d const & R ){
-  double phi = asin(R(1,2));
-  double psi = atan2(-R(1,0)/cos(phi),R(1,1)/cos(phi));
-  double theta = atan2(-R(0,2)/cos(phi),R(2,2)/cos(phi));
-  return { phi,theta,psi };
-}
-
-Matrix3d euler2rot( Vector3d const & euler ){
-
-  double roll = euler(0);
-  double pitch = euler(1);
-  double yaw = euler(2);
-
-  double sr = sin(roll);
-  double cr = cos(roll);
-  double sp = sin(pitch);
-  double cp = cos(pitch);
-  double sy = sin(yaw);
-  double cy = cos(yaw);
-
-  Matrix3d rst;
-  rst(0,0) = cy*cp - sr*sy*sp;
-  rst(0,1) = -cr*sy;
-  rst(0,2) = cy*sp+cp*sr*sy;
-
-  rst(1,0) = cp*sy+cy*sr*sp;
-  rst(1,1) = cr*cy;
-  rst(1,2) = sy*sp-cy*cp*sr;
-
-  rst(2,0) = -cr*sp;
-  rst(2,1) = sr;
-  rst(2,2) = cr*cp;
-
-  return rst;
-
+//  double phi = asin(R(1,2));
+//  double psi = atan2(-R(1,0)/cos(phi),R(1,1)/cos(phi));
+//  double theta = atan2(-R(0,2)/cos(phi),R(2,2)/cos(phi));
+//  return { phi,theta,psi };
+  return quat2eulers(Quaterniond(R));
 }
 
 Matrix3d euler_linear( Vector3d const & euler ){
@@ -113,6 +86,36 @@ Matrix3d Rz( double psi ){
           sin(psi), cos(psi), 0,
           0, 0, 1;
   return R;
+}
+
+Matrix3d euler2rot( Vector3d const & euler ){
+
+  double roll = euler(0);
+  double pitch = euler(1);
+  double yaw = euler(2);
+//
+//  double sr = sin(roll);
+//  double cr = cos(roll);
+//  double sp = sin(pitch);
+//  double cp = cos(pitch);
+//  double sy = sin(yaw);
+//  double cy = cos(yaw);
+//
+//  Matrix3d rst;
+//  rst(0,0) = cy*cp - sr*sy*sp;
+//  rst(0,1) = -cr*sy;
+//  rst(0,2) = cy*sp+cp*sr*sy;
+//
+//  rst(1,0) = cp*sy+cy*sr*sp;
+//  rst(1,1) = cr*cy;
+//  rst(1,2) = sy*sp-cy*cp*sr;
+//
+//  rst(2,0) = -cr*sp;
+//  rst(2,1) = sr;
+//  rst(2,2) = cr*cp;
+
+  return Rz(yaw)*Ry(pitch)*Rx(roll);
+
 }
 
 Matrix3d Rx_dot( double phi ){
@@ -312,16 +315,6 @@ Vector6 calc_measure_err( Vector15 const & state, Matrix3d const & R, Vector3d c
 
 }
 
-void publish_frame( Matrix3d const & R, Vector3d const & T, string const & name, string const & parent ){
-  static tf::TransformBroadcaster br;
-  tf::Transform transform;
-  transform.setOrigin( tf::Vector3(T.x(),T.y(),T.z()) );
-  Quaterniond quat(R);
-  tf::Quaternion q(quat.x(),quat.y(),quat.z(),quat.w());
-  transform.setRotation(q);
-  br.sendTransform(tf::StampedTransform(transform, ros::Time::now(), parent, name));
-}
-
 void publish_path( Vector3d const & T ){
   static nav_msgs::Path path_;
   geometry_msgs::PoseStamped path_pose;
@@ -398,7 +391,7 @@ struct ekf_estimator_t {
       cout << "acc_bias: " << x5.transpose() << endl;
     }
 
-    ekf_estimator_t(): Rbc(Quaterniond(0, 1, 0, 0)), Tbc(0.05,0.05,0) { }
+    ekf_estimator_t(): Rbc(Quaterniond(1, 0, 0, 0)), Tbc(0,0,0) { }
 
     void normalize_euler_angles(){
       ekf_state(3) = euler_rounding(ekf_state(3));
@@ -527,9 +520,12 @@ void odom_callback(const nav_msgs::Odometry::ConstPtr &msg)
   publish_frame(Rwb,Twb,"tag","world");
 
   Vector3d euler = rot2euler(Rwb);
-  cout << "roll: " << euler(0) << ", pitch: " << euler(1) << ", yaw: " << euler(2) << endl;
+  ROS_INFO_STREAM("roll: " << euler(0) << ", pitch: " << euler(1) << ", yaw: " << euler(2));
 
   estimator.update_tag(msg->header.stamp,Rwb,Twb);
+
+  Matrix3d RR = euler2rot(rot2euler(Rwb));
+  publish_frame(RR,Twb,"test_euler","world");
 
 }
 
@@ -541,7 +537,7 @@ int main(int argc, char **argv)
   ros::Subscriber s2 = n.subscribe("tag_odom", 1000, odom_callback);
   odom_pub = n.advertise<nav_msgs::Odometry>("ekf_odom", 100);
   path_pub = n.advertise<nav_msgs::Path>("ekf_path", 100);
-  Rcam = Quaterniond(0, 1, 0, 0).toRotationMatrix();
+  Rcam = Quaterniond(1, 0, 0, 0).toRotationMatrix();
   cout << "R_cam" << endl << Rcam << endl;
   // Q imu covariance matrix; Rt visual odomtry covariance matrix
   // You should also tune these parameters
@@ -551,14 +547,14 @@ int main(int argc, char **argv)
   // acc
   Q.block<3,3>(3,3) = 1 * Matrix3d::Identity();
   // ang bias
-  Q.block<3,3>(6,6) = 0.01 * Matrix3d::Identity();
+  Q.block<3,3>(6,6) = 0.1 * Matrix3d::Identity();
   // acc bias
-  Q.block<3,3>(9,9) = 0.01 * Matrix3d::Identity();
+  Q.block<3,3>(9,9) = 0.1 * Matrix3d::Identity();
 
   // position obs
-  Rt.topLeftCorner(3, 3) = 0.5 * Rt.topLeftCorner(3, 3);
+  Rt.topLeftCorner(3, 3) = 0.001 * Rt.topLeftCorner(3, 3);
   // rotation obs
-  Rt.bottomRightCorner(3, 3) = 0.5 * Rt.bottomRightCorner(3, 3);
+  Rt.bottomRightCorner(3, 3) = 0.01 * Rt.bottomRightCorner(3, 3);
   //Rt.bottomRightCorner(1, 1) = 0.1 * Rt.bottomRightCorner(1, 1);
 
   ros::spin();
