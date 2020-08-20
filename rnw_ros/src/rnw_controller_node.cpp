@@ -23,11 +23,15 @@ struct rnw_controller_t {
 
     AmTraj traj_generator;
 
+    AmTraj zigzag_generator;
+
     explicit rnw_controller_t(ros::NodeHandle & nh)
-            : traj_generator(1024, 16, 0.4, 1, 0.5, 23, 0.02)
+            : traj_generator(1024, 16, 0.4, 1, 0.5, 23, 0.02),
+              zigzag_generator(1024, 16, 0.4, 1, 0.5, 23, 0.02)
     {
-      pub_poly_traj = nh.advertise<quadrotor_msgs::PolynomialTrajectory>("poly_traj",10,true);
       rnw_config.load_from_ros(nh);
+      pub_poly_traj = nh.advertise<quadrotor_msgs::PolynomialTrajectory>("poly_traj",10,true);
+      zigzag_generator = AmTraj(1024, 16, 0.4, rnw_config.zigzag.max_vel, rnw_config.zigzag.max_acc, 23, 0.02);
     }
 
     void on_uav_odom( nav_msgs::OdometryConstPtr const & msg ){

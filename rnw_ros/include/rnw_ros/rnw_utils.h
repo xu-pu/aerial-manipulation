@@ -25,6 +25,10 @@ struct rnw_config_t {
 
         size_t cycles = 0;
 
+        double max_vel = 0;
+
+        double max_acc = 0;
+
     } zigzag;
 
     inline void load_from_ros( ros::NodeHandle & nh ){
@@ -43,6 +47,8 @@ struct rnw_config_t {
       zigzag.step_forward = get_param_default(nh,"zigzag/step_forward",0.1);
       zigzag.step_sideways = get_param_default(nh,"zigzag/step_sideways",0.1);
       zigzag.cycles = get_param_default(nh,"zigzag/cycles",5);
+      zigzag.max_vel = get_param_default(nh,"zigzag/max_vel",1);
+      zigzag.max_acc = get_param_default(nh,"zigzag/max_acc",0.5);
 
     }
 

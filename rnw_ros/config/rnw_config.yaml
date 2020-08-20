@@ -12,3 +12,5 @@ zigzag:
   step_forward: 0.1
   step_sideways: 0.1
   cycles: 5
+  max_vel: 1
+  max_acc: 0.5
