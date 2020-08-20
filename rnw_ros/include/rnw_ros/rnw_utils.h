@@ -59,7 +59,7 @@ struct rnw_config_t {
       zigzag.max_acc = get_param_default(nh,"zigzag/max_acc",0.5);
 
       topple.forward = get_param_default(nh,"topple/forward",0.2);
-      topple.downward = get_param_default(nh,"topple/downward",0.05);
+      topple.downward = get_param_default(nh,"topple/downward",0.03);
 
     }
 
@@ -76,15 +76,16 @@ struct rnw_config_t {
 inline vector<Vector3d> gen_topple_waypoints_local(
         double hover_above = 0.05,
         double insert_below = 0.03,
-        double head_room = 0.2,
-        double topple_forward = 0.2 )
+        double topple_forward = 0.2,
+        double topple_downward = 0.03,
+        double head_room = 0.2 )
 {
   vector<Vector3d> wpts;
   wpts.emplace_back(head_room,0,hover_above); // ahead
   wpts.emplace_back(0,0,hover_above); // above tip
   wpts.emplace_back(0,0,0); // tip point
   wpts.emplace_back(0,0,-insert_below); // inserted
-  wpts.emplace_back(topple_forward,0,-insert_below-0.03); // toppled
+  wpts.emplace_back(topple_forward,0,-insert_below-topple_downward); // toppled
   return wpts;
 }
 

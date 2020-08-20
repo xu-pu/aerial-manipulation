@@ -30,7 +30,7 @@ struct rnw_controller_t {
               zigzag_generator(1024, 16, 0.4, 1, 0.5, 23, 0.02)
     {
       rnw_config.load_from_ros(nh);
-      pub_poly_traj = nh.advertise<quadrotor_msgs::PolynomialTrajectory>("poly_traj",10,true);
+      pub_poly_traj = nh.advertise<quadrotor_msgs::PolynomialTrajectory>("poly_traj",10,false);
       zigzag_generator = AmTraj(1024, 16, 0.4, rnw_config.zigzag.max_vel, rnw_config.zigzag.max_acc, 23, 0.02);
     }
 
@@ -74,9 +74,19 @@ struct rnw_controller_t {
       Vector3d T_tip = ros2eigen(latest_cone_tip.point);
       Vector3d cur_pos = odom2T(latest_uav_odom);
 
-      auto wpts_local = gen_topple_waypoints_local(rnw_config.hover_above_tip,rnw_config.insert_below_tip);
+      auto wpts_local = gen_topple_waypoints_local(
+              rnw_config.hover_above_tip,
+              rnw_config.insert_below_tip,
+              rnw_config.topple.forward,
+              rnw_config.topple.downward
+      );
+
+      // wpts_local is the desired positions of tcp in the tip frame
+      // they need to be transformed to positions of the uav in the world frame
       auto waypoints = transform_pts(transform_pts(wpts_local,R_tip,T_tip),Matrix3d::Identity(),-rnw_config.X_tcp_cage);
+
       waypoints.insert(waypoints.begin(),cur_pos);
+
       Vector3d v0 = Vector3d::Zero();
       Trajectory traj = traj_generator.genOptimalTrajDTC(waypoints, v0, v0, v0, v0);
       pub_poly_traj.publish(to_ros_msg(traj,ros::Time::now()));
@@ -107,11 +117,16 @@ struct rnw_controller_t {
       Matrix3d R = ros2eigen(latest_uav_odom.pose.pose.orientation).toRotationMatrix();
       Vector3d T = ros2eigen(latest_uav_odom.pose.pose.position);
 
-      vector<Vector3d> waypoints = gen_waypoint_zigzag(5,0.1,0.2);
+      vector<Vector3d> waypoints = gen_waypoint_zigzag(
+              rnw_config.zigzag.cycles,
+              rnw_config.zigzag.step_forward,
+              rnw_config.zigzag.step_sideways
+      );
+
       vector<Vector3d> wps = transform_pts(waypoints,R,T);
 
       Vector3d v0 = Vector3d::Zero();
-      Trajectory traj = traj_generator.genOptimalTrajDTC(wps,v0,v0,v0,v0);
+      Trajectory traj = zigzag_generator.genOptimalTrajDTC(wps,v0,v0,v0,v0);
       pub_poly_traj.publish(to_ros_msg(traj,ros::Time::now()));
 
     }
