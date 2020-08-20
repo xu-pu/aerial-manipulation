@@ -19,6 +19,14 @@ struct rnw_config_t {
 
     struct {
 
+        double forward = 0;
+
+        double downward = 0;
+
+    } topple;
+
+    struct {
+
         double step_forward = 0;
 
         double step_sideways = 0;
@@ -49,6 +57,9 @@ struct rnw_config_t {
       zigzag.cycles = get_param_default(nh,"zigzag/cycles",5);
       zigzag.max_vel = get_param_default(nh,"zigzag/max_vel",1);
       zigzag.max_acc = get_param_default(nh,"zigzag/max_acc",0.5);
+
+      topple.forward = get_param_default(nh,"topple/forward",0.2);
+      topple.downward = get_param_default(nh,"topple/downward",0.05);
 
     }
 
