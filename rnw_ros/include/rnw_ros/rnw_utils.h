@@ -17,6 +17,16 @@ struct rnw_config_t {
 
     double insert_below_tip;
 
+    struct {
+
+        double step_forward = 0;
+
+        double step_sideways = 0;
+
+        size_t cycles = 0;
+
+    } zigzag;
+
     inline void load_from_ros( ros::NodeHandle & nh ){
 
       X_tip_body.x() = get_param_default(nh,"X_tip_body/x",0.);
@@ -29,6 +39,10 @@ struct rnw_config_t {
 
       hover_above_tip = get_param_default(nh,"hover_above_tip",5.);
       insert_below_tip = get_param_default(nh,"insert_below_tip",5.);
+
+      zigzag.step_forward = get_param_default(nh,"zigzag/step_forward",0.1);
+      zigzag.step_sideways = get_param_default(nh,"zigzag/step_sideways",0.1);
+      zigzag.cycles = get_param_default(nh,"zigzag/cycles",5);
 
     }
 

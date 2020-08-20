@@ -8,3 +8,7 @@ X_tcp_cage:
   z: -0.123926
 hover_above_tip: 0.08
 insert_below_tip: 0.03
+zigzag:
+  step_forward: 0.1
+  step_sideways: 0.1
+  cycles: 5
