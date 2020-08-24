@@ -28,6 +28,7 @@ find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
   uav_utils
   message_generation
+  dynamic_reconfigure
 )
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
@@ -56,6 +57,10 @@ generate_messages(
     DEPENDENCIES
     geometry_msgs
     std_msgs
+)
+
+generate_dynamic_reconfigure_options(
+        cfg/Gains.cfg
 )
 
 ###################################
@@ -113,7 +118,7 @@ add_executable(n3ctrl_node
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
-add_dependencies(n3ctrl_node n3ctrl_generate_messages_cpp)
+add_dependencies(n3ctrl_node ${PROJECT_NAME}_generate_messages_cpp ${PROJECT_NAME}_gencfg)
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(n3ctrl_node
