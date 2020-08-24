@@ -1,6 +1,6 @@
 <launch>
 
-	<arg name="uavname" default="fpv" />
+	<arg name="uavname" default="hil" />
     <arg name="odom_topic" value="/uwb_vicon_odom" />
     <arg name="cone_topic" value="/uwb_vicon_odom_cone" />
     <arg name="imu_topic" default="/djiros/imu"/>
