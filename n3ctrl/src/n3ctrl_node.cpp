@@ -11,7 +11,31 @@
 #include <n3ctrl/ControllerDebug.h>
 #include <n3ctrl/N3CtrlState.h>
 
+#include <dynamic_reconfigure/server.h>
+#include <n3ctrl/GainsConfig.h>
+
 N3CtrlFSM* pFSM;
+
+void gain_cfg_callback(n3ctrl::GainsConfig & config, uint32_t level ){
+
+  ROS_INFO_STREAM("[n3ctrl] dynamic_reconfigure callback");
+
+  if ( !pFSM ) {
+    ROS_ERROR_STREAM("[n3ctrl] Not initialized");
+    return;
+  }
+
+  Parameter_t::Gain gains {
+          .Kp0 = config.Kp0, .Kp1 = config.Kp1, .Kp2 = config.Kp2,
+          .Kv0 = config.Kv0, .Kv1 = config.Kv1, .Kv2 = config.Kv2,
+          .Kvi0 = config.Kp0, .Kvi1 = config.Kvi1, .Kvi2 = config.Kvi2,
+          .Ka0 = config.Ka0, .Ka1 = config.Ka1, .Ka2 = config.Ka2,
+          .Kyaw = config.Kyaw
+  };
+
+  pFSM->update_gains(gains);
+
+}
 
 void mySigintHandler(int sig) {
     pFSM->stateVisualizer.publish_led_vis(ros::Time::now(), "null");
@@ -150,6 +174,12 @@ int main(int argc, char* argv[]) {
     fsm.traj_start_trigger_pub = nh.advertise<geometry_msgs::PoseStamped>("traj_start_trigger", 10);
 
     fsm.stateVisualizer.led_pub = nh.advertise<visualization_msgs::Marker>("state_led", 10);
+
+    dynamic_reconfigure::Server<n3ctrl::GainsConfig> server;
+
+    dynamic_reconfigure::Server<n3ctrl::GainsConfig>::CallbackType f;
+
+  server.setCallback(gain_cfg_callback);
 
     // essential for publishers and subscribers to get ready
     ros::Duration(0.5).sleep();
