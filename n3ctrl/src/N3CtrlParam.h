@@ -98,4 +98,14 @@ private:
 	};
 };
 
+inline std::ostream & operator << ( std::ostream &out, const Parameter_t::Gain & gains )
+{
+  out << "Kp(" << gains.Kp0 << ", " << gains.Kp1 << ", " << gains.Kp2 << "), ";
+  out << "Kv(" << gains.Kv0 << ", " << gains.Kv1 << ", " << gains.Kv2 << "), ";
+  out << "Kvi(" << gains.Kvi0 << ", " << gains.Kvi1 << ", " << gains.Kvi2 << "), ";
+  out << "Ka(" << gains.Ka0 << ", " << gains.Ka1 << ", " << gains.Ka2 << "), ";
+  out << "Kyaw(" << gains.Kyaw << ")";
+  return out;
+}
+
 #endif

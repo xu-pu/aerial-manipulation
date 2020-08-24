@@ -45,6 +45,7 @@ void Controller::config_gain(const Parameter_t::Gain& gain)
 	Ka(1,1) = gain.Ka1;
 	Ka(2,2) = gain.Ka2;
 	Kyaw = gain.Kyaw;
+  ROS_WARN_STREAM("[n3ctrl] Gains: " << gain);
 }
 
 void Controller::update(

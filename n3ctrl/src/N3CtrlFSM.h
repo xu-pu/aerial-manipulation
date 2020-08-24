@@ -131,6 +131,7 @@ private:
 
 	// ---- XU PU ----
 	void publish_state();
+	void update_gains( Parameter_t::Gain const & );
 
 };
 

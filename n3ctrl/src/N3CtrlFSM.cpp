@@ -311,3 +311,9 @@ void N3CtrlFSM::publish_state(){
   msg.last_traj_id = last_command_id;
   state_pub.publish(msg);
 }
+
+void N3CtrlFSM::update_gains( const Parameter_t::Gain & gains ) {
+  param.hover_gain = gains;
+  param.track_gain = gains;
+  controller.config_gain(gains);
+}
