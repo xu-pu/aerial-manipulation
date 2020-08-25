@@ -61,7 +61,7 @@ void Controller::update(
   double yaw_curr = get_yaw_from_quaternion(odom.q);
   Matrix3d wRc = rotz(yaw_curr);
 
-  Vector3d F_des = calc_desired_force(des,odom);
+  Vector3d F_des = calc_desired_force_mellinger(des,odom);
 
   F_des = regulate_desired_force(F_des);
 
@@ -363,7 +363,7 @@ Eigen::Vector3d Controller::regulate_desired_force( Eigen::Vector3d const & cmd 
 
 }
 
-Eigen::Vector3d Controller::calc_desired_mellinger( const Desired_State_t& des,const Odom_Data_t& odom ){
+Eigen::Vector3d Controller::calc_desired_force_mellinger( const Desired_State_t& des,const Odom_Data_t& odom ){
 
   ROS_ASSERT_MSG(is_configured, "Gains for controller might not be initialized!");
 
@@ -376,19 +376,25 @@ Eigen::Vector3d Controller::calc_desired_mellinger( const Desired_State_t& des,c
   Matrix3d wRc = rotz(yaw_curr);
   Matrix3d cRw = wRc.transpose();
 
-  Vector3d e_p = des.p - odom.p;
-  Eigen::Vector3d u_p = wRc * Kp * cRw * e_p;
+  // P term in PID
 
-  Vector3d e_v = des.v + u_p - odom.v;
+  Vector3d e_p = des.p - odom.p;
+  Eigen::Vector3d u_p = wRc * Kp * cRw * e_p; // apply gain in intermediate frame
+
+  // D term in PID
+
+  Vector3d e_v = des.v - odom.v;
+  Eigen::Vector3d u_v_p = wRc * Kv * cRw * e_v; // apply gain in intermediate frame
+
+  // I term in PID
 
   const std::vector<double> integration_enable_limits = {0.1, 0.1, 0.1};
   for (size_t k = 0; k < 3; ++k) {
-    if (std::fabs(e_v(k)) < 0.2) {
-      int_e_v(k) += e_v(k) * 1.0 / 50.0;
+    if (std::fabs(e_p(k)) < integration_enable_limits.at(k)) {
+      int_e_v(k) += e_p(k) * 1.0 / 50.0;
     }
   }
 
-  Eigen::Vector3d u_v_p = wRc * Kv * cRw * e_v;
   const std::vector<double> integration_output_limits = {0.4, 0.4, 0.4};
   Eigen::Vector3d u_v_i = wRc * Kvi * cRw * int_e_v;
   for (size_t k = 0; k < 3; ++k) {
@@ -398,7 +404,9 @@ Eigen::Vector3d Controller::calc_desired_mellinger( const Desired_State_t& des,c
     }
   }
 
-  Eigen::Vector3d u_v = u_v_p + u_v_i;
+  // PID sum
+
+  Eigen::Vector3d u_v = u_p + u_v_p + u_v_i;
 
   Vector3d F_des = u_v * param.mass + Vector3d(0, 0, param.mass * param.gra) + Ka * param.mass * des.a;
 
