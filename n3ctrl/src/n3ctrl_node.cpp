@@ -147,15 +147,7 @@ int main(int argc, char* argv[]) {
 
     fsm.controller.ctrl_vis_pub = nh.advertise<sensor_msgs::Imu>("ctrl_vis", 10);
 
-    fsm.controller.ctrl_dbg_pub = nh.advertise<std_msgs::Header>("ctrl_dbg/info", 10);
-
     fsm.controller.ctrl_val_dbg_pub = nh.advertise<n3ctrl::ControllerDebug>("ctrl_dbg/value", 10);
-
-    fsm.controller.ctrl_dbg_p_pub = nh.advertise<geometry_msgs::Vector3Stamped>("ctrl_dbg/p", 10);
-
-    fsm.controller.ctrl_dbg_v_pub = nh.advertise<geometry_msgs::Vector3Stamped>("ctrl_dbg/v", 10);
-
-    fsm.controller.ctrl_dbg_a_pub = nh.advertise<geometry_msgs::Vector3Stamped>("ctrl_dbg/a", 10);
 
     fsm.controller.ctrl_dbg_att_des_pub =
         nh.advertise<geometry_msgs::Vector3Stamped>("ctrl_dbg/att_des", 10);

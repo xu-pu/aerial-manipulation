@@ -268,9 +268,8 @@ void Controller::output_visualization(const Controller_Output_t& u)
 };
 
 Eigen::Vector3d Controller::calc_desired_force( const Desired_State_t& des,const Odom_Data_t& odom ){
+
   ROS_ASSERT_MSG(is_configured, "Gains for controller might not be initialized!");
-  std::string constraint_info("");
-  Vector3d e_p, e_v, F_des;
 
   if (des.v(0) != 0.0 || des.v(1) != 0.0 || des.v(2) != 0.0) {
     // ROS_INFO("Reset integration");
@@ -281,10 +280,10 @@ Eigen::Vector3d Controller::calc_desired_force( const Desired_State_t& des,const
   Matrix3d wRc = rotz(yaw_curr);
   Matrix3d cRw = wRc.transpose();
 
-  e_p = des.p - odom.p;
+  Vector3d e_p = des.p - odom.p;
   Eigen::Vector3d u_p = wRc * Kp * cRw * e_p;
 
-  e_v = des.v + u_p - odom.v;
+  Vector3d e_v = des.v + u_p - odom.v;
 
   const std::vector<double> integration_enable_limits = {0.1, 0.1, 0.1};
   for (size_t k = 0; k < 3; ++k) {
@@ -299,87 +298,42 @@ Eigen::Vector3d Controller::calc_desired_force( const Desired_State_t& des,const
   for (size_t k = 0; k < 3; ++k) {
     if (std::fabs(u_v_i(k)) > integration_output_limits[k]) {
       uav_utils::limit_range(u_v_i(k), integration_output_limits[k]);
-      ROS_INFO("Integration saturate for axis %zu, value=%.3f", k, u_v_i(k));
+      ROS_WARN("Integration saturate for axis %zu, value=%.3f", k, u_v_i(k));
     }
   }
 
   Eigen::Vector3d u_v = u_v_p + u_v_i;
 
-  F_des = u_v * param.mass +
-          Vector3d(0, 0, param.mass * param.gra) + Ka * param.mass * des.a;
+  Vector3d F_des = u_v * param.mass + Vector3d(0, 0, param.mass * param.gra) + Ka * param.mass * des.a;
 
-  if (F_des(2) < 0.5 * param.mass * param.gra)
-  {
-    constraint_info = boost::str(
-            boost::format("thrust too low F_des(2)=%.3f; ")% F_des(2));
+  // Regulate F_des
+
+  std::string constraint_info("");
+
+  if (F_des(2) < 0.5 * param.mass * param.gra){
+    constraint_info = boost::str(boost::format("thrust too low F_des(2)=%.3f; ")% F_des(2));
     F_des = F_des / F_des(2) * (0.5 * param.mass * param.gra);
   }
-  else if (F_des(2) > 2 * param.mass * param.gra)
-  {
-    constraint_info = boost::str(
-            boost::format("thrust too high F_des(2)=%.3f; ")% F_des(2));
+  else if (F_des(2) > 2 * param.mass * param.gra){
+    constraint_info = boost::str(boost::format("thrust too high F_des(2)=%.3f; ")% F_des(2));
     F_des = F_des / F_des(2) * (2 * param.mass * param.gra);
   }
 
-  if (std::fabs(F_des(0)/F_des(2)) > std::tan(toRad(50.0)))
-  {
-    constraint_info += boost::str(boost::format("x(%f) too tilt; ")
-                                  % toDeg(std::atan2(F_des(0),F_des(2))));
+  if (std::fabs(F_des(0)/F_des(2)) > std::tan(toRad(50.0))){
+    constraint_info += boost::str(boost::format("x(%f) too tilt; ") % toDeg(std::atan2(F_des(0),F_des(2))));
     F_des(0) = F_des(0)/std::fabs(F_des(0)) * F_des(2) * std::tan(toRad(30.0));
   }
 
-  if (std::fabs(F_des(1)/F_des(2)) > std::tan(toRad(50.0)))
-  {
-    constraint_info += boost::str(boost::format("y(%f) too tilt; ")
-                                  % toDeg(std::atan2(F_des(1),F_des(2))));
+  if (std::fabs(F_des(1)/F_des(2)) > std::tan(toRad(50.0))){
+    constraint_info += boost::str(boost::format("y(%f) too tilt; ") % toDeg(std::atan2(F_des(1),F_des(2))));
     F_des(1) = F_des(1)/std::fabs(F_des(1)) * F_des(2) * std::tan(toRad(30.0));
   }
-  // }
 
-  if(param.pub_debug_msgs)
-  {
-    std_msgs::Header msg;
-    msg = odom.msg.header;
+  if ( !constraint_info.empty() ) {
+    ROS_WARN_STREAM(constraint_info);
+  }
 
-    std::stringstream ss;
-
-    if (constraint_info=="") constraint_info = "constraint no effect";
-    ss << std::endl << constraint_info << std::endl;
-    ss << "ep0 " << e_p(0) << " | ";
-    ss << "ep1 " << e_p(1) << " | ";
-    ss << "ep2 " << e_p(2) << " | ";
-    ss << "ev0 " << e_v(0) << " | ";
-    ss << "ev1 " << e_v(1) << " | ";
-    ss << "ev2 " << e_v(2) << " | ";
-    ss << "Fdes0 " << F_des(0) << " | ";
-    ss << "Fdes1 " << F_des(1) << " | ";
-    ss << "Fdes2 " << F_des(2) << " | ";
-
-    msg.frame_id = ss.str();
-    ctrl_dbg_pub.publish(msg);
-
-    geometry_msgs::Vector3Stamped m;
-    Vector3d d;
-
-    m.header = odom.msg.header;
-
-    d = -Kp * cRw * e_p;
-    // m.vector.x = d(0);
-    // m.vector.y = d(1);
-    // m.vector.z = d(2);
-
-    d = -Kv * cRw * e_v;
-    m.vector.x = d(0);
-    m.vector.y = d(1);
-    m.vector.z = d(2);
-    ctrl_dbg_v_pub.publish(m);
-
-    d = param.mass * des.a;
-    m.vector.x = d(0);
-    m.vector.y = d(1);
-    m.vector.z = d(2);
-    ctrl_dbg_a_pub.publish(m);
-
+  if(param.pub_debug_msgs){
     n3ctrl::ControllerDebug dbg_msg;
     dbg_msg.header = odom.msg.header;
     dbg_msg.des_p = uav_utils::to_vector3_msg(des.p);
@@ -390,12 +344,10 @@ Eigen::Vector3d Controller::calc_desired_force( const Desired_State_t& des,const
     dbg_msg.u_v_p = uav_utils::to_vector3_msg(u_v_p);
     dbg_msg.u_v_i = uav_utils::to_vector3_msg(u_v_i);
     dbg_msg.u_v = uav_utils::to_vector3_msg(u_v);
-
     dbg_msg.k_p_p = uav_utils::to_vector3_msg(Kp.diagonal());
     dbg_msg.k_p_i = uav_utils::to_vector3_msg(Eigen::Vector3d::Zero());
     dbg_msg.k_v_p = uav_utils::to_vector3_msg(Kv.diagonal());
     dbg_msg.k_v_i = uav_utils::to_vector3_msg(Kvi.diagonal());
-
     ctrl_val_dbg_pub.publish(dbg_msg);
   }
 

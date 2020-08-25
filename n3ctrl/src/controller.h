@@ -55,11 +55,7 @@ public:
 	ros::Publisher ctrl_so3_attitude_pub;
 	ros::Publisher ctrl_so3_thrust_pub;
 	ros::Publisher ctrl_vis_pub;
-	ros::Publisher ctrl_dbg_pub;
 	ros::Publisher ctrl_val_dbg_pub;
-	ros::Publisher ctrl_dbg_p_pub;
-	ros::Publisher ctrl_dbg_v_pub;
-	ros::Publisher ctrl_dbg_a_pub;
 	ros::Publisher ctrl_dbg_att_des_pub;
 	ros::Publisher ctrl_dbg_att_real_pub;
 
