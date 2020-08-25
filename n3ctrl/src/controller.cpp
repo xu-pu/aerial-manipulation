@@ -46,6 +46,8 @@ void Controller::config_gain(const Parameter_t::Gain& gain)
 	Ka(2,2) = gain.Ka2;
 	Kyaw = gain.Kyaw;
   ROS_WARN_STREAM("[n3ctrl] Gains: " << gain);
+  int_e_v.setZero();
+  ROS_INFO("[n3ctrl] integration terms reset!");
 }
 
 void Controller::update(
