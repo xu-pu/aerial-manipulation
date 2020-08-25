@@ -1,6 +1,6 @@
 mass        : 3.2
 gra         : 9.81
-hov_percent : 0.506365041899
+hov_percent : 0.38
 full_thrust : 81.8
 ctrl_rate   : 100.0
 js_ctrl_lock_velo: 0.3
@@ -9,7 +9,7 @@ pub_debug_msgs: false
 
 hover:
     set_hov_percent_to_zero: false
-    use_hov_percent_kf: true
+    use_hov_percent_kf: false
     vert_velo_limit_for_update: 0.2
     vert_height_limit_for_update: 0.2
     percent_lower_limit: 0.05

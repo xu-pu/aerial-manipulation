@@ -92,15 +92,17 @@ void N3CtrlFSM::process_control(const ros::Time& now_time)
 			hov_thr_kf.process(u.thrust);
 			hov_thr_kf.publish_thr();
 #else			
-			hov_thr_kf.simple_update(imu_data.q, u.thrust, imu_data.a);
-			// This line may not take effect according to param.hov.use_hov_percent_kf
-			param.config_full_thrust(hov_thr_kf.get_hov_thr());
-      quadrotor_msgs::Float64Stamped msg;
-      msg.header.stamp = now_time;
-      msg.value = hov_thr_kf.get_hov_thr();
-			pub_hov_thr.publish(msg);
-      msg.value = param.full_thrust;
-      pub_full_thrust.publish(msg);
+      if ( param.hover.use_hov_percent_kf ) {
+        hov_thr_kf.simple_update(imu_data.q, u.thrust, imu_data.a);
+        // This line may not take effect according to param.hov.use_hov_percent_kf
+        param.config_full_thrust(hov_thr_kf.get_hov_thr());
+        quadrotor_msgs::Float64Stamped msg;
+        msg.header.stamp = now_time;
+        msg.value = hov_thr_kf.get_hov_thr();
+        pub_hov_thr.publish(msg);
+        msg.value = param.full_thrust;
+        pub_full_thrust.publish(msg);
+      }
 #endif
 		}
 		
