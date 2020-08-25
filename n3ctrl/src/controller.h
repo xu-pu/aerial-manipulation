@@ -84,6 +84,11 @@ public:
 
 private:
 	bool is_configured;
+
+	// XU PU
+public:
+  Eigen::Vector3d calc_desired_force( const Desired_State_t& des,const Odom_Data_t& odom );
+
 };
 
 #endif
