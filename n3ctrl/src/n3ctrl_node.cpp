@@ -156,7 +156,7 @@ int main(int argc, char* argv[]) {
     fsm.controller.ctrl_dbg_att_real_pub =
         nh.advertise<geometry_msgs::Vector3Stamped>("ctrl_dbg/att_real", 10);
 
-    fsm.hov_thr_kf.hov_thr_pub = nh.advertise<std_msgs::Float64>("hov_thr", 10);
+    fsm.pub_hov_thr = nh.advertise<quadrotor_msgs::Float64Stamped>("hov_thr", 10);
 
     fsm.des_pose_pub = nh.advertise<geometry_msgs::PoseStamped>("desire_pose", 10);
 

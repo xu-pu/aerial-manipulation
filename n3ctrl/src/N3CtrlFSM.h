@@ -37,6 +37,7 @@ public:
 	ros::Publisher traj_start_trigger_pub;
 	ros::Publisher state_pub;
 	ros::Publisher pub_full_thrust;
+	ros::Publisher pub_hov_thr;
 
 	Eigen::Vector4d hover_pose;
 	uint32_t last_command_id;

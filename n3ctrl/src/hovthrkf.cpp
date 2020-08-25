@@ -85,9 +85,3 @@ void HovThrKF::simple_update(Eigen::Quaterniond q, double u, Eigen::Vector3d acc
         ROS_WARN("[n3ctrl.hover] Reach percent_higher_limit %f", x(0));
     }
 }
-
-void HovThrKF::publish_thr() {
-    std_msgs::Float64 msg;
-    msg.data = get_hov_thr();
-    hov_thr_pub.publish(msg);
-}

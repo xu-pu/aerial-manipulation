@@ -10,7 +10,6 @@ class HovThrKF
 {
 public:
 	Parameter_t& param;
-	ros::Publisher hov_thr_pub;
 
 	HovThrKF(Parameter_t&);
 	void init();
@@ -18,7 +17,6 @@ public:
 	void update(double a);
 	double get_hov_thr();
 	void set_hov_thr(double hov);
-	void publish_thr();
 	void simple_update(Eigen::Quaterniond q, double u, Eigen::Vector3d acc);
 private:
 	Eigen::VectorXd x;
