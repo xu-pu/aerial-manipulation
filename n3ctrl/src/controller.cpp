@@ -63,6 +63,8 @@ void Controller::update(
 
   Vector3d F_des = calc_desired_force(des,odom);
 
+  F_des = regulate_desired_force(F_des);
+
 	Vector3d z_b_des = F_des / F_des.norm();
 	
 	/////////////////////////////////////////////////
@@ -306,9 +308,33 @@ Eigen::Vector3d Controller::calc_desired_force( const Desired_State_t& des,const
 
   Vector3d F_des = u_v * param.mass + Vector3d(0, 0, param.mass * param.gra) + Ka * param.mass * des.a;
 
-  // Regulate F_des
+  if(param.pub_debug_msgs){
+    n3ctrl::ControllerDebug dbg_msg;
+    dbg_msg.header = odom.msg.header;
+    dbg_msg.des_p = uav_utils::to_vector3_msg(des.p);
+    dbg_msg.u_p_p = uav_utils::to_vector3_msg(u_p);
+    dbg_msg.u_p_i = uav_utils::to_vector3_msg(Eigen::Vector3d::Zero());
+    dbg_msg.u_p = uav_utils::to_vector3_msg(u_p);
+    dbg_msg.des_v = uav_utils::to_vector3_msg(des.v);
+    dbg_msg.u_v_p = uav_utils::to_vector3_msg(u_v_p);
+    dbg_msg.u_v_i = uav_utils::to_vector3_msg(u_v_i);
+    dbg_msg.u_v = uav_utils::to_vector3_msg(u_v);
+    dbg_msg.k_p_p = uav_utils::to_vector3_msg(Kp.diagonal());
+    dbg_msg.k_p_i = uav_utils::to_vector3_msg(Eigen::Vector3d::Zero());
+    dbg_msg.k_v_p = uav_utils::to_vector3_msg(Kv.diagonal());
+    dbg_msg.k_v_i = uav_utils::to_vector3_msg(Kvi.diagonal());
+    ctrl_val_dbg_pub.publish(dbg_msg);
+  }
 
-  std::string constraint_info("");
+  return F_des;
+
+}
+
+Eigen::Vector3d Controller::regulate_desired_force( Eigen::Vector3d const & cmd ){
+
+  Vector3d F_des = cmd;
+
+  std::string constraint_info;
 
   if (F_des(2) < 0.5 * param.mass * param.gra){
     constraint_info = boost::str(boost::format("thrust too low F_des(2)=%.3f; ")% F_des(2));
@@ -331,24 +357,6 @@ Eigen::Vector3d Controller::calc_desired_force( const Desired_State_t& des,const
 
   if ( !constraint_info.empty() ) {
     ROS_WARN_STREAM(constraint_info);
-  }
-
-  if(param.pub_debug_msgs){
-    n3ctrl::ControllerDebug dbg_msg;
-    dbg_msg.header = odom.msg.header;
-    dbg_msg.des_p = uav_utils::to_vector3_msg(des.p);
-    dbg_msg.u_p_p = uav_utils::to_vector3_msg(u_p);
-    dbg_msg.u_p_i = uav_utils::to_vector3_msg(Eigen::Vector3d::Zero());
-    dbg_msg.u_p = uav_utils::to_vector3_msg(u_p);
-    dbg_msg.des_v = uav_utils::to_vector3_msg(des.v);
-    dbg_msg.u_v_p = uav_utils::to_vector3_msg(u_v_p);
-    dbg_msg.u_v_i = uav_utils::to_vector3_msg(u_v_i);
-    dbg_msg.u_v = uav_utils::to_vector3_msg(u_v);
-    dbg_msg.k_p_p = uav_utils::to_vector3_msg(Kp.diagonal());
-    dbg_msg.k_p_i = uav_utils::to_vector3_msg(Eigen::Vector3d::Zero());
-    dbg_msg.k_v_p = uav_utils::to_vector3_msg(Kv.diagonal());
-    dbg_msg.k_v_i = uav_utils::to_vector3_msg(Kvi.diagonal());
-    ctrl_val_dbg_pub.publish(dbg_msg);
   }
 
   return F_des;
