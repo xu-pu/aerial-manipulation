@@ -4,6 +4,7 @@
 #include <ros/ros.h>
 #include <ros/assert.h>
 #include <quadrotor_msgs/SO3Command.h>
+#include <quadrotor_msgs/Float64Stamped.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <uav_utils/utils.h>
 #include <boost/format.hpp>
@@ -35,6 +36,7 @@ public:
 	ros::Publisher des_pose_pub;
 	ros::Publisher traj_start_trigger_pub;
 	ros::Publisher state_pub;
+	ros::Publisher pub_full_thrust;
 
 	Eigen::Vector4d hover_pose;
 	uint32_t last_command_id;

@@ -2,6 +2,7 @@
 #include "N3CtrlFSM.h"
 
 #include <quadrotor_msgs/SO3Command.h>
+#include <quadrotor_msgs/Float64Stamped.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <std_msgs/Header.h>
@@ -162,6 +163,8 @@ int main(int argc, char* argv[]) {
     fsm.fsm_dbg_pub = nh.advertise<std_msgs::Header>("fsm_dbg", 10);
 
     fsm.state_pub = nh.advertise<n3ctrl::N3CtrlState>("n3ctrl_state",10);
+
+    fsm.pub_full_thrust = nh.advertise<quadrotor_msgs::Float64Stamped>("full_thrust",10);
 
     fsm.traj_start_trigger_pub = nh.advertise<geometry_msgs::PoseStamped>("traj_start_trigger", 10);
 
