@@ -1,7 +1,7 @@
 mass        : 3.2
 gra         : 9.81
 hov_percent : 0.506365041899
-full_thrust : 62
+full_thrust : 81.8
 ctrl_rate   : 100.0
 js_ctrl_lock_velo: 0.3
 use_yaw_rate_ctrl: false
