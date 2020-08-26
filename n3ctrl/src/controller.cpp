@@ -32,6 +32,7 @@ void Controller::config_gain(const Parameter_t::Gain& gain)
 	Kv.setZero();
 	Kvi.setZero();
 	Ka.setZero();
+	Kap.setZero();
 	Kp(0,0) = gain.Kp0;
 	Kp(1,1) = gain.Kp1;
 	Kp(2,2) = gain.Kp2;
@@ -44,6 +45,9 @@ void Controller::config_gain(const Parameter_t::Gain& gain)
 	Ka(0,0) = gain.Ka0;
 	Ka(1,1) = gain.Ka1;
 	Ka(2,2) = gain.Ka2;
+  Kap(0,0) = gain.Kap0;
+  Kap(1,1) = gain.Kap1;
+  Kap(2,2) = gain.Kap2;
 	Kyaw = gain.Kyaw;
   ROS_WARN_STREAM("[n3ctrl] Gains: " << gain);
   int_e_v.setZero();
@@ -432,9 +436,15 @@ Eigen::Vector3d Controller::acceleration_loop( Eigen::Vector3d const & F_des, co
   // PI Controller for Acceleration
   // apply gains in the body frame
   Quaterniond Rbw = imu.q.inverse();
-  Vector3d a_des = Rbw * F_des / param.mass;
-  Vector3d a_est = odom.q * imu.a;
-  Vector3d e_a = a_des - a_est;
-  Vector3d u = F_des + ( imu.q * ( Kap * e_a ) ) * param.mass;
+  Vector3d a_des = Rbw * F_des / param.mass; // body frame
+  Vector3d a_est = imu.a; // body frame
+  Vector3d e_a = a_des - a_est; // body frame
+  if(param.pub_debug_msgs) {
+    geometry_msgs::Vector3Stamped msg;
+    msg.header.stamp = ros::Time::now();
+    msg.vector = uav_utils::to_vector3_msg(e_a);
+    ctrl_dbg_eerr_acc_pub.publish(msg);
+  }
+  Vector3d u = F_des + ( imu.q * ( Kap * e_a ) ) * param.mass; // world frame
   return u;
 }

@@ -58,6 +58,7 @@ public:
 	ros::Publisher ctrl_val_dbg_pub;
 	ros::Publisher ctrl_dbg_att_des_pub;
 	ros::Publisher ctrl_dbg_att_real_pub;
+	ros::Publisher ctrl_dbg_eerr_acc_pub;
 
 	Eigen::Matrix3d Kp;
 	Eigen::Matrix3d Kv;
