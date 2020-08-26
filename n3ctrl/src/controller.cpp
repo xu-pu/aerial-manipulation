@@ -57,6 +57,8 @@ void Controller::update(const Desired_State_t& des,const Odom_Data_t& odom,const
 
   Vector3d F_des = calc_desired_force_mellinger(des,odom);
 
+  F_des = acceleration_loop(F_des,imu,odom);
+
   F_des = regulate_desired_force(F_des);
 
 	Vector3d z_b_des = F_des / F_des.norm();
@@ -430,14 +432,9 @@ Eigen::Vector3d Controller::acceleration_loop( Eigen::Vector3d const & F_des, co
   // PI Controller for Acceleration
   // apply gains in the body frame
   Quaterniond Rbw = imu.q.inverse();
-
   Vector3d a_des = Rbw * F_des / param.mass;
   Vector3d a_est = odom.q * imu.a;
-
   Vector3d e_a = a_des - a_est;
-
-  Vector3d oo = F_des + Kap * e_a;
-
+  Vector3d oo = F_des + param.mass * Kap * e_a; // if Kap and Kai are 0, this function should do nothing
   return oo;
-
 }
