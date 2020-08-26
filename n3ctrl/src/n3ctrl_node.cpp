@@ -36,6 +36,13 @@ void gain_cfg_callback(n3ctrl::GainsConfig & config, uint32_t level ){
 
   pFSM->update_gains(gains);
 
+  if ( !pFSM->param.hover.use_hov_percent_kf ) {
+    pFSM->param.config_full_thrust(config.hover_percent);
+    pFSM->param.hov_percent = config.hover_percent;
+    pFSM->param.full_thrust = ( pFSM->param.mass * pFSM->param.gra / config.hover_percent );
+    ROS_WARN_STREAM("[n3ctrl][dyn_reconf] hover percent: " << config.hover_percent << ", full thrust: " << pFSM->param.full_thrust );
+  }
+
 }
 
 void mySigintHandler(int sig) {
