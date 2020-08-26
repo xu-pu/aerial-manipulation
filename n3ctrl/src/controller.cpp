@@ -435,6 +435,6 @@ Eigen::Vector3d Controller::acceleration_loop( Eigen::Vector3d const & F_des, co
   Vector3d a_des = Rbw * F_des / param.mass;
   Vector3d a_est = odom.q * imu.a;
   Vector3d e_a = a_des - a_est;
-  Vector3d oo = F_des + param.mass * Kap * e_a; // if Kap and Kai are 0, this function should do nothing
-  return oo;
+  Vector3d u = F_des + ( imu.q * ( Kap * e_a ) ) * param.mass;
+  return u;
 }

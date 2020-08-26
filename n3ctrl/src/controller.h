@@ -82,17 +82,25 @@ private:
 
 	// XU PU
 public:
-  Eigen::Vector3d calc_desired_force( const Desired_State_t& des,const Odom_Data_t& odom );
-  Eigen::Vector3d calc_desired_force_mellinger( const Desired_State_t& des,const Odom_Data_t& odom );
-  Eigen::Vector3d regulate_desired_force( Eigen::Vector3d const & cmd );
 
   /**
-   *
-   * @param F_des - world frame (not intermediate frame)
-   * @param imu
+   * Original method in N3Ctrl
+   * @param des
    * @param odom
-   * @return
+   * @return F_des in world frame
    */
+  Eigen::Vector3d calc_desired_force( const Desired_State_t& des,const Odom_Data_t& odom );
+
+  /**
+   * Based on mellinger thesis
+   * @param des
+   * @param odom
+   * @return F_des in world frame
+   */
+  Eigen::Vector3d calc_desired_force_mellinger( const Desired_State_t& des,const Odom_Data_t& odom );
+
+  Eigen::Vector3d regulate_desired_force( Eigen::Vector3d const & cmd );
+
   Eigen::Vector3d acceleration_loop( Eigen::Vector3d const & F_des, const Imu_Data_t& imu, const Odom_Data_t& odom );
 
 };
