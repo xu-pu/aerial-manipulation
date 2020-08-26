@@ -159,7 +159,7 @@ void N3CtrlFSM::process_hover_control(Controller_Output_t& u, SO3_Controller_Out
 	des.yaw = hover_pose(3);
 	des.a = Vector3d::Zero();
 
-	controller.update(des, odom_data, u, u_so3);
+	controller.update(des, odom_data, imu_data, u, u_so3);
 
 	publish_desire(des);
 }
@@ -172,7 +172,7 @@ void N3CtrlFSM::process_break_control(Controller_Output_t& u, SO3_Controller_Out
 	des.yaw = get_yaw_from_odom();
 	des.a = Vector3d::Zero();
 
-	controller.update(des, odom_data, u, u_so3);
+	controller.update(des, odom_data, imu_data, u, u_so3);
 
 	publish_desire(des);
 }
@@ -185,7 +185,7 @@ void N3CtrlFSM::process_cmd_control(Controller_Output_t& u, SO3_Controller_Outpu
 	des.yaw = cmd_data.yaw;
 	des.a = cmd_data.a;
 
-	controller.update(des, odom_data, u, u_so3);
+	controller.update(des, odom_data, imu_data, u, u_so3);
 
 	publish_desire(des);	
 }
@@ -237,7 +237,7 @@ void N3CtrlFSM::process_js_control(Controller_Output_t& u, SO3_Controller_Output
 			ROS_ASSERT(false);
 	}
 
-	controller.update(des, odom_data, u, u_so3); 
+	controller.update(des, odom_data, imu_data, u, u_so3);
 
 	publish_desire(des);
 }

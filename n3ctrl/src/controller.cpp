@@ -50,13 +50,7 @@ void Controller::config_gain(const Parameter_t::Gain& gain)
   ROS_INFO("[n3ctrl] integration terms reset!");
 }
 
-void Controller::update(
-	const Desired_State_t& des, 
-	const Odom_Data_t& odom, 
-	Controller_Output_t& u, 
-	SO3_Controller_Output_t& u_so3
-)
-{
+void Controller::update(const Desired_State_t& des,const Odom_Data_t& odom,const Imu_Data_t& imu,Controller_Output_t& u,SO3_Controller_Output_t& u_so3){
 
   double yaw_curr = get_yaw_from_quaternion(odom.q);
   Matrix3d wRc = rotz(yaw_curr);
