@@ -5,6 +5,8 @@ Panels:
     Property Tree Widget:
       Expanded:
         - /Odometry1/Shape1
+        - /Odometry2
+        - /Odometry2/Shape1
       Splitter Ratio: 0.421474367
     Tree Height: 750
   - Class: rviz/Selection
@@ -36,14 +38,12 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: false
-        body:
-          Value: false
+        cone:
+          Value: true
         cone_odom:
           Value: false
-        imu:
-          Value: false
-        intermediate:
-          Value: false
+        uav:
+          Value: true
         uav_odom:
           Value: true
         world:
@@ -55,13 +55,11 @@ Visualization Manager:
       Show Names: true
       Tree:
         world:
-          body:
+          cone:
             {}
           cone_odom:
             {}
-          imu:
-            {}
-          intermediate:
+          uav:
             {}
           uav_odom:
             {}
@@ -225,6 +223,40 @@ Visualization Manager:
       Topic: /uwb_vicon_odom
       Unreliable: false
       Value: true
+    - Angle Tolerance: 0.100000001
+      Class: rviz/Odometry
+      Covariance:
+        Orientation:
+          Alpha: 0.5
+          Color: 255; 255; 127
+          Color Style: Unique
+          Frame: Local
+          Offset: 1
+          Scale: 1
+          Value: true
+        Position:
+          Alpha: 0.300000012
+          Color: 204; 51; 204
+          Scale: 1
+          Value: true
+        Value: true
+      Enabled: true
+      Keep: 100
+      Name: Odometry
+      Position Tolerance: 0.100000001
+      Shape:
+        Alpha: 1
+        Axes Length: 0.100000001
+        Axes Radius: 0.00999999978
+        Color: 255; 25; 0
+        Head Length: 0.300000012
+        Head Radius: 0.100000001
+        Shaft Length: 1
+        Shaft Radius: 0.0500000007
+        Value: Axes
+      Topic: /pos_vel_mocap/odom_TA
+      Unreliable: false
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -250,7 +282,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/ThirdPersonFollower
-      Distance: 6.52255535
+      Distance: 7.50715303
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
@@ -265,10 +297,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 0.399796456
+      Pitch: 0.389795959
       Target Frame: vicon
       Value: ThirdPersonFollower (rviz)
-      Yaw: 3.26358581
+      Yaw: 6.19677258
     Saved: ~
 Window Geometry:
   Displays:
