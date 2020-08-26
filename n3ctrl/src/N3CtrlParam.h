@@ -12,6 +12,7 @@ public:
 		double Kv0,Kv1,Kv2;
 		double Kvi0,Kvi1,Kvi2;
 		double Ka0,Ka1,Ka2;
+		double Kap0,Kap1,Kap2;
 		double Kyaw;
 	};
 

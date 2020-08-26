@@ -31,6 +31,7 @@ void gain_cfg_callback(n3ctrl::GainsConfig & config, uint32_t level ){
           .Kv0 = config.Kv0, .Kv1 = config.Kv1, .Kv2 = config.Kv2,
           .Kvi0 = config.Kvi0, .Kvi1 = config.Kvi1, .Kvi2 = config.Kvi2,
           .Ka0 = config.Ka0, .Ka1 = config.Ka1, .Ka2 = config.Ka2,
+          .Kap0 = config.Kap0, .Kap1 = config.Kap1, .Kap2 = config.Kap2,
           .Kyaw = config.Kyaw
   };
 

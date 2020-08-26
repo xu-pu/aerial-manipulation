@@ -63,6 +63,7 @@ public:
 	Eigen::Matrix3d Kv;
 	Eigen::Matrix3d Kvi;
 	Eigen::Matrix3d Ka;
+	Eigen::Matrix3d Kap;
 	double Kyaw;
 
 	Eigen::Vector3d int_e_v;
@@ -84,6 +85,15 @@ public:
   Eigen::Vector3d calc_desired_force( const Desired_State_t& des,const Odom_Data_t& odom );
   Eigen::Vector3d calc_desired_force_mellinger( const Desired_State_t& des,const Odom_Data_t& odom );
   Eigen::Vector3d regulate_desired_force( Eigen::Vector3d const & cmd );
+
+  /**
+   *
+   * @param F_des - world frame (not intermediate frame)
+   * @param imu
+   * @param odom
+   * @return
+   */
+  Eigen::Vector3d acceleration_loop( Eigen::Vector3d const & F_des, const Imu_Data_t& imu, const Odom_Data_t& odom );
 
 };
 
