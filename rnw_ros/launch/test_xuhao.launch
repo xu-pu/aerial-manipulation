@@ -1,0 +1,30 @@
+<launch>
+
+    <arg name="vo_topic" default="/vins_estimator/imu_propagate"/>
+
+    <arg name="drone_number" default="1"/>
+    <arg name="output" default="screen" />
+    <env name="GMON_OUT_PREFIX" value="dji_sdk" />
+
+    <node pkg="djiros" type="djiros_node" name="dji_sdk_$(arg drone_number)" output="$(arg output)" >
+        <!-- node parameters -->
+        <param name="serial_name"   type="string"   value="/dev/tty.dji.n3"/>
+        <param name="baud_rate"     type="int"      value="921600"/>
+        <param name="app_id"        type="int"      value="1024795"/>
+        <param name="app_version"   type="int"      value="1"/>
+        <param name="align_time"    type="bool"     value="false"/>
+        <param name="enc_key"       type="string"   value="a5f11a418f3dcdc39c4a1efb35a9dd4545e47b56cae9d98c988468277a9305dc"/>
+        <param name="use_broadcast" type="bool"     value="false"/>
+        <param name="no_RTK"        type="bool"     value="true"/>
+    </node>
+
+    <node pkg="n3ctrl" type="n1_sim_helper.py" name="n1_sim_helper" output="screen" required="true">
+        <!--subscribers-->
+        <remap from="~velo" to="/dji_sdk_1/velo" />
+        <remap from="~gps" to="/dji_sdk_1/gps" />
+        <remap from="~imu" to="/dji_sdk_1/imu" />
+        <!--publishers-->
+        <remap from="~odom" to="$(arg vo_topic)" />
+    </node>
+
+</launch>
