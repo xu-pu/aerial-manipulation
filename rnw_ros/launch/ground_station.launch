@@ -13,6 +13,15 @@
         <rosparam file="$(find pos_vel_mocap)/config/calib.yaml" command="load" />
     </node>
 
+    <node pkg="rnw_ros" type="visualize_cone_node" name="visualize_cone_node" output="screen" required="true">
+        <remap from="~odom" to="$(arg cone_topic)"/>
+        <param name="clear_after_n_sec" type="double" value="1"/>
+        <param name="cone_color_r" type="double" value="0"/>
+        <param name="cone_color_g" type="double" value="1"/>
+        <param name="cone_color_b" type="double" value="0"/>
+        <rosparam command="load" file="$(find rnw_ros)/config/rnw_config.yaml"/>
+    </node>
+
     <node pkg="rnw_ros" type="pub_frames_node" name="pub_frames_node" output="screen">
         <remap from="~imu" to="$(arg imu_topic)"/>
         <remap from="~uav" to="$(arg uav_topic)"/>
