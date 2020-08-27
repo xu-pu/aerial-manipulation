@@ -17,6 +17,8 @@ struct rnw_config_t {
 
     double insert_below_tip;
 
+    double ground_z;
+
     struct {
 
         double forward = 0;
@@ -74,6 +76,8 @@ struct rnw_config_t {
       cone.radius = get_param_default(nh,"cone/radius",0.15);
       cone.height = get_param_default(nh,"cone/height",1);
       cone.apex = get_param_default(nh,"cone/apex",0.8);
+
+      ground_z = get_param_default(nh,"ground_z",0);
 
     }
 
