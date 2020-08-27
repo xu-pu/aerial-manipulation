@@ -69,8 +69,13 @@ struct cone_visualizer_t {
 
     ros::Publisher pub_marker_cone;
 
+    static constexpr int id_base = 0;
+    static constexpr int id_shaft = 1;
+
+    string ns = "cone_state_visualization";
+
     explicit cone_visualizer_t( ros::NodeHandle & nh ) {
-      pub_marker_cone = nh.advertise<visualization_msgs::Marker>("markers/cone", 1);
+      pub_marker_cone = nh.advertise<visualization_msgs::MarkerArray>("markers/cone", 1);
       clear_after_n_sec = get_param_default(nh,"clear_after_n_sec",numeric_limits<double>::max());
     }
 
@@ -78,22 +83,48 @@ struct cone_visualizer_t {
       latest_odom = *msg;
       latest_time = ros::Time::now();
       estimator.update(*msg);
-      pub_marker_cone.publish(gen_marker_base());
+      pub_marker_cone.publish(gen_markers());
       init = true;
+    }
+
+    visualization_msgs::MarkerArray gen_markers(){
+      visualization_msgs::MarkerArray marker_arr;
+      marker_arr.markers.push_back(gen_marker_base());
+      marker_arr.markers.push_back(gen_marker_shaft());
+      return marker_arr;
+    }
+
+    visualization_msgs::Marker gen_marker_shaft() const {
+
+      visualization_msgs::Marker marker;
+
+      marker.id = id_shaft;
+      marker.type = visualization_msgs::Marker::LINE_LIST;
+      marker.header.stamp = ros::Time::now();
+      marker.header.frame_id = "world";
+      marker.action = visualization_msgs::Marker::ADD;
+      marker.ns = ns;
+      marker.color.r = 0.00;
+      marker.color.g = 1.00;
+      marker.color.b = 0.00;
+      marker.color.a = 1.00;
+      marker.pose.orientation.w = 1;
+      marker.scale.x = 0.01;
+      marker.points.push_back(uav_utils::to_point_msg(estimator.T_base));
+      marker.points.push_back(uav_utils::to_point_msg(estimator.T_tip));
+      return marker;
     }
 
     visualization_msgs::Marker gen_marker_base() const {
 
-      constexpr int id = 0;
-
       visualization_msgs::Marker marker;
 
-      marker.id = id;
+      marker.id = id_base;
       marker.type = visualization_msgs::Marker::CYLINDER;
       marker.header.stamp = ros::Time::now();
       marker.header.frame_id = "world";
       marker.action = visualization_msgs::Marker::ADD;
-      marker.ns = "rnw";
+      marker.ns = ns;
       marker.color.r = 0.00;
       marker.color.g = 1.00;
       marker.color.b = 0.00;
