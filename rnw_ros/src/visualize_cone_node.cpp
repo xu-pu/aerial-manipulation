@@ -68,9 +68,16 @@ struct cone_visualizer_t {
 
     string ns = "cone_state_visualization";
 
+    double cone_color_r = 0;
+    double cone_color_g = 0;
+    double cone_color_b = 0;
+
     explicit cone_visualizer_t( ros::NodeHandle & nh ) : estimator(nh) {
       pub_marker_cone = nh.advertise<visualization_msgs::MarkerArray>("markers/cone", 1);
       clear_after_n_sec = get_param_default(nh,"clear_after_n_sec",numeric_limits<double>::max());
+      cone_color_r = get_param_default(nh,"cone_color_r",0);
+      cone_color_g = get_param_default(nh,"cone_color_g",0);
+      cone_color_b = get_param_default(nh,"cone_color_b",0);
     }
 
     void on_odom( nav_msgs::OdometryConstPtr const & msg  ){
@@ -97,9 +104,9 @@ struct cone_visualizer_t {
       marker.header.frame_id = "world";
       marker.action = visualization_msgs::Marker::ADD;
       marker.ns = ns;
-      marker.color.r = 0.00;
-      marker.color.g = 1.00;
-      marker.color.b = 0.00;
+      marker.color.r = cone_color_r;
+      marker.color.g = cone_color_g;
+      marker.color.b = cone_color_b;
       marker.color.a = 1.00;
       marker.pose.orientation.w = 1;
       marker.scale.x = 0.01;
@@ -118,9 +125,9 @@ struct cone_visualizer_t {
       marker.header.frame_id = "world";
       marker.action = visualization_msgs::Marker::ADD;
       marker.ns = ns;
-      marker.color.r = 0.00;
-      marker.color.g = 1.00;
-      marker.color.b = 0.00;
+      marker.color.r = cone_color_r;
+      marker.color.g = cone_color_g;
+      marker.color.b = cone_color_b;
       marker.color.a = 1.00;
 
       marker.pose.orientation = estimator.latest_odom.pose.pose.orientation;
