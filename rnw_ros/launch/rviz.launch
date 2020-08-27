@@ -15,7 +15,6 @@
 
     <node pkg="rnw_ros" type="visualize_cone_node" name="visualize_cone_node" output="screen" required="true">
         <remap from="~odom" to="$(arg topic_odom_cone)"/>
-        <param name="clear_after_n_sec" type="double" value="1"/>
         <param name="cone_color_r" type="double" value="0"/>
         <param name="cone_color_g" type="double" value="1"/>
         <param name="cone_color_b" type="double" value="0"/>

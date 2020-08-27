@@ -118,11 +118,15 @@ struct cone_visualizer_t {
 
     static constexpr int id_shaft = 1;
 
+    static constexpr int id_contact_path = 2;
+
     string ns = "cone_state_visualization";
 
     double cone_color_r = 0;
     double cone_color_g = 0;
     double cone_color_b = 0;
+
+    visualization_msgs::Marker marker_contact_path;
 
     explicit cone_visualizer_t( ros::NodeHandle & nh ) : estimator(nh) {
       pub_marker_cone = nh.advertise<visualization_msgs::MarkerArray>("markers/cone", 1);
@@ -131,6 +135,24 @@ struct cone_visualizer_t {
       cone_color_r = get_param_default(nh,"cone_color_r",0);
       cone_color_g = get_param_default(nh,"cone_color_g",0);
       cone_color_b = get_param_default(nh,"cone_color_b",0);
+
+      init_marker_contact_path();
+
+    }
+
+    void init_marker_contact_path(){
+      marker_contact_path.id = id_contact_path;
+      marker_contact_path.type = visualization_msgs::Marker::LINE_STRIP;
+      marker_contact_path.header.stamp = ros::Time::now();
+      marker_contact_path.header.frame_id = "world";
+      marker_contact_path.action = visualization_msgs::Marker::ADD;
+      marker_contact_path.ns = ns;
+      marker_contact_path.color.r = 1;
+      marker_contact_path.color.g = 0;
+      marker_contact_path.color.b = 0;
+      marker_contact_path.color.a = 1.00;
+      marker_contact_path.pose.orientation.w = 1;
+      marker_contact_path.scale.x = 0.01;
     }
 
     void on_odom( nav_msgs::OdometryConstPtr const & msg  ){
@@ -150,6 +172,7 @@ struct cone_visualizer_t {
       visualization_msgs::MarkerArray marker_arr;
       marker_arr.markers.push_back(gen_marker_base());
       marker_arr.markers.push_back(gen_marker_shaft());
+      marker_arr.markers.push_back(gen_contact_path());
       return marker_arr;
     }
 
@@ -197,6 +220,13 @@ struct cone_visualizer_t {
 
       return marker;
 
+    }
+
+    visualization_msgs::Marker gen_contact_path(){
+      if ( estimator.contact_valid ) {
+        marker_contact_path.points.push_back(uav_utils::to_point_msg(estimator.contact_point));
+      }
+      return marker_contact_path;
     }
 
     void clear_markers() const {

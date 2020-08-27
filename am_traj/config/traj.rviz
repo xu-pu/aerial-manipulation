@@ -6,6 +6,7 @@ Panels:
       Expanded:
         - /Global Options1
         - /Status1
+        - /TF1
         - /Axes1
         - /MarkerArray1
         - /PointStamped1
@@ -191,25 +192,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 11.6797056
+      Distance: 3.47858191
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0.796882272
-        Y: -1.00271809
-        Z: 0.267242402
+        X: 0.664190829
+        Y: -0.965088248
+        Z: -0.0918721184
       Focal Shape Fixed Size: false
       Focal Shape Size: 0.0500000007
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 0.764797091
+      Pitch: 0.569797277
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 3.62857151
+      Yaw: 3.51857018
     Saved: ~
 Window Geometry:
   Displays:
