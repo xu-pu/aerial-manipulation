@@ -61,7 +61,7 @@ void Controller::update(const Desired_State_t& des,const Odom_Data_t& odom,const
 
   Vector3d F_des = calc_desired_force_mellinger(des,odom);
 
-  F_des = acceleration_loop(F_des,imu,odom);
+  //F_des = acceleration_loop(F_des,imu,odom);
 
   F_des = regulate_desired_force(F_des);
 
