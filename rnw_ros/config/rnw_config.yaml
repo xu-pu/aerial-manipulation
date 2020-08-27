@@ -17,3 +17,7 @@ zigzag:
   cycles: 5
   max_vel: 1
   max_acc: 0.5
+cone:
+  radius: 0.15
+  apex: 0.8
+  height: 1 # this along with X_tip_body can determine the pose of the cone relative to its mocap markers
