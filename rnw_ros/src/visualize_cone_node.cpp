@@ -31,6 +31,11 @@ struct obj_state_estimator_t {
     Vector3d T_base;
     Vector3d T_center;
 
+    bool contact_valid = false;
+    Vector3d contact_point;
+
+    static constexpr double min_tilt = 5;
+
     explicit obj_state_estimator_t( ros::NodeHandle & nh ) {
       rnw_config.load_from_ros(nh);
       X_base_body = rnw_config.X_tip_body;
@@ -46,6 +51,51 @@ struct obj_state_estimator_t {
       T_tip = R_markers * rnw_config.X_tip_body + T_markers;
       T_base = R_markers * X_base_body + T_markers;
       T_center = R_markers * X_center_body + T_markers;
+      calc_contact_point();
+    }
+
+    void calc_contact_point(){
+
+      double tilt_x = abs(asin(R_markers(2,0)));
+      double tilt_x_deg = tilt_x / M_PI * 180;
+      if ( tilt_x_deg < min_tilt ) {
+        ROS_WARN_STREAM("not point contact, " << tilt_x_deg );
+        contact_valid = false;
+        return;
+      }
+
+      double x0 = T_center.x();
+      double y0 = T_center.y();
+      double z0 = T_center.z();
+
+      double zg = rnw_config.ground_z;
+
+      Vector3d n = R_markers.col(2);
+
+      double A = n.x();
+      double B = n.y();
+      double C = n.z()*(zg-z0) - A*x0 - B*y0;
+
+      double dist_2d = abs(A*x0 + B*y0 + C) / sqrt(A*A + B*B);
+      double dist = sqrt(dist_2d*dist_2d+z0*z0);
+
+      double ratio = dist/rnw_config.cone.radius;
+
+      if ( ratio > 1.1 ) {
+        // lifted off the ground
+        ROS_WARN_STREAM("lifted off the ground");
+        contact_valid = false;
+        return;
+      }
+
+      double lambda = - (A*x0 + B * y0 + C) / (A * A + B * B);
+
+      Vector3d pt = { x0+lambda*A, y0 + lambda * B, rnw_config.ground_z };
+
+      contact_point = pt;
+
+      contact_valid = true;
+
     }
 
 };
@@ -62,6 +112,8 @@ struct cone_visualizer_t {
 
     ros::Publisher pub_marker_cone;
 
+    ros::Publisher pub_contact_point;
+
     static constexpr int id_base = 0;
 
     static constexpr int id_shaft = 1;
@@ -74,6 +126,7 @@ struct cone_visualizer_t {
 
     explicit cone_visualizer_t( ros::NodeHandle & nh ) : estimator(nh) {
       pub_marker_cone = nh.advertise<visualization_msgs::MarkerArray>("markers/cone", 1);
+      pub_contact_point = nh.advertise<geometry_msgs::PointStamped>("/rnw/ground_contact_point", 10);
       clear_after_n_sec = get_param_default(nh,"clear_after_n_sec",numeric_limits<double>::max());
       cone_color_r = get_param_default(nh,"cone_color_r",0);
       cone_color_g = get_param_default(nh,"cone_color_g",0);
@@ -84,6 +137,12 @@ struct cone_visualizer_t {
       latest_time = ros::Time::now();
       estimator.update(*msg);
       pub_marker_cone.publish(gen_markers());
+      if ( estimator.contact_valid ) {
+        geometry_msgs::PointStamped pt_msg;
+        pt_msg.header = msg->header;
+        pt_msg.point = uav_utils::to_point_msg(estimator.contact_point);
+        pub_contact_point.publish(pt_msg);
+      }
       init = true;
     }
 

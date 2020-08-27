@@ -1,3 +1,4 @@
+ground_z: -0.035
 X_tip_body:
   x: 0.00922753
   y: 0.00883189
@@ -20,5 +21,4 @@ zigzag:
 cone:
   radius: 0.15
   apex: 0.8
-  height: 1 # this along with X_tip_body can determine the pose of the cone relative to its mocap markers
-ground_z: -0.035
+  height: 1
