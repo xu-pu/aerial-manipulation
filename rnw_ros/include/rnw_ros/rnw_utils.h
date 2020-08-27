@@ -39,6 +39,16 @@ struct rnw_config_t {
 
     } zigzag;
 
+    struct {
+
+        double radius;
+
+        double apex;
+
+        double height;
+
+    } cone;
+
     inline void load_from_ros( ros::NodeHandle & nh ){
 
       X_tip_body.x() = get_param_default(nh,"X_tip_body/x",0.);
@@ -60,6 +70,10 @@ struct rnw_config_t {
 
       topple.forward = get_param_default(nh,"topple/forward",0.2);
       topple.downward = get_param_default(nh,"topple/downward",0.03);
+
+      cone.radius = get_param_default(nh,"cone/radius",0.15);
+      cone.height = get_param_default(nh,"cone/height",1);
+      cone.apex = get_param_default(nh,"cone/apex",0.8);
 
     }
 

@@ -1,4 +1,5 @@
 #include "rnw_ros/pose_utils.h"
+#include "rnw_ros/rnw_utils.h"
 
 #include <uav_utils/converters.h>
 
@@ -7,21 +8,18 @@
 
 using namespace std;
 
-using Eigen::Vector3d;
-
-
 struct obj_state_estimator_t {
 
-    double radius = 0.15;
-    double height = 1;
-    Vector3d X_tip_body;
+    rnw_config_t rnw_config;
+
     Vector3d X_base_body;
+
     Vector3d X_center_body;
 
     nav_msgs::Odometry latest_odom;
 
     double diameter() const {
-      return radius * 2;
+      return rnw_config.cone.radius * 2;
     }
 
     // object state vars
@@ -33,19 +31,19 @@ struct obj_state_estimator_t {
     Vector3d T_base;
     Vector3d T_center;
 
-    obj_state_estimator_t() {
-      X_tip_body =  { 0.00922753,0.00883189,0.659304 };
-      X_base_body = X_tip_body;
-      X_base_body.z() = X_tip_body.z() - height;
+    explicit obj_state_estimator_t( ros::NodeHandle & nh ) {
+      rnw_config.load_from_ros(nh);
+      X_base_body = rnw_config.X_tip_body;
+      X_base_body.z() = rnw_config.X_tip_body.z() - rnw_config.cone.height;
       X_center_body = X_base_body;
-      X_center_body.x() -= radius;
+      X_center_body.x() -= rnw_config.cone.radius;
     }
 
     void update( nav_msgs::Odometry const & odom ){
       latest_odom = odom;
       R_markers = odom2R(odom);
       T_markers = odom2T(odom);
-      T_tip = R_markers * X_tip_body + T_markers;
+      T_tip = R_markers * rnw_config.X_tip_body + T_markers;
       T_base = R_markers * X_base_body + T_markers;
       T_center = R_markers * X_center_body + T_markers;
     }
@@ -56,31 +54,26 @@ struct cone_visualizer_t {
 
     double clear_after_n_sec = numeric_limits<double>::max();
 
-    /**
-     * record the receiving time using ros::Time::now() so it works in rosbag playback
-     */
-    ros::Time latest_time;
-
-    nav_msgs::Odometry latest_odom;
-
     obj_state_estimator_t estimator;
+
+    ros::Time latest_time;
 
     bool init = false;
 
     ros::Publisher pub_marker_cone;
 
     static constexpr int id_base = 0;
+
     static constexpr int id_shaft = 1;
 
     string ns = "cone_state_visualization";
 
-    explicit cone_visualizer_t( ros::NodeHandle & nh ) {
+    explicit cone_visualizer_t( ros::NodeHandle & nh ) : estimator(nh) {
       pub_marker_cone = nh.advertise<visualization_msgs::MarkerArray>("markers/cone", 1);
       clear_after_n_sec = get_param_default(nh,"clear_after_n_sec",numeric_limits<double>::max());
     }
 
     void on_odom( nav_msgs::OdometryConstPtr const & msg  ){
-      latest_odom = *msg;
       latest_time = ros::Time::now();
       estimator.update(*msg);
       pub_marker_cone.publish(gen_markers());
@@ -140,6 +133,21 @@ struct cone_visualizer_t {
 
     }
 
+    void clear_markers() const {
+      visualization_msgs::MarkerArray accMarkers;
+      visualization_msgs::Marker accMarker;
+      accMarker.action = visualization_msgs::Marker::DELETEALL;
+      accMarkers.markers.push_back(accMarker);
+      pub_marker_cone.publish(accMarkers);
+    }
+
+    void on_spin( const ros::TimerEvent &event ){
+      if ( !init ) { return; }
+      if ( (ros::Time::now() - latest_time).toSec() > clear_after_n_sec ) {
+        clear_markers();
+      }
+    }
+
 };
 
 int main( int argc, char** argv ) {
@@ -152,9 +160,9 @@ int main( int argc, char** argv ) {
 
   constexpr size_t spin_hz = 10;
 
-  //auto timer = nh.createTimer( ros::Duration( 1.0 / spin_hz ), &cone_visualizer_t::on_spin, &cone_viz );
+  auto timer = nh.createTimer( ros::Duration( 1.0 / spin_hz ), &cone_visualizer_t::on_spin, &cone_viz );
 
-  ros::Subscriber sub_traj = nh.subscribe<nav_msgs::Odometry>("/pos_vel_mocap/odom_cone", 100, &cone_visualizer_t::on_odom, &cone_viz );
+  ros::Subscriber sub_traj = nh.subscribe<nav_msgs::Odometry>("odom", 100, &cone_visualizer_t::on_odom, &cone_viz );
 
   ros::spin();
 

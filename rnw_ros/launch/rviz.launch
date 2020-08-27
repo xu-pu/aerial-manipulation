@@ -3,6 +3,7 @@
     <node name="rviz" pkg="rviz" type="rviz" output="log" args="-d $(find am_traj)/config/traj.rviz"/>
 
     <arg name="topic_poly_traj" value="/rnw/poly_traj" />
+    <arg name="topic_odom_cone" value="/pos_vel_mocap/odom_cone" />
 
     <node pkg="rnw_ros" type="visualize_traj_node" name="traj_visualization" output="screen" required="true">
         <remap from="~poly_traj" to="$(arg topic_poly_traj)"/>
@@ -10,6 +11,12 @@
         <param name="length_g" type="double" value="0.5"/>
         <param name="clear_after_n_sec" type="double" value="0"/>
         <param name="use_sim_time" type="bool" value="true"/>
+    </node>
+
+    <node pkg="rnw_ros" type="visualize_cone_node" name="visualize_cone_node" output="screen" required="true">
+        <remap from="~odom" to="$(arg topic_odom_cone)"/>
+        <param name="clear_after_n_sec" type="double" value="1"/>
+        <rosparam command="load" file="$(find rnw_ros)/config/rnw_config.yaml"/>
     </node>
 
 </launch>
