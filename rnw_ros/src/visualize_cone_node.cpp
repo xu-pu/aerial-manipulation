@@ -120,6 +120,8 @@ struct cone_visualizer_t {
 
     static constexpr int id_contact_path = 2;
 
+    static constexpr int id_contact_normal = 3;
+
     string ns = "cone_state_visualization";
 
     double cone_color_r = 0;
@@ -173,7 +175,38 @@ struct cone_visualizer_t {
       marker_arr.markers.push_back(gen_marker_base());
       marker_arr.markers.push_back(gen_marker_shaft());
       marker_arr.markers.push_back(gen_contact_path());
+      marker_arr.markers.push_back(gen_marker_contact_normal());
       return marker_arr;
+    }
+
+    visualization_msgs::Marker gen_marker_contact_normal() const {
+
+      visualization_msgs::Marker marker;
+
+      marker.id = id_contact_normal;
+      marker.type = visualization_msgs::Marker::ARROW;
+      marker.header.stamp = ros::Time::now();
+      marker.header.frame_id = "world";
+      marker.ns = ns;
+      marker.scale.x = 0.01;
+      marker.scale.y = 0.03;
+      marker.scale.z = 0.1;
+      marker.color.r = 1;
+      marker.color.g = 0;
+      marker.color.b = 0;
+      marker.color.a = 1.00;
+      marker.pose.orientation.w = 1;
+
+      if ( estimator.contact_valid ) {
+        marker.action = visualization_msgs::Marker::ADD;
+        marker.points.push_back(uav_utils::to_point_msg(estimator.contact_point));
+        marker.points.push_back(uav_utils::to_point_msg(estimator.contact_point+Vector3d(0,0,0.5)));
+      } else {
+        marker.action = visualization_msgs::Marker::DELETE;
+      }
+
+      return marker;
+
     }
 
     visualization_msgs::Marker gen_marker_shaft() const {
