@@ -153,13 +153,18 @@ struct cone_state_estimator_t {
 
     double odom_timeout = 1;
 
-    nav_msgs::Odometry latest_odom;
+    nav_msgs::Odometry previous_odom;
 
     bool init = false;
 
     bool cut_euler_velocity = false;
 
     double max_euler_velocity = numeric_limits<double>::max();
+
+    // latest states
+
+    Vector3d latest_euler_angles;
+    Vector3d latest_euler_velocity;
 
     inline explicit cone_state_estimator_t( ros::NodeHandle & nh ){
       pub_cone_state = nh.advertise<rnw_ros::ConeState>("state",10);
@@ -171,25 +176,39 @@ struct cone_state_estimator_t {
     inline void on_odom( nav_msgs::OdometryConstPtr const & msg ){
 
       if ( !init ) {
-        latest_odom = *msg;
+        previous_odom = *msg;
         init = true;
         ROS_INFO_STREAM("[Cone] Initialized");
         return;
       }
-      else if ( msg_time_diff(latest_odom,*msg) > odom_timeout ) {
-        latest_odom = *msg;
+      else if (msg_time_diff(previous_odom, *msg) > odom_timeout ) {
+        previous_odom = *msg;
         ROS_ERROR_STREAM("[Cone] Odom Timeout, re-initialized!");
         return;
       }
-      else if ( msg_time_diff(latest_odom,*msg) < 0 ) {
-        latest_odom = *msg;
+      else if (msg_time_diff(previous_odom, *msg) < 0 ) {
+        previous_odom = *msg;
         ROS_ERROR_STREAM("[Cone] Message out of order, re-initialized!");
         return;
       }
 
-      auto pre = latest_odom;
+      update_euler(msg);
+
+      rnw_ros::ConeState msg_cone;
+      msg_cone.header.stamp = msg->header.stamp;
+      msg_cone.odom = *msg;
+      msg_cone.euler_angles = uav_utils::to_vector3_msg(latest_euler_angles);
+      msg_cone.euler_angles_velocity = uav_utils::to_vector3_msg(latest_euler_velocity);
+      pub_cone_state.publish(msg_cone);
+
+      previous_odom = *msg;
+
+    }
+
+    inline void update_euler(  nav_msgs::OdometryConstPtr const & msg ){
+
+      auto pre = previous_odom;
       auto cur = *msg;
-      latest_odom = *msg;
 
       double dt = msg_time_diff(pre,cur);
 
@@ -219,12 +238,8 @@ struct cone_state_estimator_t {
         euler_vel(2) = max(euler_vel(2),-max_euler_velocity);
       }
 
-      rnw_ros::ConeState msg_cone;
-      msg_cone.header.stamp = msg->header.stamp;
-      msg_cone.odom = cur;
-      msg_cone.euler_angles = uav_utils::to_vector3_msg(euler_cur);
-      msg_cone.euler_angles_velocity = uav_utils::to_vector3_msg(euler_vel);
-      pub_cone_state.publish(msg_cone);
+      latest_euler_angles = euler_cur;
+      latest_euler_velocity = euler_vel;
 
     }
 
