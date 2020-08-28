@@ -1,23 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <launch>
 
-    <arg name="topic_odom_cone" value="/pos_vel_mocap/odom_cone" />
+    <arg name="topic_odom_cone" value="/pos_vel_mocap/odom_cone"/>
+    <arg name="topic_cone_state" value="/rnw/cone_state"/>
 
     <node name="rviz" pkg="rviz" type="rviz" output="log" args="-d $(find am_traj)/config/traj.rviz"/>
 
-<!--    <node pkg="rnw_ros" type="pub_cone_state_node" name="pub_cone_state_node" required="true" output="screen">-->
-<!--        <remap from="~odom" to="$(arg topic_odom_cone)"/>-->
-<!--        <param name="cut_euler_velocity" type="bool" value="true"/>-->
-<!--        <param name="max_euler_velocity" value="10"/>-->
-<!--    </node>-->
+    <node pkg="rnw_ros" type="pub_cone_state_node" name="pub_cone_state_node" required="true" output="screen">
+        <remap from="~odom" to="$(arg topic_odom_cone)"/>
+        <remap from="~cone_state" to="$(arg topic_cone_state)"/>
+        <param name="cut_euler_velocity" type="bool" value="true"/>
+        <param name="max_euler_velocity" value="10"/>
+        <rosparam command="load" file="$(find rnw_ros)/config/rnw_config.yaml"/>
+    </node>
 
     <node pkg="rnw_ros" type="visualize_cone_node" name="visualize_cone_node" output="screen" required="true">
-        <remap from="~odom" to="$(arg topic_odom_cone)"/>
+        <remap from="~cone_state" to="$(arg topic_cone_state)"/>
         <param name="cone_color_r" type="double" value="0"/>
         <param name="cone_color_g" type="double" value="1"/>
         <param name="cone_color_b" type="double" value="0"/>
-        <param name="cut_euler_velocity" type="bool" value="true"/>
-        <param name="max_euler_velocity" value="10"/>
         <rosparam command="load" file="$(find rnw_ros)/config/rnw_config.yaml"/>
     </node>
 

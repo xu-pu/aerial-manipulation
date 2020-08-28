@@ -10,9 +10,9 @@ using namespace std;
 
 struct cone_visualizer_t {
 
-    double clear_after_n_sec = numeric_limits<double>::max();
+    rnw_config_t rnw_config;
 
-    cone_state_estimator_t estimator;
+    double clear_after_n_sec = numeric_limits<double>::max();
 
     ros::Time latest_time;
 
@@ -20,7 +20,7 @@ struct cone_visualizer_t {
 
     ros::Publisher pub_marker_cone;
 
-    ros::Publisher pub_contact_point;
+    rnw_ros::ConeState latest_cone_state;
 
     static constexpr int id_base = 0;
 
@@ -38,16 +38,14 @@ struct cone_visualizer_t {
 
     visualization_msgs::Marker marker_contact_path;
 
-    explicit cone_visualizer_t( ros::NodeHandle & nh ) : estimator(nh) {
+    explicit cone_visualizer_t( ros::NodeHandle & nh ) {
+      rnw_config.load_from_ros(nh);
       pub_marker_cone = nh.advertise<visualization_msgs::MarkerArray>("markers/cone", 1);
-      pub_contact_point = nh.advertise<geometry_msgs::PointStamped>("/rnw/ground_contact_point", 10);
       clear_after_n_sec = get_param_default(nh,"clear_after_n_sec",numeric_limits<double>::max());
       cone_color_r = get_param_default(nh,"cone_color_r",0);
       cone_color_g = get_param_default(nh,"cone_color_g",0);
       cone_color_b = get_param_default(nh,"cone_color_b",0);
-
       init_marker_contact_path();
-
     }
 
     void init_marker_contact_path(){
@@ -65,16 +63,10 @@ struct cone_visualizer_t {
       marker_contact_path.scale.x = 0.01;
     }
 
-    void on_odom( nav_msgs::OdometryConstPtr const & msg  ){
+    void on_cone_state( rnw_ros::ConeStateConstPtr const & msg  ){
       latest_time = ros::Time::now();
-      estimator.on_odom(msg);
+      latest_cone_state = *msg;
       pub_marker_cone.publish(gen_markers());
-      if ( estimator.contact_valid ) {
-        geometry_msgs::PointStamped pt_msg;
-        pt_msg.header = msg->header;
-        pt_msg.point = uav_utils::to_point_msg(estimator.contact_point);
-        pub_contact_point.publish(pt_msg);
-      }
       init = true;
     }
 
@@ -105,10 +97,12 @@ struct cone_visualizer_t {
       marker.color.a = 1.00;
       marker.pose.orientation.w = 1;
 
-      if ( estimator.contact_valid ) {
+      if ( latest_cone_state.is_point_contact ) {
         marker.action = visualization_msgs::Marker::ADD;
-        marker.points.push_back(uav_utils::to_point_msg(estimator.contact_point));
-        marker.points.push_back(uav_utils::to_point_msg(estimator.contact_point+Vector3d(0,0,0.5)));
+        auto arrow_tip = latest_cone_state.contact_point;
+        arrow_tip.z += 0.5;
+        marker.points.push_back(latest_cone_state.contact_point);
+        marker.points.push_back(arrow_tip);
       } else {
         marker.action = visualization_msgs::Marker::DELETE;
       }
@@ -133,8 +127,8 @@ struct cone_visualizer_t {
       marker.color.a = 1.00;
       marker.pose.orientation.w = 1;
       marker.scale.x = 0.01;
-      marker.points.push_back(uav_utils::to_point_msg(estimator.T_base));
-      marker.points.push_back(uav_utils::to_point_msg(estimator.T_tip));
+      marker.points.push_back(latest_cone_state.base);
+      marker.points.push_back(latest_cone_state.tip);
       return marker;
     }
 
@@ -153,10 +147,10 @@ struct cone_visualizer_t {
       marker.color.b = cone_color_b;
       marker.color.a = 1.00;
 
-      marker.pose.orientation = estimator.previous_odom.pose.pose.orientation;
-      marker.pose.position = uav_utils::to_point_msg(estimator.T_center);
-      marker.scale.x = estimator.diameter();
-      marker.scale.y = estimator.diameter();
+      marker.pose.orientation = latest_cone_state.odom.pose.pose.orientation;
+      marker.pose.position = latest_cone_state.disc_center;
+      marker.scale.x = rnw_config.cone.radius * 2;
+      marker.scale.y = rnw_config.cone.radius * 2;
       marker.scale.z = 0.01;
 
       return marker;
@@ -164,8 +158,8 @@ struct cone_visualizer_t {
     }
 
     visualization_msgs::Marker gen_contact_path(){
-      if ( estimator.contact_valid ) {
-        marker_contact_path.points.push_back(uav_utils::to_point_msg(estimator.contact_point));
+      if ( latest_cone_state.is_point_contact ) {
+        marker_contact_path.points.push_back(latest_cone_state.contact_point);
       }
       return marker_contact_path;
     }
@@ -199,7 +193,12 @@ int main( int argc, char** argv ) {
 
   auto timer = nh.createTimer( ros::Duration( 1.0 / spin_hz ), &cone_visualizer_t::on_spin, &cone_viz );
 
-  ros::Subscriber sub_traj = nh.subscribe<nav_msgs::Odometry>("odom", 100, &cone_visualizer_t::on_odom, &cone_viz );
+  ros::Subscriber sub_traj = nh.subscribe<rnw_ros::ConeState>(
+          "cone_state",
+          100,
+          &cone_visualizer_t::on_cone_state,
+          &cone_viz, ros::TransportHints().tcpNoDelay()
+  );
 
   ros::spin();
 

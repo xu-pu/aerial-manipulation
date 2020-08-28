@@ -209,7 +209,7 @@ struct cone_state_estimator_t {
 
     inline explicit cone_state_estimator_t( ros::NodeHandle & nh ){
       rnw_config.load_from_ros(nh);
-      pub_cone_state = nh.advertise<rnw_ros::ConeState>("state",10);
+      pub_cone_state = nh.advertise<rnw_ros::ConeState>("cone_state",10);
       pub_odom_dt = nh.advertise<quadrotor_msgs::Float64Stamped>("dt",10);
       cut_euler_velocity = get_param_default(nh,"cut_euler_velocity",false);
       max_euler_velocity = get_param_default(nh,"max_euler_velocity",numeric_limits<double>::max());
@@ -254,6 +254,9 @@ struct cone_state_estimator_t {
       msg_cone.euler_angles_velocity = uav_utils::to_vector3_msg(latest_euler_velocity);
       msg_cone.is_point_contact = contact_valid;
       msg_cone.contact_point = uav_utils::to_point_msg(contact_point);
+      msg_cone.base = uav_utils::to_point_msg(T_base);
+      msg_cone.tip = uav_utils::to_point_msg(T_tip);
+      msg_cone.disc_center = uav_utils::to_point_msg(T_center);
       pub_cone_state.publish(msg_cone);
     }
 
