@@ -145,17 +145,43 @@ inline Vector3d cone_rot2euler( Matrix3d const & R ){
 
 struct cone_state_estimator_t {
 
+    // object properties
+
+    rnw_config_t rnw_config;
+
+    double diameter() const {
+      return rnw_config.cone.radius * 2;
+    }
+
+    Vector3d X_base_body(){
+      Vector3d rst = rnw_config.X_tip_body;
+      rst.z() = rnw_config.X_tip_body.z() - rnw_config.cone.height;
+      return rst;
+    }
+
+    Vector3d X_center_body(){
+      Vector3d rst = X_base_body();
+      rst.x() -= rnw_config.cone.radius;
+      return rst;
+    }
+
+    //////////////////////////////
+
     ros::Publisher pub_cone_state;
 
     ros::Publisher pub_odom_dt;
 
-    double odom_frequency = 50;
-
-    double odom_timeout = 1;
+    // estimator state
 
     nav_msgs::Odometry previous_odom;
 
     bool init = false;
+
+    // parameters
+
+    static constexpr double min_tilt = 5;
+
+    double odom_timeout = 1;
 
     bool cut_euler_velocity = false;
 
@@ -164,9 +190,25 @@ struct cone_state_estimator_t {
     // latest states
 
     Vector3d latest_euler_angles;
+
     Vector3d latest_euler_velocity;
 
+    Matrix3d R_markers;
+
+    Vector3d T_markers;
+
+    Vector3d T_tip;
+
+    Vector3d T_base;
+
+    Vector3d T_center;
+
+    bool contact_valid = false;
+
+    Vector3d contact_point;
+
     inline explicit cone_state_estimator_t( ros::NodeHandle & nh ){
+      rnw_config.load_from_ros(nh);
       pub_cone_state = nh.advertise<rnw_ros::ConeState>("state",10);
       pub_odom_dt = nh.advertise<quadrotor_msgs::Float64Stamped>("dt",10);
       cut_euler_velocity = get_param_default(nh,"cut_euler_velocity",false);
@@ -194,15 +236,25 @@ struct cone_state_estimator_t {
 
       update_euler(msg);
 
+      update_frames(msg);
+
+      update_contact_point();
+
+      publish_cone_state(msg);
+
+      previous_odom = *msg;
+
+    }
+
+    inline void publish_cone_state( nav_msgs::OdometryConstPtr const & msg ) const {
       rnw_ros::ConeState msg_cone;
       msg_cone.header.stamp = msg->header.stamp;
       msg_cone.odom = *msg;
       msg_cone.euler_angles = uav_utils::to_vector3_msg(latest_euler_angles);
       msg_cone.euler_angles_velocity = uav_utils::to_vector3_msg(latest_euler_velocity);
+      msg_cone.is_point_contact = contact_valid;
+      msg_cone.contact_point = uav_utils::to_point_msg(contact_point);
       pub_cone_state.publish(msg_cone);
-
-      previous_odom = *msg;
-
     }
 
     inline void update_euler(  nav_msgs::OdometryConstPtr const & msg ){
@@ -240,6 +292,58 @@ struct cone_state_estimator_t {
 
       latest_euler_angles = euler_cur;
       latest_euler_velocity = euler_vel;
+
+    }
+
+    inline void update_frames( nav_msgs::OdometryConstPtr const & msg ){
+      R_markers = odom2R(msg);
+      T_markers = odom2T(msg);
+      T_tip = R_markers * rnw_config.X_tip_body + T_markers;
+      T_base = R_markers * X_base_body() + T_markers;
+      T_center = R_markers * X_center_body() + T_markers;
+    }
+
+    inline void update_contact_point(){
+
+      double tilt_x = abs(asin(R_markers(2,0)));
+      double tilt_x_deg = tilt_x / M_PI * 180;
+      if ( tilt_x_deg < min_tilt ) {
+        ROS_WARN_STREAM("not point contact, " << tilt_x_deg );
+        contact_valid = false;
+        return;
+      }
+
+      double x0 = T_center.x();
+      double y0 = T_center.y();
+      double z0 = T_center.z();
+
+      double zg = rnw_config.ground_z;
+
+      Vector3d n = R_markers.col(2);
+
+      double A = n.x();
+      double B = n.y();
+      double C = n.z()*(zg-z0) - A*x0 - B*y0;
+
+      double dist_2d = abs(A*x0 + B*y0 + C) / sqrt(A*A + B*B);
+      double dist = sqrt(dist_2d*dist_2d+z0*z0);
+
+      double ratio = dist/rnw_config.cone.radius;
+
+      if ( ratio > 1.1 ) {
+        // lifted off the ground
+        ROS_WARN_STREAM("lifted off the ground");
+        contact_valid = false;
+        return;
+      }
+
+      double lambda = - (A*x0 + B * y0 + C) / (A * A + B * B);
+
+      Vector3d pt = { x0+lambda*A, y0 + lambda * B, rnw_config.ground_z };
+
+      contact_point = pt;
+
+      contact_valid = true;
 
     }
 

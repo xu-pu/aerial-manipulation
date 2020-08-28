@@ -8,103 +8,11 @@
 
 using namespace std;
 
-struct obj_state_estimator_t {
-
-    rnw_config_t rnw_config;
-
-    Vector3d X_base_body;
-
-    Vector3d X_center_body;
-
-    nav_msgs::Odometry latest_odom;
-
-    double diameter() const {
-      return rnw_config.cone.radius * 2;
-    }
-
-    // object state vars
-
-    Matrix3d R_markers;
-    Vector3d T_markers;
-
-    Vector3d T_tip;
-    Vector3d T_base;
-    Vector3d T_center;
-
-    bool contact_valid = false;
-    Vector3d contact_point;
-
-    static constexpr double min_tilt = 5;
-
-    explicit obj_state_estimator_t( ros::NodeHandle & nh ) {
-      rnw_config.load_from_ros(nh);
-      X_base_body = rnw_config.X_tip_body;
-      X_base_body.z() = rnw_config.X_tip_body.z() - rnw_config.cone.height;
-      X_center_body = X_base_body;
-      X_center_body.x() -= rnw_config.cone.radius;
-    }
-
-    void update( nav_msgs::Odometry const & odom ){
-      latest_odom = odom;
-      R_markers = odom2R(odom);
-      T_markers = odom2T(odom);
-      T_tip = R_markers * rnw_config.X_tip_body + T_markers;
-      T_base = R_markers * X_base_body + T_markers;
-      T_center = R_markers * X_center_body + T_markers;
-      calc_contact_point();
-    }
-
-    void calc_contact_point(){
-
-      double tilt_x = abs(asin(R_markers(2,0)));
-      double tilt_x_deg = tilt_x / M_PI * 180;
-      if ( tilt_x_deg < min_tilt ) {
-        ROS_WARN_STREAM("not point contact, " << tilt_x_deg );
-        contact_valid = false;
-        return;
-      }
-
-      double x0 = T_center.x();
-      double y0 = T_center.y();
-      double z0 = T_center.z();
-
-      double zg = rnw_config.ground_z;
-
-      Vector3d n = R_markers.col(2);
-
-      double A = n.x();
-      double B = n.y();
-      double C = n.z()*(zg-z0) - A*x0 - B*y0;
-
-      double dist_2d = abs(A*x0 + B*y0 + C) / sqrt(A*A + B*B);
-      double dist = sqrt(dist_2d*dist_2d+z0*z0);
-
-      double ratio = dist/rnw_config.cone.radius;
-
-      if ( ratio > 1.1 ) {
-        // lifted off the ground
-        ROS_WARN_STREAM("lifted off the ground");
-        contact_valid = false;
-        return;
-      }
-
-      double lambda = - (A*x0 + B * y0 + C) / (A * A + B * B);
-
-      Vector3d pt = { x0+lambda*A, y0 + lambda * B, rnw_config.ground_z };
-
-      contact_point = pt;
-
-      contact_valid = true;
-
-    }
-
-};
-
 struct cone_visualizer_t {
 
     double clear_after_n_sec = numeric_limits<double>::max();
 
-    obj_state_estimator_t estimator;
+    cone_state_estimator_t estimator;
 
     ros::Time latest_time;
 
@@ -159,7 +67,7 @@ struct cone_visualizer_t {
 
     void on_odom( nav_msgs::OdometryConstPtr const & msg  ){
       latest_time = ros::Time::now();
-      estimator.update(*msg);
+      estimator.on_odom(msg);
       pub_marker_cone.publish(gen_markers());
       if ( estimator.contact_valid ) {
         geometry_msgs::PointStamped pt_msg;
@@ -245,7 +153,7 @@ struct cone_visualizer_t {
       marker.color.b = cone_color_b;
       marker.color.a = 1.00;
 
-      marker.pose.orientation = estimator.latest_odom.pose.pose.orientation;
+      marker.pose.orientation = estimator.previous_odom.pose.pose.orientation;
       marker.pose.position = uav_utils::to_point_msg(estimator.T_center);
       marker.scale.x = estimator.diameter();
       marker.scale.y = estimator.diameter();
