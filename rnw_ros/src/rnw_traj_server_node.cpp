@@ -30,7 +30,7 @@ PolynomialTraj minsnap( vector<Vector3d> const & waypoints, vector<double> inter
 PoseStamped eigen2pathpoint( Vector3d const & T ){
   geometry_msgs::PoseStamped pose;
   pose.header.stamp = ros::Time::now();
-  pose.pose.position = eigen2ros(T);
+  pose.pose.position = uav_utils::to_point_msg(T);
   return pose;
 }
 

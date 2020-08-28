@@ -2,6 +2,7 @@
 
 #include <ros/ros.h>
 #include <geometry_msgs/Vector3.h>
+#include <uav_utils/utils.h>
 
 #include "rnw_ros/pose_utils.h"
 #include "rnw_ros/traj_uitls.h"
@@ -15,12 +16,12 @@ void on_odom( OdometryConstPtr const & odom ){
   Eigen::Matrix3d R_ENU2NED;
   R_ENU2NED << 0, 1, 0, 1, 0, 0, 0, 0, -1;
   Vector3d rpy = odom2rpy(odom);
-  pub_rpy_odom.publish(eigen2ros(rpy));
+  pub_rpy_odom.publish(uav_utils::to_vector3_msg(rpy));
 }
 
 void on_imu( sensor_msgs::ImuConstPtr const & imu ){
   Vector3d rpy = imu2rpy(imu);
-  pub_rpy_imu.publish(eigen2ros(rpy));
+  pub_rpy_imu.publish(uav_utils::to_vector3_msg(rpy));
 }
 
 int main( int argc, char** argv ) {

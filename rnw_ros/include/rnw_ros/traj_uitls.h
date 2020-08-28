@@ -57,31 +57,6 @@ VectorXd gen_time_intervals( vector<double> const & intervals, vector<Vector3d> 
   return dst;
 }
 
-geometry_msgs::Point eigen2ros( Vector3d const & src ){
-  geometry_msgs::Point dst;
-  dst.x = src.x();
-  dst.y = src.y();
-  dst.z = src.z();
-  return dst;
-}
-
-geometry_msgs::Vector3 eigen2rosv( Vector3d const & src ){
-  geometry_msgs::Vector3 dst;
-  dst.x = src.x();
-  dst.y = src.y();
-  dst.z = src.z();
-  return dst;
-}
-
-geometry_msgs::PointStamped eigen2ros( Vector3d const & src, std_msgs::Header const & header ){
-  geometry_msgs::PointStamped dst;
-  dst.header = header;
-  dst.point.x = src.x();
-  dst.point.y = src.y();
-  dst.point.z = src.z();
-  return dst;
-}
-
 geometry_msgs::Vector3Stamped eigen2rosv( Vector3d const & src, std_msgs::Header const & header ){
   geometry_msgs::Vector3Stamped dst;
   dst.header = header;
