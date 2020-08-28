@@ -111,7 +111,16 @@ inline vector<Vector3d> gen_topple_waypoints_local(
   return wpts;
 }
 
+
+/**
+ * x-psi-precession
+ * y-theta-nutation (tilt)
+ * z-phi-spin
+ * @param R
+ * @return - (x,y,z)
+ */
 inline Vector3d cone_rot2euler( Matrix3d const & R ){
+
   double psi=0,theta=0,phi=0;
 
   auto r00 = R(0,0);

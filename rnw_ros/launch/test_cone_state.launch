@@ -25,4 +25,6 @@
     <node pkg="rqt_multiplot" type="rqt_multiplot" name="rqt_multiplot" output="log"
           args="--multiplot-config $(find rnw_ros)/config/rqt_multiplot_cone_state.xml --multiplot-run-all"/>
 
+    <node name="rosbag_play" pkg="rosbag" type="play" respawn="false" args="-s 10 /home/sheep/Dropbox/rosbags/2020-08-15-22-37-43.ground_station.cone.bag"/>
+
 </launch>
