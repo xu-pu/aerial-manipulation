@@ -315,6 +315,13 @@ struct cone_state_estimator_t {
       T_center = R_markers * X_center_body() + T_markers;
     }
 
+    /**
+     * 3D plane of object's base, A(x-x0)+B(y-y0)+C(z-z0)=0
+     * where (A,B,C) is the normal vector, and (x0,y0,z0) is center of the disc
+     * The plane intersect with z=ground_z, get a 2d line A'x+B'y+C'=0, normal vector (A',B')
+     * (x0,y0) is disc center on z=ground_z plane
+     * contact point = (x0,y0) + lambda * (A',B') which lies on A'x+B'y+C'=0
+     */
     inline void update_contact_point(){
 
       double tilt_x = abs(asin(R_markers(2,0)));
@@ -338,7 +345,7 @@ struct cone_state_estimator_t {
       double C = n.z()*(zg-z0) - A*x0 - B*y0;
 
       double dist_2d = abs(A*x0 + B*y0 + C) / sqrt(A*A + B*B);
-      double dist = sqrt(dist_2d*dist_2d+z0*z0);
+      double dist = sqrt(dist_2d*dist_2d + z0*z0);
 
       double ratio = dist/rnw_config.cone.radius;
 
@@ -349,9 +356,9 @@ struct cone_state_estimator_t {
         return;
       }
 
-      double lambda = - (A*x0 + B * y0 + C) / (A * A + B * B);
+      double lambda = - ( A*x0 + B*y0 + C ) / ( A*A + B*B );
 
-      Vector3d pt = { x0+lambda*A, y0 + lambda * B, rnw_config.ground_z };
+      Vector3d pt = { x0 + lambda*A, y0 + lambda*B, zg };
 
       contact_point = pt;
 
