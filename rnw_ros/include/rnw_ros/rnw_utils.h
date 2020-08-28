@@ -131,14 +131,20 @@ inline Vector3d cone_rot2euler( Matrix3d const & R ){
   auto r21 = R(2,1);
   auto r22 = R(2,2);
 
+  constexpr double epsi = 0.05;
+
   theta = atan2(sqrt(r02*r02+r12*r12),r22);
 
-  if ( r22 == -1 ) {
-    phi = 0;
-    psi = atan2(r00,-r10);
-
-  }
-  else if ( r22 == 1 ){
+//  if ( r22 == -1 ) {
+//    phi = 0;
+//    psi = atan2(r00,-r10);
+//
+//  }
+//  else if ( r22 == 1 ){
+//    phi = 0;
+//    psi = atan2(-r00,r10);
+//  }
+  if ( abs(theta) < epsi ) {
     phi = 0;
     psi = atan2(-r00,r10);
   }
