@@ -31,7 +31,10 @@
         <param name="serial_port" value="/dev/tty.uwb.slave"/>
     </node>
 
-    <node pkg="rnw_ros" type="vicon_imu_cali_node" name="vicon_imu_cali_node" required="true" output="screen"/>
+    <node pkg="rnw_ros" type="vicon_imu_cali_node" name="vicon_imu_cali_node" required="true" output="screen">
+        <remap from="~odom" to="$(arg odom_topic)"/>
+        <remap from="~imu" to="$(arg imu_topic)"/>
+    </node>
 
     <node name="record" pkg="rosbag" type="record" output="screen" args="-a -x '/traj/(.*)'" />
 
