@@ -36,8 +36,7 @@
 
     <node name="rviz_traj" pkg="rviz" type="rviz" output="log" args="-d $(find rnw_ros)/config/traj.rviz" />
 
-
-    <node pkg="rnw_ros" type="pub_cone_state_node" name="pub_cone_state_node" required="true" output="screen">
+    <node pkg="rnw_ros" type="pub_cone_state_node" name="pub_cone_state_node" required="true" output="log">
         <remap from="~odom" to="$(arg cone_topic)"/>
         <remap from="~cone_state" to="$(arg topic_cone_state)"/>
         <param name="cut_euler_velocity" type="bool" value="true"/>
@@ -53,7 +52,7 @@
         <rosparam command="load" file="$(find rnw_ros)/config/rnw_config.yaml"/>
     </node>
 
-    <node pkg="rqt_multiplot" type="rqt_multiplot" name="rqt_multiplot" output="log"
-          args="--multiplot-config $(find rnw_ros)/config/rqt_multiplot_cone_state.xml --multiplot-run-all"/>
+<!--    <node pkg="rqt_multiplot" type="rqt_multiplot" name="rqt_multiplot" output="log"-->
+<!--          args="&#45;&#45;multiplot-config $(find rnw_ros)/config/rqt_multiplot_cone_state.xml &#45;&#45;multiplot-run-all"/>-->
 
 </launch>
