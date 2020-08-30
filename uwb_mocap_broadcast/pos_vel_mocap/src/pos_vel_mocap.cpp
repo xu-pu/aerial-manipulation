@@ -44,7 +44,7 @@ void calib_cfg_callback(pos_vel_mocap::ViconCalibConfig & config, uint32_t level
 
   rpy_markers.x() = DEG2RAD * config.yaw;
   rpy_markers.y() = DEG2RAD * config.pitch;
-  rpy_markers.z() = DEG2RAD * config.yaw;
+  rpy_markers.z() = DEG2RAD * config.roll;
 
   Matrix3d R_FLU_MARKER = rpy2rot(rpy_markers);
 
