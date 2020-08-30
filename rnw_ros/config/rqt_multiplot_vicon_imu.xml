@@ -42,11 +42,11 @@
                                     <field>x</field>
                                     <field_type>0</field_type>
                                     <scale>
-                                        <absolute_maximum>1000</absolute_maximum>
-                                        <absolute_minimum>0</absolute_minimum>
+                                        <absolute_maximum>30</absolute_maximum>
+                                        <absolute_minimum>-30</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
                                         <relative_minimum>-1000</relative_minimum>
-                                        <type>0</type>
+                                        <type>1</type>
                                     </scale>
                                     <topic>/rpy/imu</topic>
                                     <type>geometry_msgs/Vector3</type>
@@ -93,11 +93,11 @@
                                     <field>x</field>
                                     <field_type>0</field_type>
                                     <scale>
-                                        <absolute_maximum>1000</absolute_maximum>
-                                        <absolute_minimum>0</absolute_minimum>
+                                        <absolute_maximum>30</absolute_maximum>
+                                        <absolute_minimum>-30</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
                                         <relative_minimum>-1000</relative_minimum>
-                                        <type>0</type>
+                                        <type>1</type>
                                     </scale>
                                     <topic>/rpy/odom</topic>
                                     <type>geometry_msgs/Vector3</type>
@@ -167,11 +167,11 @@
                                     <field>y</field>
                                     <field_type>0</field_type>
                                     <scale>
-                                        <absolute_maximum>1000</absolute_maximum>
-                                        <absolute_minimum>0</absolute_minimum>
+                                        <absolute_maximum>30</absolute_maximum>
+                                        <absolute_minimum>-30</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
                                         <relative_minimum>-1000</relative_minimum>
-                                        <type>0</type>
+                                        <type>1</type>
                                     </scale>
                                     <topic>/rpy/imu</topic>
                                     <type>geometry_msgs/Vector3</type>
@@ -218,11 +218,11 @@
                                     <field>y</field>
                                     <field_type>0</field_type>
                                     <scale>
-                                        <absolute_maximum>1000</absolute_maximum>
-                                        <absolute_minimum>0</absolute_minimum>
+                                        <absolute_maximum>30</absolute_maximum>
+                                        <absolute_minimum>-30</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
                                         <relative_minimum>-1000</relative_minimum>
-                                        <type>0</type>
+                                        <type>1</type>
                                     </scale>
                                     <topic>/rpy/odom</topic>
                                     <type>geometry_msgs/Vector3</type>
