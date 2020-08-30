@@ -35,7 +35,7 @@
                                         <relative_minimum>-1000</relative_minimum>
                                         <type>0</type>
                                     </scale>
-                                    <topic>/uav/rpy_imu</topic>
+                                    <topic>/rpy/imu</topic>
                                     <type>geometry_msgs/Vector3</type>
                                 </x_axis>
                                 <y_axis>
@@ -48,7 +48,7 @@
                                         <relative_minimum>-1000</relative_minimum>
                                         <type>0</type>
                                     </scale>
-                                    <topic>/uav/rpy_imu</topic>
+                                    <topic>/rpy/imu</topic>
                                     <type>geometry_msgs/Vector3</type>
                                 </y_axis>
                             </axes>
@@ -59,7 +59,7 @@
                             <data>
                                 <circular_buffer_capacity>1000</circular_buffer_capacity>
                                 <time_frame_length>10</time_frame_length>
-                                <type>0</type>
+                                <type>3</type>
                             </data>
                             <style>
                                 <lines_interpolate>false</lines_interpolate>
