@@ -16,6 +16,7 @@ find_package(catkin REQUIRED COMPONENTS
   message_generation
   sensor_msgs
   tf
+  dynamic_reconfigure
 )
 
 ## System dependencies are found with CMake's conventions
@@ -50,6 +51,10 @@ find_package(catkin REQUIRED COMPONENTS
 ##     and list every .msg/.srv/.action file to be processed
 ##   * uncomment the generate_messages entry below
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
+
+generate_dynamic_reconfigure_options(
+        cfg/ViconCalib.cfg
+)
 
 ## Generate messages in the 'msg' folder
 #add_message_files(
@@ -121,3 +126,5 @@ INCLUDE_DIRECTORIES( include
 
 add_executable(pos_vel_mocap src/pos_vel_mocap.cpp)
 target_link_libraries(pos_vel_mocap ${catkin_LIBRARIES})
+
+add_dependencies(pos_vel_mocap ${PROJECT_NAME}_gencfg)
