@@ -57,13 +57,13 @@ struct cali_sampler_t {
     vector<sensor_msgs::Imu> samples_imu;
     vector<nav_msgs::Odometry> samples_odom;
 
-    size_t sample_threshold = 500;
+    size_t sample_amount = 500;
 
-    double deg_threshold = 1;
+    double sample_interval_deg = 1;
 
     explicit cali_sampler_t( ros::NodeHandle & nh ){
-      get_param_default<int>(nh,"sample_amount",500);
-      get_param_default<double>(nh,"sample_interval_deg",1);
+      sample_amount = get_param_default<int>(nh, "sample_amount", 500);
+      sample_interval_deg = get_param_default<double>(nh, "sample_interval_deg", 1);
     }
 
     bool check_rpy( Vector3d const & rpy ){
@@ -72,7 +72,7 @@ struct cali_sampler_t {
 
         double dist = (rpy-pt).norm();
 
-        if ( dist < deg2rad(deg_threshold) ) {
+        if ( dist < deg2rad(sample_interval_deg) ) {
           return false;
         }
 
@@ -91,13 +91,13 @@ struct cali_sampler_t {
         samples_rpy.push_back(rpy);
         samples_imu.push_back(*imu);
         samples_odom.push_back(*odom);
-        ROS_INFO_STREAM("Samples Collected: " << samples_rpy.size() << "/" << sample_threshold);
+        ROS_INFO_STREAM("Samples Collected: " << samples_rpy.size() << "/" << sample_amount);
       }
 
     }
 
     bool enough_samples() const {
-      return samples_rpy.size() > sample_threshold;
+      return samples_rpy.size() > sample_amount;
     }
 
     void sync_callback( sensor_msgs::ImuConstPtr const & imu, nav_msgs::OdometryConstPtr const & odom ){
