@@ -47,6 +47,7 @@ struct cali_sampler_t {
       Vector3d rpy = imu2rpy(imu);
 
       if ( check_rpy(rpy) ) {
+        ROS_INFO_STREAM("sync offset: " << int(abs((imu->header.stamp - odom->header.stamp).toSec())*1000.) << "ms");
         samples_rpy.push_back(rpy);
         samples_imu.push_back(*imu);
         samples_odom.push_back(*odom);
