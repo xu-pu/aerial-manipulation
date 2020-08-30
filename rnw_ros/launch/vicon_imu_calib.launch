@@ -9,7 +9,7 @@
     <!-- Increase from 0.1 default to 0.5 to avoid entering atti mode -->
     <param name="ctrl_cmd_stream_timeout" value="0.5"/>
 
-    <node pkg="djiros" type="djiros_node" name="djiros" output="screen" launch-prefix="" required="true">
+    <node pkg="djiros" type="djiros_node" name="djiros" output="log" launch-prefix="" required="true">
         <param name="log_level" type="string" value="info"/>
         <param name="serial_name" type="string" value="/dev/tty.dji.n3"/>
         <param name="baud_rate" type="int" value="921600"/>
