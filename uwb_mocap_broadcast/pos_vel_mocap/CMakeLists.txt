@@ -108,8 +108,10 @@ include_directories(${EIGEN3_INCLUDE_DIR})
 
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
-INCLUDE_DIRECTORIES( include
+INCLUDE_DIRECTORIES(
+    include
     ${catkin_INCLUDE_DIRS}
+    /home/sheep/am_ws/devel/include # for clion only
 )
 ###########
 ## Build ##

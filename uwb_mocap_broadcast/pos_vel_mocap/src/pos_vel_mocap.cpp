@@ -5,6 +5,10 @@
 #include <nav_msgs/Odometry.h>
 #include <nav_msgs/Path.h>
 #include <ros/ros.h>
+
+#include <dynamic_reconfigure/server.h>
+#include <pos_vel_mocap/ViconCalibConfig.h>
+
 #define IF_SUBTRACT_INIT 0
 using namespace std;
 using namespace Eigen;
@@ -24,6 +28,29 @@ nav_msgs::Path run_path;
 
 Eigen::Quaterniond R_MARKER_FLU;
 Eigen::Vector3d T_MARKER_FLU;
+
+Vector3d rpy_markers;
+
+static constexpr double DEG2RAD = M_PI/180;
+
+inline Eigen::Matrix3d rpy2rot( Vector3d const & rpy ){
+  return Eigen::AngleAxisd(rpy.z(), Vector3d::UnitZ()) *
+         Eigen::AngleAxisd(rpy.y(), Vector3d::UnitY()) *
+         Eigen::AngleAxisd(rpy.x(), Vector3d::UnitX())
+                 .toRotationMatrix();
+}
+
+void calib_cfg_callback(pos_vel_mocap::ViconCalibConfig & config, uint32_t level ){
+
+  rpy_markers.x() = DEG2RAD * config.yaw;
+  rpy_markers.y() = DEG2RAD * config.pitch;
+  rpy_markers.z() = DEG2RAD * config.yaw;
+
+  Matrix3d R_FLU_MARKER = rpy2rot(rpy_markers);
+
+  R_MARKER_FLU = R_FLU_MARKER.transpose();
+
+}
 
 void pose_callback( const geometry_msgs::PoseStamped::ConstPtr msg ) {
 
@@ -183,6 +210,12 @@ int main( int argc, char **argv )
 {
     ros::init( argc, argv, "pos_vel_mocap" );
     ros::NodeHandle n( "~" );
+
+    rpy_markers.setZero();
+
+    dynamic_reconfigure::Server<pos_vel_mocap::ViconCalibConfig> server;
+    dynamic_reconfigure::Server<pos_vel_mocap::ViconCalibConfig>::CallbackType f;
+    server.setCallback(calib_cfg_callback);
 
     R_MARKER_FLU.x() = get_param_default(n,"R_MARKER_FLU/x",0.);
     R_MARKER_FLU.y() = get_param_default(n,"R_MARKER_FLU/y",0.);
