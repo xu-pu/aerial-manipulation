@@ -30,11 +30,22 @@ int main( int argc, char** argv ) {
 
   ros::NodeHandle nh("~");
 
-  ros::Subscriber sub_imu = nh.subscribe<sensor_msgs::Imu>("imu",10,on_imu);
-  ros::Subscriber sub_odom = nh.subscribe<nav_msgs::Odometry>("odom",10,on_odom);
+  ros::Subscriber sub_imu = nh.subscribe<sensor_msgs::Imu>(
+          "imu",
+          10,
+          on_imu,
+          ros::TransportHints().tcpNoDelay()
+  );
 
-  pub_rpy_imu = nh.advertise<geometry_msgs::Vector3>("/rpy/imu",1);
-  pub_rpy_odom = nh.advertise<geometry_msgs::Vector3>("/rpy/odom",1);
+  ros::Subscriber sub_odom = nh.subscribe<nav_msgs::Odometry>(
+          "odom",
+          10,
+          on_odom,
+          ros::TransportHints().tcpNoDelay()
+  );
+
+  pub_rpy_imu = nh.advertise<geometry_msgs::Vector3>("/rpy/imu",10);
+  pub_rpy_odom = nh.advertise<geometry_msgs::Vector3>("/rpy/odom",10);
 
   ros::spin();
 

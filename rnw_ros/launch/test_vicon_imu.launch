@@ -31,12 +31,12 @@
         <param name="serial_port" value="/dev/tty.uwb.slave"/>
     </node>
 
-    <node pkg="rnw_ros" type="pub_euler_angles_node" name="pub_euler_angles_node">
+    <node pkg="rnw_ros" type="pub_euler_angles_node" name="pub_euler_angles_node" required="true" output="screen">
         <remap from="~odom" to="$(arg odom_topic)"/>
         <remap from="~imu" to="$(arg imu_topic)"/>
     </node>
 
     <node pkg="rqt_multiplot" type="rqt_multiplot" name="rqt_multiplot"
-          args="--multiplot-config $(find rnw_ros)/rqt_multiplot.xml --multiplot-run-all"/>
+          args="--multiplot-config $(find rnw_ros)/config/rqt_multiplot_vicon_imu.xml --multiplot-run-all"/>
 
 </launch>
