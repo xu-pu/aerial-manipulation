@@ -34,6 +34,8 @@
     <node pkg="rnw_ros" type="vicon_imu_cali_node" name="vicon_imu_cali_node" required="true" output="screen">
         <remap from="~odom" to="$(arg odom_topic)"/>
         <remap from="~imu" to="$(arg imu_topic)"/>
+        <param name="sample_amount" type="int" value="1000"/>
+        <param name="sample_interval_deg" type="double" value="2"/>
     </node>
 
 </launch>
