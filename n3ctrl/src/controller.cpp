@@ -59,7 +59,8 @@ void Controller::update(const Desired_State_t& des,const Odom_Data_t& odom,const
   double yaw_curr = get_yaw_from_quaternion(odom.q);
   Matrix3d wRc = rotz(yaw_curr);
 
-  Vector3d F_des = calc_desired_force_mellinger(des,odom);
+  Vector3d F_des = calc_desired_force(des,odom);
+  //Vector3d F_des = calc_desired_force_mellinger(des,odom);
 
   //F_des = acceleration_loop(F_des,imu,odom);
 
