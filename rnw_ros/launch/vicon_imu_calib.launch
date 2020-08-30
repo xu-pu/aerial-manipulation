@@ -36,6 +36,4 @@
         <remap from="~imu" to="$(arg imu_topic)"/>
     </node>
 
-    <node name="record" pkg="rosbag" type="record" output="screen" args="-a -x '/traj/(.*)'" />
-
 </launch>

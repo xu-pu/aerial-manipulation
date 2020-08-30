@@ -171,8 +171,8 @@ int main( int argc, char** argv ) {
 
   ros::NodeHandle nh;
 
-  message_filters::Subscriber<sensor_msgs::Imu> sub_imu(nh, "imu", 1, ros::TransportHints().tcpNoDelay());
-  message_filters::Subscriber<nav_msgs::Odometry> sub_odom(nh, "odom", 1, ros::TransportHints().tcpNoDelay());
+  message_filters::Subscriber<sensor_msgs::Imu> sub_imu(nh, "/djiros/imu", 1, ros::TransportHints().tcpNoDelay());
+  message_filters::Subscriber<nav_msgs::Odometry> sub_odom(nh, "/uwb_vicon_odom", 1, ros::TransportHints().tcpNoDelay());
   typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::Imu,nav_msgs::Odometry> sync_pol;
   message_filters::Synchronizer<sync_pol> sync(sync_pol(10),sub_imu,sub_odom);
   sync.registerCallback(sync_callback);
