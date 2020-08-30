@@ -1,0 +1,38 @@
+<launch>
+
+	<arg name="uavname" default="fpv" />
+    <arg name="odom_topic" value="/uwb_vicon_odom" />
+    <arg name="imu_topic" default="/djiros/imu"/>
+    <arg name="cone_topic" value="/uwb_vicon_odom_cone" />
+
+    <!-- Using dynamic_reconfigure will cause timeout -->
+    <!-- Increase from 0.1 default to 0.5 to avoid entering atti mode -->
+    <param name="ctrl_cmd_stream_timeout" value="0.5"/>
+
+    <node pkg="djiros" type="djiros_node" name="djiros" output="screen" launch-prefix="" required="true">
+        <param name="log_level" type="string" value="info"/>
+        <param name="serial_name" type="string" value="/dev/tty.dji.n3"/>
+        <param name="baud_rate" type="int" value="921600"/>
+        <param name="app_id"        type="int"      value="1024795"/>
+        <param name="app_version"   type="int"      value="1"/>
+        <param name="enc_key"       type="string"   value="a5f11a418f3dcdc39c4a1efb35a9dd4545e47b56cae9d98c988468277a9305dc"/>
+        <param name="sensor_mode" type="bool" value="false"/>
+        <param name="align_with_fmu" type="bool" value="false"/>
+    </node>
+
+    <node pkg="uart_odom" type="uart_odom" name="uart_odom_client" output="log" respawn="true">
+        <!--publishers-->
+        <remap from="~out_odom_uav" to="$(arg odom_topic)"/>
+        <remap from="~out_odom_cone" to="$(arg cone_topic)"/>
+        <!--params-->
+        <rosparam command="load" file="$(find uart_odom)/config/uart_odom_config.yaml"/>
+        <param name="work_mode" value="real-time"/>
+        <param name="js_ctrl_mode" value="feedback"/>
+        <param name="serial_port" value="/dev/tty.uwb.slave"/>
+    </node>
+
+    <node pkg="rnw_ros" type="vicon_imu_calib_node" name="vicon_imu_calib_node" required="true" output="screen"/>
+
+    <node name="record" pkg="rosbag" type="record" output="screen" args="-a -x '/traj/(.*)'" />
+
+</launch>
