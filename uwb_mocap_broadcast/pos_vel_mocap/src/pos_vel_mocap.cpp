@@ -212,17 +212,7 @@ int main( int argc, char **argv )
     ros::NodeHandle n( "~" );
 
     rpy_markers.setZero();
-
-    dynamic_reconfigure::Server<pos_vel_mocap::ViconCalibConfig> server;
-    dynamic_reconfigure::Server<pos_vel_mocap::ViconCalibConfig>::CallbackType f;
-    server.setCallback(calib_cfg_callback);
-
-    R_MARKER_FLU.x() = get_param_default(n,"R_MARKER_FLU/x",0.);
-    R_MARKER_FLU.y() = get_param_default(n,"R_MARKER_FLU/y",0.);
-    R_MARKER_FLU.z() = get_param_default(n,"R_MARKER_FLU/z",0.);
-    R_MARKER_FLU.w() = get_param_default(n,"R_MARKER_FLU/w",1.);
-
-    ROS_INFO_STREAM("Load R_MARKER_FLU: " << R_MARKER_FLU.coeffs().transpose());
+    R_MARKER_FLU.setIdentity();
 
     T_MARKER_FLU.x() = get_param_default(n,"T_MARKER_FLU/x",0.);
     T_MARKER_FLU.y() = get_param_default(n,"T_MARKER_FLU/y",0.);
@@ -230,7 +220,11 @@ int main( int argc, char **argv )
 
     ROS_INFO_STREAM("Load T_MARKER_FLU: " << T_MARKER_FLU.transpose());
 
-    ros::Subscriber s1 = n.subscribe( "/uav/pose", 100, pose_callback );
+  dynamic_reconfigure::Server<pos_vel_mocap::ViconCalibConfig> server;
+  dynamic_reconfigure::Server<pos_vel_mocap::ViconCalibConfig>::CallbackType f;
+  server.setCallback(calib_cfg_callback);
+
+  ros::Subscriber s1 = n.subscribe( "/uav/pose", 100, pose_callback );
     ros::Subscriber s3 = n.subscribe( "/cone/pose", 100, pose_cone_callback );
 
     pub_odom = n.advertise< nav_msgs::Odometry >( "odom_TA", 100 );
