@@ -5,6 +5,11 @@
     <arg name="cone_topic" value="/uwb_vicon_odom_cone" />
     <arg name="imu_topic" default="/djiros/imu"/>
 
+    <node pkg="rnw_ros" type="pub_euler_angles_node" name="pub_euler_angles_node" required="true" output="screen">
+        <remap from="~odom" to="$(arg odom_topic)"/>
+        <remap from="~imu" to="$(arg imu_topic)"/>
+    </node>
+
     <node pkg="djiros" type="djiros_node" name="djiros" output="screen" launch-prefix="" required="true">
         <param name="log_level" type="string" value="info"/>
         <param name="serial_name" type="string" value="/dev/tty.dji.n3"/>
