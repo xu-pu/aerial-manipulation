@@ -18,12 +18,22 @@ void on_odom( OdometryConstPtr const & odom ){
   Eigen::Matrix3d R_ENU2NED;
   R_ENU2NED << 0, 1, 0, 1, 0, 0, 0, 0, -1;
   Vector3d rpy = odom2rpy(odom) * RAD2DEG;
-  pub_rpy_odom.publish(uav_utils::to_vector3_msg(rpy));
+
+  geometry_msgs::Vector3Stamped msg;
+  msg.header = odom->header;
+  msg.vector = uav_utils::to_vector3_msg(rpy);
+  pub_rpy_odom.publish(msg);
+
 }
 
 void on_imu( sensor_msgs::ImuConstPtr const & imu ){
   Vector3d rpy = imu2rpy(imu) * RAD2DEG;
-  pub_rpy_imu.publish(uav_utils::to_vector3_msg(rpy));
+
+  geometry_msgs::Vector3Stamped msg;
+  msg.header = imu->header;
+  msg.vector = uav_utils::to_vector3_msg(rpy);
+  pub_rpy_imu.publish(msg);
+
 }
 
 int main( int argc, char** argv ) {
@@ -46,8 +56,8 @@ int main( int argc, char** argv ) {
           ros::TransportHints().tcpNoDelay()
   );
 
-  pub_rpy_imu = nh.advertise<geometry_msgs::Vector3>("/rpy/imu",10);
-  pub_rpy_odom = nh.advertise<geometry_msgs::Vector3>("/rpy/odom",10);
+  pub_rpy_imu = nh.advertise<geometry_msgs::Vector3Stamped>("/rpy/imu",100);
+  pub_rpy_odom = nh.advertise<geometry_msgs::Vector3Stamped>("/rpy/odom",100);
 
   ros::spin();
 
