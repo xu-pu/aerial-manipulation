@@ -422,21 +422,14 @@ Eigen::Vector3d Controller::calc_desired_force_mellinger( const Desired_State_t&
   Vector3d F_des = u_v * param.mass + Vector3d(0, 0, param.mass * param.gra) + Ka * param.mass * des.a;
 
   if(param.pub_debug_msgs){
-    n3ctrl::ControllerDebug dbg_msg;
-    dbg_msg.header = odom.msg.header;
-    dbg_msg.des_p = uav_utils::to_vector3_msg(des.p);
-    dbg_msg.u_p_p = uav_utils::to_vector3_msg(u_p);
-    dbg_msg.u_p_i = uav_utils::to_vector3_msg(Eigen::Vector3d::Zero());
-    dbg_msg.u_p = uav_utils::to_vector3_msg(u_p);
-    dbg_msg.des_v = uav_utils::to_vector3_msg(des.v);
-    dbg_msg.u_v_p = uav_utils::to_vector3_msg(u_v_p);
-    dbg_msg.u_v_i = uav_utils::to_vector3_msg(u_v_i);
-    dbg_msg.u_v = uav_utils::to_vector3_msg(u_v);
-    dbg_msg.k_p_p = uav_utils::to_vector3_msg(Kp.diagonal());
-    dbg_msg.k_p_i = uav_utils::to_vector3_msg(Eigen::Vector3d::Zero());
-    dbg_msg.k_v_p = uav_utils::to_vector3_msg(Kv.diagonal());
-    dbg_msg.k_v_i = uav_utils::to_vector3_msg(Kvi.diagonal());
-    ctrl_val_dbg_pub.publish(dbg_msg);
+    geometry_msgs::Vector3Stamped msg;
+    msg.header.stamp = ros::Time::now();
+    msg.vector = uav_utils::to_vector3_msg(e_p);
+    ctrl_dbg_e_p_pub.publish(msg);
+    msg.vector = uav_utils::to_vector3_msg(e_v);
+    ctrl_dbg_e_v_pub.publish(msg);
+    msg.vector = uav_utils::to_vector3_msg(int_e_v);
+    ctrl_dbg_e_p_i_pub.publish(msg);
   }
 
   return F_des;
@@ -454,7 +447,7 @@ Eigen::Vector3d Controller::acceleration_loop( Eigen::Vector3d const & F_des, co
     geometry_msgs::Vector3Stamped msg;
     msg.header.stamp = ros::Time::now();
     msg.vector = uav_utils::to_vector3_msg(e_a);
-    ctrl_dbg_eerr_acc_pub.publish(msg);
+    ctrl_dbg_e_a_pub.publish(msg);
   }
   Vector3d u = F_des + ( imu.q * ( Kap * e_a ) ) * param.mass; // world frame
   return u;

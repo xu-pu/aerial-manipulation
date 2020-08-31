@@ -166,10 +166,14 @@ int main(int argc, char* argv[]) {
     fsm.controller.ctrl_dbg_att_des_pub =
         nh.advertise<geometry_msgs::Vector3Stamped>("ctrl_dbg/att_des", 10);
 
+    // state-setpoint error
+    fsm.controller.ctrl_dbg_e_v_pub = nh.advertise<geometry_msgs::Vector3Stamped>("ctrl_dbg/e_v", 10);
+    fsm.controller.ctrl_dbg_e_p_pub = nh.advertise<geometry_msgs::Vector3Stamped>("ctrl_dbg/e_p", 10);
+    fsm.controller.ctrl_dbg_e_p_i_pub = nh.advertise<geometry_msgs::Vector3Stamped>("ctrl_dbg/e_p_i", 10);
+    fsm.controller.ctrl_dbg_e_a_pub = nh.advertise<geometry_msgs::Vector3Stamped>("ctrl_dbg/e_a", 10);
+
     fsm.controller.ctrl_dbg_att_real_pub =
         nh.advertise<geometry_msgs::Vector3Stamped>("ctrl_dbg/att_real", 10);
-
-    fsm.controller.ctrl_dbg_eerr_acc_pub = nh.advertise<geometry_msgs::Vector3Stamped>("ctrl_dbg/e_acc",10);
 
     fsm.pub_hov_thr = nh.advertise<quadrotor_msgs::Float64Stamped>("hov_thr", 10);
 
