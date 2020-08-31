@@ -89,4 +89,7 @@
 
     <node name="record" pkg="rosbag" type="record" output="screen" args="-a -x '/traj/(.*)'" />
 
+    <node pkg="rqt_multiplot" type="rqt_multiplot" name="rqt_multiplot"
+          args="--multiplot-config $(find rnw_ros)/config/rqt_multiplot_ctrl_err.xml --multiplot-run-all"/>
+
 </launch>
