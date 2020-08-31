@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <launch>
-    <node name="rviz" pkg="rviz" type="rviz" output="log" args="-d $(find am_traj)/config/traj.rviz"/>
+
+    <node name="rviz" pkg="rviz" type="rviz" output="log" args="-d $(find rnw_ros)/config/traj.rviz"/>
 
     <arg name="topic_poly_traj" value="/rnw/poly_traj" />
     <arg name="topic_odom_cone" value="/pos_vel_mocap/odom_cone" />

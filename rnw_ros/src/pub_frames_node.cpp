@@ -73,7 +73,7 @@ void on_vins( OdometryConstPtr const & odom ){
 
 void on_imu( sensor_msgs::ImuConstPtr const & imu ){
   Matrix3d R = imu2R(imu);
-  publish_frame(R,last_t,"imu","world");
+  publish_frame(R,last_t,"FLU","world");
 }
 
 int main( int argc, char** argv ) {
