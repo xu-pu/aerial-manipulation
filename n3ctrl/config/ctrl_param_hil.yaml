@@ -9,6 +9,9 @@ pub_debug_msgs: false
 
 enable_dynamic_reconfigure: true
 
+# tianbo(0), mellinger(1)
+ctrl_strategy: 0
+
 hover:
     set_hov_percent_to_zero: false
     use_hov_percent_kf: true

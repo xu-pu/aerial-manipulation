@@ -80,12 +80,15 @@ void Parameter_t::config_from_ros_handle(const ros::NodeHandle& nh)
 
   read_essential_param(nh, "pub_debug_msgs", pub_debug_msgs);
 
-  read_essential_param(nh, "enable_dynamic_reconfigure", enable_dynamic_reconfigure);
-	
 	// read_essential_param(nh, "paramname", paramval);
 
 	nh.param("work_mode", work_mode, std::string("realtime"));
 	nh.param("js_ctrl_mode", js_ctrl_mode, std::string("feedback"));
+
+	// XU PU
+  read_essential_param(nh, "enable_dynamic_reconfigure", enable_dynamic_reconfigure);
+  read_essential_param(nh, "ctrl_strategy", ctrl_strategy);
+
 };
 
 void Parameter_t::init()
@@ -99,7 +102,7 @@ void Parameter_t::config_full_thrust(double hov)
 	full_thrust = hover.use_hov_percent_kf?(mass * gra / hov):full_thrust;
 };
 
-n3ctrl::GainsConfig Parameter_t::get_defaults(){
+n3ctrl::GainsConfig Parameter_t::get_defaults() const {
 
   n3ctrl::GainsConfig rst;
 
@@ -126,6 +129,8 @@ n3ctrl::GainsConfig Parameter_t::get_defaults(){
   rst.Kyaw = hover_gain.Kyaw;
 
   rst.hover_percent = hov_percent;
+
+  rst.ctrl_strategy = ctrl_strategy;
 
   return rst;
 

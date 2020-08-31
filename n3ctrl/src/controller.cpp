@@ -59,10 +59,20 @@ void Controller::update(const Desired_State_t& des,const Odom_Data_t& odom,const
   double yaw_curr = get_yaw_from_quaternion(odom.q);
   Matrix3d wRc = rotz(yaw_curr);
 
-  Vector3d F_des = calc_desired_force(des,odom);
-  //Vector3d F_des = calc_desired_force_mellinger(des,odom);
+  Vector3d F_des;
 
-  //F_des = acceleration_loop(F_des,imu,odom);
+  switch ( ctrl_strategy_e(param.ctrl_strategy) ) {
+    case ctrl_strategy_e::tianbo:
+      F_des = calc_desired_force(des,odom);
+      break;
+    case ctrl_strategy_e::mellinger:
+      F_des = calc_desired_force_mellinger(des,odom);
+      break;
+    default:
+      F_des = calc_desired_force(des,odom);
+      ROS_ERROR_STREAM("[n3ctrl] Invalid control strategy!");
+      break;
+  }
 
   F_des = regulate_desired_force(F_des);
 
