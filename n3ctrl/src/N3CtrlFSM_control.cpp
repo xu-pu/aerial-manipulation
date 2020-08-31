@@ -150,7 +150,6 @@ void N3CtrlFSM::process_idling_control(Controller_Output_t& u, SO3_Controller_Ou
 	u.mode = Controller_Output_t::VERT_THRU;
 }
 
-
 void N3CtrlFSM::process_hover_control(Controller_Output_t& u, SO3_Controller_Output_t& u_so3)
 {
 	Desired_State_t des;
