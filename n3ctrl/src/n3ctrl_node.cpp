@@ -180,11 +180,15 @@ int main(int argc, char* argv[]) {
 
     fsm.stateVisualizer.led_pub = nh.advertise<visualization_msgs::Marker>("state_led", 10);
 
-    dynamic_reconfigure::Server<n3ctrl::GainsConfig> server;
-
-    dynamic_reconfigure::Server<n3ctrl::GainsConfig>::CallbackType f;
-
-  server.setCallback(gain_cfg_callback);
+    // dynamic reconfigure
+    using dyn_cfg_server_t = dynamic_reconfigure::Server<n3ctrl::GainsConfig>;
+    std::shared_ptr<dyn_cfg_server_t> server;
+    if ( param.enable_dynamic_reconfigure ) {
+      server = std::make_shared<dyn_cfg_server_t>();
+      server->setCallback(gain_cfg_callback);
+      server->setConfigDefault(param.get_defaults());
+      server->updateConfig(param.get_defaults());
+    }
 
     // essential for publishers and subscribers to get ready
     ros::Duration(0.5).sleep();

@@ -3,6 +3,8 @@
 
 #include <ros/ros.h>
 
+#include <n3ctrl/GainsConfig.h>
+
 class Parameter_t
 {
 public:
@@ -79,6 +81,8 @@ public:
 
 	bool pub_debug_msgs;
 
+	bool enable_dynamic_reconfigure;
+
 	Parameter_t();
 	void config_from_ros_handle(const ros::NodeHandle& nh);
 	void init();
@@ -97,6 +101,16 @@ private:
 			ROS_BREAK();
 		}
 	};
+
+
+public:
+    // XU PU
+
+    /**
+     * @return default values for dynamic_reconfigure
+     */
+    n3ctrl::GainsConfig get_defaults();
+
 };
 
 inline std::ostream & operator << ( std::ostream &out, const Parameter_t::Gain & gains )

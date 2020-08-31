@@ -78,7 +78,9 @@ void Parameter_t::config_from_ros_handle(const ros::NodeHandle& nh)
 	read_essential_param(nh, "js_ctrl_lock_velo", js_ctrl_lock_velo);
 	read_essential_param(nh, "use_yaw_rate_ctrl", use_yaw_rate_ctrl);
 
-	read_essential_param(nh, "pub_debug_msgs", pub_debug_msgs);
+  read_essential_param(nh, "pub_debug_msgs", pub_debug_msgs);
+
+  read_essential_param(nh, "enable_dynamic_reconfigure", enable_dynamic_reconfigure);
 	
 	// read_essential_param(nh, "paramname", paramval);
 
@@ -96,3 +98,35 @@ void Parameter_t::config_full_thrust(double hov)
 	ROS_ASSERT(full_thrust>0.1);
 	full_thrust = hover.use_hov_percent_kf?(mass * gra / hov):full_thrust;
 };
+
+n3ctrl::GainsConfig Parameter_t::get_defaults(){
+
+  n3ctrl::GainsConfig rst;
+
+  rst.Kp0 = hover_gain.Kp0;
+  rst.Kp1 = hover_gain.Kp1;
+  rst.Kp2 = hover_gain.Kp2;
+
+  rst.Kv0 = hover_gain.Kv0;
+  rst.Kv1 = hover_gain.Kv1;
+  rst.Kv2 = hover_gain.Kv2;
+
+  rst.Kvi0 = hover_gain.Kvi0;
+  rst.Kvi1 = hover_gain.Kvi1;
+  rst.Kvi2 = hover_gain.Kvi2;
+
+  rst.Ka0 = hover_gain.Ka0;
+  rst.Ka1 = hover_gain.Ka1;
+  rst.Ka2 = hover_gain.Ka2;
+
+  rst.Kap0 = hover_gain.Kap0;
+  rst.Kap1 = hover_gain.Kap1;
+  rst.Kap2 = hover_gain.Kap2;
+
+  rst.Kyaw = hover_gain.Kyaw;
+
+  rst.hover_percent = hov_percent;
+
+  return rst;
+
+}
