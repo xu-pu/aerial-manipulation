@@ -77,7 +77,7 @@ struct rnw_planner_t {
       else if ( !msg.is_point_contact ){
         state_transition(fsm,cone_fsm_e::idle);
       }
-      else if ( abs(msg.euler_angles_velocity.y) < ang_vel_threshold ) {
+      else if ( abs(msg.euler_angles_velocity.z) < ang_vel_threshold ) {
         state_transition(fsm,cone_fsm_e::qstatic);
       }
       else {

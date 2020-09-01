@@ -5,6 +5,8 @@
 #ifndef SRC_RNW_UTILS_H
 #define SRC_RNW_UTILS_H
 
+#include <deque>
+
 #include "rnw_ros/ros_utils.h"
 #include "rnw_ros/pose_utils.h"
 #include <rnw_ros/ConeState.h>
@@ -158,6 +160,33 @@ inline Vector3d cone_rot2euler( Matrix3d const & R ){
 
 }
 
+template<typename T>
+struct avg_smoother_t {
+
+    std::deque<T> values;
+
+    size_t const queue_sz;
+
+    explicit avg_smoother_t( size_t window_size ) : queue_sz(window_size) {}
+
+    T smooth( T val ){
+
+      values.push_back(val);
+
+      if ( values.size() > queue_sz ) {
+        values.pop_front();
+      }
+
+      T sum; sum.setZero();
+
+      for ( auto v : values ) { sum+=v; }
+
+      return sum/values.size();
+
+    }
+
+};
+
 struct cone_state_estimator_t {
 
     // object properties
@@ -222,7 +251,11 @@ struct cone_state_estimator_t {
 
     Vector3d contact_point;
 
-    inline explicit cone_state_estimator_t( ros::NodeHandle & nh ){
+    // speed est
+
+    avg_smoother_t<Vector3d> ang_vel_smoother;
+
+    inline explicit cone_state_estimator_t( ros::NodeHandle & nh ) : ang_vel_smoother(20) {
       rnw_config.load_from_ros(nh);
       pub_cone_state = nh.advertise<rnw_ros::ConeState>("cone_state",10);
       pub_odom_dt = nh.advertise<quadrotor_msgs::Float64Stamped>("dt",10);
@@ -307,6 +340,8 @@ struct cone_state_estimator_t {
         euler_vel(1) = max(euler_vel(1),-max_euler_velocity);
         euler_vel(2) = max(euler_vel(2),-max_euler_velocity);
       }
+
+      euler_vel = ang_vel_smoother.smooth(euler_vel);
 
       latest_euler_angles = euler_cur;
       latest_euler_velocity = euler_vel;
