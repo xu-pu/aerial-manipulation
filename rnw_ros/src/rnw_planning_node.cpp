@@ -9,9 +9,9 @@ struct rnw_planner_t {
 
     static constexpr double deg2rad = M_PI/180.;
 
-    static constexpr double min_tilt = 20 * deg2rad;
+    static constexpr double min_tilt = 10 * deg2rad;
 
-    double ang_vel_threshold = 1;
+    double ang_vel_threshold = 0.5;
 
     enum class cone_fsm_e {
         idle, qstatic, rocking
@@ -71,13 +71,13 @@ struct rnw_planner_t {
 
     void update_state( rnw_ros::ConeState const & msg ){
 
-      if ( msg.euler_angles.x < min_tilt ) {
+      if ( msg.euler_angles.y < min_tilt ) {
         state_transition(fsm,cone_fsm_e::idle);
       }
       else if ( !msg.is_point_contact ){
         state_transition(fsm,cone_fsm_e::idle);
       }
-      else if ( msg.euler_angles_velocity.y < ang_vel_threshold ) {
+      else if ( abs(msg.euler_angles_velocity.y) < ang_vel_threshold ) {
         state_transition(fsm,cone_fsm_e::qstatic);
       }
       else {
@@ -94,8 +94,16 @@ struct rnw_planner_t {
         step_count++;
       }
 
+      if ( to == cone_fsm_e::rocking && from == cone_fsm_e::qstatic ) {
+        ROS_INFO_STREAM("[rnw] from qstatic to rocking");
+      }
+
       if ( to == cone_fsm_e::idle ) {
         step_count = 0;
+      }
+
+      if ( from != cone_fsm_e::idle && to == cone_fsm_e::idle ) {
+        ROS_INFO_STREAM("[rnw] object became idle");
       }
 
       fsm = to;

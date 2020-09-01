@@ -3,6 +3,7 @@
 
     <arg name="topic_odom_cone" value="/pos_vel_mocap/odom_cone"/>
     <arg name="topic_cone_state" value="/rnw/cone_state"/>
+    <arg name="topic_rocking_cmd" value="/rnw/rocking_cmd"/>
 
     <node name="rviz" pkg="rviz" type="rviz" output="log" args="-d $(find am_traj)/config/traj.rviz"/>
 
@@ -14,8 +15,15 @@
         <rosparam command="load" file="$(find rnw_ros)/config/rnw_config.yaml"/>
     </node>
 
+    <node pkg="rnw_ros" type="rnw_planning_node" name="rnw_planning_node" output="screen" required="true">
+        <remap from="~cone_state" to="$(arg topic_cone_state)"/>
+        <remap from="~rocking_cmd" to="$(arg topic_rocking_cmd)"/>
+        <rosparam command="load" file="$(find rnw_ros)/config/rnw_config.yaml"/>
+    </node>
+
     <node pkg="rnw_ros" type="visualize_cone_node" name="visualize_cone_node" output="screen" required="true">
         <remap from="~cone_state" to="$(arg topic_cone_state)"/>
+        <remap from="~rocking_cmd" to="$(arg topic_rocking_cmd)"/>
         <param name="cone_color_r" type="double" value="0"/>
         <param name="cone_color_g" type="double" value="1"/>
         <param name="cone_color_b" type="double" value="0"/>
