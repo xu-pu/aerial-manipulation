@@ -8,6 +8,7 @@
 #include "rnw_ros/ros_utils.h"
 #include "rnw_ros/pose_utils.h"
 #include <rnw_ros/ConeState.h>
+#include <rnw_ros/RockingCmd.h>
 #include <quadrotor_msgs/Float64Stamped.h>
 #include <uav_utils/utils.h>
 

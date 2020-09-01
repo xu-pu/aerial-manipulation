@@ -60,6 +60,7 @@ find_package(Ceres REQUIRED)
 add_message_files(
         FILES
         ConeState.msg
+        RockingCmd.msg
 )
 
 generate_messages(
