@@ -60,6 +60,9 @@ struct rnw_planner_t {
       if ( msg.euler_angles.x < min_tilt ) {
         fsm = cone_fsm_e::idle;
       }
+      else if ( !msg.is_point_contact ){
+        fsm = cone_fsm_e::idle;
+      }
       else if ( msg.euler_angles_velocity.y < ang_vel_threshold ) {
         fsm = cone_fsm_e::qstatic;
       }
