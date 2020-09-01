@@ -22,6 +22,8 @@ struct cone_visualizer_t {
 
     rnw_ros::ConeState latest_cone_state;
 
+    rnw_ros::RockingCmd latest_rocking_cmd;
+
     static constexpr int id_base = 0;
 
     static constexpr int id_shaft = 1;
@@ -29,6 +31,8 @@ struct cone_visualizer_t {
     static constexpr int id_contact_path = 2;
 
     static constexpr int id_contact_normal = 3;
+
+    static constexpr int id_rocking_cmd = 4;
 
     string ns = "cone_state_visualization";
 
@@ -70,13 +74,44 @@ struct cone_visualizer_t {
       init = true;
     }
 
+    void on_rocking_cmd( rnw_ros::RockingCmdConstPtr const & msg ){
+      latest_rocking_cmd = *msg;
+    }
+
     visualization_msgs::MarkerArray gen_markers(){
       visualization_msgs::MarkerArray marker_arr;
       marker_arr.markers.push_back(gen_marker_base());
       marker_arr.markers.push_back(gen_marker_shaft());
       marker_arr.markers.push_back(gen_contact_path());
       marker_arr.markers.push_back(gen_marker_contact_normal());
+      marker_arr.markers.push_back(gen_marker_rocking_cmd());
       return marker_arr;
+    }
+
+    visualization_msgs::Marker gen_marker_rocking_cmd() const {
+
+      visualization_msgs::Marker marker;
+
+      marker.id = id_rocking_cmd;
+      marker.type = visualization_msgs::Marker::ARROW;
+      marker.header.stamp = ros::Time::now();
+      marker.header.frame_id = "world";
+      marker.ns = ns;
+      marker.scale.x = 0.01;
+      marker.scale.y = 0.03;
+      marker.scale.z = 0.1;
+      marker.color.r = 1;
+      marker.color.g = 0;
+      marker.color.b = 0;
+      marker.color.a = 1.00;
+      marker.pose.orientation.w = 1;
+
+      marker.action = visualization_msgs::Marker::ADD;
+      marker.points.push_back(latest_cone_state.tip);
+      marker.points.push_back(latest_rocking_cmd.tip_setpoint);
+
+      return marker;
+
     }
 
     visualization_msgs::Marker gen_marker_contact_normal() const {
@@ -197,7 +232,16 @@ int main( int argc, char** argv ) {
           "cone_state",
           100,
           &cone_visualizer_t::on_cone_state,
-          &cone_viz, ros::TransportHints().tcpNoDelay()
+          &cone_viz,
+          ros::TransportHints().tcpNoDelay()
+  );
+
+  ros::Subscriber sub_rocking_cmd = nh.subscribe<rnw_ros::RockingCmd>(
+          "rocking_cmd",
+          100,
+          &cone_visualizer_t::on_rocking_cmd,
+          &cone_viz,
+          ros::TransportHints().tcpNoDelay()
   );
 
   ros::spin();
