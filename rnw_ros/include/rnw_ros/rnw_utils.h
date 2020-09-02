@@ -160,24 +160,50 @@ inline Vector3d cone_rot2euler( Matrix3d const & R ){
 
 }
 
-template<typename T>
-struct avg_smoother_t {
+template<typename T, size_t window_size>
+struct median_filter_t {
 
     std::deque<T> values;
 
-    size_t const queue_sz;
+    median_filter_t() = default;
 
-    explicit avg_smoother_t( size_t window_size ) : queue_sz(window_size) {}
-
-    T smooth( T val ){
+    T update( T val ){
 
       values.push_back(val);
 
-      if ( values.size() > queue_sz ) {
+      if ( values.size() > window_size ) {
         values.pop_front();
       }
 
-      T sum; sum.setZero();
+      std::deque<T> sorted(values);
+      std::sort(sorted.begin(),sorted.end());
+
+      T output = sorted.at(sorted.size()/2);
+
+      //ROS_INFO_STREAM("[median filter] input=" << val << ", output=" << output );
+
+      return output;
+
+    }
+
+};
+
+template<typename T, size_t window_size>
+struct average_filter_t {
+
+    std::deque<T> values;
+
+    average_filter_t() = default;
+
+    T update( T val ){
+
+      values.push_back(val);
+
+      if ( values.size() > window_size ) {
+        values.pop_front();
+      }
+
+      T sum = 0;
 
       for ( auto v : values ) { sum+=v; }
 
@@ -217,7 +243,7 @@ struct cone_state_estimator_t {
 
     // estimator state
 
-    nav_msgs::Odometry previous_odom;
+    nav_msgs::Odometry latest_odom;
 
     bool init = false;
 
@@ -251,11 +277,14 @@ struct cone_state_estimator_t {
 
     Vector3d contact_point;
 
-    // speed est
+    // filters
 
-    avg_smoother_t<Vector3d> ang_vel_smoother;
+    median_filter_t<double,50> ang_vel_z_filter;
 
-    inline explicit cone_state_estimator_t( ros::NodeHandle & nh ) : ang_vel_smoother(20) {
+    average_filter_t<double,50> ang_y_filter;
+    average_filter_t<double,50> ang_z_filter;
+
+    inline explicit cone_state_estimator_t( ros::NodeHandle & nh ) {
       rnw_config.load_from_ros(nh);
       pub_cone_state = nh.advertise<rnw_ros::ConeState>("cone_state",10);
       pub_odom_dt = nh.advertise<quadrotor_msgs::Float64Stamped>("dt",10);
@@ -266,18 +295,21 @@ struct cone_state_estimator_t {
     inline void on_odom( nav_msgs::OdometryConstPtr const & msg ){
 
       if ( !init ) {
-        previous_odom = *msg;
+        latest_odom = *msg;
+        update_euler_angles();
         init = true;
         ROS_INFO_STREAM("[Cone] Initialized");
         return;
       }
-      else if (msg_time_diff(previous_odom, *msg) > odom_timeout ) {
-        previous_odom = *msg;
+      else if (msg_time_diff(latest_odom, *msg) > odom_timeout ) {
+        latest_odom = *msg;
+        update_euler_angles();
         ROS_ERROR_STREAM("[Cone] Odom Timeout, re-initialized!");
         return;
       }
-      else if (msg_time_diff(previous_odom, *msg) < 0 ) {
-        previous_odom = *msg;
+      else if (msg_time_diff(latest_odom, *msg) < 0 ) {
+        latest_odom = *msg;
+        update_euler_angles();
         ROS_ERROR_STREAM("[Cone] Message out of order, re-initialized!");
         return;
       }
@@ -290,7 +322,7 @@ struct cone_state_estimator_t {
 
       publish_cone_state(msg);
 
-      previous_odom = *msg;
+      latest_odom = *msg;
 
     }
 
@@ -308,10 +340,17 @@ struct cone_state_estimator_t {
       pub_cone_state.publish(msg_cone);
     }
 
+    inline void update_euler_angles(){
+      latest_euler_angles = cone_rot2euler(odom2R(latest_odom));
+      latest_euler_angles.y() = ang_y_filter.update(latest_euler_angles.y());
+      latest_euler_angles.z() = ang_z_filter.update(latest_euler_angles.z());
+    }
+
     inline void update_euler(  nav_msgs::OdometryConstPtr const & msg ){
 
-      auto pre = previous_odom;
+      auto pre = latest_odom;
       auto cur = *msg;
+      latest_odom = *msg;
 
       double dt = msg_time_diff(pre,cur);
 
@@ -320,8 +359,9 @@ struct cone_state_estimator_t {
       msg_dt.value = dt;
       pub_odom_dt.publish(msg_dt);
 
-      Vector3d euler_cur = cone_rot2euler(odom2R(cur));
-      Vector3d euler_pre = cone_rot2euler(odom2R(pre));
+      Vector3d euler_pre = latest_euler_angles;
+      update_euler_angles();
+      Vector3d euler_cur = latest_euler_angles;
 
       Vector3d euler_diff = euler_cur - euler_pre;
       //ROS_INFO_STREAM("before " << euler_diff.transpose());
@@ -341,7 +381,8 @@ struct cone_state_estimator_t {
         euler_vel(2) = max(euler_vel(2),-max_euler_velocity);
       }
 
-      euler_vel = ang_vel_smoother.smooth(euler_vel);
+      euler_vel.z() = ang_vel_z_filter.update(euler_vel.z());
+      //euler_vel = ang_vel_filter.smooth(euler_vel);
 
       latest_euler_angles = euler_cur;
       latest_euler_velocity = euler_vel;
