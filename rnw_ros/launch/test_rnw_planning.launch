@@ -49,13 +49,6 @@
         <remap from="~Y" to="$(arg topic_trigger_topple)"/>
     </node>
 
-    <node pkg="rnw_ros" type="rnw_planning_node" name="rnw_planning_node" output="screen" required="true">
-        <remap from="~cone_state" to="$(arg topic_cone_state)"/>
-        <remap from="~rocking_cmd" to="$(arg topic_rocking_cmd)"/>
-        <remap from="~dbg_trigger" to="$(arg topic_dbg_trigger)"/>
-        <rosparam command="load" file="$(find rnw_ros)/config/rnw_config.yaml"/>
-    </node>
-
     <node pkg="rnw_ros" type="visualize_cone_node" name="visualize_cone_node" output="screen" required="true">
         <remap from="~cone_state" to="$(arg topic_cone_state)"/>
         <remap from="~rocking_cmd" to="$(arg topic_rocking_cmd)"/>
