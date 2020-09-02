@@ -1,13 +1,15 @@
 #include <ros/ros.h>
+#include <Eigen/Geometry>
 
-#include "rnw_ros/rnw_utils.h"
+#include <rnw_ros/ConeState.h>
+#include <uav_utils/utils.h>
 
 ros::Publisher pub_uav_odom;
 
 void on_cone_state( rnw_ros::ConeStateConstPtr const & msg ){
   nav_msgs::Odometry odom;
   odom.header.stamp = msg->header.stamp;
-  odom.pose.pose.orientation = uav_utils::to_quaternion_msg(Quaterniond::Identity());
+  odom.pose.pose.orientation = uav_utils::to_quaternion_msg(Eigen::Quaterniond::Identity());
   odom.pose.pose.position = msg->tip;
   pub_uav_odom.publish(odom);
 }

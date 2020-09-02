@@ -4,6 +4,12 @@
     <arg name="topic_odom_cone" value="/pos_vel_mocap/odom_cone"/>
     <arg name="topic_cone_state" value="/rnw/cone_state"/>
     <arg name="topic_rocking_cmd" value="/rnw/rocking_cmd"/>
+    <arg name="odom_topic" value="/uwb_vicon_odom" />
+
+    <node pkg="rnw_ros" type="pub_mock_uav_node" name="pub_mock_uav_node" output="screen" required="true">
+        <remap from="~cone_state" to="$(arg topic_cone_state)"/>
+        <remap from="~odom" to="$(arg odom_topic)"/>
+    </node>
 
     <node pkg="mocap_optitrack" type="mocap_node" name="mocap_node" respawn="false" launch-prefix="" required="true" output="log">
         <rosparam file="$(find mocap_optitrack)/config/mocap.yaml" command="load" />
