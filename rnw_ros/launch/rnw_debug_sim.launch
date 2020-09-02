@@ -1,0 +1,131 @@
+<launch>
+
+	<arg name="uavname" default="hil" />
+    <arg name="odom_topic" value="/uwb_vicon_odom" />
+    <arg name="cone_topic" value="/pos_vel_mocap/odom_cone" />
+    <arg name="imu_topic" default="/djiros/imu"/>
+
+    <node pkg="rnw_ros" type="pub_euler_angles_node" name="pub_euler_angles_node" required="true" output="screen">
+        <remap from="~odom" to="$(arg odom_topic)"/>
+        <remap from="~imu" to="$(arg imu_topic)"/>
+    </node>
+
+    <node pkg="djiros" type="djiros_node" name="djiros" output="screen" launch-prefix="" required="true">
+        <param name="log_level" type="string" value="info"/>
+        <param name="serial_name" type="string" value="/dev/tty.dji.n3"/>
+        <param name="baud_rate" type="int" value="921600"/>
+        <param name="app_id"        type="int"      value="1024795"/>
+        <param name="app_version"   type="int"      value="1"/>
+        <param name="enc_key"       type="string"   value="a5f11a418f3dcdc39c4a1efb35a9dd4545e47b56cae9d98c988468277a9305dc"/>
+        <param name="sensor_mode" type="bool" value="false"/>
+        <param name="align_with_fmu" type="bool" value="false"/>
+    </node>
+
+    <node pkg="n3ctrl" type="n3ctrl_node" name="n3ctrl" output="screen" required="true">
+        <!--subscribers-->
+		<remap from="~joy" to="/djiros/rc" />
+        <remap from="~odom" to="$(arg odom_topic)" />
+		<remap from="~imu" to="/djiros/imu" />
+		<remap from="~cmd" to="/position_cmd" />
+        <!--publishers-->
+		<remap from="~desire_pose" to="/desire_pose" />
+		<remap from="~traj_start_trigger" to="/traj_start_trigger" />
+		<remap from="~ctrl" to="/djiros/ctrl" />
+        <!--params-->
+        <rosparam command="load" file="$(find n3ctrl)/config/ctrl_param_$(arg uavname).yaml" />
+        <param name="work_mode" value="real-time" />
+        <param name="js_ctrl_mode" value="feedback" />
+        <param name="pub_debug_msgs" type="bool" value="true"/>
+    </node>
+
+    <node pkg="n3ctrl" type="n1_sim_helper.py" name="n1_sim_helper" output="screen" required="true">
+        <!--subscribers-->
+        <remap from="~velo" to="/djiros/velo" />
+        <remap from="~gps" to="/djiros/gps" />
+        <remap from="~imu" to="/djiros/imu" />
+        <!--publishers-->
+        <remap from="~odom" to="/uwb_vicon_odom" />
+    </node>
+
+    <node pkg="rnw_ros" type="pub_frames_node" name="pub_frames_node" output="screen">
+        <remap from="~imu" to="$(arg imu_topic)"/>
+        <remap from="~uav" to="$(arg odom_topic)"/>
+        <remap from="~cone" to="$(arg cone_topic)"/>
+        <remap from="~vins" to="/vins_estimator/imu_propagate"/>
+        <rosparam command="load" file="$(find rnw_ros)/config/rnw_config.yaml"/>
+    </node>
+
+    <arg name="topic_trigger_insert" value="/rnw/trigger/insert" />
+    <arg name="topic_trigger_zigzag" value="/rnw/trigger/zigzag" />
+    <arg name="topic_trigger_topple" value="/rnw/trigger/topple" />
+    <arg name="topic_poly_traj" value="/rnw/poly_traj" />
+
+    <node pkg="rnw_ros" type="rnw_traj_server_node" name="rnw_traj_server_node" output="screen">
+        <!--subscribers-->
+        <remap from="~vicon" to="$(arg odom_topic)"/>
+        <remap from="~poly_traj" to="$(arg topic_poly_traj)"/>
+    </node>
+
+    <node pkg="rnw_ros" type="visualize_traj_node" name="traj_visualization" output="screen" required="true">
+        <remap from="~poly_traj" to="$(arg topic_poly_traj)"/>
+        <param name="lift_dt" type="double" value="0.05"/>
+        <param name="length_g" type="double" value="0.5"/>
+    </node>
+
+    <node name="rviz_traj" pkg="rviz" type="rviz" output="log" args="-d $(find rnw_ros)/config/traj.rviz" />
+
+<!--    <node pkg="rostopic" type="rostopic" name="rostopic" args="pub -r 10 /uwb_vicon_odom_cone nav_msgs/Odometry '{ header: { frame_id: world }, pose: { pose: { orientation: { w: 1 } } } }'"/>-->
+
+<!--  cone state, rnw_controller, uwb, joystick, gamepad -->
+
+    <node pkg="mocap_optitrack" type="mocap_node" name="mocap_node" respawn="false" launch-prefix="" required="true" output="log">
+        <rosparam file="$(find mocap_optitrack)/config/mocap.yaml" command="load" />
+    </node>
+
+    <node pkg="pos_vel_mocap" type="pos_vel_mocap" name="pos_vel_mocap" output="screen" required="true">
+        <rosparam file="$(find pos_vel_mocap)/config/calib.yaml" command="load" />
+    </node>
+
+    <arg name="topic_trigger_rnw" value="/rnw/trigger/rnw" />
+    <arg name="topic_cone_state" value="/rnw/cone_state"/>
+    <arg name="topic_rocking_cmd" value="/rnw/rocking_cmd"/>
+
+
+    <node pkg="rnw_ros" type="rnw_controller_node" name="rnw_controller_node" output="screen" launch-prefix="gdb -ex run --args">
+        <remap from="~uav_odom" to="$(arg odom_topic)"/>
+        <remap from="~cone_state" to="$(arg topic_cone_state)"/>
+        <remap from="~poly_traj" to="$(arg topic_poly_traj)"/>
+        <remap from="~trigger_zigzag" to="$(arg topic_trigger_zigzag)"/>
+        <remap from="~trigger_topple" to="$(arg topic_trigger_topple)"/>
+        <remap from="~trigger_rnw" to="$(arg topic_trigger_rnw)"/>
+        <rosparam command="load" file="$(find rnw_ros)/config/rnw_config.yaml"/>
+    </node>
+
+    <node pkg="joy" type="joy_node" name="joy_node" output="screen">
+        <param name="~autorepeat_rate" value="0" />
+    </node>
+
+    <node pkg="rnw_ros" type="gamepad_trigger_node" name="gamepad_trigger_node" output="screen">
+        <remap from="~A" to="$(arg topic_trigger_rnw)"/>
+        <remap from="~X" to="$(arg topic_trigger_zigzag)"/>
+        <remap from="~Y" to="$(arg topic_trigger_topple)"/>
+    </node>
+
+    <node pkg="rnw_ros" type="pub_cone_state_node" name="pub_cone_state_node" required="true" output="log">
+        <remap from="~odom" to="$(arg cone_topic)"/>
+        <remap from="~cone_state" to="$(arg topic_cone_state)"/>
+        <param name="cut_euler_velocity" type="bool" value="true"/>
+        <param name="max_euler_velocity" value="10"/>
+        <rosparam command="load" file="$(find rnw_ros)/config/rnw_config.yaml"/>
+    </node>
+
+    <node pkg="rnw_ros" type="visualize_cone_node" name="visualize_cone_node" output="screen" required="true">
+        <remap from="~cone_state" to="$(arg topic_cone_state)"/>
+        <remap from="~rocking_cmd" to="$(arg topic_rocking_cmd)"/>
+        <param name="cone_color_r" type="double" value="0"/>
+        <param name="cone_color_g" type="double" value="1"/>
+        <param name="cone_color_b" type="double" value="0"/>
+        <rosparam command="load" file="$(find rnw_ros)/config/rnw_config.yaml"/>
+    </node>
+
+</launch>
