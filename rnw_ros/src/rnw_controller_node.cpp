@@ -27,7 +27,7 @@ struct rnw_controller_t {
 
     explicit rnw_controller_t(ros::NodeHandle & nh)
             : rnw_planner(nh),
-              traj_generator(1024, 16, 0.4, 1, 0.5, 23, 0.02),
+              traj_generator(1024, 16, 0.4, 0.5, 0.5, 23, 0.02),
               zigzag_generator(1024, 16, 0.4, 1, 0.5, 23, 0.02)
     {
       rnw_config.load_from_ros(nh);
