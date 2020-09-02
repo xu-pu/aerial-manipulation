@@ -33,6 +33,8 @@ struct rnw_planner_t {
 
     // rocking command
 
+    bool plan_cmd = false;
+
     rnw_ros::RockingCmd latest_cmd;
 
     bool cmd_pending = false;
@@ -65,6 +67,10 @@ struct rnw_planner_t {
     }
 
     void plan_next_position(){
+
+      if ( !plan_cmd ) {
+        return;
+      }
 
       if ( cmd_pending ) {
         pub_rocking_cmd.publish(latest_cmd);
@@ -125,10 +131,21 @@ struct rnw_planner_t {
 
       if ( from != cone_fsm_e::idle && to == cone_fsm_e::idle ) {
         ROS_INFO_STREAM("[rnw] object became idle");
+        stop_planning_cmd();
       }
 
       fsm = to;
 
+    }
+
+    void start_planning_cmd(){
+      ROS_INFO_STREAM("[rnw] Start planning rocking commands");
+      plan_cmd = true;
+    }
+
+    void stop_planning_cmd(){
+      ROS_INFO_STREAM("[rnw] Stop planning rocking commands");
+      plan_cmd = false;
     }
 
     void rocking_ack(){
@@ -139,7 +156,12 @@ struct rnw_planner_t {
 
     void on_debug_trigger( std_msgs::HeaderConstPtr const & msg ){
       ROS_WARN_STREAM("[rnw] Got debug trigger");
-      rocking_ack();
+      if ( !plan_cmd ) {
+        start_planning_cmd();
+      }
+      else {
+        rocking_ack();
+      }
     }
 
 };
