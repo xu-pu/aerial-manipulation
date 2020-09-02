@@ -160,6 +160,12 @@ inline Vector3d cone_rot2euler( Matrix3d const & R ){
 
 }
 
+inline Vector3d tip_position_to_uav_position( Vector3d const & tip, rnw_config_t const & config ){
+  Vector3d rst = tip;
+  rst.z()  = rst.z() - config.insert_below_tip - config.X_tcp_cage.z();
+  return rst;
+}
+
 template<typename T, size_t window_size>
 struct median_filter_t {
 

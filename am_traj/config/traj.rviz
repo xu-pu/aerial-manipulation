@@ -120,7 +120,7 @@ Visualization Manager:
       Marker Topic: /traj_visualization/markers/traj
       Name: Marker
       Namespaces:
-        test: true
+        {}
       Queue Size: 100
       Value: true
     - Class: rviz/MarkerArray
@@ -128,7 +128,7 @@ Visualization Manager:
       Marker Topic: /traj_visualization/markers/lift
       Name: MarkerArray
       Namespaces:
-        viz_lift: true
+        {}
       Queue Size: 100
       Value: true
     - Class: rviz/MarkerArray
@@ -164,8 +164,8 @@ Visualization Manager:
           Scale: 1
           Value: true
         Value: true
-      Enabled: false
-      Keep: 100
+      Enabled: true
+      Keep: 1
       Name: Odometry
       Position Tolerance: 0.100000001
       Shape:
@@ -180,7 +180,7 @@ Visualization Manager:
         Value: Axes
       Topic: /uwb_vicon_odom
       Unreliable: false
-      Value: false
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48

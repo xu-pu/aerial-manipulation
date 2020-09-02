@@ -146,7 +146,7 @@ struct rnw_controller_t {
         }
       }
       else if ( rnw_planner.has_pending_cmd() ) {
-        Vector3d tgt_pt = rnw_planner.next_position();
+        Vector3d tgt_pt = tip_position_to_uav_position(rnw_planner.next_position(),rnw_config);
         Vector3d pt_uav = pose2T(latest_uav_odom.pose.pose);
         Vector3d v0 = Vector3d::Zero();
         Trajectory traj = traj_generator.genOptimalTrajDTC({pt_uav, tgt_pt}, v0, v0, v0, v0);
