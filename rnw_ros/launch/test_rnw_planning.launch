@@ -9,6 +9,7 @@
     <arg name="topic_trigger_insert" value="/rnw/trigger/insert" />
     <arg name="topic_trigger_zigzag" value="/rnw/trigger/zigzag" />
     <arg name="topic_trigger_topple" value="/rnw/trigger/topple" />
+    <arg name="topic_trigger_rnw" value="/rnw/trigger/rnw" />
     <arg name="topic_poly_traj" value="/rnw/poly_traj" />
 
     <node pkg="rnw_ros" type="pub_mock_uav_node" name="pub_mock_uav_node" output="screen" required="true">
@@ -42,7 +43,7 @@
 
     <node pkg="rnw_ros" type="gamepad_trigger_node" name="gamepad_trigger_node" output="screen">
         <remap from="~B" to="$(arg topic_dbg_trigger)"/>
-        <remap from="~A" to="$(arg topic_trigger_insert)"/>
+        <remap from="~A" to="$(arg topic_trigger_rnw)"/>
         <remap from="~X" to="$(arg topic_trigger_zigzag)"/>
         <remap from="~Y" to="$(arg topic_trigger_topple)"/>
     </node>
@@ -67,9 +68,9 @@
         <remap from="~uav_odom" to="$(arg odom_topic)"/>
         <remap from="~cone_state" to="$(arg topic_cone_state)"/>
         <remap from="~poly_traj" to="$(arg topic_poly_traj)"/>
-        <remap from="~trigger_insert" to="$(arg topic_trigger_insert)"/>
         <remap from="~trigger_zigzag" to="$(arg topic_trigger_zigzag)"/>
         <remap from="~trigger_topple" to="$(arg topic_trigger_topple)"/>
+        <remap from="~trigger_rnw" to="$(arg topic_trigger_rnw)"/>
         <rosparam command="load" file="$(find rnw_ros)/config/rnw_config.yaml"/>
     </node>
 
@@ -77,6 +78,7 @@
         <remap from="~poly_traj" to="$(arg topic_poly_traj)"/>
         <param name="lift_dt" type="double" value="0.05"/>
         <param name="length_g" type="double" value="0.5"/>
+        <param name="clear_after_n_sec" type="double" value="0"/>
     </node>
 
     <!--    <node pkg="rqt_multiplot" type="rqt_multiplot" name="rqt_multiplot" output="log"-->

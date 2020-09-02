@@ -41,6 +41,7 @@ struct rnw_controller_t {
 
     void on_cone_state( rnw_ros::ConeStateConstPtr const & msg ){
       latest_cone_state = *msg;
+      rnw_planner.on_cone_state(msg);
     }
 
     void on_trigger_n3ctrl( geometry_msgs::PoseStampedConstPtr const & msg ){}
@@ -109,6 +110,10 @@ struct rnw_controller_t {
 
     void on_trigger_rock( std_msgs::HeaderConstPtr const & msg ){}
 
+    void on_trigger_rnw( std_msgs::HeaderConstPtr const & msg ){
+      rnw_planner.start_planning_cmd();
+    }
+
     void on_trigger_zigzag( std_msgs::HeaderConstPtr const & msg ) const {
 
       Matrix3d R = ros2eigen(latest_uav_odom.pose.pose.orientation).toRotationMatrix();
@@ -128,6 +133,30 @@ struct rnw_controller_t {
 
     }
 
+    bool is_rocking = false;
+
+    ros::Time rocking_start_stamp;
+    ros::Duration rocking_duration;
+
+    void on_spin( const ros::TimerEvent &event ){
+      if ( is_rocking ) {
+        if ( ros::Time::now() > rocking_start_stamp + rocking_duration ) {
+          rnw_planner.cmd_ack();
+          is_rocking = false;
+        }
+      }
+      else if ( rnw_planner.has_pending_cmd() ) {
+        Vector3d tgt_pt = rnw_planner.next_position();
+        Vector3d pt_uav = pose2T(latest_uav_odom.pose.pose);
+        Vector3d v0 = Vector3d::Zero();
+        Trajectory traj = traj_generator.genOptimalTrajDTC({pt_uav, tgt_pt}, v0, v0, v0, v0);
+        pub_poly_traj.publish(to_ros_msg(traj,ros::Time::now()));
+        rocking_start_stamp = ros::Time::now();
+        rocking_duration = ros::Duration(traj.getTotalDuration());
+        is_rocking = true;
+      }
+    }
+
 };
 
 int main( int argc, char** argv ) {
@@ -137,6 +166,8 @@ int main( int argc, char** argv ) {
   ros::NodeHandle nh("~");
 
   rnw_controller_t rnw_controller(nh);
+
+  auto timer = nh.createTimer(ros::Rate(20), &rnw_controller_t::on_spin, &rnw_controller);
 
   ros::Subscriber sub_uav_odom = nh.subscribe<nav_msgs::Odometry>(
           "uav_odom",
@@ -161,7 +192,7 @@ int main( int argc, char** argv ) {
   ros::Subscriber sub_trigger_rock = nh.subscribe<std_msgs::Header>("trigger_rock", 10, &rnw_controller_t::on_trigger_rock, &rnw_controller);
   ros::Subscriber sub_trigger_zigzag = nh.subscribe<std_msgs::Header>("trigger_zigzag", 10, &rnw_controller_t::on_trigger_zigzag, &rnw_controller);
   ros::Subscriber sub_trigger_topple = nh.subscribe<std_msgs::Header>("trigger_topple", 10, &rnw_controller_t::on_trigger_topple, &rnw_controller);
-
+  ros::Subscriber sub_trigger_rnw = nh.subscribe<std_msgs::Header>("trigger_rnw", 10, &rnw_controller_t::on_trigger_rnw, &rnw_controller);
   ros::spin();
 
   ros::shutdown();

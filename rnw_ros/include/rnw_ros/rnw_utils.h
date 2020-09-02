@@ -455,8 +455,14 @@ struct rnw_planner_t {
     // interface to other modules
 
     void start_planning_cmd(){
-      ROS_INFO_STREAM("[rnw] Start planning rocking commands");
-      plan_cmd = true;
+      if ( fsm == cone_fsm_e::idle ) {
+        ROS_ERROR_STREAM("[rnw] Can't start planning when object is idle!");
+        plan_cmd = false;
+      }
+      else {
+        ROS_INFO_STREAM("[rnw] Start planning rocking commands");
+        plan_cmd = true;
+      }
     }
 
     void stop_planning_cmd(){
