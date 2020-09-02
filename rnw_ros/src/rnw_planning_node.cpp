@@ -23,6 +23,22 @@ struct rnw_planner_t {
 
     rnw_ros::ConeState latest_cone_state;
 
+    // planning
+
+    double rot_dir = -1;
+
+    double rot_amp_deg = 30;
+
+    size_t step_count = 0;
+
+    // rocking command
+
+    rnw_ros::RockingCmd latest_cmd;
+
+    bool cmd_pending = false;
+
+    size_t cmd_idx = 0;
+
     explicit rnw_planner_t( ros::NodeHandle & nh ){
       pub_rocking_cmd = nh.advertise<rnw_ros::RockingCmd>("rocking_cmd",10);
     }
@@ -48,12 +64,15 @@ struct rnw_planner_t {
 
     }
 
-    double rot_dir = -1;
-    double rot_amp_deg = 30;
-
-    size_t step_count = 0;
-
     void plan_next_position(){
+
+      if ( cmd_pending ) {
+        pub_rocking_cmd.publish(latest_cmd);
+        return;
+      }
+
+      rot_dir = -rot_dir;
+
       Vector3d contact_point = uav_utils::from_point_msg(latest_cone_state.contact_point);
       Vector3d apex = uav_utils::from_point_msg(latest_cone_state.tip);
       Vector3d v = apex - contact_point;
@@ -61,11 +80,13 @@ struct rnw_planner_t {
       Vector3d next_v = offset * v;
       Vector3d next_tip = contact_point + next_v;
 
-      rnw_ros::RockingCmd msg;
-      msg.header.stamp = latest_cone_state.header.stamp;
-      msg.step_count = step_count;
-      msg.tip_setpoint = uav_utils::to_point_msg(next_tip);
-      pub_rocking_cmd.publish(msg);
+      latest_cmd.header.stamp = latest_cone_state.header.stamp;
+      latest_cmd.step_count = step_count;
+      latest_cmd.tip_setpoint = uav_utils::to_point_msg(next_tip);
+      latest_cmd.cmd_idx = cmd_idx++;
+      pub_rocking_cmd.publish(latest_cmd);
+
+      cmd_pending = true;
 
     }
 
@@ -90,7 +111,6 @@ struct rnw_planner_t {
 
       if ( from == cone_fsm_e::rocking && to == cone_fsm_e::qstatic ) {
         ROS_INFO_STREAM("[rnw] from rocking to qstatic");
-        rot_dir = -rot_dir; // switch rocking direction
         step_count++;
       }
 
@@ -99,6 +119,7 @@ struct rnw_planner_t {
       }
 
       if ( to == cone_fsm_e::idle ) {
+        cmd_pending = false;
         step_count = 0;
       }
 
@@ -108,6 +129,17 @@ struct rnw_planner_t {
 
       fsm = to;
 
+    }
+
+    void rocking_ack(){
+      cmd_pending = false;
+    }
+
+    // debug
+
+    void on_debug_trigger( std_msgs::HeaderConstPtr const & msg ){
+      ROS_WARN_STREAM("[rnw] Got debug trigger");
+      rocking_ack();
     }
 
 };
@@ -124,6 +156,14 @@ int main( int argc, char** argv ) {
           "cone_state",
           100,
           &rnw_planner_t::on_cone_state,
+          &rnw_planner,
+          ros::TransportHints().tcpNoDelay()
+  );
+
+  ros::Subscriber sub_dbg_trigger = nh.subscribe<std_msgs::Header>(
+          "dbg_trigger",
+          100,
+          &rnw_planner_t::on_debug_trigger,
           &rnw_planner,
           ros::TransportHints().tcpNoDelay()
   );

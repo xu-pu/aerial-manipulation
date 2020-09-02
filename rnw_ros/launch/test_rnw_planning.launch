@@ -23,9 +23,20 @@
         <rosparam command="load" file="$(find rnw_ros)/config/rnw_config.yaml"/>
     </node>
 
+    <node pkg="joy" type="joy_node" name="joy_node" output="screen">
+        <param name="~autorepeat_rate" value="0" />
+    </node>
+
+    <arg name="topic_dbg_trigger" value="/rnw/trigger/debug" />
+
+    <node pkg="rnw_ros" type="gamepad_trigger_node" name="gamepad_trigger_node" output="screen">
+        <remap from="~B" to="$(arg topic_dbg_trigger)"/>
+    </node>
+
     <node pkg="rnw_ros" type="rnw_planning_node" name="rnw_planning_node" output="screen" required="true">
         <remap from="~cone_state" to="$(arg topic_cone_state)"/>
         <remap from="~rocking_cmd" to="$(arg topic_rocking_cmd)"/>
+        <remap from="~dbg_trigger" to="$(arg topic_dbg_trigger)"/>
         <rosparam command="load" file="$(find rnw_ros)/config/rnw_config.yaml"/>
     </node>
 
@@ -38,7 +49,7 @@
         <rosparam command="load" file="$(find rnw_ros)/config/rnw_config.yaml"/>
     </node>
 
-    <node pkg="rqt_multiplot" type="rqt_multiplot" name="rqt_multiplot" output="log"
-          args="--multiplot-config $(find rnw_ros)/config/rqt_multiplot_cone_state.xml --multiplot-run-all"/>
+<!--    <node pkg="rqt_multiplot" type="rqt_multiplot" name="rqt_multiplot" output="log"-->
+<!--          args="&#45;&#45;multiplot-config $(find rnw_ros)/config/rqt_multiplot_cone_state.xml &#45;&#45;multiplot-run-all"/>-->
 
 </launch>

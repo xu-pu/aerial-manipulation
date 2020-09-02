@@ -1,3 +1,4 @@
 Header header
 geometry_msgs/Point tip_setpoint
 uint32 step_count
+uint32 cmd_idx
