@@ -38,4 +38,7 @@
         <rosparam command="load" file="$(find rnw_ros)/config/rnw_config.yaml"/>
     </node>
 
+    <node pkg="rqt_multiplot" type="rqt_multiplot" name="rqt_multiplot" output="log"
+          args="--multiplot-config $(find rnw_ros)/config/rqt_multiplot_cone_state.xml --multiplot-run-all"/>
+
 </launch>
