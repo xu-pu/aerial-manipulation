@@ -110,6 +110,10 @@ struct cone_visualizer_t {
       marker.points.push_back(latest_cone_state.tip);
       marker.points.push_back(latest_rocking_cmd.tip_setpoint);
 
+      if ( (latest_time - latest_rocking_cmd.header.stamp).toSec() > 0.5 ) {
+        marker.action = visualization_msgs::Marker::DELETE;
+      }
+
       return marker;
 
     }
@@ -198,6 +202,8 @@ struct cone_visualizer_t {
       }
       return marker_contact_path;
     }
+
+
 
     void clear_markers() const {
       visualization_msgs::MarkerArray accMarkers;

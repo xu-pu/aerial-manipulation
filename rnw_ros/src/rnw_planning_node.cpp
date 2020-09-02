@@ -73,6 +73,7 @@ struct rnw_planner_t {
       }
 
       if ( cmd_pending ) {
+        latest_cmd.header.stamp = ros::Time::now();
         pub_rocking_cmd.publish(latest_cmd);
         return;
       }
