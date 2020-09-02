@@ -452,6 +452,63 @@ struct cone_state_estimator_t {
 
 struct rnw_planner_t {
 
+    // interface to other modules
+
+    void start_planning_cmd(){
+      ROS_INFO_STREAM("[rnw] Start planning rocking commands");
+      plan_cmd = true;
+    }
+
+    void stop_planning_cmd(){
+      ROS_INFO_STREAM("[rnw] Stop planning rocking commands");
+      plan_cmd = false;
+    }
+
+    /**
+     * Call when the current command is complete
+     */
+    void cmd_ack(){
+      cmd_pending = false;
+    }
+
+    /**
+     * Check is there command to execute
+     */
+    bool has_pending_cmd() const {
+      return cmd_pending;
+    }
+
+    Vector3d next_position() const {
+      return uav_utils::from_point_msg(latest_cmd.tip_setpoint);
+    }
+
+    /**
+     * Call on every new ConeState message
+     * @param msg
+     */
+    void on_cone_state( rnw_ros::ConeStateConstPtr const & msg ){
+
+      latest_cone_state = *msg;
+
+      update_state(latest_cone_state);
+
+      switch ( fsm ) {
+        case cone_fsm_e::idle:
+          break;
+        case cone_fsm_e::rocking:
+          break;
+        case cone_fsm_e::qstatic:
+          plan_next_position();
+          break;
+        default:
+          ROS_ERROR_STREAM("[rnw_planner] Invalid Cone State");
+          break;
+      }
+
+    }
+
+    ///////////////////////////////
+
     static constexpr double deg2rad = M_PI/180.;
 
     static constexpr double min_tilt = 10 * deg2rad;
@@ -488,27 +545,6 @@ struct rnw_planner_t {
 
     explicit rnw_planner_t( ros::NodeHandle & nh ){
       pub_rocking_cmd = nh.advertise<rnw_ros::RockingCmd>("rocking_cmd",10);
-    }
-
-    void on_cone_state( rnw_ros::ConeStateConstPtr const & msg ){
-
-      latest_cone_state = *msg;
-
-      update_state(latest_cone_state);
-
-      switch ( fsm ) {
-        case cone_fsm_e::idle:
-          break;
-        case cone_fsm_e::rocking:
-          break;
-        case cone_fsm_e::qstatic:
-          plan_next_position();
-          break;
-        default:
-          ROS_ERROR_STREAM("[rnw_planner] Invalid Cone State");
-          break;
-      }
-
     }
 
     void plan_next_position(){
@@ -584,20 +620,6 @@ struct rnw_planner_t {
 
     }
 
-    void start_planning_cmd(){
-      ROS_INFO_STREAM("[rnw] Start planning rocking commands");
-      plan_cmd = true;
-    }
-
-    void stop_planning_cmd(){
-      ROS_INFO_STREAM("[rnw] Stop planning rocking commands");
-      plan_cmd = false;
-    }
-
-    void rocking_ack(){
-      cmd_pending = false;
-    }
-
     // debug
 
     void on_debug_trigger( std_msgs::HeaderConstPtr const & msg ){
@@ -606,7 +628,7 @@ struct rnw_planner_t {
         start_planning_cmd();
       }
       else {
-        rocking_ack();
+        cmd_ack();
       }
     }
 
