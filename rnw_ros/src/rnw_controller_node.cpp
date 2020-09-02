@@ -149,7 +149,11 @@ struct rnw_controller_t {
         Vector3d tgt_pt = tip_position_to_uav_position(rnw_planner.next_position(),rnw_config);
         Vector3d pt_uav = pose2T(latest_uav_odom.pose.pose);
         Vector3d v0 = Vector3d::Zero();
-        Trajectory traj = traj_generator.genOptimalTrajDTC({pt_uav, tgt_pt}, v0, v0, v0, v0);
+        // there is a wierd bug, use 3 points will solve it.
+        //ROS_INFO_STREAM("[rnw] from " << pt_uav.transpose() << ", to " << tgt_pt.transpose());
+        //ROS_INFO_STREAM("[rnw] offset " << (tgt_pt-pt_uav).transpose());
+        Vector3d mid_point = (pt_uav+tgt_pt)/2;
+        Trajectory traj = traj_generator.genOptimalTrajDTC({pt_uav, mid_point, tgt_pt}, v0, v0, v0, v0);
         pub_poly_traj.publish(to_ros_msg(traj,ros::Time::now()));
         rocking_start_stamp = ros::Time::now();
         rocking_duration = ros::Duration(traj.getTotalDuration());
