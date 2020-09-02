@@ -10,8 +10,8 @@ X_tcp_cage:
 hover_above_tip: 0.08
 insert_below_tip: 0.03
 topple:
-  forward: 0.2
-  downward: 0.03
+  forward: 0.4
+  downward: 0.05
 zigzag:
   step_forward: 0.1
   step_sideways: 0.1
