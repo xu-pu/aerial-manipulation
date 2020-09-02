@@ -15,11 +15,7 @@ struct rnw_controller_t {
 
     nav_msgs::Odometry latest_uav_odom;
 
-    nav_msgs::Odometry latest_cone_odom;
-
     rnw_ros::ConeState latest_cone_state;
-
-    geometry_msgs::PointStamped latest_cone_tip;
 
     rnw_config_t rnw_config;
 
@@ -43,14 +39,6 @@ struct rnw_controller_t {
       latest_uav_odom = *msg;
     }
 
-    void on_cone_odom( nav_msgs::OdometryConstPtr const & msg ){
-      latest_cone_odom = *msg;
-    }
-
-    void on_cone_tip( geometry_msgs::PointStampedConstPtr const & msg ){
-      latest_cone_tip = *msg;
-    }
-
     void on_cone_state( rnw_ros::ConeStateConstPtr const & msg ){
       latest_cone_state = *msg;
     }
@@ -60,7 +48,7 @@ struct rnw_controller_t {
     void on_trigger_insert( std_msgs::HeaderConstPtr const & msg ){
 
       Vector3d pt_uav = pose2T(latest_uav_odom.pose.pose);
-      Vector3d pt_tip(latest_cone_tip.point.x, latest_cone_tip.point.y, latest_cone_tip.point.z);
+      Vector3d pt_tip = uav_utils::from_point_msg(latest_cone_state.tip);
 
       double z_planned_tcp = pt_tip.z() + rnw_config.hover_above_tip;
       double z_planned_uav = z_planned_tcp - rnw_config.X_tcp_cage.z(); // offset between imu and tcp
@@ -79,8 +67,8 @@ struct rnw_controller_t {
 
     void on_trigger_topple( std_msgs::HeaderConstPtr const & msg ) const {
 
-      Matrix3d R_tip = odom2R(latest_cone_odom);
-      Vector3d T_tip = ros2eigen(latest_cone_tip.point);
+      Matrix3d R_tip = odom2R(latest_cone_state.odom);
+      Vector3d T_tip = ros2eigen(latest_cone_state.tip);
       Vector3d cur_pos = odom2T(latest_uav_odom);
 
       auto wpts_local = gen_topple_waypoints_local(
@@ -105,7 +93,7 @@ struct rnw_controller_t {
     void on_trigger_go_to_tip( std_msgs::HeaderConstPtr const & msg ){
 
       Vector3d pt_uav = pose2T(latest_uav_odom.pose.pose);
-      Vector3d pt_tip(latest_cone_tip.point.x, latest_cone_tip.point.y, latest_cone_tip.point.z);
+      Vector3d pt_tip = uav_utils::from_point_msg(latest_cone_state.tip);
 
       double z_planned_tcp = pt_tip.z() + rnw_config.hover_above_tip;
       double z_planned_uav = z_planned_tcp - rnw_config.X_tcp_cage.z(); // offset between imu and tcp
@@ -144,8 +132,6 @@ struct rnw_controller_t {
 
 int main( int argc, char** argv ) {
 
-  sleep(3);
-
   ros::init(argc,argv,"rnw_controller_node");
 
   ros::NodeHandle nh("~");
@@ -153,25 +139,17 @@ int main( int argc, char** argv ) {
   rnw_controller_t rnw_controller(nh);
 
   ros::Subscriber sub_uav_odom = nh.subscribe<nav_msgs::Odometry>(
-          "/uwb_vicon_odom",
+          "uav_odom",
           10,
           &rnw_controller_t::on_uav_odom,
           &rnw_controller,
           ros::TransportHints().tcpNoDelay()
   );
 
-  ros::Subscriber sub_cone_odom = nh.subscribe<nav_msgs::Odometry>(
-          "/uwb_vicon_odom_cone",
+  ros::Subscriber sub_cone_state = nh.subscribe<rnw_ros::ConeState>(
+          "cone_state",
           10,
-          &rnw_controller_t::on_cone_odom,
-          &rnw_controller,
-          ros::TransportHints().tcpNoDelay()
-  );
-
-  ros::Subscriber sub_cone_tip = nh.subscribe<geometry_msgs::PointStamped>(
-          "/cone/tip",
-          1,
-          &rnw_controller_t::on_cone_tip,
+          &rnw_controller_t::on_cone_state,
           &rnw_controller,
           ros::TransportHints().tcpNoDelay()
   );

@@ -9,8 +9,10 @@ ros::Publisher pub_uav_odom;
 void on_cone_state( rnw_ros::ConeStateConstPtr const & msg ){
   nav_msgs::Odometry odom;
   odom.header.stamp = msg->header.stamp;
+  odom.header.frame_id = "world";
   odom.pose.pose.orientation = uav_utils::to_quaternion_msg(Eigen::Quaterniond::Identity());
   odom.pose.pose.position = msg->tip;
+  odom.pose.pose.position.z += 0.1;
   pub_uav_odom.publish(odom);
 }
 
