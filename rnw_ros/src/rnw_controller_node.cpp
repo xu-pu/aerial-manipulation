@@ -17,6 +17,8 @@ struct rnw_controller_t {
 
     nav_msgs::Odometry latest_cone_odom;
 
+    rnw_ros::ConeState latest_cone_state;
+
     geometry_msgs::PointStamped latest_cone_tip;
 
     rnw_config_t rnw_config;
@@ -25,8 +27,11 @@ struct rnw_controller_t {
 
     AmTraj zigzag_generator;
 
+    rnw_planner_t rnw_planner;
+
     explicit rnw_controller_t(ros::NodeHandle & nh)
-            : traj_generator(1024, 16, 0.4, 1, 0.5, 23, 0.02),
+            : rnw_planner(nh),
+              traj_generator(1024, 16, 0.4, 1, 0.5, 23, 0.02),
               zigzag_generator(1024, 16, 0.4, 1, 0.5, 23, 0.02)
     {
       rnw_config.load_from_ros(nh);
@@ -44,6 +49,10 @@ struct rnw_controller_t {
 
     void on_cone_tip( geometry_msgs::PointStampedConstPtr const & msg ){
       latest_cone_tip = *msg;
+    }
+
+    void on_cone_state( rnw_ros::ConeStateConstPtr const & msg ){
+      latest_cone_state = *msg;
     }
 
     void on_trigger_n3ctrl( geometry_msgs::PoseStampedConstPtr const & msg ){}
@@ -143,9 +152,29 @@ int main( int argc, char** argv ) {
 
   rnw_controller_t rnw_controller(nh);
 
-  ros::Subscriber sub_uav_odom = nh.subscribe<nav_msgs::Odometry>("/uwb_vicon_odom",10,&rnw_controller_t::on_uav_odom,&rnw_controller);
-  ros::Subscriber sub_cone_odom = nh.subscribe<nav_msgs::Odometry>("/uwb_vicon_odom_cone",10,&rnw_controller_t::on_cone_odom,&rnw_controller);
-  ros::Subscriber sub_cone_tip = nh.subscribe<geometry_msgs::PointStamped>("/cone/tip",1,&rnw_controller_t::on_cone_tip,&rnw_controller);
+  ros::Subscriber sub_uav_odom = nh.subscribe<nav_msgs::Odometry>(
+          "/uwb_vicon_odom",
+          10,
+          &rnw_controller_t::on_uav_odom,
+          &rnw_controller,
+          ros::TransportHints().tcpNoDelay()
+  );
+
+  ros::Subscriber sub_cone_odom = nh.subscribe<nav_msgs::Odometry>(
+          "/uwb_vicon_odom_cone",
+          10,
+          &rnw_controller_t::on_cone_odom,
+          &rnw_controller,
+          ros::TransportHints().tcpNoDelay()
+  );
+
+  ros::Subscriber sub_cone_tip = nh.subscribe<geometry_msgs::PointStamped>(
+          "/cone/tip",
+          1,
+          &rnw_controller_t::on_cone_tip,
+          &rnw_controller,
+          ros::TransportHints().tcpNoDelay()
+  );
 
   ros::Subscriber sub_trigger = nh.subscribe<geometry_msgs::PoseStamped>("/traj_start_trigger",10,&rnw_controller_t::on_trigger_n3ctrl,&rnw_controller);
 

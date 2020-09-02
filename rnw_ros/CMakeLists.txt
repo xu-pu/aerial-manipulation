@@ -173,6 +173,8 @@ add_executable(rnw_controller_node src/rnw_controller_node.cpp)
 add_executable(pub_cone_state_node src/pub_cone_state_node.cpp)
 add_executable(visualize_cone_node src/visualize_cone_node.cpp)
 add_executable(rnw_planning_node src/rnw_planning_node.cpp)
+add_executable(pub_mock_cone_node src/pub_mock_cone_node.cpp)
+add_executable(pub_mock_uav_node src/pub_mock_uav_node.cpp)
 
 target_link_libraries(pub_frames_node ${catkin_LIBRARIES})
 target_link_libraries(test_traj_node ${catkin_LIBRARIES})
@@ -188,6 +190,8 @@ target_link_libraries(rnw_controller_node ${catkin_LIBRARIES})
 target_link_libraries(pub_cone_state_node ${catkin_LIBRARIES})
 target_link_libraries(visualize_cone_node ${catkin_LIBRARIES})
 target_link_libraries(rnw_planning_node ${catkin_LIBRARIES})
+target_link_libraries(pub_mock_cone_node ${catkin_LIBRARIES})
+target_link_libraries(pub_mock_uav_node ${catkin_LIBRARIES})
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
