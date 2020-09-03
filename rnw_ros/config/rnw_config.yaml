@@ -7,8 +7,8 @@ X_tcp_cage:
   x: 0.000548455
   y: 0.00354947
   z: -0.194698
-hover_above_tip: 0.08
-insert_below_tip: 0.03
+hover_above_tip: 0.05
+insert_below_tip: 0.07
 topple:
   forward: 0.4
   downward: 0.05
