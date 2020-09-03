@@ -20,6 +20,7 @@ find_package(catkin REQUIRED COMPONENTS
         n3ctrl
         message_generation
         uav_utils
+        dynamic_reconfigure
 )
 
 find_package(Ceres REQUIRED)
@@ -115,7 +116,9 @@ generate_messages(
 #   cfg/DynReconf1.cfg
 #   cfg/DynReconf2.cfg
 # )
-
+generate_dynamic_reconfigure_options(
+        cfg/MocapCalib.cfg
+)
 ###################################
 ## catkin specific configuration ##
 ###################################
@@ -175,6 +178,7 @@ add_executable(visualize_cone_node src/visualize_cone_node.cpp)
 add_executable(rnw_planning_node src/rnw_planning_node.cpp)
 add_executable(pub_mock_cone_node src/pub_mock_cone_node.cpp)
 add_executable(pub_mock_uav_node src/pub_mock_uav_node.cpp)
+add_executable(mocap_calib_node src/mocap_calib_node.cpp)
 
 target_link_libraries(pub_frames_node ${catkin_LIBRARIES})
 target_link_libraries(test_traj_node ${catkin_LIBRARIES})
@@ -192,6 +196,7 @@ target_link_libraries(visualize_cone_node ${catkin_LIBRARIES})
 target_link_libraries(rnw_planning_node ${catkin_LIBRARIES})
 target_link_libraries(pub_mock_cone_node ${catkin_LIBRARIES})
 target_link_libraries(pub_mock_uav_node ${catkin_LIBRARIES})
+target_link_libraries(mocap_calib_node ${catkin_LIBRARIES})
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -205,6 +210,7 @@ target_link_libraries(pub_mock_uav_node ${catkin_LIBRARIES})
 add_dependencies(pub_cone_state_node ${PROJECT_NAME}_generate_messages_cpp)
 add_dependencies(visualize_cone_node ${PROJECT_NAME}_generate_messages_cpp)
 add_dependencies(rnw_planning_node ${PROJECT_NAME}_generate_messages_cpp)
+add_dependencies(mocap_calib_node ${PROJECT_NAME}_gencfg)
 
 ## Specify libraries to link a library or executable target against
 # target_link_libraries(${PROJECT_NAME}_node
