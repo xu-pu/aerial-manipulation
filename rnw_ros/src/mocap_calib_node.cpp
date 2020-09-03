@@ -53,6 +53,8 @@ struct mocap_calibrator_t {
 
     void cfg_callback( rnw_ros::MocapCalibConfig & config, uint32_t level ){
 
+      ROS_INFO_STREAM("cfg callback");
+
       // to eigen
 
       Vector3d cage_center( config.cage_center_x, config.cage_center_y, config.cage_center_z );
@@ -109,6 +111,8 @@ struct mocap_calibrator_t {
       cout << "tip_offset: " << tip_offset.transpose() << endl;
 
       cout << "===================================\n";
+
+      cout << endl;
 
     }
 
