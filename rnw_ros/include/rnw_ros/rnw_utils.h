@@ -56,6 +56,10 @@ struct rnw_config_t {
 
         double height;
 
+        Vector3d base_center;
+
+        Vector3d tip;
+
     } cone;
 
     inline void load_from_ros( ros::NodeHandle & nh ){
@@ -83,6 +87,14 @@ struct rnw_config_t {
       cone.radius = get_param_default(nh,"cone/radius",0.15);
       cone.height = get_param_default(nh,"cone/height",1);
       cone.apex = get_param_default(nh,"cone/apex",0.8);
+
+      cone.tip.x() = get_param_default(nh,"cone/tip/x",0);
+      cone.tip.y() = get_param_default(nh,"cone/tip/y",0);
+      cone.tip.z() = get_param_default(nh,"cone/tip/z",0);
+
+      cone.base_center.x() = get_param_default(nh,"cone/base_center/x",0);
+      cone.base_center.y() = get_param_default(nh,"cone/base_center/y",0);
+      cone.base_center.z() = get_param_default(nh,"cone/base_center/z",0);
 
       ground_z = get_param_default<double>(nh, "ground_z", 0);
 
