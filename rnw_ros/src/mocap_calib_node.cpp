@@ -6,6 +6,10 @@
 #include <geometry_msgs/AccelStamped.h>
 #include <nav_msgs/Path.h>
 #include <geometry_msgs/Vector3.h>
+#include <uav_utils/converters.h>
+
+#include <dynamic_reconfigure/server.h>
+#include <rnw_ros/MocapCalibConfig.h>
 
 #include <message_filters/subscriber.h>
 #include <message_filters/time_synchronizer.h>
@@ -15,38 +19,132 @@
 #include "rnw_ros/pose_utils.h"
 #include "rnw_ros/traj_uitls.h"
 
-Matrix3d R;
-Vector3d T;
-
-void on_pose( PoseStampedConstPtr const & msg ){
-  R = pose2R(msg->pose);
-  T = pose2T(msg->pose);
-}
-
-void on_point( geometry_msgs::PointConstPtr const & msg ){
+Vector3d from_vicon( Vector3d const & pt ){
   // OptiTrack's cord is in (x,z,-y)
-  Vector3d X_vicon ( msg->x, -msg->z, msg->y );
-  Vector3d X_body = R.transpose() * ( X_vicon - T );
-  cout << "Tip point in body frame (yaml)\n"
-       << "point:\n"
-       << "   x: " << X_body.x() << endl
-       << "   y: " << X_body.y() << endl
-       << "   z: " << X_body.z() << endl
-       << endl;
+  return { pt.x(), -pt.z(), pt.y() };
 }
+
+struct mocap_calibrator_t {
+
+    geometry_msgs::PoseStamped latest_pose_cone;
+    geometry_msgs::PoseStamped latest_pose_uav;
+
+    Matrix3d uav_R;
+    Vector3d uav_T;
+
+    Matrix3d cone_R;
+    Vector3d cone_T;
+
+    void on_odom_uav( geometry_msgs::PoseStampedConstPtr const & msg ){
+      latest_pose_uav = *msg;
+      Matrix3d R = uav_utils::from_quaternion_msg(msg->pose.orientation).toRotationMatrix();
+      Vector3d T = uav_utils::from_point_msg(msg->pose.position);
+      uav_R = R.transpose();
+      uav_T = - uav_R * T;
+    }
+
+    void on_odom_cone( geometry_msgs::PoseStampedConstPtr const & msg ){
+      latest_pose_cone = *msg;
+      Matrix3d R = uav_utils::from_quaternion_msg(msg->pose.orientation).toRotationMatrix();
+      Vector3d T = uav_utils::from_point_msg(msg->pose.position);
+      cone_R = R.transpose();
+      cone_T = - cone_R * T;
+    }
+
+    void cfg_callback( rnw_ros::MocapCalibConfig & config, uint32_t level ){
+
+      // to eigen
+
+      Vector3d cage_center( config.cage_center_x, config.cage_center_y, config.cage_center_z );
+      Vector3d base_center( config.base_center_x, config.base_center_y, config.base_center_z );
+      Vector3d G1( config.G1_x, config.G1_y, config.G1_z );
+      Vector3d G2( config.G2_x, config.G2_y, config.G2_z );
+      Vector3d tip( config.Tip_x, config.Tip_y, config.Tip_z );
+
+      // correct vicon point order
+
+      cage_center = from_vicon(cage_center);
+      base_center = from_vicon(base_center);
+      G1 = from_vicon(G1);
+      G2 = from_vicon(G2);
+      tip = from_vicon(tip);
+
+      // to body frame
+
+      cage_center = uav_R * cage_center + uav_T;
+
+      base_center = cone_R * base_center + cone_T;
+      G1 = cone_R * G1 + cone_T;
+      G2 = cone_R * G2 + cone_T;
+      tip = cone_R * tip + cone_T;
+
+      // calc
+
+      cout << "===================================\n";
+
+      cout << "X_tcp_cage:\n"
+           << "  x: " << cage_center.x() << '\n'
+           << "  y: " << cage_center.y() << '\n'
+           << "  z: " << cage_center.z() << '\n'
+           << "X_tip_body:\n"
+           << "  x: " << tip.x() << '\n'
+           << "  y: " << tip.y() << '\n'
+           << "  z: " << tip.z() << '\n'
+           << "cone:\n"
+           << "  base_center:\n"
+           << "    x: " << base_center.x() << '\n'
+           << "    y: " << base_center.y() << '\n'
+           << "    z: " << base_center.z() << '\n'
+           << "  tip:\n"
+           << "    x: " << tip.x() << '\n'
+           << "    y: " << tip.y() << '\n'
+           << "    z: " << tip.z() << endl;
+
+      cout << "===================================\n";
+
+      Vector3d G = (G1+G2)/2;
+
+      Vector3d tip_offset = tip-G;
+
+      cout << "tip_offset: " << tip_offset.transpose() << endl;
+
+      cout << "===================================\n";
+
+    }
+
+};
 
 int main( int argc, char** argv ) {
 
-  ros::init(argc,argv,"body_point_calib_node");
+  ros::init(argc,argv,"mocap_calib_node");
 
   ros::NodeHandle nh("~");
 
-  ros::Subscriber sub_odom = nh.subscribe<geometry_msgs::PoseStamped>("body",10,on_pose);
-  ros::Subscriber sub_point = nh.subscribe<geometry_msgs::Point>("point",10,on_point);
+  mocap_calibrator_t cali;
 
-  ROS_INFO_STREAM("Send coordinates through command line:");
-  ROS_INFO_STREAM("rostopic pub /cmd/point geometry_msgs/Point '{ x: 1, y: 2, z: 3 }'");
+  ros::Subscriber sub_pose_uav = nh.subscribe<geometry_msgs::PoseStamped>(
+          "uav",
+          10,
+          &mocap_calibrator_t::on_odom_uav,
+          &cali,
+          ros::TransportHints().tcpNoDelay()
+  );
+
+  ros::Subscriber sub_pose_cone = nh.subscribe<geometry_msgs::PoseStamped>(
+          "cone",
+          10,
+          &mocap_calibrator_t::on_odom_cone,
+          &cali,
+          ros::TransportHints().tcpNoDelay()
+  );
+
+  ROS_INFO_STREAM("rosrun rqt_reconfigure rqt_reconfigure");
   ROS_INFO_STREAM("x, y, z is in the order OptiTrack shows, we will handle it");
+
+  dynamic_reconfigure::Server<rnw_ros::MocapCalibConfig> server;
+  server.setCallback([&]( rnw_ros::MocapCalibConfig & config, uint32_t level ){
+      cali.cfg_callback(config,level);
+  });
 
   ros::spin();
 
