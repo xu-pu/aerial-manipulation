@@ -88,15 +88,15 @@ struct rnw_config_t {
       cone.height = get_param_default(nh,"cone/height",1);
       cone.apex = get_param_default(nh,"cone/apex",0.8);
 
-      cone.tip.x() = get_param_default(nh,"cone/tip/x",0);
-      cone.tip.y() = get_param_default(nh,"cone/tip/y",0);
-      cone.tip.z() = get_param_default(nh,"cone/tip/z",0);
+      cone.tip.x() = get_param_default<double>(nh,"cone/tip/x",0.);
+      cone.tip.y() = get_param_default<double>(nh,"cone/tip/y",0.);
+      cone.tip.z() = get_param_default<double>(nh,"cone/tip/z",0.);
 
-      cone.base_center.x() = get_param_default(nh,"cone/base_center/x",0);
-      cone.base_center.y() = get_param_default(nh,"cone/base_center/y",0);
-      cone.base_center.z() = get_param_default(nh,"cone/base_center/z",0);
+      cone.base_center.x() = get_param_default<double>(nh,"cone/base_center/x",0.);
+      cone.base_center.y() = get_param_default<double>(nh,"cone/base_center/y",0.);
+      cone.base_center.z() = get_param_default<double>(nh,"cone/base_center/z",0.);
 
-      ground_z = get_param_default<double>(nh, "ground_z", 0);
+      ground_z = get_param_default<double>(nh, "ground_z", 0.);
 
     }
 
@@ -242,15 +242,13 @@ struct cone_state_estimator_t {
     }
 
     Vector3d X_base_body(){
-      Vector3d rst = rnw_config.X_tip_body;
-      rst.z() = rnw_config.X_tip_body.z() - rnw_config.cone.height;
+      Vector3d rst = rnw_config.cone.tip;
+      rst.z() = rnw_config.cone.tip.z() - rnw_config.cone.height;
       return rst;
     }
 
     Vector3d X_center_body(){
-      Vector3d rst = X_base_body();
-      rst.x() -= rnw_config.cone.radius;
-      return rst;
+      return rnw_config.cone.base_center;
     }
 
     //////////////////////////////
@@ -410,9 +408,10 @@ struct cone_state_estimator_t {
     inline void update_frames( nav_msgs::OdometryConstPtr const & msg ){
       R_markers = odom2R(msg);
       T_markers = odom2T(msg);
-      T_tip = R_markers * rnw_config.X_tip_body + T_markers;
+      T_tip = R_markers * rnw_config.cone.tip + T_markers;
       T_base = R_markers * X_base_body() + T_markers;
       T_center = R_markers * X_center_body() + T_markers;
+      ROS_INFO_STREAM("" << X_center_body().transpose());
     }
 
     /**
