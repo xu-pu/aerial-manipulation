@@ -191,12 +191,10 @@ int main( int argc, char** argv ) {
 
   ros::Subscriber sub_trigger = nh.subscribe<geometry_msgs::PoseStamped>("/traj_start_trigger",10,&rnw_controller_t::on_trigger_n3ctrl,&rnw_controller);
 
-  ros::Subscriber sub_trigger_tip = nh.subscribe<std_msgs::Header>("trigger_go_to_tip", 10, &rnw_controller_t::on_trigger_go_to_tip, &rnw_controller);
-  ros::Subscriber sub_trigger_insert = nh.subscribe<std_msgs::Header>("trigger_insert", 10, &rnw_controller_t::on_trigger_insert, &rnw_controller);
-  ros::Subscriber sub_trigger_rock = nh.subscribe<std_msgs::Header>("trigger_rock", 10, &rnw_controller_t::on_trigger_rock, &rnw_controller);
-  ros::Subscriber sub_trigger_zigzag = nh.subscribe<std_msgs::Header>("trigger_zigzag", 10, &rnw_controller_t::on_trigger_zigzag, &rnw_controller);
-  ros::Subscriber sub_trigger_topple = nh.subscribe<std_msgs::Header>("trigger_topple", 10, &rnw_controller_t::on_trigger_topple, &rnw_controller);
-  ros::Subscriber sub_trigger_rnw = nh.subscribe<std_msgs::Header>("trigger_rnw", 10, &rnw_controller_t::on_trigger_rnw, &rnw_controller);
+  ros::Subscriber sub_trigger_insert = nh.subscribe<std_msgs::Header>("/rnw/trigger/insert", 10, &rnw_controller_t::on_trigger_insert, &rnw_controller);
+  ros::Subscriber sub_trigger_zigzag = nh.subscribe<std_msgs::Header>("/rnw/trigger/zigzag", 10, &rnw_controller_t::on_trigger_zigzag, &rnw_controller);
+  ros::Subscriber sub_trigger_topple = nh.subscribe<std_msgs::Header>("/rnw/trigger/topple", 10, &rnw_controller_t::on_trigger_topple, &rnw_controller);
+  ros::Subscriber sub_trigger_rnw = nh.subscribe<std_msgs::Header>("/rnw/trigger/rnw", 10, &rnw_controller_t::on_trigger_rnw, &rnw_controller);
   ros::spin();
 
   ros::shutdown();
