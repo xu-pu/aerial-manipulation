@@ -36,6 +36,7 @@ struct rnw_controller_t {
       rnw_config.load_from_ros(nh);
       pub_poly_traj = nh.advertise<quadrotor_msgs::PolynomialTrajectory>("/rnw/poly_traj",10,false);
       zigzag_generator = AmTraj(1024, 16, 0.4, rnw_config.zigzag.max_vel, rnw_config.zigzag.max_acc, 23, 0.02);
+      traj_generator = AmTraj(1024, 16, 0.4, rnw_config.rnw.max_vel, rnw_config.rnw.max_acc, 23, 0.02);
     }
 
     void on_uav_odom( nav_msgs::OdometryConstPtr const & msg ){
@@ -144,6 +145,9 @@ struct rnw_controller_t {
       rnw_config.rnw.topple_init = config.topple_init;
       rnw_config.rnw.desired_nutation = config.desired_nutation;
       rnw_config.rnw.tau = config.tau;
+      rnw_config.rnw.max_vel = config.max_vel;
+      rnw_config.rnw.max_acc = config.max_acc;
+      traj_generator = AmTraj(1024, 16, 0.4, rnw_config.rnw.max_vel, rnw_config.rnw.max_acc, 23, 0.02);
       ROS_INFO_STREAM(rnw_config.rnw.to_string());
     }
 
@@ -211,10 +215,11 @@ int main( int argc, char** argv ) {
   ros::Subscriber sub_trigger_rnw = nh.subscribe<std_msgs::Header>("/rnw/trigger/rnw", 10, &rnw_controller_t::on_trigger_rnw, &rnw_controller);
 
   dynamic_reconfigure::Server<rnw_ros::RNWConfig> server;
+  server.setConfigDefault(rnw_controller.rnw_config.rnw.to_config());
+  server.updateConfig(rnw_controller.rnw_config.rnw.to_config());
   server.setCallback([&]( rnw_ros::RNWConfig & config, uint32_t level ){
     rnw_controller.cfg_callback(config,level);
   });
-  server.setConfigDefault(rnw_controller.rnw_config.rnw.to_config());
   server.updateConfig(rnw_controller.rnw_config.rnw.to_config());
 
   ros::spin();
