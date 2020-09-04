@@ -235,7 +235,7 @@ int main( int argc, char** argv ) {
   auto timer = nh.createTimer( ros::Duration( 1.0 / spin_hz ), &cone_visualizer_t::on_spin, &cone_viz );
 
   ros::Subscriber sub_traj = nh.subscribe<rnw_ros::ConeState>(
-          "cone_state",
+          "/rnw/cone_state",
           100,
           &cone_visualizer_t::on_cone_state,
           &cone_viz,
@@ -243,7 +243,7 @@ int main( int argc, char** argv ) {
   );
 
   ros::Subscriber sub_rocking_cmd = nh.subscribe<rnw_ros::RockingCmd>(
-          "rocking_cmd",
+          "/rnw/rocking_cmd",
           100,
           &cone_visualizer_t::on_rocking_cmd,
           &cone_viz,

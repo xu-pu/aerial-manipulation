@@ -31,7 +31,7 @@ struct rnw_controller_t {
               zigzag_generator(1024, 16, 0.4, 1, 0.5, 23, 0.02)
     {
       rnw_config.load_from_ros(nh);
-      pub_poly_traj = nh.advertise<quadrotor_msgs::PolynomialTrajectory>("poly_traj",10,false);
+      pub_poly_traj = nh.advertise<quadrotor_msgs::PolynomialTrajectory>("/rnw/poly_traj",10,false);
       zigzag_generator = AmTraj(1024, 16, 0.4, rnw_config.zigzag.max_vel, rnw_config.zigzag.max_acc, 23, 0.02);
     }
 
@@ -182,7 +182,7 @@ int main( int argc, char** argv ) {
   );
 
   ros::Subscriber sub_cone_state = nh.subscribe<rnw_ros::ConeState>(
-          "cone_state",
+          "/rnw/cone_state",
           10,
           &rnw_controller_t::on_cone_state,
           &rnw_controller,

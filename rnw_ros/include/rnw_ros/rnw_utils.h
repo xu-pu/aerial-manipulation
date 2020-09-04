@@ -317,7 +317,7 @@ struct cone_state_estimator_t {
 
     inline explicit cone_state_estimator_t( ros::NodeHandle & nh ) {
       rnw_config.load_from_ros(nh);
-      pub_cone_state = nh.advertise<rnw_ros::ConeState>("cone_state",10);
+      pub_cone_state = nh.advertise<rnw_ros::ConeState>("/rnw/cone_state",10);
       pub_odom_dt = nh.advertise<quadrotor_msgs::Float64Stamped>("dt",10);
       cut_euler_velocity = get_param_default(nh,"cut_euler_velocity",false);
       max_euler_velocity = get_param_default(nh,"max_euler_velocity",numeric_limits<double>::max());
@@ -582,7 +582,7 @@ struct rnw_planner_t {
     size_t cmd_idx = 0;
 
     explicit rnw_planner_t( ros::NodeHandle & nh ){
-      pub_rocking_cmd = nh.advertise<rnw_ros::RockingCmd>("rocking_cmd",10);
+      pub_rocking_cmd = nh.advertise<rnw_ros::RockingCmd>("/rnw/rocking_cmd",10);
     }
 
     void plan_next_position(){
