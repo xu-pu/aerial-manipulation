@@ -6,16 +6,32 @@
     <arg name="vicon_topic" value="/uwb_vicon_odom"/>
     <arg name="joy_ctrl_topic" value="/djiros/ctrl"/>
 
-    <node pkg="rnw_ros" type="dbg_atti_loop_node" name="dbg_atti_loop_node" output="screen">
-        <remap from="~imu" to="$(arg imu_topic)"/>
-        <remap from="~joy_ctrl" to="$(arg joy_ctrl_topic)"/>
+    <node pkg="rnw_ros" type="visualize_traj_node" name="traj_visualization" output="screen" required="true">
+        <param name="lift_dt" type="double" value="0.05"/>
+        <param name="length_g" type="double" value="0.5"/>
+        <param name="clear_after_n_sec" type="double" value="0"/>
     </node>
+
+    <node pkg="rnw_ros" type="visualize_cone_node" name="visualize_cone_node" output="screen" required="true">
+        <param name="cone_color_r" type="double" value="0"/>
+        <param name="cone_color_g" type="double" value="1"/>
+        <param name="cone_color_b" type="double" value="0"/>
+    </node>
+
+    <node name="rviz_traj" pkg="rviz" type="rviz" output="log" args="-d $(find rnw_ros)/config/traj.rviz" />
+
+    <rosparam command="load" file="$(find rnw_ros)/config/rnw_config.yaml"/>
+
+    <!--    <node pkg="rnw_ros" type="dbg_atti_loop_node" name="dbg_atti_loop_node" output="screen">-->
+<!--        <remap from="~imu" to="$(arg imu_topic)"/>-->
+<!--        <remap from="~joy_ctrl" to="$(arg joy_ctrl_topic)"/>-->
+<!--    </node>-->
 
 <!--    <node pkg="rqt_multiplot" type="rqt_multiplot" name="rqt_multiplot"-->
 <!--          args="&#45;&#45;multiplot-config $(find rnw_ros)/rqt_multiplot.xml &#45;&#45;multiplot-run-all"/>-->
 
-    <node name="rosbag_play" pkg="rosbag" type="play" respawn="false" required="true" args="-r 10 /home/sheep/Dropbox/rosbags/interval3_reduced.bag"/>
+    <node name="rosbag_play" pkg="rosbag" type="play" respawn="false" args="-s 20 /home/sheep/Dropbox/rosbags/2020-09-04-17-36-34.bag"/>
 
-    <node name="rosbag_record" pkg="rosbag" type="record" respawn="false" required="true" args="-o /home/sheep/ -a" output="screen"/>
+<!--    <node name="rosbag_record" pkg="rosbag" type="record" respawn="false" required="true" args="-o /home/sheep/ -a" output="screen"/>-->
 
 </launch>
