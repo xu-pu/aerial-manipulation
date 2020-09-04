@@ -1,10 +1,15 @@
 <launch>
 
     <arg name="imu_topic" default="/djiros/imu"/>
-    <arg name="uav_topic" value="/pos_vel_mocap/odom_TA"/>
-    <arg name="cone_topic" value="/pos_vel_mocap/odom_cone"/>
     <arg name="vins_topic" value="/vins_estimator/imu_propagate"/>
+
+    <arg name="topic_mocap_uav" default="/mocap/uav"/>
+    <arg name="topic_mocap_cone" default="/mocap/cone"/>
+    <arg name="topic_odom_uav" default="/odom/uav"/>
+    <arg name="topic_odom_cone" default="/odom/cone"/>
     <arg name="topic_cone_state" value="/rnw/cone_state"/>
+
+    <rosparam command="load" file="$(find rnw_ros)/config/rnw_config.yaml"/>
 
     <node pkg="mocap_optitrack" type="mocap_node" name="mocap_node" respawn="false" launch-prefix="" required="true" output="log">
         <rosparam file="$(find mocap_optitrack)/config/mocap.yaml" command="load" />
@@ -16,15 +21,13 @@
 
     <node pkg="rnw_ros" type="pub_frames_node" name="pub_frames_node" output="screen">
         <remap from="~imu" to="$(arg imu_topic)"/>
-        <remap from="~uav" to="$(arg uav_topic)"/>
-        <remap from="~cone" to="$(arg cone_topic)"/>
         <remap from="~vins" to="$(arg vins_topic)"/>
         <rosparam command="load" file="$(find rnw_ros)/config/rnw_config.yaml"/>
     </node>
 
     <node pkg="uart_odom" type="uart_odom" name="uart_odom" output="screen">
-        <remap from="~odom" to="$(arg uav_topic)" />
-        <remap from="~odom_cone" to="$(arg cone_topic)" />
+        <remap from="~odom" to="$(arg topic_odom_uav)" />
+        <remap from="~odom_cone" to="$(arg topic_odom_cone)" />
         <rosparam command="load" file="$(find uart_odom)/config/uart_odom_config.yaml" />
         <param name="work_mode" value="real-time" />
         <param name="js_ctrl_mode" value="feedback" />
@@ -37,11 +40,8 @@
     <node name="rviz_traj" pkg="rviz" type="rviz" output="log" args="-d $(find rnw_ros)/config/traj.rviz" />
 
     <node pkg="rnw_ros" type="pub_cone_state_node" name="pub_cone_state_node" required="true" output="screen">
-        <remap from="~odom" to="$(arg cone_topic)"/>
-        <remap from="~cone_state" to="$(arg topic_cone_state)"/>
         <param name="cut_euler_velocity" type="bool" value="true"/>
         <param name="max_euler_velocity" value="10"/>
-        <rosparam command="load" file="$(find rnw_ros)/config/rnw_config.yaml"/>
     </node>
 
     <node pkg="rnw_ros" type="visualize_cone_node" name="visualize_cone_node" output="screen" required="true">
@@ -49,7 +49,6 @@
         <param name="cone_color_r" type="double" value="0"/>
         <param name="cone_color_g" type="double" value="1"/>
         <param name="cone_color_b" type="double" value="0"/>
-        <rosparam command="load" file="$(find rnw_ros)/config/rnw_config.yaml"/>
     </node>
 
 <!--    <node pkg="rqt_multiplot" type="rqt_multiplot" name="rqt_multiplot" output="log"-->

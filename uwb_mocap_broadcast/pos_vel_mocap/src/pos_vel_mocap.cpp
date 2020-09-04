@@ -13,7 +13,7 @@
 using namespace std;
 using namespace Eigen;
 
-ros::Publisher pub_odom;
+ros::Publisher pub_odom_uav;
 ros::Publisher pub_odom_cone;
 ros::Publisher pub_path;
 
@@ -139,7 +139,7 @@ void pose_callback( const geometry_msgs::PoseStamped::ConstPtr msg ) {
         odom.twist.twist.linear.x = Vo0.x(); // now_vel.x();
         odom.twist.twist.linear.y = Vo0.y(); // now_vel.y();
         odom.twist.twist.linear.z = Vo0.z(); // now_vel.z();
-        pub_odom.publish( odom );
+        pub_odom_uav.publish(odom );
 
 
 //        ros::Duration delta_t = now_t - last_path_t;
@@ -206,8 +206,8 @@ T get_param_default( ros::NodeHandle & nh, string const & key, T const & default
   return val;
 }
 
-int main( int argc, char **argv )
-{
+int main( int argc, char **argv ){
+
     ros::init( argc, argv, "pos_vel_mocap" );
     ros::NodeHandle n( "~" );
 
@@ -224,13 +224,29 @@ int main( int argc, char **argv )
   dynamic_reconfigure::Server<pos_vel_mocap::ViconCalibConfig>::CallbackType f;
   server.setCallback(calib_cfg_callback);
 
-  ros::Subscriber s1 = n.subscribe( "/uav/pose", 100, pose_callback );
-    ros::Subscriber s3 = n.subscribe( "/cone/pose", 100, pose_cone_callback );
+  ros::Subscriber sub_uav = n.subscribe<geometry_msgs::PoseStamped>(
+          "/mocap/uav",
+          100,
+          pose_callback,
+          nullptr,
+          ros::TransportHints().tcpNoDelay()
+  );
 
-    pub_odom = n.advertise< nav_msgs::Odometry >( "odom_TA", 100 );
-    pub_odom_cone = n.advertise< nav_msgs::Odometry >( "odom_cone", 100 );
-    //pub_path = n.advertise< nav_msgs::Path >( "/mocap_path", 10 );
+  ros::Subscriber sub_cone = n.subscribe<geometry_msgs::PoseStamped>(
+          "/mocap/cone",
+          100,
+          pose_cone_callback,
+          nullptr,
+          ros::TransportHints().tcpNoDelay()
+  );
 
-    ros::spin();
-    return 0;
+  pub_odom_uav = n.advertise<nav_msgs::Odometry>("/odom/uav", 100);
+  pub_odom_cone = n.advertise<nav_msgs::Odometry>("/odom/cone", 100);
+
+  ros::spin();
+
+  ros::shutdown();
+
+  return 0;
+
 }
