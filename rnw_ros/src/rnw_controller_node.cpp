@@ -76,13 +76,7 @@ struct rnw_controller_t {
       Vector3d T_tip = ros2eigen(latest_cone_state.tip);
       Vector3d cur_pos = odom2T(latest_uav_odom);
 
-      auto wpts_local = gen_topple_waypoints_local(
-              rnw_config,
-              rnw_config.hover_above_tip,
-              rnw_config.insert_below_tip,
-              rnw_config.topple.forward,
-              rnw_config.topple.downward
-      );
+      auto wpts_local = gen_topple_waypoints_local(rnw_config);
 
       // wpts_local is the desired positions of tcp in the tip frame
       // they need to be transformed to positions of the uav in the world frame

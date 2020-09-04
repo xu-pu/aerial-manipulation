@@ -127,36 +127,29 @@ struct rnw_config_t {
  * @param topple_forward
  * @return
  */
-inline vector<Vector3d> gen_topple_waypoints_local(
-        rnw_config_t const & rnw_config,
-        double hover_above = 0.05,
-        double insert_below = 0.03,
-        double topple_forward = 0.2,
-        double topple_downward = 0.03,
-        double head_room = 0.2 )
-{
-  vector<Vector3d> wpts;
-//  wpts.emplace_back(head_room,0,hover_above); // ahead
-  wpts.emplace_back(0,0,hover_above); // above tip
-  wpts.emplace_back(0,0,0); // tip point
-  wpts.emplace_back(0,0,-insert_below); // inserted
-  //wpts.emplace_back(0.05,0,-insert_below); // inserted
+inline vector<Vector3d> gen_topple_waypoints_local( rnw_config_t const & rnw_config ){
 
-  double topple_angle = 30;
+  vector<Vector3d> wpts;
+  wpts.emplace_back(0,0,rnw_config.hover_above_tip); // above tip
+  wpts.emplace_back(0,0,0); // tip point
+  wpts.emplace_back(0,0,-rnw_config.rnw.insertion_depth); // inserted
+
+  Vector3d offset(rnw_config.rnw.topple_init,0,-rnw_config.rnw.insertion_depth);
+
   constexpr double deg2rad = M_PI/180.;
-  double object_height = 1;
-  Vector3d offset(0.05,0,-insert_below);
-  size_t segments = 5;
+  constexpr size_t segments = 5;
+  double rad_step = rnw_config.rnw.desired_nutation/segments*deg2rad;
+
   for ( size_t i=0; i<=segments; i++ ) {
-    double rad = i*topple_angle/segments*deg2rad;
-    double forward = sin(rad)*object_height;
-    double downward = (1-cos(rad))*object_height;
+    double rad = i*rad_step;
+    double forward = sin(rad)*rnw_config.cone.height;
+    double downward = (1-cos(rad))*rnw_config.cone.height;
     Vector3d v(forward,0,-downward);
-    wpts.push_back(offset+v);
+    wpts.emplace_back(offset+v);
   }
 
-  //wpts.emplace_back(topple_forward,0,-insert_below-topple_downward); // toppled
   return wpts;
+
 }
 
 
