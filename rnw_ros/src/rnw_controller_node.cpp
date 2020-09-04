@@ -214,6 +214,8 @@ int main( int argc, char** argv ) {
   server.setCallback([&]( rnw_ros::RNWConfig & config, uint32_t level ){
     rnw_controller.cfg_callback(config,level);
   });
+  server.setConfigDefault(rnw_controller.rnw_config.rnw.to_config());
+  server.updateConfig(rnw_controller.rnw_config.rnw.to_config());
 
   ros::spin();
 

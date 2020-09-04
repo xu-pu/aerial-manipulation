@@ -13,6 +13,7 @@
 #include <rnw_ros/RockingCmd.h>
 #include <quadrotor_msgs/Float64Stamped.h>
 #include <uav_utils/utils.h>
+#include <rnw_ros/RNWConfig.h>
 
 struct rnw_config_t {
 
@@ -72,17 +73,31 @@ struct rnw_config_t {
 
         double tau;
 
+        double max_vel;
+
+        double max_acc;
+
         inline std::string to_string() const {
           std::stringstream ss;
           ss << "RnW Parameters:\n"
-              << "insertion_depth: " << insertion_depth << "\n"
-              << "topple_init: " << topple_init << "\n"
-              << "desired_nutation: " << desired_nutation << "\n"
-              << "tau: " << tau << "\n";
+             << "insertion_depth: " << insertion_depth << "\n"
+             << "topple_init: " << topple_init << "\n"
+             << "desired_nutation: " << desired_nutation << "\n"
+             << "max_vel: " << max_vel << "\n"
+             << "max_acc: " << max_acc << "\n";
           return ss.str();
-
         }
 
+        inline rnw_ros::RNWConfig to_config() const {
+          rnw_ros::RNWConfig config;
+          config.insertion_depth = insertion_depth;
+          config.topple_init = topple_init;
+          config.tau = tau;
+          config.desired_nutation = desired_nutation;
+          config.max_vel = max_vel;
+          config.max_acc = max_acc;
+          return config;
+        }
 
     } rnw;
 
@@ -126,6 +141,8 @@ struct rnw_config_t {
       rnw.topple_init      = get_param_default<double>(nh, "/rnw/topple_init", 0.);
       rnw.desired_nutation = get_param_default<double>(nh, "/rnw/desired_nutation", 30.);
       rnw.tau              = get_param_default<double>(nh, "/rnw/tau", 30.);
+      rnw.max_vel          = get_param_default<double>(nh, "/rnw/max_vel", 0.5);
+      rnw.max_acc          = get_param_default<double>(nh, "/rnw/max_acc", 0.5);
 
     }
 
