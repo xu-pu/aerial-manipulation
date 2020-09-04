@@ -124,18 +124,18 @@ inline vector<Vector3d> gen_topple_waypoints_local(
   wpts.emplace_back(0,0,-insert_below); // inserted
   //wpts.emplace_back(0.05,0,-insert_below); // inserted
 
-//  double topple_angle = 30;
-//  constexpr double deg2rad = M_PI/180.;
-//  double object_height = 1;
-//  Vector3d offset(0.05,0,-insert_below);
-//  size_t segments = 5;
-//  for ( size_t i=0; i<=segments; i++ ) {
-//    double rad = topple_angle/segments*deg2rad;
-//    double forward = sin(rad)*object_height;
-//    double downward = (1-cos(rad))*object_height;
-//    Vector3d v(forward,0,-downward);
-//    wpts.push_back(offset+v);
-//  }
+  double topple_angle = 30;
+  constexpr double deg2rad = M_PI/180.;
+  double object_height = 1;
+  Vector3d offset(0.05,0,-insert_below);
+  size_t segments = 5;
+  for ( size_t i=0; i<=segments; i++ ) {
+    double rad = i*topple_angle/segments*deg2rad;
+    double forward = sin(rad)*object_height;
+    double downward = (1-cos(rad))*object_height;
+    Vector3d v(forward,0,-downward);
+    wpts.push_back(offset+v);
+  }
 
   //wpts.emplace_back(topple_forward,0,-insert_below-topple_downward); // toppled
   return wpts;
