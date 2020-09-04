@@ -163,10 +163,31 @@ int main( int argc, char** argv ) {
   pub_path_plant = nh.advertise<nav_msgs::Path>("/traj/plant",10);
   pub_pos_cmd = nh.advertise<quadrotor_msgs::PositionCommand>("/position_cmd",10);
 
-  ros::Subscriber sub_odom = nh.subscribe<nav_msgs::Odometry>("/uwb_vicon_odom",10,&traj_server_t::on_odom,&traj_server);
+  ros::Subscriber sub_odom = nh.subscribe<nav_msgs::Odometry>(
+          "/odom/uav",
+          10,
+          &traj_server_t::on_odom,
+          &traj_server,
+          ros::TransportHints().tcpNoDelay()
+  );
+
+  ros::Subscriber sub_poly_traj = nh.subscribe<quadrotor_msgs::PolynomialTrajectory>(
+          "/rnw/poly_traj",
+          10,
+          &traj_server_t::on_poly_traj,
+          &traj_server,
+          ros::TransportHints().tcpNoDelay()
+  );
+
+  ros::Subscriber sub_n3ctrl_state = nh.subscribe<n3ctrl::N3CtrlState>(
+          "/n3ctrl/n3ctrl_state",
+          10,
+          &traj_server_t::on_n3ctrl_state,
+          &traj_server,
+          ros::TransportHints().tcpNoDelay()
+  );
+
   ros::Subscriber sub_trigger = nh.subscribe<geometry_msgs::PoseStamped>("/traj_start_trigger",10,&traj_server_t::on_trigger,&traj_server);
-  ros::Subscriber sub_poly_traj = nh.subscribe<quadrotor_msgs::PolynomialTrajectory>("/rnw/poly_traj",10,&traj_server_t::on_poly_traj,&traj_server);
-  ros::Subscriber sub_n3ctrl_state = nh.subscribe<n3ctrl::N3CtrlState>("/n3ctrl/n3ctrl_state",10,&traj_server_t::on_n3ctrl_state,&traj_server);
 
   ros::spin();
 

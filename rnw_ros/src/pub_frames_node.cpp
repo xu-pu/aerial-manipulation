@@ -79,8 +79,8 @@ int main( int argc, char** argv ) {
   rnw_config.load_from_ros(nh);
 
   ros::Subscriber sub_imu = nh.subscribe<sensor_msgs::Imu>("imu",10,on_imu);
-  ros::Subscriber sub_odom = nh.subscribe<nav_msgs::Odometry>("uav",10,on_odom);
-  ros::Subscriber sub_cone = nh.subscribe<nav_msgs::Odometry>("cone",10,on_cone);
+  ros::Subscriber sub_odom = nh.subscribe<nav_msgs::Odometry>("/odom/uav",10,on_odom);
+  ros::Subscriber sub_cone = nh.subscribe<nav_msgs::Odometry>("/odom/cone",10,on_cone);
   ros::Subscriber sub_vins = nh.subscribe<nav_msgs::Odometry>("vins",10,on_vins);
 
   pub_cone_tip = nh.advertise<geometry_msgs::PointStamped>("/cone/tip",1);

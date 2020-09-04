@@ -1,9 +1,10 @@
 <launch>
 
 	<arg name="uavname" default="hil" />
-    <arg name="odom_topic" value="/uwb_vicon_odom" />
-    <arg name="cone_topic" value="/uwb_vicon_odom_cone" />
     <arg name="imu_topic" default="/djiros/imu"/>
+
+    <arg name="topic_odom_uav" default="/odom/uav"/>
+    <arg name="topic_odom_cone" default="/odom/cone"/>
 
     <arg name="topic_rocking_cmd" value="/rnw/rocking_cmd"/>
     <arg name="topic_cone_state" value="/rnw/cone_state"/>
@@ -14,10 +15,12 @@
     <arg name="topic_trigger_topple" value="/rnw/trigger/topple" />
     <arg name="topic_trigger_rnw" value="/rnw/trigger/rnw" />
 
+    <remap from="/uwb_vicon_odom" to="$(arg topic_odom_uav)"/>
+    <remap from="/uwb_vicon_odom_cone" to="$(arg topic_odom_cone)"/>
+
     <rosparam command="load" file="$(find rnw_ros)/config/rnw_config.yaml"/>
 
     <node pkg="rnw_ros" type="pub_euler_angles_node" name="pub_euler_angles_node" required="true" output="screen">
-        <remap from="~odom" to="$(arg odom_topic)"/>
         <remap from="~imu" to="$(arg imu_topic)"/>
     </node>
 
@@ -35,7 +38,7 @@
     <node pkg="n3ctrl" type="n3ctrl_node" name="n3ctrl" output="screen" required="true">
         <!--subscribers-->
 		<remap from="~joy" to="/djiros/rc" />
-        <remap from="~odom" to="$(arg odom_topic)" />
+        <remap from="~odom" to="$(arg topic_odom_uav)" />
 		<remap from="~imu" to="/djiros/imu" />
 		<remap from="~cmd" to="/position_cmd" />
         <!--publishers-->
@@ -60,8 +63,6 @@
 
     <node pkg="rnw_ros" type="pub_frames_node" name="pub_frames_node" output="screen">
         <remap from="~imu" to="$(arg imu_topic)"/>
-        <remap from="~uav" to="$(arg odom_topic)"/>
-        <remap from="~cone" to="$(arg cone_topic)"/>
         <remap from="~vins" to="/vins_estimator/imu_propagate"/>
     </node>
 
@@ -75,13 +76,9 @@
         <remap from="~Y" to="$(arg topic_trigger_topple)"/>
     </node>
 
-    <node pkg="rnw_ros" type="rnw_controller_node" name="rnw_controller_node" output="screen">
-        <remap from="~uav_odom" to="$(arg odom_topic)"/>
-    </node>
+    <node pkg="rnw_ros" type="rnw_controller_node" name="rnw_controller_node" output="screen"/>
 
-    <node pkg="rnw_ros" type="rnw_traj_server_node" name="rnw_traj_server_node" output="screen">
-        <remap from="~vicon" to="$(arg odom_topic)"/>
-    </node>
+    <node pkg="rnw_ros" type="rnw_traj_server_node" name="rnw_traj_server_node" output="screen"/>
 
     <node pkg="rnw_ros" type="visualize_traj_node" name="traj_visualization" output="screen" required="true">
         <param name="lift_dt" type="double" value="0.05"/>
@@ -89,7 +86,6 @@
     </node>
 
     <node pkg="rnw_ros" type="pub_cone_state_node" name="pub_cone_state_node" required="true" output="log">
-        <remap from="~odom" to="$(arg cone_topic)"/>
         <param name="cut_euler_velocity" type="bool" value="true"/>
         <param name="max_euler_velocity" value="10"/>
     </node>

@@ -174,7 +174,7 @@ int main( int argc, char** argv ) {
   auto timer = nh.createTimer(ros::Rate(20), &rnw_controller_t::on_spin, &rnw_controller);
 
   ros::Subscriber sub_uav_odom = nh.subscribe<nav_msgs::Odometry>(
-          "uav_odom",
+          "/odom/uav",
           10,
           &rnw_controller_t::on_uav_odom,
           &rnw_controller,
