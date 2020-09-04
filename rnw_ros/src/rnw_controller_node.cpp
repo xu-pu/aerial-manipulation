@@ -48,6 +48,8 @@ struct rnw_controller_t {
 
     void on_trigger_insert( std_msgs::HeaderConstPtr const & msg ){
 
+      ROS_WARN_STREAM("[rnw] insert triggered!");
+
       Vector3d pt_uav = pose2T(latest_uav_odom.pose.pose);
       Vector3d pt_tip = uav_utils::from_point_msg(latest_cone_state.tip);
 
@@ -67,6 +69,8 @@ struct rnw_controller_t {
     }
 
     void on_trigger_topple( std_msgs::HeaderConstPtr const & msg ) const {
+
+      ROS_WARN_STREAM("[rnw] topple triggered!");
 
       Matrix3d R_tip = odom2R(latest_cone_state.odom);
       Vector3d T_tip = ros2eigen(latest_cone_state.tip);
@@ -111,10 +115,13 @@ struct rnw_controller_t {
     void on_trigger_rock( std_msgs::HeaderConstPtr const & msg ){}
 
     void on_trigger_rnw( std_msgs::HeaderConstPtr const & msg ){
+      ROS_WARN_STREAM("[rnw] rnw triggered!");
       rnw_planner.start_planning_cmd();
     }
 
     void on_trigger_zigzag( std_msgs::HeaderConstPtr const & msg ) const {
+
+      ROS_WARN_STREAM("[rnw] zig-zag triggered!");
 
       Matrix3d R = ros2eigen(latest_uav_odom.pose.pose.orientation).toRotationMatrix();
       Vector3d T = ros2eigen(latest_uav_odom.pose.pose.position);
