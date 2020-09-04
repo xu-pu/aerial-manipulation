@@ -9,6 +9,9 @@
 #include "am_traj/am_traj.hpp"
 #include "am_traj/ros_msgs.h"
 
+#include <dynamic_reconfigure/server.h>
+#include <rnw_ros/RNWConfig.h>
+
 struct rnw_controller_t {
 
     ros::Publisher pub_poly_traj;
@@ -135,6 +138,15 @@ struct rnw_controller_t {
 
     }
 
+    void cfg_callback( rnw_ros::RNWConfig & config, uint32_t level ){
+      ROS_WARN_STREAM("[rnw] re-config rnw");
+      rnw_config.rnw.insertion_depth = config.insertion_depth;
+      rnw_config.rnw.topple_init = config.topple_init;
+      rnw_config.rnw.desired_nutation = config.desired_nutation;
+      rnw_config.rnw.tau = config.tau;
+      ROS_INFO_STREAM(rnw_config.rnw.to_string());
+    }
+
     bool is_rocking = false;
 
     ros::Time rocking_start_stamp;
@@ -197,6 +209,12 @@ int main( int argc, char** argv ) {
   ros::Subscriber sub_trigger_zigzag = nh.subscribe<std_msgs::Header>("/rnw/trigger/zigzag", 10, &rnw_controller_t::on_trigger_zigzag, &rnw_controller);
   ros::Subscriber sub_trigger_topple = nh.subscribe<std_msgs::Header>("/rnw/trigger/topple", 10, &rnw_controller_t::on_trigger_topple, &rnw_controller);
   ros::Subscriber sub_trigger_rnw = nh.subscribe<std_msgs::Header>("/rnw/trigger/rnw", 10, &rnw_controller_t::on_trigger_rnw, &rnw_controller);
+
+  dynamic_reconfigure::Server<rnw_ros::RNWConfig> server;
+  server.setCallback([&]( rnw_ros::RNWConfig & config, uint32_t level ){
+    rnw_controller.cfg_callback(config,level);
+  });
+
   ros::spin();
 
   ros::shutdown();

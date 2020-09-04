@@ -72,6 +72,18 @@ struct rnw_config_t {
 
         double tau;
 
+        inline std::string to_string() const {
+          std::stringstream ss;
+          ss << "RnW Parameters:\n"
+              << "insertion_depth: " << insertion_depth << "\n"
+              << "topple_init: " << topple_init << "\n"
+              << "desired_nutation: " << desired_nutation << "\n"
+              << "tau: " << tau << "\n";
+          return ss.str();
+
+        }
+
+
     } rnw;
 
     inline void load_from_ros( ros::NodeHandle & nh ){
@@ -151,7 +163,6 @@ inline vector<Vector3d> gen_topple_waypoints_local( rnw_config_t const & rnw_con
   return wpts;
 
 }
-
 
 /**
  * x-psi-precession
