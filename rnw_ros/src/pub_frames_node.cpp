@@ -1,21 +1,15 @@
-#include <iostream>
-
 #include <ros/ros.h>
-#include <geometry_msgs/PoseStamped.h>
-#include <geometry_msgs/TwistStamped.h>
-#include <geometry_msgs/AccelStamped.h>
-#include <nav_msgs/Path.h>
-#include <geometry_msgs/Vector3.h>
 
 #include "rnw_ros/ros_utils.h"
 #include "rnw_ros/pose_utils.h"
 #include "rnw_ros/traj_uitls.h"
+#include "rnw_ros/rnw_utils.h"
 
 ros::Publisher pub_cone_tip;
 ros::Publisher pub_cage_tcp;
 Vector3d last_t;
-Vector3d X_tip_body;
-Vector3d X_tcp_cage;
+
+rnw_config_t rnw_config;
 
 Matrix3d calc_intermediate_R( double yaw ){
 
@@ -42,7 +36,7 @@ void on_odom( OdometryConstPtr const & odom ){
 
   Matrix3d R_intermediate = calc_intermediate_R(rpy.z());
 
-  Vector3d X_tcp = R_intermediate * X_tcp_cage + T;
+  Vector3d X_tcp = R_intermediate * rnw_config.X_tcp_cage + T;
   //Vector3d X_tcp = R * X_tcp_cage + T;
   geometry_msgs::PointStamped tcp_msg;
   tcp_msg.header = odom->header;
@@ -57,7 +51,7 @@ void on_cone( OdometryConstPtr const & odom ){
   Matrix3d R = odom2R(odom);
   Vector3d T = odom2T(odom);
   publish_frame(R,T,"cone_odom","world");
-  Vector3d tip = R * X_tip_body + T;
+  Vector3d tip = R * rnw_config.cone.tip + T;
   geometry_msgs::PointStamped tip_msg;
   tip_msg.header = odom->header;
   tip_msg.point.x = tip.x();
@@ -82,13 +76,7 @@ int main( int argc, char** argv ) {
 
   ros::NodeHandle nh("~");
 
-  X_tip_body.x() = get_param_default(nh,"X_tip_body/x",0.);
-  X_tip_body.y() = get_param_default(nh,"X_tip_body/y",0.);
-  X_tip_body.z() = get_param_default(nh,"X_tip_body/z",0.);
-
-  X_tcp_cage.x() = get_param_default(nh,"X_tcp_cage/x",0.);
-  X_tcp_cage.y() = get_param_default(nh,"X_tcp_cage/y",0.);
-  X_tcp_cage.z() = get_param_default(nh,"X_tcp_cage/z",0.);
+  rnw_config.load_from_ros(nh);
 
   ros::Subscriber sub_imu = nh.subscribe<sensor_msgs::Imu>("imu",10,on_imu);
   ros::Subscriber sub_odom = nh.subscribe<nav_msgs::Odometry>("uav",10,on_odom);
