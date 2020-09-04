@@ -83,6 +83,7 @@
     <node pkg="rnw_ros" type="visualize_traj_node" name="traj_visualization" output="screen" required="true">
         <param name="lift_dt" type="double" value="0.05"/>
         <param name="length_g" type="double" value="0.5"/>
+        <param name="clear_after_n_sec" type="double" value="0"/>
     </node>
 
     <node pkg="rnw_ros" type="pub_cone_state_node" name="pub_cone_state_node" required="true" output="log">
