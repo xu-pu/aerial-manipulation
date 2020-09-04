@@ -118,6 +118,7 @@ generate_messages(
 # )
 generate_dynamic_reconfigure_options(
         cfg/MocapCalib.cfg
+        cfg/RNW.cfg
 )
 ###################################
 ## catkin specific configuration ##
@@ -207,6 +208,7 @@ add_dependencies(pub_cone_state_node ${PROJECT_NAME}_generate_messages_cpp)
 add_dependencies(visualize_cone_node ${PROJECT_NAME}_generate_messages_cpp)
 add_dependencies(rnw_planning_node ${PROJECT_NAME}_generate_messages_cpp)
 add_dependencies(mocap_calib_node ${PROJECT_NAME}_gencfg)
+add_dependencies(rnw_controller_node ${PROJECT_NAME}_gencfg)
 
 ## Specify libraries to link a library or executable target against
 # target_link_libraries(${PROJECT_NAME}_node
