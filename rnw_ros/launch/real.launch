@@ -1,17 +1,22 @@
 <launch>
 
 	<arg name="uavname" default="fpv" />
-    <arg name="odom_topic" value="/uwb_vicon_odom" />
+
     <arg name="imu_topic" default="/djiros/imu"/>
-    <arg name="cone_topic" value="/uwb_vicon_odom_cone" />
 
-    <arg name="topic_cone_state" value="/rnw/cone_state"/>
-    <arg name="topic_poly_traj" value="/rnw/poly_traj"/>
+    <arg name="topic_odom_uav" default="/odom/uav"/>
+    <arg name="topic_odom_cone" default="/odom/cone"/>
+
     <arg name="topic_rocking_cmd" value="/rnw/rocking_cmd"/>
+    <arg name="topic_cone_state" value="/rnw/cone_state"/>
+    <arg name="topic_poly_traj" value="/rnw/poly_traj" />
 
-    <arg name="topic_trigger_rnw" value="/rnw/trigger/rnw" />
+    <arg name="topic_trigger_insert" value="/rnw/trigger/insert" />
     <arg name="topic_trigger_zigzag" value="/rnw/trigger/zigzag" />
     <arg name="topic_trigger_topple" value="/rnw/trigger/topple" />
+    <arg name="topic_trigger_rnw" value="/rnw/trigger/rnw" />
+
+    <rosparam command="load" file="$(find rnw_ros)/config/rnw_config.yaml"/>
 
     <!-- Using dynamic_reconfigure will cause timeout -->
     <!-- Increase from 0.1 default to 0.5 to avoid entering atti mode -->
@@ -30,8 +35,8 @@
 
     <node pkg="uart_odom" type="uart_odom" name="uart_odom_client" output="log" respawn="true">
         <!--publishers-->
-        <remap from="~out_odom_uav" to="$(arg odom_topic)"/>
-        <remap from="~out_odom_cone" to="$(arg cone_topic)"/>
+        <remap from="~out_odom_uav" to="$(arg topic_odom_uav)"/>
+        <remap from="~out_odom_cone" to="$(arg topic_odom_cone)"/>
         <!--params-->
         <rosparam command="load" file="$(find uart_odom)/config/uart_odom_config.yaml"/>
         <param name="work_mode" value="real-time"/>
@@ -42,7 +47,7 @@
     <node pkg="n3ctrl" type="n3ctrl_node" name="n3ctrl" output="screen" required="true">
         <!--subscribers-->
 		<remap from="~joy" to="/djiros/rc" />
-        <remap from="~odom" to="$(arg odom_topic)" />
+        <remap from="~odom" to="$(arg topic_odom_uav)" />
 		<remap from="~imu" to="/djiros/imu" />
 		<remap from="~cmd" to="/position_cmd" />
         <!--publishers-->
@@ -67,45 +72,17 @@
     </node>
 
     <node pkg="rnw_ros" type="pub_cone_state_node" name="pub_cone_state_node" required="true" output="log">
-        <!-- Sub -->
-        <remap from="~odom" to="$(arg cone_topic)"/>
-        <!-- Pub -->
-        <remap from="~cone_state" to="$(arg topic_cone_state)"/>
-        <!-- Params -->
         <param name="cut_euler_velocity" type="bool" value="true"/>
         <param name="max_euler_velocity" value="10"/>
-        <rosparam command="load" file="$(find rnw_ros)/config/rnw_config.yaml"/>
     </node>
 
-    <node pkg="rnw_ros" type="rnw_controller_node" name="rnw_controller_node" output="screen">
-        <!-- Sub -->
-        <remap from="~cone_state" to="$(arg topic_cone_state)"/>
-        <remap from="~uav_odom" to="$(arg odom_topic)"/>
-        <!-- Sub Triggers -->
-        <remap from="~trigger_zigzag" to="$(arg topic_trigger_zigzag)"/>
-        <remap from="~trigger_topple" to="$(arg topic_trigger_topple)"/>
-        <remap from="~trigger_rnw" to="$(arg topic_trigger_rnw)"/>
-        <!-- Pub -->
-        <remap from="~rocking_cmd" to="$(arg topic_rocking_cmd)"/>
-        <remap from="~poly_traj" to="$(arg topic_poly_traj)"/>
-        <!-- Param -->
-        <rosparam command="load" file="$(find rnw_ros)/config/rnw_config.yaml"/>
-    </node>
+    <node pkg="rnw_ros" type="rnw_controller_node" name="rnw_controller_node" output="screen"/>
 
-    <node pkg="rnw_ros" type="rnw_traj_server_node" name="rnw_traj_server_node" output="screen">
-        <!--subscribers-->
-        <remap from="~vicon" to="$(arg odom_topic)"/>
-        <remap from="~poly_traj" to="$(arg topic_poly_traj)"/>
-    </node>
+    <node pkg="rnw_ros" type="rnw_traj_server_node" name="rnw_traj_server_node" output="screen"/>
 
     <node pkg="rnw_ros" type="pub_frames_node" name="pub_frames_node" output="screen">
-        <!--subscribers-->
         <remap from="~imu" to="$(arg imu_topic)"/>
-        <remap from="~uav" to="$(arg odom_topic)"/>
-        <remap from="~cone" to="$(arg cone_topic)"/>
         <remap from="~vins" to="/vins_estimator/imu_propagate"/>
-        <!--params-->
-        <rosparam command="load" file="$(find rnw_ros)/config/rnw_config.yaml"/>
     </node>
 
     <node name="record" pkg="rosbag" type="record" output="screen" args="-a -x '/traj/(.*)'" />
