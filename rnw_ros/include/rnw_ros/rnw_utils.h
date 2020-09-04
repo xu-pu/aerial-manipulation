@@ -62,6 +62,18 @@ struct rnw_config_t {
 
     } cone;
 
+    struct {
+
+        double insertion_depth;
+
+        double topple_init;
+
+        double desired_nutation;
+
+        double tau;
+
+    } rnw;
+
     inline void load_from_ros( ros::NodeHandle & nh ){
 
       X_tip_body.x() = get_param_default(nh,"/X_tip_body/x",0.);
@@ -98,6 +110,11 @@ struct rnw_config_t {
 
       ground_z = get_param_default<double>(nh, "/ground_z", 0.);
 
+      rnw.insertion_depth  = get_param_default<double>(nh, "/rnw/insertion_depth", 0.);
+      rnw.topple_init      = get_param_default<double>(nh, "/rnw/topple_init", 0.);
+      rnw.desired_nutation = get_param_default<double>(nh, "/rnw/desired_nutation", 30.);
+      rnw.tau              = get_param_default<double>(nh, "/rnw/tau", 30.);
+
     }
 
 };
@@ -111,6 +128,7 @@ struct rnw_config_t {
  * @return
  */
 inline vector<Vector3d> gen_topple_waypoints_local(
+        rnw_config_t const & rnw_config,
         double hover_above = 0.05,
         double insert_below = 0.03,
         double topple_forward = 0.2,

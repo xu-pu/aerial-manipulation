@@ -77,6 +77,7 @@ struct rnw_controller_t {
       Vector3d cur_pos = odom2T(latest_uav_odom);
 
       auto wpts_local = gen_topple_waypoints_local(
+              rnw_config,
               rnw_config.hover_above_tip,
               rnw_config.insert_below_tip,
               rnw_config.topple.forward,

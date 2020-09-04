@@ -13,6 +13,9 @@ int main( int argc, char** argv ) {
 
   ros::NodeHandle nh("~");
 
+  rnw_config_t rnw_config;
+  rnw_config.load_from_ros(nh);
+
   ros::Publisher pub_poly_traj = nh.advertise<quadrotor_msgs::PolynomialTrajectory>("/poly_traj_test",10,true);
 
   AmTraj amTrajOpt(1024,16,0.4,1,1,23,0.02);
@@ -22,7 +25,7 @@ int main( int argc, char** argv ) {
 
   Vector3d cur_pos = {2,3,1};
 
-  vector<Vector3d> wpts = gen_topple_waypoints_local();
+  vector<Vector3d> wpts = gen_topple_waypoints_local(rnw_config);
 
   vector<Vector3d> waypoints = transform_pts(wpts,R_tip,T_tip);
 
