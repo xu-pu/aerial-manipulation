@@ -59,16 +59,12 @@ struct mocap_calibrator_t {
 
       Vector3d cage_center( config.cage_center_x, config.cage_center_y, config.cage_center_z );
       Vector3d base_center( config.base_center_x, config.base_center_y, config.base_center_z );
-      Vector3d G1( config.G1_x, config.G1_y, config.G1_z );
-      Vector3d G2( config.G2_x, config.G2_y, config.G2_z );
       Vector3d tip( config.Tip_x, config.Tip_y, config.Tip_z );
 
       // correct vicon point order
 
       cage_center = from_vicon(cage_center);
       base_center = from_vicon(base_center);
-      G1 = from_vicon(G1);
-      G2 = from_vicon(G2);
       tip = from_vicon(tip);
 
       // to body frame
@@ -76,8 +72,6 @@ struct mocap_calibrator_t {
       cage_center = uav_R * cage_center + uav_T;
 
       base_center = cone_R * base_center + cone_T;
-      G1 = cone_R * G1 + cone_T;
-      G2 = cone_R * G2 + cone_T;
       tip = cone_R * tip + cone_T;
 
       // calc
@@ -104,14 +98,6 @@ struct mocap_calibrator_t {
 
       cout << "===================================\n";
 
-      Vector3d G = (G1+G2)/2;
-
-      Vector3d tip_offset = tip-G;
-
-      cout << "tip_offset: " << tip_offset.transpose() << endl;
-
-      cout << "===================================\n";
-
       cout << endl;
 
     }
@@ -127,7 +113,7 @@ int main( int argc, char** argv ) {
   mocap_calibrator_t cali;
 
   ros::Subscriber sub_pose_uav = nh.subscribe<geometry_msgs::PoseStamped>(
-          "uav",
+          "/mocap/uav",
           10,
           &mocap_calibrator_t::on_odom_uav,
           &cali,
@@ -135,7 +121,7 @@ int main( int argc, char** argv ) {
   );
 
   ros::Subscriber sub_pose_cone = nh.subscribe<geometry_msgs::PoseStamped>(
-          "cone",
+          "/mocap/cone",
           10,
           &mocap_calibrator_t::on_odom_cone,
           &cali,

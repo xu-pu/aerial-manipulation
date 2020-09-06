@@ -4,10 +4,7 @@
         <rosparam file="$(find mocap_optitrack)/config/mocap.yaml" command="load" />
     </node>
 
-    <node pkg="rnw_ros" type="mocap_calib_node" name="mocap_calib_node" output="screen">
-        <remap from="~uav" to="/uav/pose" />
-        <remap from="~cone" to="/cone/pose" />
-    </node>
+    <node pkg="rnw_ros" type="mocap_calib_node" name="mocap_calib_node" output="screen"/>
 
     <node pkg="rqt_reconfigure" type="rqt_reconfigure" name="rqt_reconfigure"/>
 
