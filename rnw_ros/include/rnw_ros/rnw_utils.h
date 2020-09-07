@@ -21,8 +21,6 @@ struct rnw_config_t {
 
     Vector3d X_tcp_cage;
 
-    double hover_above_tip;
-
     double insert_below_tip;
 
     double ground_z;
@@ -81,6 +79,8 @@ struct rnw_config_t {
 
         double rocking_max_acc;
 
+        double hover_above_tip;
+
         inline std::string to_string() const {
           std::stringstream ss;
           ss << "RnW Parameters:\n"
@@ -104,6 +104,7 @@ struct rnw_config_t {
           config.max_acc = max_acc;
           config.rocking_max_vel = rocking_max_vel;
           config.rocking_max_acc = rocking_max_acc;
+          config.hover_above_tip = hover_above_tip;
           return config;
         }
 
@@ -119,7 +120,6 @@ struct rnw_config_t {
       X_tcp_cage.y() = get_param_default(nh,"/X_tcp_cage/y",0.);
       X_tcp_cage.z() = get_param_default(nh,"/X_tcp_cage/z",0.);
 
-      hover_above_tip = get_param_default(nh,"/hover_above_tip",5.);
       insert_below_tip = get_param_default(nh,"/insert_below_tip",5.);
 
       zigzag.step_forward = get_param_default(nh,"/zigzag/step_forward",0.1);
@@ -153,7 +153,7 @@ struct rnw_config_t {
       rnw.max_acc          = get_param_default<double>(nh, "/rnw/max_acc", 0.5);
       rnw.rocking_max_vel  = get_param_default<double>(nh, "/rnw/rocking_max_vel", 0.5);
       rnw.rocking_max_acc  = get_param_default<double>(nh, "/rnw/rocking_max_acc", 0.5);
-
+      rnw.hover_above_tip  = get_param_default<double>(nh,"/rnw/hover_above_tip",0.03);
     }
 
 };
@@ -169,7 +169,7 @@ struct rnw_config_t {
 inline vector<Vector3d> gen_topple_waypoints_local( rnw_config_t const & rnw_config ){
 
   vector<Vector3d> wpts;
-  wpts.emplace_back(0,0,rnw_config.hover_above_tip); // above tip
+  wpts.emplace_back(0,0,rnw_config.rnw.hover_above_tip); // above tip
   wpts.emplace_back(0,0,0); // tip point
   wpts.emplace_back(0,0,-rnw_config.rnw.insertion_depth); // inserted
 

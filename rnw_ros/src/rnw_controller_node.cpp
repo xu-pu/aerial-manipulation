@@ -61,14 +61,14 @@ struct rnw_controller_t {
       Vector3d pt_uav = pose2T(latest_uav_odom.pose.pose);
       Vector3d pt_tip = uav_utils::from_point_msg(latest_cone_state.tip);
 
-      double z_planned_tcp = pt_tip.z() + rnw_config.hover_above_tip;
+      double z_planned_tcp = pt_tip.z() + rnw_config.rnw.hover_above_tip;
       double z_planned_uav = z_planned_tcp - rnw_config.X_tcp_cage.z(); // offset between imu and tcp
 
       Vector3d pt_tgt = pt_tip;
       pt_tgt.z() = z_planned_uav;
 
       Vector3d pt_inserted = pt_tgt;
-      pt_inserted.z()  = pt_inserted.z() - rnw_config.hover_above_tip - rnw_config.insert_below_tip;
+      pt_inserted.z()  = pt_inserted.z() - rnw_config.rnw.hover_above_tip - rnw_config.insert_below_tip;
 
       Vector3d v0 = Vector3d::Zero();
       Trajectory traj = traj_generator.genOptimalTrajDTC({pt_uav, pt_tgt, pt_inserted}, v0, v0, v0, v0);
@@ -141,6 +141,7 @@ struct rnw_controller_t {
 
     void cfg_callback( rnw_ros::RNWConfig & config, uint32_t level ){
       ROS_WARN_STREAM("[rnw] re-config rnw");
+      rnw_config.rnw.hover_above_tip = config.hover_above_tip;
       rnw_config.rnw.insertion_depth = config.insertion_depth;
       rnw_config.rnw.topple_init = config.topple_init;
       rnw_config.rnw.desired_nutation = config.desired_nutation;
