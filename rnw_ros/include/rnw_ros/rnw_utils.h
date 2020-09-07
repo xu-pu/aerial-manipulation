@@ -151,6 +151,8 @@ struct rnw_config_t {
       rnw.tau              = get_param_default<double>(nh, "/rnw/tau", 30.);
       rnw.max_vel          = get_param_default<double>(nh, "/rnw/max_vel", 0.5);
       rnw.max_acc          = get_param_default<double>(nh, "/rnw/max_acc", 0.5);
+      rnw.rocking_max_vel  = get_param_default<double>(nh, "/rnw/rocking_max_vel", 0.5);
+      rnw.rocking_max_acc  = get_param_default<double>(nh, "/rnw/rocking_max_acc", 0.5);
 
     }
 
