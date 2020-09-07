@@ -1,4 +1,5 @@
 ground_z: -0.035
+#ground_z: -0.05
 X_tip_body:
   x: 0.0959235
   y: 0.0158244
