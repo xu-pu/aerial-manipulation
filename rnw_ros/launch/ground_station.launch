@@ -51,7 +51,11 @@
         <param name="cone_color_b" type="double" value="0"/>
     </node>
 
-<!--    <node pkg="rqt_multiplot" type="rqt_multiplot" name="rqt_multiplot" output="log"-->
+<!--    <node pkg="rnw_ros" type="pub_contact_radius_node" name="pub_contact_radius_node" output="screen" required="true"/>-->
+
+<!--    <node pkg="rqt_plot" type="rqt_plot" name="rqt_plot"/>-->
+
+    <!--    <node pkg="rqt_multiplot" type="rqt_multiplot" name="rqt_multiplot" output="log"-->
 <!--          args="&#45;&#45;multiplot-config $(find rnw_ros)/config/rqt_multiplot_cone_state.xml &#45;&#45;multiplot-run-all"/>-->
 
 </launch>

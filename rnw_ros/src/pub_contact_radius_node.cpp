@@ -19,7 +19,7 @@ void on_cone_state( rnw_ros::ConeStateConstPtr const & msg ){
   pub_est_radius.publish(msg2);
 
   msg2.value = rnw_config.cone.radius;
-  pub_est_radius.publish(msg2);
+  pub_true_radius.publish(msg2);
 
 }
 
