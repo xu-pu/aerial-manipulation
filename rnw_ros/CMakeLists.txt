@@ -59,6 +59,16 @@ find_package(Ceres REQUIRED)
 ##   * uncomment the generate_messages entrybelow
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
+add_message_files(
+        FILES
+        RockingCmd.msg
+)
+
+generate_messages(
+        DEPENDENCIES
+        geometry_msgs
+        nav_msgs
+)
 
 ## Generate messages in the 'msg' folder
 # add_message_files(
@@ -153,39 +163,32 @@ include_directories(
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 # add_executable(${PROJECT_NAME}_node src/rnw_ros_node.cpp)
-add_executable(pub_frames_node src/pub_frames_node.cpp)
-add_executable(pub_euler_angles_node src/pub_euler_angles_node.cpp)
-add_executable(test_traj_node src/test_traj_node.cpp)
-add_executable(vicon_imu_cali_node src/vicon_imu_cali_node.cpp)
-add_executable(rnw_traj_server_node src/rnw_traj_server_node.cpp)
-add_executable(gamepad_trigger_node src/gamepad_trigger_node.cpp)
-add_executable(dbg_atti_loop_node src/dbg_atti_loop_node.cpp)
-add_executable(visualize_traj_node src/visualize_traj_node.cpp)
-add_executable(rnw_controller_node src/rnw_controller_node.cpp)
-add_executable(pub_cone_state_node src/pub_cone_state_node.cpp)
-add_executable(visualize_cone_node src/visualize_cone_node.cpp)
-add_executable(rnw_planning_node src/rnw_planning_node.cpp)
-add_executable(pub_mock_cone_node src/pub_mock_cone_node.cpp)
-add_executable(pub_mock_uav_node src/pub_mock_uav_node.cpp)
-add_executable(mocap_calib_node src/mocap_calib_node.cpp)
-add_executable(pub_contact_radius_node src/pub_contact_radius_node.cpp)
 
-target_link_libraries(pub_frames_node ${catkin_LIBRARIES})
-target_link_libraries(test_traj_node ${catkin_LIBRARIES})
-target_link_libraries(vicon_imu_cali_node ${catkin_LIBRARIES} ${CERES_LIBRARIES})
-target_link_libraries(rnw_traj_server_node ${catkin_LIBRARIES})
-target_link_libraries(gamepad_trigger_node ${catkin_LIBRARIES})
-target_link_libraries(pub_euler_angles_node ${catkin_LIBRARIES})
-target_link_libraries(dbg_atti_loop_node ${catkin_LIBRARIES})
-target_link_libraries(visualize_traj_node ${catkin_LIBRARIES})
-target_link_libraries(rnw_controller_node ${catkin_LIBRARIES})
-target_link_libraries(pub_cone_state_node ${catkin_LIBRARIES})
-target_link_libraries(visualize_cone_node ${catkin_LIBRARIES})
-target_link_libraries(rnw_planning_node ${catkin_LIBRARIES})
-target_link_libraries(pub_mock_cone_node ${catkin_LIBRARIES})
-target_link_libraries(pub_mock_uav_node ${catkin_LIBRARIES})
-target_link_libraries(mocap_calib_node ${catkin_LIBRARIES})
-target_link_libraries(pub_contact_radius_node ${catkin_LIBRARIES})
+set(RNW_NODES
+        pub_frames_node
+        pub_euler_angles_node
+        test_traj_node
+        vicon_imu_cali_node
+        rnw_traj_server_node
+        gamepad_trigger_node
+        dbg_atti_loop_node
+        visualize_traj_node
+        rnw_controller_node
+        pub_cone_state_node
+        visualize_cone_node
+        rnw_planning_node
+        pub_mock_cone_node
+        pub_mock_uav_node
+        mocap_calib_node
+        pub_contact_radius_node
+)
+
+FOREACH(NODE ${RNW_NODES})
+    add_executable(${NODE} src/${NODE}.cpp)
+    target_link_libraries(${NODE} ${catkin_LIBRARIES} ${CERES_LIBRARIES})
+    add_dependencies(${NODE} ${PROJECT_NAME}_generate_messages_cpp)
+    add_dependencies(${NODE} ${PROJECT_NAME}_gencfg)
+ENDFOREACH()
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -196,8 +199,6 @@ target_link_libraries(pub_contact_radius_node ${catkin_LIBRARIES})
 ## Add cmake target dependencies of the executable
 ## same as for the library above
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-add_dependencies(mocap_calib_node ${PROJECT_NAME}_gencfg)
-add_dependencies(rnw_controller_node ${PROJECT_NAME}_gencfg)
 
 ## Specify libraries to link a library or executable target against
 # target_link_libraries(${PROJECT_NAME}_node

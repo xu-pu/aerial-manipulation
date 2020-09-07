@@ -10,7 +10,7 @@
 #include "rnw_ros/ros_utils.h"
 #include "rnw_ros/pose_utils.h"
 #include <rnw_msgs/ConeState.h>
-#include <rnw_msgs/RockingCmd.h>
+#include <rnw_ros/RockingCmd.h>
 #include <quadrotor_msgs/Float64Stamped.h>
 #include <uav_utils/utils.h>
 #include <rnw_ros/RNWConfig.h>
@@ -627,14 +627,14 @@ struct rnw_planner_t {
 
     bool plan_cmd = false;
 
-    rnw_msgs::RockingCmd latest_cmd;
+    rnw_ros::RockingCmd latest_cmd;
 
     bool cmd_pending = false;
 
     size_t cmd_idx = 0;
 
     explicit rnw_planner_t( ros::NodeHandle & nh ){
-      pub_rocking_cmd = nh.advertise<rnw_msgs::RockingCmd>("/rnw/rocking_cmd",10);
+      pub_rocking_cmd = nh.advertise<rnw_ros::RockingCmd>("/rnw/rocking_cmd",10);
     }
 
     void plan_next_position(){

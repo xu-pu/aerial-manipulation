@@ -20,7 +20,7 @@ struct cone_visualizer_t {
 
     rnw_msgs::ConeState latest_cone_state;
 
-    rnw_msgs::RockingCmd latest_rocking_cmd;
+    rnw_ros::RockingCmd latest_rocking_cmd;
 
     static constexpr int id_base = 0;
 
@@ -71,7 +71,7 @@ struct cone_visualizer_t {
       init = true;
     }
 
-    void on_rocking_cmd( rnw_msgs::RockingCmdConstPtr const & msg ){
+    void on_rocking_cmd( rnw_ros::RockingCmdConstPtr const & msg ){
       latest_rocking_cmd = *msg;
     }
 
@@ -239,7 +239,7 @@ int main( int argc, char** argv ) {
           ros::TransportHints().tcpNoDelay()
   );
 
-  ros::Subscriber sub_rocking_cmd = nh.subscribe<rnw_msgs::RockingCmd>(
+  ros::Subscriber sub_rocking_cmd = nh.subscribe<rnw_ros::RockingCmd>(
           "/rnw/rocking_cmd",
           100,
           &cone_visualizer_t::on_rocking_cmd,
