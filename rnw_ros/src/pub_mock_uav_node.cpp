@@ -3,14 +3,14 @@
 
 #include "rnw_ros/rnw_utils.h"
 
-#include <rnw_ros/ConeState.h>
+#include <rnw_msgs/ConeState.h>
 #include <uav_utils/utils.h>
 
 ros::Publisher pub_uav_odom;
 
 rnw_config_t rnw_config;
 
-void on_cone_state( rnw_ros::ConeStateConstPtr const & msg ){
+void on_cone_state( rnw_msgs::ConeStateConstPtr const & msg ){
   nav_msgs::Odometry odom;
   odom.header.stamp = msg->header.stamp;
   odom.header.frame_id = "world";
@@ -31,7 +31,7 @@ int main( int argc, char** argv ) {
 
   pub_uav_odom = nh.advertise<nav_msgs::Odometry>("/odom/uav",100);
 
-  ros::Subscriber sub_odom = nh.subscribe<rnw_ros::ConeState>(
+  ros::Subscriber sub_odom = nh.subscribe<rnw_msgs::ConeState>(
           "/rnw/cone_state",
           10,
           on_cone_state,

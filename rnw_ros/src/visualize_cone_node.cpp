@@ -18,9 +18,9 @@ struct cone_visualizer_t {
 
     ros::Publisher pub_marker_cone;
 
-    rnw_ros::ConeState latest_cone_state;
+    rnw_msgs::ConeState latest_cone_state;
 
-    rnw_ros::RockingCmd latest_rocking_cmd;
+    rnw_msgs::RockingCmd latest_rocking_cmd;
 
     static constexpr int id_base = 0;
 
@@ -64,14 +64,14 @@ struct cone_visualizer_t {
       marker_contact_path.scale.x = 0.01;
     }
 
-    void on_cone_state( rnw_ros::ConeStateConstPtr const & msg  ){
+    void on_cone_state( rnw_msgs::ConeStateConstPtr const & msg  ){
       latest_time = ros::Time::now();
       latest_cone_state = *msg;
       pub_marker_cone.publish(gen_markers());
       init = true;
     }
 
-    void on_rocking_cmd( rnw_ros::RockingCmdConstPtr const & msg ){
+    void on_rocking_cmd( rnw_msgs::RockingCmdConstPtr const & msg ){
       latest_rocking_cmd = *msg;
     }
 
@@ -231,7 +231,7 @@ int main( int argc, char** argv ) {
 
   auto timer = nh.createTimer( ros::Duration( 1.0 / spin_hz ), &cone_visualizer_t::on_spin, &cone_viz );
 
-  ros::Subscriber sub_traj = nh.subscribe<rnw_ros::ConeState>(
+  ros::Subscriber sub_traj = nh.subscribe<rnw_msgs::ConeState>(
           "/rnw/cone_state",
           100,
           &cone_visualizer_t::on_cone_state,
@@ -239,7 +239,7 @@ int main( int argc, char** argv ) {
           ros::TransportHints().tcpNoDelay()
   );
 
-  ros::Subscriber sub_rocking_cmd = nh.subscribe<rnw_ros::RockingCmd>(
+  ros::Subscriber sub_rocking_cmd = nh.subscribe<rnw_msgs::RockingCmd>(
           "/rnw/rocking_cmd",
           100,
           &cone_visualizer_t::on_rocking_cmd,

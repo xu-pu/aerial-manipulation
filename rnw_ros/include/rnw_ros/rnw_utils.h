@@ -9,8 +9,8 @@
 
 #include "rnw_ros/ros_utils.h"
 #include "rnw_ros/pose_utils.h"
-#include <rnw_ros/ConeState.h>
-#include <rnw_ros/RockingCmd.h>
+#include <rnw_msgs/ConeState.h>
+#include <rnw_msgs/RockingCmd.h>
 #include <quadrotor_msgs/Float64Stamped.h>
 #include <uav_utils/utils.h>
 #include <rnw_ros/RNWConfig.h>
@@ -366,7 +366,7 @@ struct cone_state_estimator_t {
 
     inline explicit cone_state_estimator_t( ros::NodeHandle & nh ) {
       rnw_config.load_from_ros(nh);
-      pub_cone_state = nh.advertise<rnw_ros::ConeState>("/rnw/cone_state",10);
+      pub_cone_state = nh.advertise<rnw_msgs::ConeState>("/rnw/cone_state",10);
       pub_odom_dt = nh.advertise<quadrotor_msgs::Float64Stamped>("dt",10);
       cut_euler_velocity = get_param_default(nh,"cut_euler_velocity",false);
       max_euler_velocity = get_param_default(nh,"max_euler_velocity",numeric_limits<double>::max());
@@ -407,7 +407,7 @@ struct cone_state_estimator_t {
     }
 
     inline void publish_cone_state( nav_msgs::OdometryConstPtr const & msg ) const {
-      rnw_ros::ConeState msg_cone;
+      rnw_msgs::ConeState msg_cone;
       msg_cone.header.stamp = msg->header.stamp;
       msg_cone.odom = *msg;
       msg_cone.euler_angles = uav_utils::to_vector3_msg(latest_euler_angles);
@@ -576,7 +576,7 @@ struct rnw_planner_t {
      * Call on every new ConeState message
      * @param msg
      */
-    void on_cone_state( rnw_ros::ConeStateConstPtr const & msg ){
+    void on_cone_state( rnw_msgs::ConeStateConstPtr const & msg ){
 
       latest_cone_state = *msg;
 
@@ -613,7 +613,7 @@ struct rnw_planner_t {
 
     cone_fsm_e fsm;
 
-    rnw_ros::ConeState latest_cone_state;
+    rnw_msgs::ConeState latest_cone_state;
 
     // planning
 
@@ -627,14 +627,14 @@ struct rnw_planner_t {
 
     bool plan_cmd = false;
 
-    rnw_ros::RockingCmd latest_cmd;
+    rnw_msgs::RockingCmd latest_cmd;
 
     bool cmd_pending = false;
 
     size_t cmd_idx = 0;
 
     explicit rnw_planner_t( ros::NodeHandle & nh ){
-      pub_rocking_cmd = nh.advertise<rnw_ros::RockingCmd>("/rnw/rocking_cmd",10);
+      pub_rocking_cmd = nh.advertise<rnw_msgs::RockingCmd>("/rnw/rocking_cmd",10);
     }
 
     void plan_next_position(){
@@ -646,6 +646,11 @@ struct rnw_planner_t {
       if ( cmd_pending ) {
         latest_cmd.header.stamp = ros::Time::now();
         pub_rocking_cmd.publish(latest_cmd);
+        return;
+      }
+
+      if ( !latest_cone_state.is_point_contact ) {
+        ROS_ERROR_STREAM("[rnw] trying to plan but contact point is invalid!");
         return;
       }
 
@@ -662,13 +667,14 @@ struct rnw_planner_t {
       latest_cmd.step_count = step_count;
       latest_cmd.tip_setpoint = uav_utils::to_point_msg(next_tip);
       latest_cmd.cmd_idx = cmd_idx++;
+
       pub_rocking_cmd.publish(latest_cmd);
 
       cmd_pending = true;
 
     }
 
-    void update_state( rnw_ros::ConeState const & msg ){
+    void update_state( rnw_msgs::ConeState const & msg ){
 
       if ( msg.euler_angles.y < min_tilt ) {
         state_transition(fsm,cone_fsm_e::idle);

@@ -9,7 +9,7 @@ int main( int argc, char** argv ) {
 
   rnw_planner_t rnw_planner(nh);
 
-  ros::Subscriber sub_traj = nh.subscribe<rnw_ros::ConeState>(
+  ros::Subscriber sub_traj = nh.subscribe<rnw_msgs::ConeState>(
           "cone_state",
           100,
           &rnw_planner_t::on_cone_state,

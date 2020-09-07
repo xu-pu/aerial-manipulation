@@ -18,7 +18,7 @@ struct rnw_controller_t {
 
     nav_msgs::Odometry latest_uav_odom;
 
-    rnw_ros::ConeState latest_cone_state;
+    rnw_msgs::ConeState latest_cone_state;
 
     rnw_config_t rnw_config;
 
@@ -47,7 +47,7 @@ struct rnw_controller_t {
       latest_uav_odom = *msg;
     }
 
-    void on_cone_state( rnw_ros::ConeStateConstPtr const & msg ){
+    void on_cone_state( rnw_msgs::ConeStateConstPtr const & msg ){
       latest_cone_state = *msg;
       rnw_planner.on_cone_state(msg);
     }
@@ -192,7 +192,7 @@ int main( int argc, char** argv ) {
           ros::TransportHints().tcpNoDelay()
   );
 
-  ros::Subscriber sub_cone_state = nh.subscribe<rnw_ros::ConeState>(
+  ros::Subscriber sub_cone_state = nh.subscribe<rnw_msgs::ConeState>(
           "/rnw/cone_state",
           10,
           &rnw_controller_t::on_cone_state,

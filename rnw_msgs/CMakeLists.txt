@@ -1,30 +1,18 @@
-cmake_minimum_required(VERSION 2.8.3)
-project(rnw_ros)
+cmake_minimum_required(VERSION 3.0.2)
+project(rnw_msgs)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
-add_compile_options(-std=c++11)
+# add_compile_options(-std=c++11)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-        message_filters
-        tf
         roscpp
-        sensor_msgs
         nav_msgs
-        std_msgs
-        quadrotor_msgs
-        poly_traj
-        am_traj
-        n3ctrl
+        geometry_msgs
         message_generation
-        uav_utils
-        rnw_msgs
-        dynamic_reconfigure
 )
-
-find_package(Ceres REQUIRED)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -56,9 +44,8 @@ find_package(Ceres REQUIRED)
 ##     catkin_package(CATKIN_DEPENDS ...)
 ##   * uncomment the add_*_files sections below as needed
 ##     and list every .msg/.srv/.action file to be processed
-##   * uncomment the generate_messages entrybelow
+##   * uncomment the generate_messages entry below
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
-
 
 ## Generate messages in the 'msg' folder
 # add_message_files(
@@ -66,6 +53,13 @@ find_package(Ceres REQUIRED)
 #   Message1.msg
 #   Message2.msg
 # )
+
+add_message_files(
+        FILES
+        ConeState.msg
+        RockingCmd.msg
+)
+
 
 ## Generate services in the 'srv' folder
 # add_service_files(
@@ -87,6 +81,12 @@ find_package(Ceres REQUIRED)
 #   std_msgs  # Or other packages containing msgs
 # )
 
+generate_messages(
+        DEPENDENCIES
+        geometry_msgs
+        nav_msgs
+)
+
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
 ################################################
@@ -106,10 +106,7 @@ find_package(Ceres REQUIRED)
 #   cfg/DynReconf1.cfg
 #   cfg/DynReconf2.cfg
 # )
-generate_dynamic_reconfigure_options(
-        cfg/MocapCalib.cfg
-        cfg/RNW.cfg
-)
+
 ###################################
 ## catkin specific configuration ##
 ###################################
@@ -121,7 +118,7 @@ generate_dynamic_reconfigure_options(
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 #  INCLUDE_DIRS include
-#  LIBRARIES rnw_ros
+#  LIBRARIES rnw_msgs
 #  CATKIN_DEPENDS other_catkin_pkg
 #  DEPENDS system_lib
 )
@@ -133,15 +130,13 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-  ${PROJECT_SOURCE_DIR}/include
-  ${catkin_INCLUDE_DIRS}
-  /usr/include/eigen3
-  /home/sheep/am_ws/devel/include # for clion only
+# include
+# ${catkin_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/rnw_ros.cpp
+#   src/${PROJECT_NAME}/rnw_msgs.cpp
 # )
 
 ## Add cmake target dependencies of the library
@@ -152,40 +147,7 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-# add_executable(${PROJECT_NAME}_node src/rnw_ros_node.cpp)
-add_executable(pub_frames_node src/pub_frames_node.cpp)
-add_executable(pub_euler_angles_node src/pub_euler_angles_node.cpp)
-add_executable(test_traj_node src/test_traj_node.cpp)
-add_executable(vicon_imu_cali_node src/vicon_imu_cali_node.cpp)
-add_executable(rnw_traj_server_node src/rnw_traj_server_node.cpp)
-add_executable(gamepad_trigger_node src/gamepad_trigger_node.cpp)
-add_executable(dbg_atti_loop_node src/dbg_atti_loop_node.cpp)
-add_executable(visualize_traj_node src/visualize_traj_node.cpp)
-add_executable(rnw_controller_node src/rnw_controller_node.cpp)
-add_executable(pub_cone_state_node src/pub_cone_state_node.cpp)
-add_executable(visualize_cone_node src/visualize_cone_node.cpp)
-add_executable(rnw_planning_node src/rnw_planning_node.cpp)
-add_executable(pub_mock_cone_node src/pub_mock_cone_node.cpp)
-add_executable(pub_mock_uav_node src/pub_mock_uav_node.cpp)
-add_executable(mocap_calib_node src/mocap_calib_node.cpp)
-add_executable(pub_contact_radius_node src/pub_contact_radius_node.cpp)
-
-target_link_libraries(pub_frames_node ${catkin_LIBRARIES})
-target_link_libraries(test_traj_node ${catkin_LIBRARIES})
-target_link_libraries(vicon_imu_cali_node ${catkin_LIBRARIES} ${CERES_LIBRARIES})
-target_link_libraries(rnw_traj_server_node ${catkin_LIBRARIES})
-target_link_libraries(gamepad_trigger_node ${catkin_LIBRARIES})
-target_link_libraries(pub_euler_angles_node ${catkin_LIBRARIES})
-target_link_libraries(dbg_atti_loop_node ${catkin_LIBRARIES})
-target_link_libraries(visualize_traj_node ${catkin_LIBRARIES})
-target_link_libraries(rnw_controller_node ${catkin_LIBRARIES})
-target_link_libraries(pub_cone_state_node ${catkin_LIBRARIES})
-target_link_libraries(visualize_cone_node ${catkin_LIBRARIES})
-target_link_libraries(rnw_planning_node ${catkin_LIBRARIES})
-target_link_libraries(pub_mock_cone_node ${catkin_LIBRARIES})
-target_link_libraries(pub_mock_uav_node ${catkin_LIBRARIES})
-target_link_libraries(mocap_calib_node ${catkin_LIBRARIES})
-target_link_libraries(pub_contact_radius_node ${catkin_LIBRARIES})
+# add_executable(${PROJECT_NAME}_node src/rnw_msgs_node.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -196,8 +158,6 @@ target_link_libraries(pub_contact_radius_node ${catkin_LIBRARIES})
 ## Add cmake target dependencies of the executable
 ## same as for the library above
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-add_dependencies(mocap_calib_node ${PROJECT_NAME}_gencfg)
-add_dependencies(rnw_controller_node ${PROJECT_NAME}_gencfg)
 
 ## Specify libraries to link a library or executable target against
 # target_link_libraries(${PROJECT_NAME}_node
@@ -213,7 +173,7 @@ add_dependencies(rnw_controller_node ${PROJECT_NAME}_gencfg)
 
 ## Mark executable scripts (Python etc.) for installation
 ## in contrast to setup.py, you can choose the destination
-# install(PROGRAMS
+# catkin_install_python(PROGRAMS
 #   scripts/my_python_script
 #   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 # )
@@ -251,7 +211,7 @@ add_dependencies(rnw_controller_node ${PROJECT_NAME}_gencfg)
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_rnw_ros.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_rnw_msgs.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()

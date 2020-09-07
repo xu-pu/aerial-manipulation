@@ -7,7 +7,7 @@ ros::Publisher pub_true_radius;
 
 rnw_config_t rnw_config;
 
-void on_cone_state( rnw_ros::ConeStateConstPtr const & msg ){
+void on_cone_state( rnw_msgs::ConeStateConstPtr const & msg ){
 
   Vector3d D = uav_utils::from_point_msg(msg->disc_center);
   Vector3d G = uav_utils::from_point_msg(msg->contact_point);
@@ -31,7 +31,7 @@ int main( int argc, char** argv ) {
 
   rnw_config.load_from_ros(nh);
 
-  ros::Subscriber sub_odom = nh.subscribe<rnw_ros::ConeState>(
+  ros::Subscriber sub_odom = nh.subscribe<rnw_msgs::ConeState>(
           "/rnw/cone_state",
           10,
           on_cone_state,
