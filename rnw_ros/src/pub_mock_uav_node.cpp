@@ -29,10 +29,10 @@ int main( int argc, char** argv ) {
 
   rnw_config.load_from_ros(nh);
 
-  pub_uav_odom = nh.advertise<nav_msgs::Odometry>("odom",100);
+  pub_uav_odom = nh.advertise<nav_msgs::Odometry>("/odom/uav",100);
 
   ros::Subscriber sub_odom = nh.subscribe<rnw_ros::ConeState>(
-          "cone_state",
+          "/rnw/cone_state",
           10,
           on_cone_state,
           nullptr,

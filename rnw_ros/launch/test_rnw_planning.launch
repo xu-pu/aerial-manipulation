@@ -1,22 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <launch>
 
-    <arg name="topic_odom_cone" value="/pos_vel_mocap/odom_cone"/>
-    <arg name="topic_cone_state" value="/rnw/cone_state"/>
-    <arg name="topic_rocking_cmd" value="/rnw/rocking_cmd"/>
-    <arg name="odom_topic" value="/uwb_vicon_odom" />
-
     <arg name="topic_trigger_insert" value="/rnw/trigger/insert" />
     <arg name="topic_trigger_zigzag" value="/rnw/trigger/zigzag" />
     <arg name="topic_trigger_topple" value="/rnw/trigger/topple" />
     <arg name="topic_trigger_rnw" value="/rnw/trigger/rnw" />
-    <arg name="topic_poly_traj" value="/rnw/poly_traj" />
 
-    <node pkg="rnw_ros" type="pub_mock_uav_node" name="pub_mock_uav_node" output="screen" required="true">
-        <remap from="~cone_state" to="$(arg topic_cone_state)"/>
-        <remap from="~odom" to="$(arg odom_topic)"/>
-        <rosparam command="load" file="$(find rnw_ros)/config/rnw_config.yaml"/>
-    </node>
+    <rosparam command="load" file="$(find rnw_ros)/config/rnw_config.yaml"/>
+
+    <node pkg="rnw_ros" type="pub_mock_uav_node" name="pub_mock_uav_node" output="screen" required="true"/>
 
     <node pkg="mocap_optitrack" type="mocap_node" name="mocap_node" respawn="false" launch-prefix="" required="true" output="log">
         <rosparam file="$(find mocap_optitrack)/config/mocap.yaml" command="load" />
@@ -29,11 +21,8 @@
     <node name="rviz" pkg="rviz" type="rviz" output="log" args="-d $(find am_traj)/config/traj.rviz"/>
 
     <node pkg="rnw_ros" type="pub_cone_state_node" name="pub_cone_state_node" required="true" output="log">
-        <remap from="~odom" to="$(arg topic_odom_cone)"/>
-        <remap from="~cone_state" to="$(arg topic_cone_state)"/>
         <param name="cut_euler_velocity" type="bool" value="true"/>
         <param name="max_euler_velocity" value="10"/>
-        <rosparam command="load" file="$(find rnw_ros)/config/rnw_config.yaml"/>
     </node>
 
     <node pkg="joy" type="joy_node" name="joy_node" output="screen">
@@ -50,27 +39,14 @@
     </node>
 
     <node pkg="rnw_ros" type="visualize_cone_node" name="visualize_cone_node" output="screen" required="true">
-        <remap from="~cone_state" to="$(arg topic_cone_state)"/>
-        <remap from="~rocking_cmd" to="$(arg topic_rocking_cmd)"/>
         <param name="cone_color_r" type="double" value="0"/>
         <param name="cone_color_g" type="double" value="1"/>
         <param name="cone_color_b" type="double" value="0"/>
-        <rosparam command="load" file="$(find rnw_ros)/config/rnw_config.yaml"/>
     </node>
 
-    <node pkg="rnw_ros" type="rnw_controller_node" name="rnw_controller_node" output="screen">
-        <remap from="~uav_odom" to="$(arg odom_topic)"/>
-        <remap from="~cone_state" to="$(arg topic_cone_state)"/>
-        <remap from="~poly_traj" to="$(arg topic_poly_traj)"/>
-        <remap from="~rocking_cmd" to="$(arg topic_rocking_cmd)"/>
-        <remap from="~trigger_zigzag" to="$(arg topic_trigger_zigzag)"/>
-        <remap from="~trigger_topple" to="$(arg topic_trigger_topple)"/>
-        <remap from="~trigger_rnw" to="$(arg topic_trigger_rnw)"/>
-        <rosparam command="load" file="$(find rnw_ros)/config/rnw_config.yaml"/>
-    </node>
+    <node pkg="rnw_ros" type="rnw_controller_node" name="rnw_controller_node" output="screen"/>
 
     <node pkg="rnw_ros" type="visualize_traj_node" name="traj_visualization" output="screen" required="true">
-        <remap from="~poly_traj" to="$(arg topic_poly_traj)"/>
         <param name="lift_dt" type="double" value="0.05"/>
         <param name="length_g" type="double" value="0.5"/>
         <param name="clear_after_n_sec" type="double" value="0"/>
