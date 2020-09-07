@@ -17,8 +17,8 @@ rnw:
   tau: 40
   max_vel: 0.5
   max_acc: 0.3
-  rocking_max_vel: 0.5
-  rocking_max_acc: 0.3
+  rocking_max_vel: 1
+  rocking_max_acc: 1
 topple:
   forward: 0.4
   downward: 0.05
