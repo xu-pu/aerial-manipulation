@@ -53,6 +53,8 @@
         <param name="clear_after_n_sec" type="double" value="0"/>
     </node>
 
+    <node pkg="rqt_reconfigure" type="rqt_reconfigure" name="rqt_reconfigure"/>
+
     <!--    <node pkg="rqt_multiplot" type="rqt_multiplot" name="rqt_multiplot" output="log"-->
 <!--          args="&#45;&#45;multiplot-config $(find rnw_ros)/config/rqt_multiplot_cone_state.xml &#45;&#45;multiplot-run-all"/>-->
 
