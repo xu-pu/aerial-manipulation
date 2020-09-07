@@ -10,8 +10,6 @@ using namespace std;
 
 struct cone_visualizer_t {
 
-    rnw_config_t rnw_config;
-
     double clear_after_n_sec = numeric_limits<double>::max();
 
     ros::Time latest_time;
@@ -43,7 +41,6 @@ struct cone_visualizer_t {
     visualization_msgs::Marker marker_contact_path;
 
     explicit cone_visualizer_t( ros::NodeHandle & nh ) {
-      rnw_config.load_from_ros(nh);
       pub_marker_cone = nh.advertise<visualization_msgs::MarkerArray>("markers/cone", 1);
       clear_after_n_sec = get_param_default(nh,"clear_after_n_sec",numeric_limits<double>::max());
       cone_color_r = get_param_default(nh,"cone_color_r",0);
@@ -188,8 +185,8 @@ struct cone_visualizer_t {
 
       marker.pose.orientation = latest_cone_state.odom.pose.pose.orientation;
       marker.pose.position = latest_cone_state.disc_center;
-      marker.scale.x = rnw_config.cone.radius * 2;
-      marker.scale.y = rnw_config.cone.radius * 2;
+      marker.scale.x = latest_cone_state.radius * 2;
+      marker.scale.y = latest_cone_state.radius * 2;
       marker.scale.z = 0.01;
 
       return marker;

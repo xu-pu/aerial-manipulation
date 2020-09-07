@@ -407,6 +407,9 @@ struct cone_state_estimator_t {
       msg_cone.base = uav_utils::to_point_msg(T_base);
       msg_cone.tip = uav_utils::to_point_msg(T_tip);
       msg_cone.disc_center = uav_utils::to_point_msg(T_center);
+      msg_cone.radius = rnw_config.cone.radius;
+      msg_cone.height = rnw_config.cone.height;
+
       pub_cone_state.publish(msg_cone);
     }
 

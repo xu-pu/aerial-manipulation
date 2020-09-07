@@ -7,3 +7,5 @@ geometry_msgs/Point contact_point
 geometry_msgs/Point disc_center
 geometry_msgs/Point tip
 geometry_msgs/Point base
+float64 height
+float64 radius
