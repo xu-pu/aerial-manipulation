@@ -226,9 +226,11 @@ int main( int argc, char **argv ){
 
   bool publish_uav_odom = get_param_default<bool>(n, "publish_uav_odom", true);
 
+  ros::Subscriber sub_uav;
+
   if(publish_uav_odom){
 
-    ros::Subscriber sub_uav = n.subscribe<geometry_msgs::PoseStamped>(
+    sub_uav = n.subscribe<geometry_msgs::PoseStamped>(
             "/mocap/uav",
             100,
             pose_callback,

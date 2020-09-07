@@ -26,8 +26,6 @@
     </node>
 
     <node pkg="uart_odom" type="uart_odom" name="uart_odom" output="screen">
-        <remap from="~odom" to="$(arg topic_odom_uav)" />
-        <remap from="~odom_cone" to="$(arg topic_odom_cone)" />
         <rosparam command="load" file="$(find uart_odom)/config/uart_odom_config.yaml" />
         <param name="work_mode" value="real-time" />
         <param name="js_ctrl_mode" value="feedback" />
