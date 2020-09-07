@@ -77,6 +77,10 @@ struct rnw_config_t {
 
         double max_acc;
 
+        double rocking_max_vel;
+
+        double rocking_max_acc;
+
         inline std::string to_string() const {
           std::stringstream ss;
           ss << "RnW Parameters:\n"
@@ -84,7 +88,9 @@ struct rnw_config_t {
              << "topple_init: " << topple_init << "\n"
              << "desired_nutation: " << desired_nutation << "\n"
              << "max_vel: " << max_vel << "\n"
-             << "max_acc: " << max_acc << "\n";
+             << "max_acc: " << max_acc << "\n"
+             << "rocking_max_vel: " << rocking_max_vel << "\n"
+             << "rocking_max_acc: " << rocking_max_acc << "\n";
           return ss.str();
         }
 
@@ -96,6 +102,8 @@ struct rnw_config_t {
           config.desired_nutation = desired_nutation;
           config.max_vel = max_vel;
           config.max_acc = max_acc;
+          config.rocking_max_vel = rocking_max_vel;
+          config.rocking_max_acc = rocking_max_acc;
           return config;
         }
 

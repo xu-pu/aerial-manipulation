@@ -24,6 +24,8 @@ struct rnw_controller_t {
 
     AmTraj traj_generator;
 
+    AmTraj rocking_generator;
+
     AmTraj zigzag_generator;
 
     rnw_planner_t rnw_planner;
@@ -31,12 +33,14 @@ struct rnw_controller_t {
     explicit rnw_controller_t(ros::NodeHandle & nh)
             : rnw_planner(nh),
               traj_generator(1024, 16, 0.4, 0.5, 0.5, 23, 0.02),
-              zigzag_generator(1024, 16, 0.4, 1, 0.5, 23, 0.02)
+              zigzag_generator(1024, 16, 0.4, 1, 0.5, 23, 0.02),
+              rocking_generator(1024, 16, 0.4, 0.5, 0.5, 23, 0.02)
     {
       rnw_config.load_from_ros(nh);
       pub_poly_traj = nh.advertise<quadrotor_msgs::PolynomialTrajectory>("/rnw/poly_traj",10,false);
       zigzag_generator = AmTraj(1024, 16, 0.4, rnw_config.zigzag.max_vel, rnw_config.zigzag.max_acc, 23, 0.02);
       traj_generator = AmTraj(1024, 16, 0.4, rnw_config.rnw.max_vel, rnw_config.rnw.max_acc, 23, 0.02);
+      rocking_generator = AmTraj(1024, 16, 0.4, rnw_config.rnw.rocking_max_vel, rnw_config.rnw.rocking_max_acc, 23, 0.02);
     }
 
     void on_uav_odom( nav_msgs::OdometryConstPtr const & msg ){
@@ -94,24 +98,20 @@ struct rnw_controller_t {
 
     }
 
-    void on_trigger_go_to_tip( std_msgs::HeaderConstPtr const & msg ){
-
+    void on_rocking(){
+      Vector3d tgt_pt = tip_position_to_uav_position(rnw_planner.next_position(),rnw_config);
       Vector3d pt_uav = pose2T(latest_uav_odom.pose.pose);
-      Vector3d pt_tip = uav_utils::from_point_msg(latest_cone_state.tip);
-
-      double z_planned_tcp = pt_tip.z() + rnw_config.hover_above_tip;
-      double z_planned_uav = z_planned_tcp - rnw_config.X_tcp_cage.z(); // offset between imu and tcp
-
-      Vector3d pt_tgt = pt_tip;
-      pt_tgt.z() = z_planned_uav;
-
       Vector3d v0 = Vector3d::Zero();
-      Trajectory traj = traj_generator.genOptimalTrajDTC({pt_uav, pt_tgt}, v0, v0, v0, v0);
+      // there is a wierd bug, use 3 points will solve it.
+      //ROS_INFO_STREAM("[rnw] from " << pt_uav.transpose() << ", to " << tgt_pt.transpose());
+      //ROS_INFO_STREAM("[rnw] offset " << (tgt_pt-pt_uav).transpose());
+      Vector3d mid_point = (pt_uav+tgt_pt)/2;
+      Trajectory traj = rocking_generator.genOptimalTrajDTC({pt_uav, mid_point, tgt_pt}, v0, v0, v0, v0);
       pub_poly_traj.publish(to_ros_msg(traj,ros::Time::now()));
-
+      rocking_start_stamp = ros::Time::now();
+      rocking_duration = ros::Duration(traj.getTotalDuration());
+      is_rocking = true;
     }
-
-    void on_trigger_rock( std_msgs::HeaderConstPtr const & msg ){}
 
     void on_trigger_rnw( std_msgs::HeaderConstPtr const & msg ){
       ROS_WARN_STREAM("[rnw] rnw triggered!");
@@ -147,7 +147,10 @@ struct rnw_controller_t {
       rnw_config.rnw.tau = config.tau;
       rnw_config.rnw.max_vel = config.max_vel;
       rnw_config.rnw.max_acc = config.max_acc;
+      rnw_config.rnw.rocking_max_vel = config.rocking_max_vel;
+      rnw_config.rnw.rocking_max_acc = config.rocking_max_acc;
       traj_generator = AmTraj(1024, 16, 0.4, rnw_config.rnw.max_vel, rnw_config.rnw.max_acc, 23, 0.02);
+      rocking_generator = AmTraj(1024, 16, 0.4, rnw_config.rnw.rocking_max_vel, rnw_config.rnw.rocking_max_acc, 23, 0.02);
       ROS_INFO_STREAM(rnw_config.rnw.to_string());
     }
 
@@ -157,6 +160,7 @@ struct rnw_controller_t {
     ros::Duration rocking_duration;
 
     void on_spin( const ros::TimerEvent &event ){
+
       if ( is_rocking ) {
         if ( ros::Time::now() > rocking_start_stamp + rocking_duration ) {
           rnw_planner.cmd_ack();
@@ -164,18 +168,7 @@ struct rnw_controller_t {
         }
       }
       else if ( rnw_planner.has_pending_cmd() ) {
-        Vector3d tgt_pt = tip_position_to_uav_position(rnw_planner.next_position(),rnw_config);
-        Vector3d pt_uav = pose2T(latest_uav_odom.pose.pose);
-        Vector3d v0 = Vector3d::Zero();
-        // there is a wierd bug, use 3 points will solve it.
-        //ROS_INFO_STREAM("[rnw] from " << pt_uav.transpose() << ", to " << tgt_pt.transpose());
-        //ROS_INFO_STREAM("[rnw] offset " << (tgt_pt-pt_uav).transpose());
-        Vector3d mid_point = (pt_uav+tgt_pt)/2;
-        Trajectory traj = traj_generator.genOptimalTrajDTC({pt_uav, mid_point, tgt_pt}, v0, v0, v0, v0);
-        pub_poly_traj.publish(to_ros_msg(traj,ros::Time::now()));
-        rocking_start_stamp = ros::Time::now();
-        rocking_duration = ros::Duration(traj.getTotalDuration());
-        is_rocking = true;
+        on_rocking();
       }
     }
 
