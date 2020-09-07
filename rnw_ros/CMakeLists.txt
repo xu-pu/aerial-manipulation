@@ -59,17 +59,6 @@ find_package(Ceres REQUIRED)
 ##   * uncomment the generate_messages entrybelow
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
-add_message_files(
-        FILES
-        RockingCmd.msg
-)
-
-generate_messages(
-        DEPENDENCIES
-        geometry_msgs
-        nav_msgs
-)
-
 ## Generate messages in the 'msg' folder
 # add_message_files(
 #   FILES
@@ -186,7 +175,7 @@ set(RNW_NODES
 FOREACH(NODE ${RNW_NODES})
     add_executable(${NODE} src/${NODE}.cpp)
     target_link_libraries(${NODE} ${catkin_LIBRARIES} ${CERES_LIBRARIES})
-    add_dependencies(${NODE} ${PROJECT_NAME}_generate_messages_cpp)
+    #add_dependencies(${NODE} ${PROJECT_NAME}_generate_messages_cpp)
     add_dependencies(${NODE} ${PROJECT_NAME}_gencfg)
 ENDFOREACH()
 
