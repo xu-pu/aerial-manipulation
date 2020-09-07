@@ -46,7 +46,7 @@ struct traj_visualizer_t {
       clear_after_n_sec = get_param_default(nh,"clear_after_n_sec",numeric_limits<double>::max());
       lift_dt = get_param_default(nh,"lift_dt",0.15);
       acc_dt = get_param_default(nh,"acc_dt",0.15);
-      length_g = get_param_default(nh,"length_g",1);
+      length_g = get_param_default<double>(nh,"length_g",1.);
 
     }
 
