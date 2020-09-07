@@ -8,13 +8,13 @@ X_tcp_cage:
   x: 0.000548455
   y: 0.00354947
   z: -0.194698
-hover_above_tip: 0.05
+hover_above_tip: 0.03
 insert_below_tip: 0.1
 rnw:
-  insertion_depth: 0.1
+  insertion_depth: 0.12
   topple_init: 0.05
   desired_nutation: 30
-  tau: 30
+  tau: 40
   max_vel: 0.5
   max_acc: 0.3
 topple:
