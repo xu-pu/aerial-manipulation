@@ -224,13 +224,21 @@ int main( int argc, char **argv ){
   dynamic_reconfigure::Server<pos_vel_mocap::ViconCalibConfig>::CallbackType f;
   server.setCallback(calib_cfg_callback);
 
-  ros::Subscriber sub_uav = n.subscribe<geometry_msgs::PoseStamped>(
-          "/mocap/uav",
-          100,
-          pose_callback,
-          nullptr,
-          ros::TransportHints().tcpNoDelay()
-  );
+  bool publish_uav_odom = get_param_default<bool>(n, "publish_uav_odom", true);
+
+  if(publish_uav_odom){
+
+    ros::Subscriber sub_uav = n.subscribe<geometry_msgs::PoseStamped>(
+            "/mocap/uav",
+            100,
+            pose_callback,
+            nullptr,
+            ros::TransportHints().tcpNoDelay()
+    );
+
+    pub_odom_uav = n.advertise<nav_msgs::Odometry>("/odom/uav", 100);
+
+  }
 
   ros::Subscriber sub_cone = n.subscribe<geometry_msgs::PoseStamped>(
           "/mocap/cone",
@@ -240,7 +248,6 @@ int main( int argc, char **argv ){
           ros::TransportHints().tcpNoDelay()
   );
 
-  pub_odom_uav = n.advertise<nav_msgs::Odometry>("/odom/uav", 100);
   pub_odom_cone = n.advertise<nav_msgs::Odometry>("/odom/cone", 100);
 
   ros::spin();
