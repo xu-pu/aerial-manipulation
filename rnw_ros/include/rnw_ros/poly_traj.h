@@ -110,7 +110,7 @@ struct poly_traj_t {
      * @param dt - normalized time inside the segment, [0,1]
      */
     void calc_segment_t(double t, int & idx, double & dt){
-      dt = min(t, poly_duration());
+      dt = max(min(t, poly_duration()),0.);
       for ( idx = 0; idx < n_segment; ++idx) {
         // find the segment idx
         if (dt > times[idx] && idx + 1 < n_segment) {
@@ -179,6 +179,10 @@ struct poly_traj_t {
 
     }
 
+    /**
+     * @param T - safe for any value
+     * @return
+     */
     Vector3d eval_pos( double T ){
 
       int idx;
@@ -231,6 +235,13 @@ struct poly_traj_t {
 
     }
 
+    Vector3d eval_pos( ros::Time const & t ){
+      return eval_pos((t-start_time).toSec());
+    }
+
+    Vector3d eval_acc( ros::Time const & t ){
+      return eval_acc((t-start_time).toSec());
+    }
 
     void gen_pos_cmd( quadrotor_msgs::PositionCommand & _cmd, const nav_msgs::Odometry & _odom, ros::Time const & _cur_t ){
 
