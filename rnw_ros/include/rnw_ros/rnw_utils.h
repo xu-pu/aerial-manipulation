@@ -112,6 +112,12 @@ struct rnw_config_t {
 
 };
 
+/**
+ * For downward moundted caging end-effector
+ * Waypoints for initialization, insert -> topple
+ * @param rnw_config
+ * @return
+ */
 vector<Vector3d> gen_topple_waypoints_local( rnw_config_t const & rnw_config );
 
 /**
@@ -123,6 +129,13 @@ vector<Vector3d> gen_topple_waypoints_local( rnw_config_t const & rnw_config );
  */
 Vector3d cone_rot2euler( Matrix3d const & R );
 
+/**
+ * Transform tip position to UAV position,
+ * using downward mounted caging end-effector
+ * @param tip
+ * @param config
+ * @return
+ */
 Vector3d tip_position_to_uav_position( Vector3d const & tip, rnw_config_t const & config );
 
 template<typename T, size_t window_size>
