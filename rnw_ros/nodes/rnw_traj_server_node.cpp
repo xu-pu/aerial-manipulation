@@ -35,7 +35,7 @@ PoseStamped eigen2pathpoint( Vector3d const & T ){
 }
 
 double odom2yaw( nav_msgs::Odometry const & odom ){
-  Matrix3d R = ros2eigen(odom.pose.pose.orientation).toRotationMatrix();
+  Matrix3d R = uav_utils::from_quaternion_msg(odom.pose.pose.orientation).toRotationMatrix();
   return quat2eulers(Quaterniond(R)).z();
 }
 

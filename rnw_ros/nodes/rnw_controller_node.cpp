@@ -80,7 +80,7 @@ struct rnw_controller_t {
       ROS_WARN_STREAM("[rnw] topple triggered!");
 
       Matrix3d R_tip = odom2R(latest_cone_state.odom);
-      Vector3d T_tip = ros2eigen(latest_cone_state.tip);
+      Vector3d T_tip = uav_utils::from_point_msg(latest_cone_state.tip);
       Vector3d cur_pos = odom2T(latest_uav_odom);
 
       auto wpts_local = gen_topple_waypoints_local(rnw_config);
@@ -121,8 +121,8 @@ struct rnw_controller_t {
 
       ROS_WARN_STREAM("[rnw] zig-zag triggered!");
 
-      Matrix3d R = ros2eigen(latest_uav_odom.pose.pose.orientation).toRotationMatrix();
-      Vector3d T = ros2eigen(latest_uav_odom.pose.pose.position);
+      Matrix3d R = uav_utils::from_quaternion_msg(latest_uav_odom.pose.pose.orientation).toRotationMatrix();
+      Vector3d T = uav_utils::from_point_msg(latest_uav_odom.pose.pose.position);
 
       vector<Vector3d> waypoints = gen_waypoint_zigzag(
               rnw_config.zigzag.cycles,

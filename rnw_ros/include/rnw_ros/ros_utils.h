@@ -35,13 +35,4 @@ T get_param_default( ros::NodeHandle & nh, string const & key, T const & default
   return val;
 }
 
-inline Quaterniond ros2eigen( geometry_msgs::Quaternion const & quat ){
-  return { quat.w, quat.x, quat.y, quat.z };
-}
-
-inline Vector3d ros2eigen( geometry_msgs::Point const & pos ){
-  return { pos.x, pos.y, pos.z };
-
-}
-
 #endif //SRC_ROS_UTILS_H
