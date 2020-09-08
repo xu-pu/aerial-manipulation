@@ -1,6 +1,7 @@
 #include <ros/ros.h>
 
 #include "rnw_ros/rnw_utils.h"
+#include "rnw_ros/cone_state_estimator.h"
 
 int main( int argc, char** argv ) {
 

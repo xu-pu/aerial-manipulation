@@ -145,6 +145,8 @@ include_directories(
 
 add_library(${PROJECT_NAME}
         src/rnw_utils.cpp
+        src/cone_state_estimator.cpp
+        src/rnw_planner.cpp
 )
 
 ## Add cmake target dependencies of the library

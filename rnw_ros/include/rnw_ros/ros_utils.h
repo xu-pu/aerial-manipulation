@@ -11,6 +11,8 @@
 #include <ros/ros.h>
 #include <nav_msgs/Odometry.h>
 #include <tf/transform_broadcaster.h>
+#include <uav_utils/geometry_utils.h>
+#include <uav_utils/converters.h>
 
 using Eigen::Matrix3d;
 using Eigen::Vector3d;

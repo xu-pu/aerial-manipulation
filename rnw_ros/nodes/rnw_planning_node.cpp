@@ -1,5 +1,6 @@
 #include "rnw_ros/pose_utils.h"
 #include "rnw_ros/rnw_utils.h"
+#include "rnw_ros/rnw_planner.h"
 
 int main( int argc, char** argv ) {
 
