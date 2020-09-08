@@ -14,6 +14,7 @@
     <arg name="topic_trigger_zigzag" value="/rnw/trigger/zigzag" />
     <arg name="topic_trigger_topple" value="/rnw/trigger/topple" />
     <arg name="topic_trigger_rnw" value="/rnw/trigger/rnw" />
+    <arg name="topic_trigger_push_init" value="/rnw/trigger/push_init" />
 
     <remap from="/uwb_vicon_odom" to="$(arg topic_odom_uav)"/>
     <remap from="/uwb_vicon_odom_cone" to="$(arg topic_odom_cone)"/>
@@ -74,6 +75,7 @@
         <remap from="~A" to="$(arg topic_trigger_insert)"/>
         <remap from="~X" to="$(arg topic_trigger_zigzag)"/>
         <remap from="~Y" to="$(arg topic_trigger_topple)"/>
+        <remap from="~B" to="$(arg topic_trigger_push_init)"/>
     </node>
 
     <node pkg="rnw_ros" type="rnw_controller_node" name="rnw_controller_node" output="screen"/>

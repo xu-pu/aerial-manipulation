@@ -25,7 +25,7 @@ int main( int argc, char** argv ) {
 
   Vector3d cur_pos = {2,3,1};
 
-  vector<Vector3d> wpts = gen_topple_waypoints_local(rnw_config);
+  vector<Vector3d> wpts = gen_wpts_insert_topple(rnw_config);
 
   vector<Vector3d> waypoints = transform_pts(wpts,R_tip,T_tip);
 

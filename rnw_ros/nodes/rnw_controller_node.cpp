@@ -51,6 +51,21 @@ struct rnw_controller_t {
       rnw_planner.on_cone_state(msg);
     }
 
+    void on_rocking(){
+      Vector3d tgt_pt = tip_position_to_uav_position(rnw_planner.next_position(),rnw_config);
+      Vector3d pt_uav = pose2T(latest_uav_odom.pose.pose);
+      Vector3d v0 = Vector3d::Zero();
+      // there is a wierd bug, use 3 points will solve it.
+      //ROS_INFO_STREAM("[rnw] from " << pt_uav.transpose() << ", to " << tgt_pt.transpose());
+      //ROS_INFO_STREAM("[rnw] offset " << (tgt_pt-pt_uav).transpose());
+      Vector3d mid_point = (pt_uav+tgt_pt)/2;
+      Trajectory traj = rocking_generator.genOptimalTrajDTC({pt_uav, mid_point, tgt_pt}, v0, v0, v0, v0);
+      pub_poly_traj.publish(to_ros_msg(traj,ros::Time::now()));
+      rocking_start_stamp = ros::Time::now();
+      rocking_duration = ros::Duration(traj.getTotalDuration());
+      is_rocking = true;
+    }
+
     void on_trigger_n3ctrl( geometry_msgs::PoseStampedConstPtr const & msg ){}
 
     void on_trigger_insert( std_msgs::HeaderConstPtr const & msg ){
@@ -83,7 +98,7 @@ struct rnw_controller_t {
       Vector3d T_tip = uav_utils::from_point_msg(latest_cone_state.tip);
       Vector3d cur_pos = odom2T(latest_uav_odom);
 
-      auto wpts_local = gen_topple_waypoints_local(rnw_config);
+      auto wpts_local = gen_wpts_insert_topple(rnw_config);
 
       // wpts_local is the desired positions of tcp in the tip frame
       // they need to be transformed to positions of the uav in the world frame
@@ -95,21 +110,6 @@ struct rnw_controller_t {
       Trajectory traj = traj_generator.genOptimalTrajDTC(waypoints, v0, v0, v0, v0);
       pub_poly_traj.publish(to_ros_msg(traj,ros::Time::now()));
 
-    }
-
-    void on_rocking(){
-      Vector3d tgt_pt = tip_position_to_uav_position(rnw_planner.next_position(),rnw_config);
-      Vector3d pt_uav = pose2T(latest_uav_odom.pose.pose);
-      Vector3d v0 = Vector3d::Zero();
-      // there is a wierd bug, use 3 points will solve it.
-      //ROS_INFO_STREAM("[rnw] from " << pt_uav.transpose() << ", to " << tgt_pt.transpose());
-      //ROS_INFO_STREAM("[rnw] offset " << (tgt_pt-pt_uav).transpose());
-      Vector3d mid_point = (pt_uav+tgt_pt)/2;
-      Trajectory traj = rocking_generator.genOptimalTrajDTC({pt_uav, mid_point, tgt_pt}, v0, v0, v0, v0);
-      pub_poly_traj.publish(to_ros_msg(traj,ros::Time::now()));
-      rocking_start_stamp = ros::Time::now();
-      rocking_duration = ros::Duration(traj.getTotalDuration());
-      is_rocking = true;
     }
 
     void on_trigger_rnw( std_msgs::HeaderConstPtr const & msg ){
@@ -134,6 +134,28 @@ struct rnw_controller_t {
 
       Vector3d v0 = Vector3d::Zero();
       Trajectory traj = zigzag_generator.genOptimalTrajDTC(wps,v0,v0,v0,v0);
+      pub_poly_traj.publish(to_ros_msg(traj,ros::Time::now()));
+
+    }
+
+    void on_trigger_push_init( std_msgs::HeaderConstPtr const & msg ) const {
+
+      ROS_WARN_STREAM("[rnw] push_init triggered!");
+
+      Matrix3d R_tip = odom2R(latest_cone_state.odom);
+      Vector3d T_tip = uav_utils::from_point_msg(latest_cone_state.tip);
+      Vector3d cur_pos = odom2T(latest_uav_odom);
+
+      auto wpts_local = gen_wpts_push_topple(rnw_config);
+
+      // wpts_local is the desired positions of tcp in the tip frame
+      // they need to be transformed to positions of the uav in the world frame
+      auto waypoints = transform_pts(transform_pts(wpts_local,R_tip,T_tip),Matrix3d::Identity(),-rnw_config.X_tcp_cage);
+
+      waypoints.insert(waypoints.begin(),cur_pos);
+
+      Vector3d v0 = Vector3d::Zero();
+      Trajectory traj = traj_generator.genOptimalTrajDTC(waypoints, v0, v0, v0, v0);
       pub_poly_traj.publish(to_ros_msg(traj,ros::Time::now()));
 
     }
@@ -206,6 +228,7 @@ int main( int argc, char** argv ) {
   ros::Subscriber sub_trigger_zigzag = nh.subscribe<std_msgs::Header>("/rnw/trigger/zigzag", 10, &rnw_controller_t::on_trigger_zigzag, &rnw_controller);
   ros::Subscriber sub_trigger_topple = nh.subscribe<std_msgs::Header>("/rnw/trigger/topple", 10, &rnw_controller_t::on_trigger_topple, &rnw_controller);
   ros::Subscriber sub_trigger_rnw = nh.subscribe<std_msgs::Header>("/rnw/trigger/rnw", 10, &rnw_controller_t::on_trigger_rnw, &rnw_controller);
+  ros::Subscriber sub_trigger_push_init = nh.subscribe<std_msgs::Header>("/rnw/trigger/push_init", 10, &rnw_controller_t::on_trigger_push_init, &rnw_controller);
 
   dynamic_reconfigure::Server<rnw_ros::RNWConfig> server;
   server.setConfigDefault(rnw_controller.rnw_config.rnw.to_config());

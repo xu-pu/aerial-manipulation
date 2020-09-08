@@ -16,7 +16,9 @@
  * @param rnw_config
  * @return
  */
-vector<Vector3d> gen_topple_waypoints_local( rnw_config_t const & rnw_config );
+vector<Vector3d> gen_wpts_insert_topple(rnw_config_t const & rnw_config );
+
+vector<Vector3d> gen_wpts_push_topple( rnw_config_t const & rnw_config );
 
 /**
  * x-psi-precession

@@ -15,6 +15,7 @@
     <arg name="topic_trigger_zigzag" value="/rnw/trigger/zigzag" />
     <arg name="topic_trigger_topple" value="/rnw/trigger/topple" />
     <arg name="topic_trigger_rnw" value="/rnw/trigger/rnw" />
+    <arg name="topic_trigger_push_init" value="/rnw/trigger/push_init" />
 
     <rosparam command="load" file="$(find rnw_ros)/config/rnw_config.yaml"/>
 
@@ -69,6 +70,7 @@
         <remap from="~A" to="$(arg topic_trigger_rnw)"/>
         <remap from="~X" to="$(arg topic_trigger_zigzag)"/>
         <remap from="~Y" to="$(arg topic_trigger_topple)"/>
+        <remap from="~B" to="$(arg topic_trigger_push_init)"/>
     </node>
 
     <node pkg="rnw_ros" type="pub_cone_state_node" name="pub_cone_state_node" required="true" output="log">

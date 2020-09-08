@@ -47,7 +47,34 @@ Vector3d tip_position_to_uav_position( Vector3d const & tip, rnw_config_t const 
   return rst;
 }
 
-vector<Vector3d> gen_topple_waypoints_local( rnw_config_t const & rnw_config ){
+vector<Vector3d> gen_wpts_push_topple( rnw_config_t const & rnw_config ){
+
+  constexpr double forward_offset = 0.1;
+
+  vector<Vector3d> wpts;
+
+  wpts.emplace_back(-forward_offset,0,-rnw_config.rnw.insertion_depth); // in front of the tip
+  wpts.emplace_back(0,0,-rnw_config.rnw.insertion_depth); // push the tip
+
+  Vector3d offset(rnw_config.rnw.topple_init,0,-rnw_config.rnw.insertion_depth);
+
+  constexpr double deg2rad = M_PI/180.;
+  constexpr size_t segments = 5;
+  double rad_step = rnw_config.rnw.desired_nutation/segments*deg2rad;
+
+  for ( size_t i=0; i<=segments; i++ ) {
+    double rad = i*rad_step;
+    double forward = sin(rad)*rnw_config.cone.height;
+    double downward = (1-cos(rad))*rnw_config.cone.height;
+    Vector3d v(forward,0,-downward);
+    wpts.emplace_back(offset+v);
+  }
+
+  return wpts;
+
+}
+
+vector<Vector3d> gen_wpts_insert_topple(rnw_config_t const & rnw_config ){
 
   vector<Vector3d> wpts;
   wpts.emplace_back(0,0,rnw_config.rnw.hover_above_tip); // above tip
