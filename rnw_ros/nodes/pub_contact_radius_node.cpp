@@ -1,6 +1,7 @@
 #include <ros/ros.h>
 
 #include "rnw_ros/rnw_utils.h"
+#include "rnw_msgs/ConeState.h"
 
 ros::Publisher pub_est_radius;
 ros::Publisher pub_true_radius;

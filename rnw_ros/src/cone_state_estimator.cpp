@@ -5,6 +5,13 @@
 #include <uav_utils/converters.h>
 #include <uav_utils/geometry_utils.h>
 #include "rnw_ros/pose_utils.h"
+#include "rnw_msgs/ConeState.h"
+
+Vector3d cone_state_estimator_t::X_base_body() const {
+  Vector3d rst = rnw_config.cone.tip;
+  rst.z() = rnw_config.cone.tip.z() - rnw_config.cone.height;
+  return rst;
+}
 
 cone_state_estimator_t::cone_state_estimator_t( ros::NodeHandle & nh ) {
   rnw_config.load_from_ros(nh);
@@ -36,9 +43,9 @@ void cone_state_estimator_t::on_odom( nav_msgs::OdometryConstPtr const & msg ){
     return;
   }
 
-  update_euler(msg);
+  update_euler_velocity(msg);
 
-  update_frames(msg);
+  update_body_points(msg);
 
   update_contact_point();
 
@@ -71,7 +78,7 @@ void cone_state_estimator_t::update_euler_angles(){
   latest_euler_angles.z() = ang_z_filter.update(latest_euler_angles.z());
 }
 
-void cone_state_estimator_t::update_euler(  nav_msgs::OdometryConstPtr const & msg ){
+void cone_state_estimator_t::update_euler_velocity(nav_msgs::OdometryConstPtr const & msg ){
 
   auto pre = latest_odom;
   auto cur = *msg;
@@ -114,13 +121,12 @@ void cone_state_estimator_t::update_euler(  nav_msgs::OdometryConstPtr const & m
 
 }
 
-void cone_state_estimator_t::update_frames( nav_msgs::OdometryConstPtr const & msg ){
+void cone_state_estimator_t::update_body_points(nav_msgs::OdometryConstPtr const & msg ){
   R_markers = odom2R(msg);
   T_markers = odom2T(msg);
   T_tip = R_markers * rnw_config.cone.tip + T_markers;
   T_base = R_markers * X_base_body() + T_markers;
-  T_center = R_markers * X_center_body() + T_markers;
-  ROS_INFO_STREAM("" << X_center_body().transpose());
+  T_center = R_markers * rnw_config.cone.base_center + T_markers;
 }
 
 void cone_state_estimator_t::update_contact_point(){

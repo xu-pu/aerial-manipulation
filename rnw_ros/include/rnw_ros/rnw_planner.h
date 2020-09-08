@@ -6,6 +6,8 @@
 #define SRC_RNW_PLANNER_H
 
 #include "rnw_ros/rnw_utils.h"
+#include "rnw_msgs/ConeState.h"
+#include "rnw_msgs/RockingCmd.h"
 
 struct rnw_planner_t {
 

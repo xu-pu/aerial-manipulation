@@ -1,10 +1,8 @@
 #include "rnw_ros/pose_utils.h"
-#include "rnw_ros/rnw_utils.h"
-
-#include <uav_utils/converters.h>
-
 #include <visualization_msgs/Marker.h>
 #include <visualization_msgs/MarkerArray.h>
+#include "rnw_msgs/ConeState.h"
+#include "rnw_msgs/RockingCmd.h"
 
 using namespace std;
 
