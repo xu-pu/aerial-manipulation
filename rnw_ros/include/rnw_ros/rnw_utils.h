@@ -170,7 +170,7 @@ inline vector<Vector3d> gen_topple_waypoints_local( rnw_config_t const & rnw_con
 
   vector<Vector3d> wpts;
   wpts.emplace_back(0,0,rnw_config.rnw.hover_above_tip); // above tip
-  wpts.emplace_back(0,0,0); // tip point
+  //wpts.emplace_back(0,0,0); // tip point
   wpts.emplace_back(0,0,-rnw_config.rnw.insertion_depth); // inserted
 
   Vector3d offset(rnw_config.rnw.topple_init,0,-rnw_config.rnw.insertion_depth);

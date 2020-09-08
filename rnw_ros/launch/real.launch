@@ -76,7 +76,7 @@
         <param name="max_euler_velocity" value="10"/>
     </node>
 
-    <node pkg="rnw_ros" type="rnw_controller_node" name="rnw_controller_node" output="screen"/>
+    <node pkg="rnw_ros" type="rnw_controller_node" name="rnw_controller_node" output="screen" respawn="true"/>
 
     <node pkg="rnw_ros" type="rnw_traj_server_node" name="rnw_traj_server_node" output="screen"/>
 
