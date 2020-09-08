@@ -143,6 +143,10 @@ include_directories(
 #   src/${PROJECT_NAME}/rnw_ros.cpp
 # )
 
+add_library(${PROJECT_NAME}
+        src/rnw_utils.cpp
+)
+
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
 ## either from message generation or dynamic reconfigure
@@ -174,7 +178,7 @@ set(RNW_NODES
 
 FOREACH(NODE ${RNW_NODES})
     add_executable(${NODE} nodes/${NODE}.cpp)
-    target_link_libraries(${NODE} ${catkin_LIBRARIES} ${CERES_LIBRARIES})
+    target_link_libraries(${NODE} ${PROJECT_NAME} ${catkin_LIBRARIES} ${CERES_LIBRARIES})
     #add_dependencies(${NODE} ${PROJECT_NAME}_generate_messages_cpp)
     add_dependencies(${NODE} ${PROJECT_NAME}_gencfg)
 ENDFOREACH()
