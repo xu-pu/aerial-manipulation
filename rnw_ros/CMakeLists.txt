@@ -173,7 +173,7 @@ set(RNW_NODES
 )
 
 FOREACH(NODE ${RNW_NODES})
-    add_executable(${NODE} src/${NODE}.cpp)
+    add_executable(${NODE} nodes/${NODE}.cpp)
     target_link_libraries(${NODE} ${catkin_LIBRARIES} ${CERES_LIBRARIES})
     #add_dependencies(${NODE} ${PROJECT_NAME}_generate_messages_cpp)
     add_dependencies(${NODE} ${PROJECT_NAME}_gencfg)
