@@ -35,4 +35,13 @@ T get_param_default( ros::NodeHandle & nh, string const & key, T const & default
   return val;
 }
 
+template<typename T>
+double sec_since_msg( T const & msg ){
+  return (ros::Time::now() - msg.header.stamp).toSec();
+}
+
+inline double sec_since( ros::Time const & t ){
+  return (ros::Time::now() - t).toSec();
+}
+
 #endif //SRC_ROS_UTILS_H

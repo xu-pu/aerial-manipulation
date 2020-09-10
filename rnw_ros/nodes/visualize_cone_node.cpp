@@ -1,8 +1,9 @@
 #include "rnw_ros/pose_utils.h"
 #include <visualization_msgs/Marker.h>
 #include <visualization_msgs/MarkerArray.h>
-#include "rnw_msgs/ConeState.h"
-#include "rnw_msgs/RockingCmd.h"
+#include <rnw_msgs/ConeState.h>
+#include <rnw_msgs/RockingCmd.h>
+#include <rnw_msgs/GripState.h>
 
 using namespace std;
 
@@ -12,23 +13,26 @@ struct cone_visualizer_t {
 
     ros::Time latest_time;
 
-    bool init = false;
-
     ros::Publisher pub_marker_cone;
+
+    bool init = false;
 
     rnw_msgs::ConeState latest_cone_state;
 
+    bool rocking_cmd_init = false;
+
     rnw_msgs::RockingCmd latest_rocking_cmd;
 
+    bool grip_state_init = false;
+
+    rnw_msgs::GripState latest_grip_state;
+
     static constexpr int id_base = 0;
-
     static constexpr int id_shaft = 1;
-
     static constexpr int id_contact_path = 2;
-
     static constexpr int id_contact_normal = 3;
-
     static constexpr int id_rocking_cmd = 4;
+    static constexpr int id_grip = 5;
 
     string ns = "cone_state_visualization";
 
@@ -71,6 +75,12 @@ struct cone_visualizer_t {
 
     void on_rocking_cmd( rnw_msgs::RockingCmdConstPtr const & msg ){
       latest_rocking_cmd = *msg;
+      rocking_cmd_init = true;
+    }
+
+    void on_grip_state( rnw_msgs::GripStateConstPtr const & msg ){
+      latest_grip_state = *msg;
+      grip_state_init = true;
     }
 
     visualization_msgs::MarkerArray gen_markers(){
@@ -80,6 +90,7 @@ struct cone_visualizer_t {
       marker_arr.markers.push_back(gen_contact_path());
       marker_arr.markers.push_back(gen_marker_contact_normal());
       marker_arr.markers.push_back(gen_marker_rocking_cmd());
+      marker_arr.markers.push_back(gen_maker_grip());
       return marker_arr;
     }
 
@@ -198,7 +209,39 @@ struct cone_visualizer_t {
       return marker_contact_path;
     }
 
+    visualization_msgs::Marker gen_maker_grip(){
 
+      visualization_msgs::Marker marker;
+
+      marker.id = id_grip;
+      marker.type = visualization_msgs::Marker::SPHERE;
+      marker.header.stamp = ros::Time::now();
+      marker.header.frame_id = "world";
+      marker.ns = ns;
+      marker.scale.x = 0.1;
+      marker.scale.y = 0.1;
+      marker.scale.z = 0.1;
+      marker.color.r = 0;
+      marker.color.g = 0;
+      marker.color.b = 1;
+      marker.color.a = 1.00;
+      marker.pose.orientation.w = 1;
+
+      bool show_grip = grip_state_init
+                       && latest_grip_state.grip_valid
+                       && sec_since_msg(latest_grip_state) > 0.5;
+
+      if ( show_grip ) {
+        marker.action = visualization_msgs::Marker::ADD;
+        marker.pose.position = latest_grip_state.grip_point;
+      }
+      else {
+        marker.action = visualization_msgs::Marker::DELETE;
+      }
+
+      return marker;
+
+    }
 
     void clear_markers() const {
       visualization_msgs::MarkerArray accMarkers;
@@ -241,6 +284,14 @@ int main( int argc, char** argv ) {
           "/rnw/rocking_cmd",
           100,
           &cone_visualizer_t::on_rocking_cmd,
+          &cone_viz,
+          ros::TransportHints().tcpNoDelay()
+  );
+
+  ros::Subscriber sub_grip_state = nh.subscribe<rnw_msgs::GripState>(
+          "/rnw/grip_state",
+          100,
+          &cone_visualizer_t::on_grip_state,
           &cone_viz,
           ros::TransportHints().tcpNoDelay()
   );

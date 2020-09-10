@@ -50,7 +50,7 @@ int main( int argc, char** argv ) {
   grip_state_node_t node(nh);
 
   ros::Subscriber sub_uav_odom = nh.subscribe<nav_msgs::Odometry>(
-          "/odom/cone",
+          "/odom/uav",
           10,
           &grip_state_node_t::on_uav_odom,
           &node,

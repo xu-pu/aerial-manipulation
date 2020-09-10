@@ -195,6 +195,7 @@ double line_point_dist_3d( Vector3d const & A, Vector3d const & B, Vector3d cons
 
 rnw_msgs::GripState grip_state_t::to_msg() const {
   rnw_msgs::GripState msg;
+  msg.header = cone_state.header;
   msg.uav_odom = uav_odom;
   msg.cone_state = cone_state;
   msg.flu_T_tcp = uav_utils::to_point_msg(flu_T_tcp);
