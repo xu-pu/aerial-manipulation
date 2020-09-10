@@ -7,6 +7,8 @@
 
 #include <deque>
 #include <quadrotor_msgs/Float64Stamped.h>
+#include <rnw_msgs/ConeState.h>
+#include <nav_msgs/Odometry.h>
 
 #include "rnw_ros/rnw_config.h"
 
@@ -28,6 +30,28 @@ vector<Vector3d> gen_wpts_push_topple( rnw_config_t const & rnw_config );
  * @return - (x,y,z)
  */
 Vector3d cone_rot2euler( Matrix3d const & R );
+
+struct grip_state_t {
+
+    rnw_msgs::ConeState cone_state;
+
+    nav_msgs::Odometry uav_odom;
+
+    Vector3d const & flu_T_grip;
+
+    bool grip_valid;
+
+    double grip_radius;
+
+    double grip_depth;
+
+};
+
+grip_state_t calc_gripping_point(
+        rnw_msgs::ConeState const & cone_state,
+        nav_msgs::Odometry uav_odom,
+        Vector3d const & flu_T_grip
+);
 
 /**
  * Transform tip position to UAV position,
