@@ -15,7 +15,7 @@ struct cone_visualizer_t {
 
     ros::Publisher pub_marker_cone;
 
-    bool init = false;
+    bool cone_state_init = false;
 
     rnw_msgs::ConeState latest_cone_state;
 
@@ -70,7 +70,7 @@ struct cone_visualizer_t {
       latest_time = ros::Time::now();
       latest_cone_state = *msg;
       pub_marker_cone.publish(gen_markers());
-      init = true;
+      cone_state_init = true;
     }
 
     void on_rocking_cmd( rnw_msgs::RockingCmdConstPtr const & msg ){
@@ -209,7 +209,7 @@ struct cone_visualizer_t {
       return marker_contact_path;
     }
 
-    visualization_msgs::Marker gen_maker_grip(){
+    visualization_msgs::Marker gen_maker_grip() const {
 
       visualization_msgs::Marker marker;
 
@@ -251,9 +251,9 @@ struct cone_visualizer_t {
       pub_marker_cone.publish(accMarkers);
     }
 
-    void on_spin( const ros::TimerEvent &event ){
-      if ( !init ) { return; }
-      if ( (ros::Time::now() - latest_time).toSec() > clear_after_n_sec ) {
+    void on_spin( const ros::TimerEvent &event ) const {
+      if ( !cone_state_init ) { return; }
+      if ( sec_since(latest_time) > clear_after_n_sec ) {
         clear_markers();
       }
     }
