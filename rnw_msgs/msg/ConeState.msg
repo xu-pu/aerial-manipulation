@@ -1,5 +1,8 @@
 Header header
 nav_msgs/Odometry odom
+# x-psi-precession
+# y-theta-nutation (tilt)
+# z-phi-spin
 geometry_msgs/Vector3 euler_angles
 geometry_msgs/Vector3 euler_angles_velocity
 bool is_point_contact
