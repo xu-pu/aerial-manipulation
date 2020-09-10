@@ -15,7 +15,11 @@ struct rnw_controller_t {
 
     ros::Publisher pub_poly_traj;
 
+    bool uav_odom_init = false;
+
     nav_msgs::Odometry latest_uav_odom;
+
+    bool cone_state_init = false;
 
     rnw_msgs::ConeState latest_cone_state;
 
@@ -44,10 +48,12 @@ struct rnw_controller_t {
 
     void on_uav_odom( nav_msgs::OdometryConstPtr const & msg ){
       latest_uav_odom = *msg;
+      uav_odom_init = true;
     }
 
     void on_cone_state( rnw_msgs::ConeStateConstPtr const & msg ){
       latest_cone_state = *msg;
+      cone_state_init = true;
       rnw_planner.on_cone_state(msg);
     }
 
@@ -72,6 +78,11 @@ struct rnw_controller_t {
 
       ROS_WARN_STREAM("[rnw] insert triggered!");
 
+      if (!(uav_odom_init&&cone_state_init)) {
+        ROS_ERROR_STREAM("[rnw] No odom, can't plan traj");
+        return;
+      }
+
       Vector3d pt_uav = pose2T(latest_uav_odom.pose.pose);
       Vector3d pt_tip = uav_utils::from_point_msg(latest_cone_state.tip);
 
@@ -94,6 +105,11 @@ struct rnw_controller_t {
 
       ROS_WARN_STREAM("[rnw] topple triggered!");
 
+      if (!(uav_odom_init&&cone_state_init)) {
+        ROS_ERROR_STREAM("[rnw] No odom, can't plan traj");
+        return;
+      }
+
       Matrix3d R_tip = odom2R(latest_cone_state.odom);
       Vector3d T_tip = uav_utils::from_point_msg(latest_cone_state.tip);
       Vector3d cur_pos = odom2T(latest_uav_odom);
@@ -113,13 +129,26 @@ struct rnw_controller_t {
     }
 
     void on_trigger_rnw( std_msgs::HeaderConstPtr const & msg ){
+
       ROS_WARN_STREAM("[rnw] rnw triggered!");
+
+      if (!(uav_odom_init&&cone_state_init)) {
+        ROS_ERROR_STREAM("[rnw] No odom, can't plan traj");
+        return;
+      }
+
       rnw_planner.start_planning_cmd();
+
     }
 
     void on_trigger_zigzag( std_msgs::HeaderConstPtr const & msg ) const {
 
       ROS_WARN_STREAM("[rnw] zig-zag triggered!");
+
+      if (!(uav_odom_init&&cone_state_init)) {
+        ROS_ERROR_STREAM("[rnw] No odom, can't plan traj");
+        return;
+      }
 
       Matrix3d R = uav_utils::from_quaternion_msg(latest_uav_odom.pose.pose.orientation).toRotationMatrix();
       Vector3d T = uav_utils::from_point_msg(latest_uav_odom.pose.pose.position);
@@ -141,6 +170,11 @@ struct rnw_controller_t {
     void on_trigger_push_init( std_msgs::HeaderConstPtr const & msg ) const {
 
       ROS_WARN_STREAM("[rnw] push_init triggered!");
+
+      if (!(uav_odom_init&&cone_state_init)) {
+        ROS_ERROR_STREAM("[rnw] No odom, can't plan traj");
+        return;
+      }
 
       Matrix3d R_tip = odom2R(latest_cone_state.odom);
       Vector3d T_tip = uav_utils::from_point_msg(latest_cone_state.tip);
