@@ -2,6 +2,7 @@
 // Created by sheep on 2020/9/8.
 //
 #include "rnw_ros/rnw_utils.h"
+#include "rnw_ros/pose_utils.h"
 
 Vector3d cone_rot2euler( Matrix3d const & R ){
 
@@ -143,4 +144,63 @@ void rnw_config_t::load_from_ros( ros::NodeHandle & nh ){
   rnw.rocking_max_vel  = get_param_default<double>(nh, "/rnw/rocking_max_vel", 0.5);
   rnw.rocking_max_acc  = get_param_default<double>(nh, "/rnw/rocking_max_acc", 0.5);
   rnw.hover_above_tip  = get_param_default<double>(nh,"/rnw/hover_above_tip",0.03);
+}
+
+double dist( Vector3d const & A, Vector3d const & B ){
+  return (A-B).norm();
+}
+
+grip_state_t calc_gripping_point(
+        rnw_msgs::ConeState const & cone_state,
+        nav_msgs::Odometry const & uav_odom,
+        Vector3d const & flu_T_tcp )
+{
+  grip_state_t grip_state;
+  grip_state.cone_state = cone_state;
+  grip_state.uav_odom = uav_odom;
+  grip_state.flu_T_tcp = flu_T_tcp;
+
+  Matrix3d R = odom2R(uav_odom);
+  Vector3d T = odom2T(uav_odom);
+  Vector3d tcp = R * flu_T_tcp + T;
+  Vector3d tip = uav_utils::from_point_msg(cone_state.tip);
+  Vector3d base = uav_utils::from_point_msg(cone_state.base);
+  Vector3d dir = (base - tip).normalized();
+
+  grip_state.grip_depth = dir.dot(tcp-tip);
+  grip_state.grip_radius = line_point_dist_3d(tip,base,tcp);;
+
+  double tip_tcp = (tip-tcp).norm();
+  double tip_grip = sqrt(square(tip_tcp) - square(grip_state.grip_radius));
+
+  Vector3d grip1 = tip+tip_grip*dir;
+  Vector3d grip2 = tip-tip_grip*dir;
+
+  Vector3d grip = grip2;
+  if ( dist(grip1,tcp) < dist(grip2,tcp) ) {
+    grip = grip1;
+  }
+
+  grip_state.grip_point = grip;
+
+  grip_state.grip_valid = grip_state.grip_depth > 0 && grip_state.grip_radius < 0.1;
+
+  return grip_state;
+
+}
+
+double line_point_dist_3d( Vector3d const & A, Vector3d const & B, Vector3d const & C ){
+  return ((C-A).cross(C-B)).norm()/(A-B).norm();
+}
+
+rnw_msgs::GripState grip_state_t::to_msg() const {
+  rnw_msgs::GripState msg;
+  msg.uav_odom = uav_odom;
+  msg.cone_state = cone_state;
+  msg.flu_T_tcp = uav_utils::to_point_msg(flu_T_tcp);
+  msg.grip_point = uav_utils::to_point_msg(grip_point);
+  msg.grip_radius = grip_radius;
+  msg.grip_depth = grip_depth;
+  msg.grip_valid = grip_valid;
+  return msg;
 }

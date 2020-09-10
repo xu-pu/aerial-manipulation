@@ -9,6 +9,7 @@
 #include <quadrotor_msgs/Float64Stamped.h>
 #include <rnw_msgs/ConeState.h>
 #include <nav_msgs/Odometry.h>
+#include <rnw_msgs/GripState.h>
 
 #include "rnw_ros/rnw_config.h"
 
@@ -31,13 +32,29 @@ vector<Vector3d> gen_wpts_push_topple( rnw_config_t const & rnw_config );
  */
 Vector3d cone_rot2euler( Matrix3d const & R );
 
+/**
+ * Distance between 3d line AB and 3d point C
+ * See https://mathworld.wolfram.com/Point-LineDistance3-Dimensional.html
+ * @param pt1 - A
+ * @param pt2 - B
+ * @param pt - C
+ * @return distance
+ */
+double line_point_dist_3d( Vector3d const & A, Vector3d const & B, Vector3d const & C );
+
+double dist( Vector3d const & A, Vector3d const & B );
+
+inline double square( double val ){ return val*val; }
+
 struct grip_state_t {
 
     rnw_msgs::ConeState cone_state;
 
     nav_msgs::Odometry uav_odom;
 
-    Vector3d const & flu_T_grip;
+    Vector3d flu_T_tcp;
+
+    Vector3d grip_point;
 
     bool grip_valid;
 
@@ -45,11 +62,13 @@ struct grip_state_t {
 
     double grip_depth;
 
+    rnw_msgs::GripState to_msg() const;
+
 };
 
 grip_state_t calc_gripping_point(
         rnw_msgs::ConeState const & cone_state,
-        nav_msgs::Odometry uav_odom,
+        nav_msgs::Odometry const & uav_odom,
         Vector3d const & flu_T_grip
 );
 

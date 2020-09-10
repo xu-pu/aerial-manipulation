@@ -42,7 +42,7 @@ inline Eigen::Matrix3d rpy2rot( Vector3d const & rpy ){
                  .toRotationMatrix();
 }
 
-Vector3d imu2rpy( sensor_msgs::Imu const & imu ){
+inline Vector3d imu2rpy( sensor_msgs::Imu const & imu ){
 
   Eigen::Matrix3d R_FLU2FRD;
   R_FLU2FRD << 1, 0, 0, 0, -1, 0, 0, 0, -1;
@@ -59,7 +59,7 @@ Vector3d imu2rpy( sensor_msgs::Imu const & imu ){
 
 }
 
-Vector3d imu2rpy( ImuConstPtr const & imu ){
+inline Vector3d imu2rpy( ImuConstPtr const & imu ){
   return imu2rpy(*imu);
 }
 
@@ -74,7 +74,7 @@ inline Vector3d pose2T( geometry_msgs::Pose const & pose ){
   return { pos.x, pos.y, pos.z };
 }
 
-Vector3d odom2rpy( OdometryConstPtr const & odom ){
+inline Vector3d odom2rpy( OdometryConstPtr const & odom ){
 
   Eigen::Matrix3d R_FLU2FRD;
   R_FLU2FRD << 1, 0, 0, 0, -1, 0, 0, 0, -1;
@@ -88,7 +88,7 @@ Vector3d odom2rpy( OdometryConstPtr const & odom ){
 
 }
 
-Vector3d odom2rpy( Quaterniond const & odom ){
+inline Vector3d odom2rpy( Quaterniond const & odom ){
 
   Eigen::Matrix3d R_FLU2FRD;
   R_FLU2FRD << 1, 0, 0, 0, -1, 0, 0, 0, -1;
@@ -100,29 +100,29 @@ Vector3d odom2rpy( Quaterniond const & odom ){
 
 }
 
-Matrix3d odom2R( OdometryConstPtr const & odom ){
+inline Matrix3d odom2R( OdometryConstPtr const & odom ){
   return pose2R(odom->pose.pose);
 }
 
-Matrix3d odom2R( nav_msgs::Odometry const & odom ){
+inline Matrix3d odom2R( nav_msgs::Odometry const & odom ){
   return pose2R(odom.pose.pose);
 }
 
-Vector3d odom2T( nav_msgs::Odometry const & odom ){
+inline Vector3d odom2T( nav_msgs::Odometry const & odom ){
   return pose2T(odom.pose.pose);
 }
 
-Vector3d odom2T( OdometryConstPtr const & odom ){
+inline Vector3d odom2T( OdometryConstPtr const & odom ){
   return pose2T(odom->pose.pose);
 }
 
-Matrix3d imu2R( ImuConstPtr const & imu ){
+inline Matrix3d imu2R( ImuConstPtr const & imu ){
   auto const & quat = imu->orientation;
   Eigen::Quaterniond q(quat.w, quat.x, quat.y, quat.z);
   return q.toRotationMatrix();
 }
 
-void publish_frame( Matrix3d const & R, Vector3d const & T, string const & name, string const & parent ){
+inline void publish_frame( Matrix3d const & R, Vector3d const & T, string const & name, string const & parent ){
   static tf::TransformBroadcaster br;
   tf::Transform transform;
   transform.setOrigin( tf::Vector3(T.x(),T.y(),T.z()) );
