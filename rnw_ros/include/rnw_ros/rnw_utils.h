@@ -157,6 +157,14 @@ Vector3d tip_position_to_uav_position( Vector3d const & tip, rnw_config_t const 
  */
 Vector3d tcp2uav( Vector3d const & tcp, nav_msgs::Odometry const & uav_odom, Vector3d const & flu_T_tcp );
 
+/**
+ * Calculate the desired TCP position under current cone_state at specific grip_depth
+ * @param cone_state
+ * @param grip_depth
+ * @return tcp position
+ */
+Vector3d point_at_grip_depth( rnw_msgs::ConeState const & cone_state, double grip_depth );
+
 template<typename T, size_t window_size>
 struct median_filter_t {
 

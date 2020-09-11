@@ -214,3 +214,10 @@ grip_state_t::grip_state_t( rnw_msgs::ConeState const & _cone_state, nav_msgs::O
 Vector3d tcp2uav( Vector3d const & tcp, nav_msgs::Odometry const & uav_odom, Vector3d const & flu_T_tcp ){
   return tcp - uav_utils::from_quaternion_msg(uav_odom.pose.pose.orientation) * flu_T_tcp;
 }
+
+Vector3d point_at_grip_depth( rnw_msgs::ConeState const & cone_state, double grip_depth ){
+  Vector3d tip = uav_utils::from_point_msg(cone_state.tip);
+  Vector3d base = uav_utils::from_point_msg(cone_state.base);
+  Vector3d dir = (base-tip).normalized();
+  return tip - grip_depth * dir;
+}

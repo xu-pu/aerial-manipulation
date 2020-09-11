@@ -180,7 +180,16 @@ void rnw_planner_t::plan_cmd_walk(){
 }
 
 void rnw_planner_t::plan_cmd_adjust_grip(){
-
+  rnw_cmd.setpoint_apex = point_at_grip_depth(latest_cone_state,rnw_config.rnw.desired_grip_depth);
+  rnw_cmd.setpoint_uav = tcp2uav(rnw_cmd.setpoint_apex,latest_uav_odom,rnw_config.flu_T_tcp);
+  rnw_cmd.setpoint_grip_depth = rnw_config.rnw.desired_grip_depth;
+  rnw_cmd.setpoint_nutation = rnw_config.rnw.desired_nutation;
+  rnw_cmd.tau_deg = 0;
+  rnw_cmd.tau_vec = Vector3d::Zero();
+  rnw_cmd.cmd_type = rnw_cmd_t::cmd_adjust_grip;
+  rnw_cmd.cmd_idx++;
+  //rnw_cmd.step_count++;
+  rnw_cmd.fsm = rnw_cmd_t::fsm_pending;
 }
 
 void rnw_planner_t::plan_cmd_adjust_nutation(){
