@@ -11,29 +11,23 @@
 
 struct rnw_planner_t {
 
-    // interface to other modules
+    /// interface to other modules
 
-    void start_planning_cmd();
+    void start();
 
-    void stop_planning_cmd();
+    void stop();
 
-    /**
-     * Call when the current command is complete
-     */
-    void cmd_ack();
+    void cmd_complete();
 
-    /**
-     * Check is there command to execute
-     */
     bool has_pending_cmd() const;
 
     Vector3d next_position() const;
 
-    /**
-     * Call on every new ConeState message
-     * @param msg
-     */
     void on_cone_state( rnw_msgs::ConeStateConstPtr const & msg );
+
+    void on_uav_odom( nav_msgs::OdometryConstPtr const & msg );
+
+    void spin();
 
     ///////////////////////////////
 
@@ -51,7 +45,13 @@ struct rnw_planner_t {
 
     cone_fsm_e fsm;
 
+    bool cone_state_init = false;
+
     rnw_msgs::ConeState latest_cone_state;
+
+    bool uav_odom_init = false;
+
+    nav_msgs::Odometry latest_uav_odom;
 
     // planning
 
@@ -75,9 +75,9 @@ struct rnw_planner_t {
 
     void plan_next_position();
 
-    void update_state( rnw_msgs::ConeState const & msg );
+    void fsm_update(rnw_msgs::ConeState const & msg );
 
-    void state_transition( cone_fsm_e from, cone_fsm_e to );
+    void fsm_transition( cone_fsm_e from, cone_fsm_e to );
 
     // debug
 

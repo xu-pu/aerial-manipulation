@@ -4,7 +4,7 @@
 #include "rnw_ros/rnw_planner.h"
 #include <uav_utils/converters.h>
 
-void rnw_planner_t::start_planning_cmd(){
+void rnw_planner_t::start(){
   if ( fsm == cone_fsm_e::idle ) {
     ROS_ERROR_STREAM("[rnw] Can't start planning when object is idle!");
     plan_cmd = false;
@@ -15,12 +15,12 @@ void rnw_planner_t::start_planning_cmd(){
   }
 }
 
-void rnw_planner_t::stop_planning_cmd(){
+void rnw_planner_t::stop(){
   ROS_INFO_STREAM("[rnw] Stop planning rocking commands");
   plan_cmd = false;
 }
 
-void rnw_planner_t::cmd_ack(){
+void rnw_planner_t::cmd_complete(){
   cmd_pending = false;
 }
 
@@ -33,24 +33,13 @@ Vector3d rnw_planner_t::next_position() const {
 }
 
 void rnw_planner_t::on_cone_state( rnw_msgs::ConeStateConstPtr const & msg ){
-
   latest_cone_state = *msg;
+  cone_state_init = true;
+}
 
-  update_state(latest_cone_state);
-
-  switch ( fsm ) {
-    case cone_fsm_e::idle:
-      break;
-    case cone_fsm_e::rocking:
-      break;
-    case cone_fsm_e::qstatic:
-      plan_next_position();
-      break;
-    default:
-      ROS_ERROR_STREAM("[rnw_planner] Invalid Cone State");
-      break;
-  }
-
+void rnw_planner_t::on_uav_odom( nav_msgs::OdometryConstPtr const & msg ){
+  latest_uav_odom = *msg;
+  uav_odom_init = true;
 }
 
 rnw_planner_t::rnw_planner_t( ros::NodeHandle & nh ){
@@ -94,24 +83,24 @@ void rnw_planner_t::plan_next_position(){
 
 }
 
-void rnw_planner_t::update_state( rnw_msgs::ConeState const & msg ){
+void rnw_planner_t::fsm_update(rnw_msgs::ConeState const & msg ){
 
   if ( msg.euler_angles.y < min_tilt ) {
-    state_transition(fsm,cone_fsm_e::idle);
+    fsm_transition(fsm, cone_fsm_e::idle);
   }
   else if ( !msg.is_point_contact ){
-    state_transition(fsm,cone_fsm_e::idle);
+    fsm_transition(fsm, cone_fsm_e::idle);
   }
   else if ( abs(msg.euler_angles_velocity.z) < ang_vel_threshold ) {
-    state_transition(fsm,cone_fsm_e::qstatic);
+    fsm_transition(fsm, cone_fsm_e::qstatic);
   }
   else {
-    state_transition(fsm,cone_fsm_e::rocking);
+    fsm_transition(fsm, cone_fsm_e::rocking);
   }
 
 }
 
-void rnw_planner_t::state_transition( cone_fsm_e from, cone_fsm_e to ){
+void rnw_planner_t::fsm_transition(cone_fsm_e from, cone_fsm_e to ){
 
   if ( from == cone_fsm_e::rocking && to == cone_fsm_e::qstatic ) {
     ROS_INFO_STREAM("[rnw] from rocking to qstatic");
@@ -129,7 +118,7 @@ void rnw_planner_t::state_transition( cone_fsm_e from, cone_fsm_e to ){
 
   if ( from != cone_fsm_e::idle && to == cone_fsm_e::idle ) {
     ROS_INFO_STREAM("[rnw] object became idle");
-    stop_planning_cmd();
+    stop();
   }
 
   fsm = to;
@@ -139,9 +128,29 @@ void rnw_planner_t::state_transition( cone_fsm_e from, cone_fsm_e to ){
 void rnw_planner_t::on_debug_trigger( std_msgs::HeaderConstPtr const & msg ){
   ROS_WARN_STREAM("[rnw] Got debug trigger");
   if ( !plan_cmd ) {
-    start_planning_cmd();
+    start();
   }
   else {
-    cmd_ack();
+    cmd_complete();
   }
+}
+
+void rnw_planner_t::spin(){
+
+  ROS_INFO_STREAM("[rnw] planner main loop spinning");
+
+  fsm_update(latest_cone_state);
+  switch ( fsm ) {
+    case cone_fsm_e::idle:
+      break;
+    case cone_fsm_e::rocking:
+      break;
+    case cone_fsm_e::qstatic:
+      plan_next_position();
+      break;
+    default:
+      ROS_ERROR_STREAM("[rnw_planner] Invalid Cone State");
+      break;
+  }
+
 }

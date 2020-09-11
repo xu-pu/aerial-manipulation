@@ -49,6 +49,7 @@ struct rnw_controller_t {
     void on_uav_odom( nav_msgs::OdometryConstPtr const & msg ){
       latest_uav_odom = *msg;
       uav_odom_init = true;
+      rnw_planner.on_uav_odom(msg);
     }
 
     void on_cone_state( rnw_msgs::ConeStateConstPtr const & msg ){
@@ -120,7 +121,7 @@ struct rnw_controller_t {
         return;
       }
 
-      rnw_planner.start_planning_cmd();
+      rnw_planner.start();
 
     }
 
@@ -206,13 +207,14 @@ struct rnw_controller_t {
     /**
      * This loop checks commands (RockingCmd) from rnw_planner
      * If there is pending RockingCmd, execute
-     * After execution, rnw_planner.cmd_ack()
+     * After execution, rnw_planner.cmd_complete()
      * @param event
      */
     void rnw_planner_loop( const ros::TimerEvent &event ){
+      rnw_planner.spin();
       if ( cmd_in_progress ) {
         if (ros::Time::now() > cmd_start_time + cmd_duration ) {
-          rnw_planner.cmd_ack();
+          rnw_planner.cmd_complete();
           cmd_in_progress = false;
         }
       }
