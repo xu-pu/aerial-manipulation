@@ -150,7 +150,7 @@ double dist( Vector3d const & A, Vector3d const & B ){
   return (A-B).norm();
 }
 
-grip_state_t calc_gripping_point(
+grip_state_t calc_grip_state(
         rnw_msgs::ConeState const & cone_state,
         nav_msgs::Odometry const & uav_odom,
         Vector3d const & flu_T_tcp )
