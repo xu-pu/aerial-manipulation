@@ -13,7 +13,7 @@
 
 struct rnw_controller_t {
 
-    ros::Publisher pub_poly_traj;
+    rnw_config_t rnw_config;
 
     bool uav_odom_init = false;
 
@@ -23,8 +23,6 @@ struct rnw_controller_t {
 
     rnw_msgs::ConeState latest_cone_state;
 
-    rnw_config_t rnw_config;
-
     AmTraj traj_generator;
 
     AmTraj rocking_generator;
@@ -32,6 +30,8 @@ struct rnw_controller_t {
     AmTraj zigzag_generator;
 
     rnw_planner_t rnw_planner;
+
+    ros::Publisher pub_poly_traj;
 
     explicit rnw_controller_t(ros::NodeHandle & nh)
             : rnw_planner(nh),
@@ -56,8 +56,6 @@ struct rnw_controller_t {
       cone_state_init = true;
       rnw_planner.on_cone_state(msg);
     }
-
-    void on_trigger_n3ctrl( geometry_msgs::PoseStampedConstPtr const & msg ){}
 
     void on_trigger_insert( std_msgs::HeaderConstPtr const & msg ){
 
@@ -261,8 +259,6 @@ int main( int argc, char** argv ) {
           &rnw_controller,
           ros::TransportHints().tcpNoDelay()
   );
-
-  ros::Subscriber sub_trigger = nh.subscribe<geometry_msgs::PoseStamped>("/traj_start_trigger",10,&rnw_controller_t::on_trigger_n3ctrl,&rnw_controller);
 
   ros::Subscriber sub_trigger_insert = nh.subscribe<std_msgs::Header>("/rnw/trigger/insert", 10, &rnw_controller_t::on_trigger_insert, &rnw_controller);
   ros::Subscriber sub_trigger_zigzag = nh.subscribe<std_msgs::Header>("/rnw/trigger/zigzag", 10, &rnw_controller_t::on_trigger_zigzag, &rnw_controller);
