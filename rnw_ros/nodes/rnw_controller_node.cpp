@@ -121,7 +121,7 @@ struct rnw_controller_t {
         return;
       }
 
-      rnw_planner.start();
+      rnw_planner.start_walking();
 
     }
 

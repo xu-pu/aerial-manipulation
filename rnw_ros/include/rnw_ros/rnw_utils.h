@@ -90,6 +90,12 @@ grip_state_t calc_grip_state(
 
 struct rnw_cmd_t {
 
+    enum cmd_fsm_e {
+        fsm_idle,
+        fsm_pending,
+        fsm_executing
+    } fsm = fsm_idle;
+
     enum cmd_type_e {
         cmd_rocking,
         cmd_adjust_grip,

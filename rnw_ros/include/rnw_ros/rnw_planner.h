@@ -11,17 +11,25 @@
 
 struct rnw_planner_t {
 
-    /// interface to other modules
+    ///////////////////////////////////////
+    /// Public Interface
+    ///////////////////////////////////////
 
-    void start();
+    explicit rnw_planner_t( ros::NodeHandle & nh );
 
-    void stop();
+    void start_walking();
+
+    void stop_walking();
 
     void cmd_complete();
 
     bool has_pending_cmd() const;
 
     Vector3d next_position() const;
+
+    void trigger_adjust_grip();
+
+    void trigger_adjust_nutation();
 
     void on_cone_state( rnw_msgs::ConeStateConstPtr const & msg );
 
@@ -30,22 +38,26 @@ struct rnw_planner_t {
     void spin();
 
     ///////////////////////////////
-
-    static constexpr double deg2rad = M_PI/180.;
-
-    static constexpr double min_tilt = 10 * deg2rad;
-
-    double ang_vel_threshold = 0.5;
+    /// FSM
 
     enum class cone_fsm_e {
         idle, qstatic, rocking
     };
 
+    cone_fsm_e fsm = cone_fsm_e::idle;
+
+    void fsm_update();
+
+    void fsm_transition( cone_fsm_e from, cone_fsm_e to );
+
+    ////////////////////////////////////////////
+    /// ROS Stuff
+
+    rnw_config_t rnw_config;
+
     ros::Publisher pub_rocking_cmd;
 
     ros::Publisher pub_grip_state;
-
-    cone_fsm_e fsm = cone_fsm_e::idle;
 
     bool cone_state_init = false;
 
@@ -55,31 +67,37 @@ struct rnw_planner_t {
 
     nav_msgs::Odometry latest_uav_odom;
 
-    // planning
+    ////////////////////////////////////////////
+    /// Command
+
+    rnw_cmd_t rnw_cmd;
+
+    ////////////////////////////////////////////
+    /// Planning
+
+    static constexpr double deg2rad = M_PI/180.;
+
+    static constexpr double min_tilt = 10 * deg2rad;
+
+    double ang_vel_threshold = 0.5;
 
     double rot_dir = -1;
 
     double rot_amp_deg = 30;
 
-    size_t step_count = 0;
-
     // rocking command
 
-    bool plan_cmd = false;
+    bool request_adjust_grip = false;
 
-    rnw_msgs::RockingCmd latest_cmd;
+    bool request_adjust_nutation = false;
 
-    bool cmd_pending = false;
+    bool is_walking = false;
 
-    size_t cmd_idx = 0;
+    void plan_cmd_walk();
 
-    explicit rnw_planner_t( ros::NodeHandle & nh );
+    void plan_cmd_adjust_grip();
 
-    void plan_next_position();
-
-    void fsm_update();
-
-    void fsm_transition( cone_fsm_e from, cone_fsm_e to );
+    void plan_cmd_adjust_nutation();
 
     // debug
 
