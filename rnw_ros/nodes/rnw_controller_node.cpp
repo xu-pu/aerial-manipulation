@@ -57,21 +57,6 @@ struct rnw_controller_t {
       rnw_planner.on_cone_state(msg);
     }
 
-    void on_rocking(){
-      Vector3d tgt_pt = tip_position_to_uav_position(rnw_planner.next_position(),rnw_config);
-      Vector3d pt_uav = pose2T(latest_uav_odom.pose.pose);
-      Vector3d v0 = Vector3d::Zero();
-      // there is a wierd bug, use 3 points will solve it.
-      //ROS_INFO_STREAM("[rnw] from " << pt_uav.transpose() << ", to " << tgt_pt.transpose());
-      //ROS_INFO_STREAM("[rnw] offset " << (tgt_pt-pt_uav).transpose());
-      Vector3d mid_point = (pt_uav+tgt_pt)/2;
-      Trajectory traj = rocking_generator.genOptimalTrajDTC({pt_uav, mid_point, tgt_pt}, v0, v0, v0, v0);
-      pub_poly_traj.publish(to_ros_msg(traj,ros::Time::now()));
-      rocking_start_stamp = ros::Time::now();
-      rocking_duration = ros::Duration(traj.getTotalDuration());
-      is_rocking = true;
-    }
-
     void on_trigger_n3ctrl( geometry_msgs::PoseStampedConstPtr const & msg ){}
 
     void on_trigger_insert( std_msgs::HeaderConstPtr const & msg ){
@@ -210,21 +195,42 @@ struct rnw_controller_t {
       ROS_INFO_STREAM(rnw_config.rnw.to_string());
     }
 
-    bool is_rocking = false;
+    ///////////////////////////////////////////////////
+    //// Here we handle the rnw_planner
+    ///////////////////////////////////////////////////
 
-    ros::Time rocking_start_stamp;
-    ros::Duration rocking_duration;
+    bool cmd_in_progress = false;
 
-    void on_spin( const ros::TimerEvent &event ){
+    ros::Time cmd_start_time;
 
-      if ( is_rocking ) {
-        if ( ros::Time::now() > rocking_start_stamp + rocking_duration ) {
+    ros::Duration cmd_duration;
+
+    /**
+     * This loop checks commands (RockingCmd) from rnw_planner
+     * If there is pending RockingCmd, execute
+     * After execution, rnw_planner.cmd_ack()
+     * @param event
+     */
+    void rnw_planner_loop( const ros::TimerEvent &event ){
+      if ( cmd_in_progress ) {
+        if (ros::Time::now() > cmd_start_time + cmd_duration ) {
           rnw_planner.cmd_ack();
-          is_rocking = false;
+          cmd_in_progress = false;
         }
       }
       else if ( rnw_planner.has_pending_cmd() ) {
-        on_rocking();
+        Vector3d tgt_pt = tip_position_to_uav_position(rnw_planner.next_position(),rnw_config);
+        Vector3d pt_uav = pose2T(latest_uav_odom.pose.pose);
+        Vector3d v0 = Vector3d::Zero();
+        // there is a wierd bug, use 3 points will solve it.
+        //ROS_INFO_STREAM("[rnw] from " << pt_uav.transpose() << ", to " << tgt_pt.transpose());
+        //ROS_INFO_STREAM("[rnw] offset " << (tgt_pt-pt_uav).transpose());
+        Vector3d mid_point = (pt_uav+tgt_pt)/2;
+        Trajectory traj = rocking_generator.genOptimalTrajDTC({pt_uav, mid_point, tgt_pt}, v0, v0, v0, v0);
+        pub_poly_traj.publish(to_ros_msg(traj,ros::Time::now()));
+        cmd_start_time = ros::Time::now();
+        cmd_duration = ros::Duration(traj.getTotalDuration());
+        cmd_in_progress = true;
       }
     }
 
@@ -238,7 +244,7 @@ int main( int argc, char** argv ) {
 
   rnw_controller_t rnw_controller(nh);
 
-  auto timer = nh.createTimer(ros::Rate(20), &rnw_controller_t::on_spin, &rnw_controller);
+  auto timer = nh.createTimer(ros::Rate(30), &rnw_controller_t::rnw_planner_loop, &rnw_controller);
 
   ros::Subscriber sub_uav_odom = nh.subscribe<nav_msgs::Odometry>(
           "/odom/uav",
