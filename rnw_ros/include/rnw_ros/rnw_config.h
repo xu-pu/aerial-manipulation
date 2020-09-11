@@ -12,6 +12,8 @@ struct rnw_config_t {
 
     Vector3d X_tcp_cage;
 
+    Vector3d flu_T_tcp;
+
     double insert_below_tip;
 
     double ground_z;

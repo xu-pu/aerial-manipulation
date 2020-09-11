@@ -106,6 +106,10 @@ void rnw_config_t::load_from_ros( ros::NodeHandle & nh ){
   X_tcp_cage.y() = get_param_default(nh,"/X_tcp_cage/y",0.);
   X_tcp_cage.z() = get_param_default(nh,"/X_tcp_cage/z",0.);
 
+  flu_T_tcp.x() = get_param_default(nh,"/flu_T_tcp/x",0.);
+  flu_T_tcp.y() = get_param_default(nh,"/flu_T_tcp/y",0.);
+  flu_T_tcp.z() = get_param_default(nh,"/flu_T_tcp/z",0.);
+
   insert_below_tip = get_param_default(nh,"/insert_below_tip",5.);
 
   zigzag.step_forward = get_param_default(nh,"/zigzag/step_forward",0.1);
