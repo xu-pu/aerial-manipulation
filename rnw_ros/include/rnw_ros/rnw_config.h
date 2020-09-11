@@ -10,8 +10,6 @@
 
 struct rnw_config_t {
 
-    Vector3d X_tip_body;
-
     Vector3d X_tcp_cage;
 
     double insert_below_tip;

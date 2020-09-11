@@ -82,10 +82,6 @@ struct mocap_calibrator_t {
            << "  x: " << cage_center.x() << '\n'
            << "  y: " << cage_center.y() << '\n'
            << "  z: " << cage_center.z() << '\n'
-           << "X_tip_body:\n"
-           << "  x: " << tip.x() << '\n'
-           << "  y: " << tip.y() << '\n'
-           << "  z: " << tip.z() << '\n'
            << "cone:\n"
            << "  base_center:\n"
            << "    x: " << base_center.x() << '\n'

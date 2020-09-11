@@ -102,10 +102,6 @@ vector<Vector3d> gen_wpts_insert_topple(rnw_config_t const & rnw_config ){
 
 void rnw_config_t::load_from_ros( ros::NodeHandle & nh ){
 
-  X_tip_body.x() = get_param_default(nh,"/X_tip_body/x",0.);
-  X_tip_body.y() = get_param_default(nh,"/X_tip_body/y",0.);
-  X_tip_body.z() = get_param_default(nh,"/X_tip_body/z",0.);
-
   X_tcp_cage.x() = get_param_default(nh,"/X_tcp_cage/x",0.);
   X_tcp_cage.y() = get_param_default(nh,"/X_tcp_cage/y",0.);
   X_tcp_cage.z() = get_param_default(nh,"/X_tcp_cage/z",0.);
