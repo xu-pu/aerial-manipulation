@@ -8,6 +8,10 @@ X_tcp_cage:
   x: 0.000548455
   y: 0.00354947
   z: -0.194698
+flu_T_tcp:
+  x: -0.020548455
+  y: 0.00354947
+  z: -0.114698
 insert_below_tip: 0.1
 rnw:
   hover_above_tip: 0.03
