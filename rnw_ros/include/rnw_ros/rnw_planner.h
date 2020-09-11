@@ -43,7 +43,9 @@ struct rnw_planner_t {
 
     ros::Publisher pub_rocking_cmd;
 
-    cone_fsm_e fsm;
+    ros::Publisher pub_grip_state;
+
+    cone_fsm_e fsm = cone_fsm_e::idle;
 
     bool cone_state_init = false;
 
@@ -75,7 +77,7 @@ struct rnw_planner_t {
 
     void plan_next_position();
 
-    void fsm_update(rnw_msgs::ConeState const & msg );
+    void fsm_update();
 
     void fsm_transition( cone_fsm_e from, cone_fsm_e to );
 

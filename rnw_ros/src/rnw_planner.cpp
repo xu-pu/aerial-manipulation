@@ -44,6 +44,7 @@ void rnw_planner_t::on_uav_odom( nav_msgs::OdometryConstPtr const & msg ){
 
 rnw_planner_t::rnw_planner_t( ros::NodeHandle & nh ){
   pub_rocking_cmd = nh.advertise<rnw_msgs::RockingCmd>("/rnw/rocking_cmd",10);
+  pub_grip_state = nh.advertise<rnw_msgs::GripState>("/rnw/grip_state",10);
 }
 
 void rnw_planner_t::plan_next_position(){
@@ -83,21 +84,19 @@ void rnw_planner_t::plan_next_position(){
 
 }
 
-void rnw_planner_t::fsm_update(rnw_msgs::ConeState const & msg ){
-
-  if ( msg.euler_angles.y < min_tilt ) {
+void rnw_planner_t::fsm_update(){
+  if ( latest_cone_state.euler_angles.y < min_tilt ) {
     fsm_transition(fsm, cone_fsm_e::idle);
   }
-  else if ( !msg.is_point_contact ){
+  else if ( !latest_cone_state.is_point_contact ){
     fsm_transition(fsm, cone_fsm_e::idle);
   }
-  else if ( abs(msg.euler_angles_velocity.z) < ang_vel_threshold ) {
+  else if ( abs(latest_cone_state.euler_angles_velocity.z) < ang_vel_threshold ) {
     fsm_transition(fsm, cone_fsm_e::qstatic);
   }
   else {
     fsm_transition(fsm, cone_fsm_e::rocking);
   }
-
 }
 
 void rnw_planner_t::fsm_transition(cone_fsm_e from, cone_fsm_e to ){
@@ -139,7 +138,8 @@ void rnw_planner_t::spin(){
 
   ROS_INFO_STREAM("[rnw] planner main loop spinning");
 
-  fsm_update(latest_cone_state);
+  fsm_update();
+
   switch ( fsm ) {
     case cone_fsm_e::idle:
       break;

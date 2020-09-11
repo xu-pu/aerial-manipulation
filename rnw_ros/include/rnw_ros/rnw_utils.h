@@ -48,6 +48,20 @@ inline double square( double val ){ return val*val; }
 
 struct grip_state_t {
 
+    grip_state_t();
+
+    /**
+     * Calculate the current grip state
+     * @param cone_state
+     * @param uav_odom
+     * @param flu_T_tcp
+     */
+    grip_state_t(
+            rnw_msgs::ConeState const & cone_state,
+            nav_msgs::Odometry const & uav_odom,
+            Vector3d const & flu_T_tcp
+    );
+
     rnw_msgs::ConeState cone_state;
 
     nav_msgs::Odometry uav_odom;
@@ -56,20 +70,22 @@ struct grip_state_t {
 
     Vector3d grip_point;
 
-    bool grip_valid;
+    bool grip_valid = false;
 
-    double grip_radius;
+    double grip_radius = 0;
 
-    double grip_depth;
+    double grip_depth = 0;
+
+    bool initialized = false;
 
     rnw_msgs::GripState to_msg() const;
 
 };
 
 grip_state_t calc_grip_state(
-        rnw_msgs::ConeState const & cone_state,
-        nav_msgs::Odometry const & uav_odom,
-        Vector3d const & flu_T_tcp
+        rnw_msgs::ConeState const & _cone_state,
+        nav_msgs::Odometry const & _uav_odom,
+        Vector3d const & _flu_T_tcp
 );
 
 struct rnw_cmd_t {

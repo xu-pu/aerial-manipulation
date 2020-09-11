@@ -151,42 +151,11 @@ double dist( Vector3d const & A, Vector3d const & B ){
 }
 
 grip_state_t calc_grip_state(
-        rnw_msgs::ConeState const & cone_state,
-        nav_msgs::Odometry const & uav_odom,
-        Vector3d const & flu_T_tcp )
+        rnw_msgs::ConeState const & _cone_state,
+        nav_msgs::Odometry const & _uav_odom,
+        Vector3d const & _flu_T_tcp )
 {
-  grip_state_t grip_state;
-  grip_state.cone_state = cone_state;
-  grip_state.uav_odom = uav_odom;
-  grip_state.flu_T_tcp = flu_T_tcp;
-
-  Matrix3d R = odom2R(uav_odom);
-  Vector3d T = odom2T(uav_odom);
-  Vector3d tcp = R * flu_T_tcp + T;
-  Vector3d tip = uav_utils::from_point_msg(cone_state.tip);
-  Vector3d base = uav_utils::from_point_msg(cone_state.base);
-  Vector3d dir = (base - tip).normalized();
-
-  grip_state.grip_depth = dir.dot(tcp-tip);
-  grip_state.grip_radius = line_point_dist_3d(tip,base,tcp);;
-
-  double tip_tcp = (tip-tcp).norm();
-  double tip_grip = sqrt(square(tip_tcp) - square(grip_state.grip_radius));
-
-  Vector3d grip1 = tip+tip_grip*dir;
-  Vector3d grip2 = tip-tip_grip*dir;
-
-  Vector3d grip = grip2;
-  if ( dist(grip1,tcp) < dist(grip2,tcp) ) {
-    grip = grip1;
-  }
-
-  grip_state.grip_point = grip;
-
-  grip_state.grip_valid = grip_state.grip_depth > 0 && grip_state.grip_radius < 0.1;
-
-  return grip_state;
-
+  return grip_state_t(_cone_state, _uav_odom, _flu_T_tcp);
 }
 
 double line_point_dist_3d( Vector3d const & A, Vector3d const & B, Vector3d const & C ){
@@ -204,4 +173,39 @@ rnw_msgs::GripState grip_state_t::to_msg() const {
   msg.grip_depth = grip_depth;
   msg.grip_valid = grip_valid;
   return msg;
+}
+
+grip_state_t::grip_state_t() = default;
+
+grip_state_t::grip_state_t( rnw_msgs::ConeState const & _cone_state, nav_msgs::Odometry const & _uav_odom,Vector3d const & _flu_T_tcp )
+        : cone_state(_cone_state), uav_odom(_uav_odom), flu_T_tcp(_flu_T_tcp)
+{
+
+  Matrix3d R = odom2R(uav_odom);
+  Vector3d T = odom2T(uav_odom);
+  Vector3d tcp = R * flu_T_tcp + T;
+  Vector3d tip = uav_utils::from_point_msg(cone_state.tip);
+  Vector3d base = uav_utils::from_point_msg(cone_state.base);
+  Vector3d dir = (base - tip).normalized();
+
+  grip_depth = dir.dot(tcp-tip);
+  grip_radius = line_point_dist_3d(tip,base,tcp);;
+
+  double tip_tcp = (tip-tcp).norm();
+  double tip_grip = sqrt(square(tip_tcp) - square(grip_radius));
+
+  Vector3d grip1 = tip+tip_grip*dir;
+  Vector3d grip2 = tip-tip_grip*dir;
+
+  Vector3d grip = grip2;
+  if ( dist(grip1,tcp) < dist(grip2,tcp) ) {
+    grip = grip1;
+  }
+
+  grip_point = grip;
+
+  grip_valid = grip_depth > 0 && grip_radius < 0.1;
+
+  initialized = true;
+
 }
