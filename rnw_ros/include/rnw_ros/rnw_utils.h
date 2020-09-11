@@ -72,6 +72,49 @@ grip_state_t calc_grip_state(
         Vector3d const & flu_T_tcp
 );
 
+struct rnw_cmd_t {
+
+    enum cmd_type_e {
+        cmd_rocking,
+        cmd_adjust_grip,
+        cmd_adjust_nutation
+    } cmd_type;
+
+    /**
+     * same cmd may be published multiple times, use this to keep track
+     */
+    size_t cmd_idx;
+
+    grip_state_t grip_state;
+
+    /**
+     * where the uav need to move, this will:
+     * 1. change nutation
+     * 2. change grip depth
+     * 3. rock the object
+     */
+    Vector3d setpoint_uav;
+
+    ////////////////////////////////////////
+    /// the above properties are enough for
+    /// executing the command, the following
+    /// properties are just for debug
+
+    /// for cmd_adjust_grip
+
+    double setpoint_nutation;
+
+    double setpoint_grip_depth;
+
+    double tau_deg;
+
+    Vector3d tau_vec; // gripping point
+
+    size_t step_count;
+
+};
+
+
 /**
  * Transform tip position to UAV position,
  * using downward mounted caging end-effector
