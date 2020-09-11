@@ -62,6 +62,8 @@ struct rnw_config_t {
 
         double desired_nutation;
 
+        double desired_grip_depth;
+
         double tau;
 
         double max_vel;

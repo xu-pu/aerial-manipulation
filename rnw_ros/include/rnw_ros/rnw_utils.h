@@ -128,6 +128,8 @@ struct rnw_cmd_t {
 
     double setpoint_grip_depth;
 
+    Vector3d setpoint_apex;
+
     double tau_deg;
 
     Vector3d tau_vec; // gripping point
@@ -145,6 +147,15 @@ struct rnw_cmd_t {
  * @return
  */
 Vector3d tip_position_to_uav_position( Vector3d const & tip, rnw_config_t const & config );
+
+/**
+ * Desired TCP position to desired UAV position, all in world frame
+ * @param tcp
+ * @param uav_odom
+ * @param flu_T_tcp
+ * @return
+ */
+Vector3d tcp2uav( Vector3d const & tcp, nav_msgs::Odometry const & uav_odom, Vector3d const & flu_T_tcp );
 
 template<typename T, size_t window_size>
 struct median_filter_t {

@@ -144,6 +144,7 @@ void rnw_config_t::load_from_ros( ros::NodeHandle & nh ){
   rnw.rocking_max_vel  = get_param_default<double>(nh, "/rnw/rocking_max_vel", 0.5);
   rnw.rocking_max_acc  = get_param_default<double>(nh, "/rnw/rocking_max_acc", 0.5);
   rnw.hover_above_tip  = get_param_default<double>(nh,"/rnw/hover_above_tip",0.03);
+  rnw.desired_grip_depth = get_param_default<double>(nh, "/rnw/desired_grip_depth", 0.08);
 }
 
 double dist( Vector3d const & A, Vector3d const & B ){
@@ -208,4 +209,8 @@ grip_state_t::grip_state_t( rnw_msgs::ConeState const & _cone_state, nav_msgs::O
 
   initialized = true;
 
+}
+
+Vector3d tcp2uav( Vector3d const & tcp, nav_msgs::Odometry const & uav_odom, Vector3d const & flu_T_tcp ){
+  return tcp - uav_utils::from_quaternion_msg(uav_odom.pose.pose.orientation) * flu_T_tcp;
 }
