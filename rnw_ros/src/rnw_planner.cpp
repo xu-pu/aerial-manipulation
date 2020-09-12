@@ -16,8 +16,10 @@ void rnw_planner_t::start_walking(){
 }
 
 void rnw_planner_t::stop_walking(){
-  ROS_INFO_STREAM("[rnw] Stop walking");
-  is_walking = false;
+  if ( is_walking ) {
+    ROS_INFO_STREAM("[rnw] Stop walking");
+    is_walking = false;
+  }
 }
 
 void rnw_planner_t::cmd_complete(){
