@@ -5,6 +5,9 @@
     <arg name="topic_trigger_zigzag" value="/rnw/trigger/zigzag" />
     <arg name="topic_trigger_topple" value="/rnw/trigger/topple" />
     <arg name="topic_trigger_rnw" value="/rnw/trigger/rnw" />
+    <arg name="topic_trigger_adjust_nutation" value="/rnw/trigger/adjust_nutation" />
+    <arg name="topic_trigger_adjust_grip" value="/rnw/trigger/adjust_grip" />
+
     <arg name="topic_dbg_trigger" value="/rnw/trigger/debug" />
 
     <rosparam command="load" file="$(find rnw_ros)/config/rnw_config.yaml"/>
@@ -34,6 +37,8 @@
         <remap from="~A" to="$(arg topic_trigger_rnw)"/>
         <remap from="~X" to="$(arg topic_trigger_zigzag)"/>
         <remap from="~Y" to="$(arg topic_trigger_topple)"/>
+        <remap from="~LT" to="$(arg topic_trigger_adjust_nutation)"/>
+        <remap from="~RT" to="$(arg topic_trigger_adjust_grip)"/>
     </node>
 
     <node pkg="rnw_ros" type="visualize_cone_node" name="visualize_cone_node" output="screen" required="true">

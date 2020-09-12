@@ -15,6 +15,14 @@ struct gamepad_handler_t {
 
     ros::Publisher pub_Y;
 
+    ros::Publisher pub_RB;
+
+    ros::Publisher pub_LB;
+
+    ros::Publisher pub_RT;
+
+    ros::Publisher pub_LT;
+
     sensor_msgs::Joy latest_joy;
 
     bool init = false;
@@ -23,12 +31,20 @@ struct gamepad_handler_t {
     static constexpr size_t BUTTON_A = 1;
     static constexpr size_t BUTTON_B = 2;
     static constexpr size_t BUTTON_Y = 3;
+    static constexpr size_t BUTTON_LB = 4;
+    static constexpr size_t BUTTON_RB = 5;
+    static constexpr size_t BUTTON_LT = 6;
+    static constexpr size_t BUTTON_RT = 7;
 
     explicit gamepad_handler_t( ros::NodeHandle & nh ){
       pub_A = nh.advertise<std_msgs::Header>("A",10,false);
       pub_B = nh.advertise<std_msgs::Header>("B",10,false);
       pub_X = nh.advertise<std_msgs::Header>("X",10,false);
       pub_Y = nh.advertise<std_msgs::Header>("Y",10,false);
+      pub_RB = nh.advertise<std_msgs::Header>("RB",10,false);
+      pub_LB = nh.advertise<std_msgs::Header>("LB",10,false);
+      pub_RT = nh.advertise<std_msgs::Header>("RT",10,false);
+      pub_LT = nh.advertise<std_msgs::Header>("LT",10,false);
     }
 
     void on_joystick( sensor_msgs::JoyConstPtr const & msg ){
@@ -61,6 +77,26 @@ struct gamepad_handler_t {
       if ( pre_msg.buttons.at(BUTTON_Y) > cur_msg.buttons.at(BUTTON_Y) ) {
         ROS_INFO_STREAM("Button Y triggered!");
         pub_Y.publish(std_msgs::Header());
+      }
+
+      if ( pre_msg.buttons.at(BUTTON_LB) > cur_msg.buttons.at(BUTTON_LB) ) {
+        ROS_INFO_STREAM("Button LB triggered!");
+        pub_LB.publish(std_msgs::Header());
+      }
+
+      if ( pre_msg.buttons.at(BUTTON_RB) > cur_msg.buttons.at(BUTTON_RB) ) {
+        ROS_INFO_STREAM("Button RB triggered!");
+        pub_RB.publish(std_msgs::Header());
+      }
+
+      if ( pre_msg.buttons.at(BUTTON_LT) > cur_msg.buttons.at(BUTTON_LT) ) {
+        ROS_INFO_STREAM("Button LT triggered!");
+        pub_LT.publish(std_msgs::Header());
+      }
+
+      if ( pre_msg.buttons.at(BUTTON_RT) > cur_msg.buttons.at(BUTTON_RT) ) {
+        ROS_INFO_STREAM("Button RT triggered!");
+        pub_RT.publish(std_msgs::Header());
       }
 
     }

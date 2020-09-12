@@ -112,6 +112,16 @@ struct rnw_controller_t {
 
     }
 
+    void on_trigger_adjust_grip( std_msgs::HeaderConstPtr const & msg ){
+      ROS_WARN_STREAM("[rnw] adjust_grip triggered!");
+      rnw_planner.trigger_adjust_grip();
+    }
+
+    void on_trigger_adjust_nutation( std_msgs::HeaderConstPtr const & msg ){
+      ROS_WARN_STREAM("[rnw] adjust_nutation triggered!");
+      rnw_planner.trigger_adjust_nutation();
+    }
+
     void on_trigger_rnw( std_msgs::HeaderConstPtr const & msg ){
 
       ROS_WARN_STREAM("[rnw] rnw triggered!");
@@ -263,6 +273,8 @@ int main( int argc, char** argv ) {
   ros::Subscriber sub_trigger_topple = nh.subscribe<std_msgs::Header>("/rnw/trigger/topple", 10, &rnw_controller_t::on_trigger_topple, &rnw_controller);
   ros::Subscriber sub_trigger_rnw = nh.subscribe<std_msgs::Header>("/rnw/trigger/rnw", 10, &rnw_controller_t::on_trigger_rnw, &rnw_controller);
   ros::Subscriber sub_trigger_push_init = nh.subscribe<std_msgs::Header>("/rnw/trigger/push_init", 10, &rnw_controller_t::on_trigger_push_init, &rnw_controller);
+  ros::Subscriber sub_trigger_adjust_grip = nh.subscribe<std_msgs::Header>("/rnw/trigger/adjust_grip", 10, &rnw_controller_t::on_trigger_adjust_grip, &rnw_controller);
+  ros::Subscriber sub_trigger_adjust_nutation = nh.subscribe<std_msgs::Header>("/rnw/trigger/adjust_nutation", 10, &rnw_controller_t::on_trigger_adjust_nutation, &rnw_controller);
 
   dynamic_reconfigure::Server<rnw_ros::RNWConfig> server;
   server.setConfigDefault(rnw_controller.rnw_config.rnw.to_config());
