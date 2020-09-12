@@ -171,6 +171,8 @@ private:
 
     bool is_walking = false;
 
+    void plan_next_cmd();
+
     void plan_cmd_walk();
 
     void plan_cmd_adjust_grip();

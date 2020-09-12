@@ -117,28 +117,16 @@ void rnw_planner_t::spin(){
 
   fsm_update();
 
+  /// Finished updating states
+  /////////////////////////////////
+  /// Do Planning
+
   if ( rnw_cmd.grip_state.grip_valid && rnw_cmd.fsm == rnw_cmd_t::fsm_idle && fsm == cone_fsm_e::qstatic ) {
-    ROS_INFO_STREAM("[rnw_planner] plan next cmd");
-    bool grip_bad = abs(rnw_cmd.err_grip_depth) > 0.05;
-    bool posture_bad = abs(rnw_cmd.err_nutation_deg) > 10;
-    if ( request_adjust_grip || grip_bad ) {
-      ROS_WARN_STREAM("[rnw_planner] adjusting grip depth");
-      request_adjust_grip = false;
-      request_adjust_nutation = false;
-      plan_cmd_adjust_grip();
-    }
-    else if ( request_adjust_nutation || posture_bad ) {
-      ROS_WARN_STREAM("[rnw_planner] adjusting nutation");
-      request_adjust_grip = false;
-      request_adjust_nutation = false;
-      plan_cmd_adjust_nutation();
-    }
-    else {
-      plan_cmd_walk();
-    }
+    //ROS_INFO_STREAM("[rnw_planner] plan next cmd");
+    plan_next_cmd();
   }
   else if ( rnw_cmd.fsm == rnw_cmd_t::fsm_pending ) {
-    ROS_INFO_STREAM("[rnw_planner] cmd pending, do not plan");
+    //ROS_INFO_STREAM("[rnw_planner] cmd pending, do not plan");
   }
   else if ( rnw_cmd.fsm == rnw_cmd_t::fsm_executing ) {
     //ROS_INFO_STREAM("[rnw_planner] cmd executing, do not plan");
@@ -217,6 +205,40 @@ void rnw_planner_t::plan_cmd_adjust_nutation(){
   rnw_cmd.cmd_idx++;
   //rnw_cmd.step_count++;
   rnw_cmd.fsm = rnw_cmd_t::fsm_pending;
+
+}
+
+void rnw_planner_t::plan_next_cmd(){
+
+  bool grip_bad = abs(rnw_cmd.err_grip_depth) > 0.05;
+
+  bool posture_bad = abs(rnw_cmd.err_nutation_deg) > 10;
+
+  if ( is_walking ) {
+
+    if ( request_adjust_grip || grip_bad ) {
+      ROS_WARN_STREAM("[rnw_planner] adjusting grip depth");
+      plan_cmd_adjust_grip();
+    }
+    else if ( request_adjust_nutation || posture_bad ) {
+      ROS_WARN_STREAM("[rnw_planner] adjusting nutation");
+      plan_cmd_adjust_nutation();
+    }
+    else {
+      ROS_INFO_STREAM("[rnw_planner] plan next step of r-n-w");
+      plan_cmd_walk();
+    }
+
+  }
+  else if ( request_adjust_grip ) {
+    plan_cmd_adjust_grip();
+  }
+  else if ( request_adjust_nutation ) {
+    plan_cmd_adjust_nutation();
+  }
+
+  request_adjust_grip = false;
+  request_adjust_nutation = false;
 
 }
 
