@@ -28,7 +28,7 @@ vector<Vector3d> gen_wpts_push_topple( rnw_config_t const & rnw_config );
  * y-theta-nutation (tilt)
  * z-phi-spin
  * @param R
- * @return - (x,y,z)
+ * @return - (x,y,z) - rad
  */
 Vector3d cone_rot2euler( Matrix3d const & R );
 
@@ -166,7 +166,7 @@ Vector3d tcp2uav( Vector3d const & tcp, nav_msgs::Odometry const & uav_odom, Vec
 Vector3d point_at_grip_depth( rnw_msgs::ConeState const & cone_state, double grip_depth );
 
 /**
- * Rodrigues's Rotation Formula
+ * Rodrigues' Rotation Formula
  * see https://en.wikipedia.org/wiki/Rodrigues%27_rotation_formula
  * rotate point X along axis (O+lambda*K), right-hand-rule theta
  * @param X - the point to rotate

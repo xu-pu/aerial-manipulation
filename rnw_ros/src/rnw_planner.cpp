@@ -194,4 +194,31 @@ void rnw_planner_t::plan_cmd_adjust_grip(){
 
 void rnw_planner_t::plan_cmd_adjust_nutation(){
 
+  Vector3d O = uav_utils::from_point_msg(latest_cone_state.contact_point);
+  Vector3d D = uav_utils::from_point_msg(latest_cone_state.disc_center);
+  Vector3d Dg = D; Dg.z() = rnw_config.ground_z;
+
+  Vector3d e1 = (Dg-O).normalized();
+  Vector3d e2 = Vector3d::UnitZ();
+  Vector3d K = e1.cross(e2);
+
+  // rotate along K, positive rotation increase nutation
+
+  Vector3d C = rnw_cmd.grip_state.grip_point;
+  // make sure they are radiant
+  double cur_nutation = latest_cone_state.euler_angles.y;
+  double desired_nutation = rnw_config.rnw.desired_nutation*deg2rad;
+  double theta = desired_nutation - cur_nutation;
+
+  rnw_cmd.setpoint_apex = rotate_point_along_axis(C,O,K,theta);
+  rnw_cmd.setpoint_uav = tcp2uav(rnw_cmd.setpoint_apex,latest_uav_odom,rnw_config.flu_T_tcp);
+  rnw_cmd.setpoint_grip_depth = rnw_config.rnw.desired_grip_depth;
+  rnw_cmd.setpoint_nutation = rnw_config.rnw.desired_nutation;
+  rnw_cmd.tau_deg = 0;
+  rnw_cmd.tau_vec = Vector3d::Zero();
+  rnw_cmd.cmd_type = rnw_cmd_t::cmd_adjust_nutation;
+  rnw_cmd.cmd_idx++;
+  //rnw_cmd.step_count++;
+  rnw_cmd.fsm = rnw_cmd_t::fsm_pending;
+
 }
