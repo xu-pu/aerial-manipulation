@@ -21,12 +21,29 @@ struct rnw_planner_t {
 
     void on_uav_odom( nav_msgs::OdometryConstPtr const & msg );
 
+    /**
+     * Main loop of the planner, run at 30Hz
+     */
     void spin();
 
+    /**
+     * Call when the current command is executed
+     * fsm: "executing" -> "idle"
+     */
     void cmd_complete();
 
+    /**
+     * Take the current pending command
+     * fsm: "pending" -> "executing"
+     * @return rnw_cmd pointer
+     */
     rnw_cmd_t * take_cmd();
 
+    /**
+     * All information output from the planner is in the rnw_cmd.
+     * You only need to care about setpoint_uav, which is where the
+     * UAV need to go. Other information are supplementary
+     */
     rnw_cmd_t rnw_cmd;
 
     //////////////////////////////////////
@@ -43,6 +60,7 @@ struct rnw_planner_t {
 
     ///////////////////////////////
     /// FSM
+    ///////////////////////////////
 
     enum class cone_fsm_e {
         idle, qstatic, rocking
@@ -54,8 +72,9 @@ struct rnw_planner_t {
 
     void fsm_transition( cone_fsm_e from, cone_fsm_e to );
 
-    ////////////////////////////////////////////
+    //////////////////////////
     /// ROS Stuff
+    //////////////////////////
 
     rnw_config_t rnw_config;
 
