@@ -198,8 +198,6 @@ struct rnw_controller_t {
     //// Here we handle the rnw_planner
     ///////////////////////////////////////////////////
 
-    bool cmd_in_progress = false;
-
     ros::Time cmd_start_time;
 
     ros::Duration cmd_duration;
@@ -212,14 +210,13 @@ struct rnw_controller_t {
      */
     void rnw_planner_loop( const ros::TimerEvent &event ){
       rnw_planner.spin();
-      if ( cmd_in_progress ) {
+      if ( rnw_planner.rnw_cmd.fsm == rnw_cmd_t::fsm_executing ) {
         if (ros::Time::now() > cmd_start_time + cmd_duration ) {
           rnw_planner.cmd_complete();
-          cmd_in_progress = false;
         }
       }
-      else if ( rnw_planner.has_pending_cmd() ) {
-        Vector3d tgt_pt = tip_position_to_uav_position(rnw_planner.next_position(),rnw_config);
+      else if ( rnw_planner.rnw_cmd.fsm == rnw_cmd_t::fsm_pending ) {
+        Vector3d tgt_pt = rnw_planner.take_cmd()->setpoint_uav;
         Vector3d pt_uav = pose2T(latest_uav_odom.pose.pose);
         Vector3d v0 = Vector3d::Zero();
         // there is a wierd bug, use 3 points will solve it.
@@ -230,7 +227,6 @@ struct rnw_controller_t {
         pub_poly_traj.publish(to_ros_msg(traj,ros::Time::now()));
         cmd_start_time = ros::Time::now();
         cmd_duration = ros::Duration(traj.getTotalDuration());
-        cmd_in_progress = true;
       }
     }
 

@@ -17,25 +17,29 @@ struct rnw_planner_t {
 
     explicit rnw_planner_t( ros::NodeHandle & nh );
 
-    void start_walking();
-
-    void stop_walking();
-
-    void cmd_complete();
-
-    bool has_pending_cmd() const;
-
-    Vector3d next_position() const;
-
-    void trigger_adjust_grip();
-
-    void trigger_adjust_nutation();
-
     void on_cone_state( rnw_msgs::ConeStateConstPtr const & msg );
 
     void on_uav_odom( nav_msgs::OdometryConstPtr const & msg );
 
     void spin();
+
+    void cmd_complete();
+
+    rnw_cmd_t * take_cmd();
+
+    rnw_cmd_t rnw_cmd;
+
+    //////////////////////////////////////
+    /// Interactive Triggers
+    //////////////////////////////////////
+
+    void start_walking();
+
+    void stop_walking();
+
+    void trigger_adjust_grip();
+
+    void trigger_adjust_nutation();
 
     ///////////////////////////////
     /// FSM
@@ -66,11 +70,6 @@ struct rnw_planner_t {
     bool uav_odom_init = false;
 
     nav_msgs::Odometry latest_uav_odom;
-
-    ////////////////////////////////////////////
-    /// Command
-
-    rnw_cmd_t rnw_cmd;
 
     ////////////////////////////////////////////
     /// Planning

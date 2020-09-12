@@ -26,15 +26,6 @@ void rnw_planner_t::cmd_complete(){
   }
 }
 
-bool rnw_planner_t::has_pending_cmd() const {
-  return rnw_cmd.fsm == rnw_cmd_t::fsm_pending;
-}
-
-Vector3d rnw_planner_t::next_position() const {
-  //return uav_utils::from_point_msg(latest_cmd.tip_setpoint);
-  return rnw_cmd.setpoint_uav;
-}
-
 void rnw_planner_t::on_cone_state( rnw_msgs::ConeStateConstPtr const & msg ){
   latest_cone_state = *msg;
   cone_state_init = true;
@@ -221,4 +212,22 @@ void rnw_planner_t::plan_cmd_adjust_nutation(){
   //rnw_cmd.step_count++;
   rnw_cmd.fsm = rnw_cmd_t::fsm_pending;
 
+}
+
+rnw_cmd_t * rnw_planner_t::take_cmd(){
+  switch ( rnw_cmd.fsm ) {
+    case rnw_cmd_t::fsm_idle:
+      ROS_ERROR("[rnw] there is no command at the moment");
+      break;
+    case rnw_cmd_t::fsm_pending:
+      ROS_INFO_STREAM("[rnw] command is taken, now executing");
+      rnw_cmd.fsm = rnw_cmd_t::fsm_executing;
+      break;
+    case rnw_cmd_t::fsm_executing:
+      ROS_ERROR("[rnw] command is already taken!");
+      break;
+    default:
+      ROS_ERROR("[rnw] invalid rnw_cmd state!");
+  }
+  return &rnw_cmd;
 }
