@@ -1,4 +1,5 @@
 #include "rnw_ros/pose_utils.h"
+#include "rnw_ros/rnw_utils.h"
 #include <visualization_msgs/Marker.h>
 #include <visualization_msgs/MarkerArray.h>
 #include <rnw_msgs/ConeState.h>
@@ -113,8 +114,28 @@ struct cone_visualizer_t {
       marker.pose.orientation.w = 1;
 
       marker.action = visualization_msgs::Marker::ADD;
-      marker.points.push_back(latest_cone_state.tip);
-      marker.points.push_back(latest_rocking_cmd.tip_setpoint);
+      marker.points.push_back(latest_rocking_cmd.grip_state.grip_point);
+      marker.points.push_back(latest_rocking_cmd.setpoint_apex);
+
+      switch (latest_rocking_cmd.cmd_type) {
+        case rnw_cmd_t::cmd_rocking:
+          marker.color.r = 1;
+          marker.color.g = 0;
+          marker.color.b = 0;
+          break;
+        case rnw_cmd_t::cmd_adjust_grip:
+          marker.color.r = 0;
+          marker.color.g = 1;
+          marker.color.b = 0;
+          break;
+        case rnw_cmd_t::cmd_adjust_nutation:
+          marker.color.r = 0;
+          marker.color.g = 0;
+          marker.color.b = 1;
+          break;
+        default:
+          ROS_ERROR("[rnw_visual] invalid rnw cmd type!");
+      }
 
       if ( (latest_time - latest_rocking_cmd.header.stamp).toSec() > 0.5 ) {
         marker.action = visualization_msgs::Marker::DELETE;

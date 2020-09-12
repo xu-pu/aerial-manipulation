@@ -1,7 +1,11 @@
 Header header
-rnw_msgs/ConeState cone_state
-float64 tau_deg
-geometry_msgs/Vector3 tau_vec
-geometry_msgs/Point tip_setpoint
-uint32 step_count
+uint8 fsm
+uint8 cmd_type
 uint32 cmd_idx
+rnw_msgs/GripState grip_state
+geometry_msgs/Point setpoint_uav
+geometry_msgs/Point setpoint_apex
+float64 setpoint_nutation
+float64 setpoint_grip_depth
+float64 tau_deg
+uint32 step_count
