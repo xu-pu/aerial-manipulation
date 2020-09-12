@@ -211,7 +211,7 @@ Vector3d point_at_grip_depth( rnw_msgs::ConeState const & cone_state, double gri
   Vector3d tip = uav_utils::from_point_msg(cone_state.tip);
   Vector3d base = uav_utils::from_point_msg(cone_state.base);
   Vector3d dir = (base-tip).normalized();
-  return tip - grip_depth * dir;
+  return tip + grip_depth * dir;
 }
 
 Vector3d rotate_point_along_axis( Vector3d const & X, Vector3d const & O, Vector3d const & K, double theta ){
