@@ -58,6 +58,10 @@ struct rnw_planner_t {
 
     void trigger_adjust_nutation();
 
+    void on_debug_trigger( std_msgs::HeaderConstPtr const & msg );
+
+private:
+
     ///////////////////////////////
     /// FSM
     ///////////////////////////////
@@ -116,10 +120,6 @@ struct rnw_planner_t {
     void plan_cmd_adjust_grip();
 
     void plan_cmd_adjust_nutation();
-
-    // debug
-
-    void on_debug_trigger( std_msgs::HeaderConstPtr const & msg );
 
 };
 
