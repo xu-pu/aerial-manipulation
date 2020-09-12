@@ -137,11 +137,23 @@ void rnw_planner_t::spin(){
 }
 
 void rnw_planner_t::trigger_adjust_grip(){
-  request_adjust_grip = true;
+  if ( rnw_cmd.grip_state.initialized && rnw_cmd.grip_state.grip_valid && fsm != cone_fsm_e::idle ) {
+    ROS_INFO("[rnw_planner] grip adjustment request accepted");
+    request_adjust_grip = true;
+  }
+  else {
+    ROS_ERROR("[rnw_planner] Can not adjust grip at current state!");
+  }
 }
 
 void rnw_planner_t::trigger_adjust_nutation(){
-  request_adjust_nutation = true;
+  if ( rnw_cmd.grip_state.initialized && rnw_cmd.grip_state.grip_valid && fsm != cone_fsm_e::idle ) {
+    ROS_INFO("[rnw_planner] nutation adjustment request accepted");
+    request_adjust_nutation = true;
+  }
+  else {
+    ROS_ERROR("[rnw_planner] Can not adjust nutation at current state!");
+  }
 }
 
 void rnw_planner_t::plan_cmd_walk(){
