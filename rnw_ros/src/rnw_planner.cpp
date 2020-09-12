@@ -161,7 +161,6 @@ void rnw_planner_t::plan_cmd_walk(){
   rnw_cmd.setpoint_grip_depth = rnw_config.rnw.desired_grip_depth;
   rnw_cmd.setpoint_nutation = rnw_config.rnw.desired_nutation;
   rnw_cmd.tau_deg = rot_amp_deg;
-  rnw_cmd.tau_vec = setpoint_apex - apex;
   rnw_cmd.cmd_type = rnw_cmd_t::cmd_rocking;
   rnw_cmd.cmd_idx++;
   rnw_cmd.step_count++;
@@ -175,7 +174,6 @@ void rnw_planner_t::plan_cmd_adjust_grip(){
   rnw_cmd.setpoint_grip_depth = rnw_config.rnw.desired_grip_depth;
   rnw_cmd.setpoint_nutation = rnw_config.rnw.desired_nutation;
   rnw_cmd.tau_deg = 0;
-  rnw_cmd.tau_vec = Vector3d::Zero();
   rnw_cmd.cmd_type = rnw_cmd_t::cmd_adjust_grip;
   rnw_cmd.cmd_idx++;
   //rnw_cmd.step_count++;
@@ -205,7 +203,6 @@ void rnw_planner_t::plan_cmd_adjust_nutation(){
   rnw_cmd.setpoint_grip_depth = rnw_config.rnw.desired_grip_depth;
   rnw_cmd.setpoint_nutation = rnw_config.rnw.desired_nutation;
   rnw_cmd.tau_deg = 0;
-  rnw_cmd.tau_vec = Vector3d::Zero();
   rnw_cmd.cmd_type = rnw_cmd_t::cmd_adjust_nutation;
   rnw_cmd.cmd_idx++;
   //rnw_cmd.step_count++;

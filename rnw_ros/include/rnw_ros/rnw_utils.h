@@ -10,6 +10,7 @@
 #include <rnw_msgs/ConeState.h>
 #include <nav_msgs/Odometry.h>
 #include <rnw_msgs/GripState.h>
+#include <rnw_msgs/RockingCmd.h>
 
 #include "rnw_ros/rnw_config.h"
 
@@ -149,9 +150,9 @@ struct rnw_cmd_t {
 
     double tau_deg;
 
-    Vector3d tau_vec; // gripping point
-
     size_t step_count;
+
+    rnw_msgs::RockingCmd to_msg() const;
 
 };
 

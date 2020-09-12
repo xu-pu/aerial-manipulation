@@ -227,3 +227,18 @@ Vector3d rotate_point_along_axis( Vector3d const & X, Vector3d const & O, Vector
   Vector3d Vrot = V * cos(theta) + K.cross(V) * sin(theta) + K * K.dot(V) * (1-cos(theta));
   return Vrot+O;
 }
+
+rnw_msgs::RockingCmd rnw_cmd_t::to_msg() const {
+  rnw_msgs::RockingCmd msg;
+  msg.fsm = fsm;
+  msg.cmd_type = cmd_type;
+  msg.cmd_idx = cmd_idx;
+  msg.grip_state = grip_state.to_msg();
+  msg.setpoint_uav = uav_utils::to_point_msg(setpoint_uav);
+  msg.setpoint_apex = uav_utils::to_point_msg(setpoint_apex);
+  msg.setpoint_nutation = setpoint_nutation;
+  msg.setpoint_grip_depth = setpoint_grip_depth;
+  msg.tau_deg = tau_deg;
+  msg.step_count = step_count;
+  return msg;
+}
