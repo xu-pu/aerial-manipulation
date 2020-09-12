@@ -15,7 +15,7 @@ struct rnw_planner_t {
     /// Public Interface
     ///////////////////////////////////////
 
-    explicit rnw_planner_t( ros::NodeHandle & nh );
+    rnw_planner_t( ros::NodeHandle & nh, rnw_config_t const & config );
 
     void on_cone_state( rnw_msgs::ConeStateConstPtr const & msg );
 
@@ -80,7 +80,7 @@ private:
     /// ROS Stuff
     //////////////////////////
 
-    rnw_config_t rnw_config;
+    rnw_config_t const & rnw_config;
 
     ros::Publisher pub_rocking_cmd;
 

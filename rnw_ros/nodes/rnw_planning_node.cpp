@@ -8,7 +8,9 @@ int main( int argc, char** argv ) {
 
   ros::NodeHandle nh("~");
 
-  rnw_planner_t rnw_planner(nh);
+  rnw_config_t rnw_cfg; rnw_cfg.load_from_ros(nh);
+
+  rnw_planner_t rnw_planner(nh,rnw_cfg);
 
   ros::Subscriber sub_traj = nh.subscribe<rnw_msgs::ConeState>(
           "cone_state",

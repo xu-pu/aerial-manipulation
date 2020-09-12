@@ -34,7 +34,7 @@ struct rnw_controller_t {
     ros::Publisher pub_poly_traj;
 
     explicit rnw_controller_t(ros::NodeHandle & nh)
-            : rnw_planner(nh),
+            : rnw_planner(nh,rnw_config),
               traj_generator(1024, 16, 0.4, 0.5, 0.5, 23, 0.02),
               zigzag_generator(1024, 16, 0.4, 1, 0.5, 23, 0.02),
               rocking_generator(1024, 16, 0.4, 0.5, 0.5, 23, 0.02)

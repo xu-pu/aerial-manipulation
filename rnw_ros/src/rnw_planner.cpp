@@ -36,8 +36,7 @@ void rnw_planner_t::on_uav_odom( nav_msgs::OdometryConstPtr const & msg ){
   uav_odom_init = true;
 }
 
-rnw_planner_t::rnw_planner_t( ros::NodeHandle & nh ){
-  rnw_config.load_from_ros(nh);
+rnw_planner_t::rnw_planner_t( ros::NodeHandle & nh, rnw_config_t const & cfg ) : rnw_config(cfg) {
   pub_rocking_cmd = nh.advertise<rnw_msgs::RockingCmd>("/rnw/rocking_cmd",10);
   pub_grip_state = nh.advertise<rnw_msgs::GripState>("/rnw/grip_state",10);
 }
