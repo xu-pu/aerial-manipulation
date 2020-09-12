@@ -14,13 +14,18 @@
 #include "rnw_ros/rnw_config.h"
 
 /**
- * For downward moundted caging end-effector
+ * For downward mounted caging end-effector
  * Waypoints for initialization, insert -> topple
  * @param rnw_config
  * @return
  */
 vector<Vector3d> gen_wpts_insert_topple(rnw_config_t const & rnw_config );
 
+/**
+ * For forward mounted open cage, no insertion
+ * @param rnw_config
+ * @return
+ */
 vector<Vector3d> gen_wpts_push_topple( rnw_config_t const & rnw_config );
 
 /**
@@ -41,6 +46,18 @@ Vector3d cone_rot2euler( Matrix3d const & R );
  * @return distance
  */
 double line_point_dist_3d( Vector3d const & A, Vector3d const & B, Vector3d const & C );
+
+/**
+ * Rodrigues' Rotation Formula
+ * see https://en.wikipedia.org/wiki/Rodrigues%27_rotation_formula
+ * rotate point X along axis (O+lambda*K), right-hand-rule theta
+ * @param X - the point to rotate
+ * @param O - origin of the rotation axis
+ * @param K - unit normal vector of the rotation axis
+ * @param theta - radiant
+ * @return
+ */
+Vector3d rotate_point_along_axis( Vector3d const & X, Vector3d const & O, Vector3d const & K, double theta );
 
 double dist( Vector3d const & A, Vector3d const & B );
 
@@ -138,7 +155,6 @@ struct rnw_cmd_t {
 
 };
 
-
 /**
  * Transform tip position to UAV position,
  * using downward mounted caging end-effector
@@ -164,18 +180,6 @@ Vector3d tcp2uav( Vector3d const & tcp, nav_msgs::Odometry const & uav_odom, Vec
  * @return tcp position
  */
 Vector3d point_at_grip_depth( rnw_msgs::ConeState const & cone_state, double grip_depth );
-
-/**
- * Rodrigues' Rotation Formula
- * see https://en.wikipedia.org/wiki/Rodrigues%27_rotation_formula
- * rotate point X along axis (O+lambda*K), right-hand-rule theta
- * @param X - the point to rotate
- * @param O - origin of the rotation axis
- * @param K - unit normal vector of the rotation axis
- * @param theta - radiant
- * @return
- */
-Vector3d rotate_point_along_axis( Vector3d const & X, Vector3d const & O, Vector3d const & K, double theta );
 
 template<typename T, size_t window_size>
 struct median_filter_t {
