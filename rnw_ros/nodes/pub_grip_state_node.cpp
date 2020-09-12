@@ -34,7 +34,7 @@ struct grip_state_node_t {
 
     void on_spin() const {
       if ( uav_odom_init && cone_state_init ) {
-        grip_state_t grip_state = calc_grip_state(cone_state, uav_odom, rnw_config.flu_T_tcp);
+        grip_state_t grip_state(cone_state, uav_odom, rnw_config.flu_T_tcp);
         pub_grip_state.publish(grip_state.to_msg());
       }
     }

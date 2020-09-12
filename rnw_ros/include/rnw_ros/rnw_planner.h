@@ -9,6 +9,60 @@
 #include "rnw_msgs/ConeState.h"
 #include "rnw_msgs/RockingCmd.h"
 
+struct rnw_cmd_t {
+
+    rnw_msgs::RockingCmd to_msg() const;
+
+    //////////////////////////////////////
+    /// Planner State
+    //////////////////////////////////////
+
+    enum cmd_fsm_e {
+        fsm_idle,
+        fsm_pending,
+        fsm_executing
+    } fsm = fsm_idle;
+
+    enum cmd_type_e {
+        cmd_rocking,
+        cmd_adjust_grip,
+        cmd_adjust_nutation
+    } cmd_type;
+
+    size_t cmd_idx; // same cmd may be published multiple times, use this to keep track
+
+    //////////////////////////////////////
+    /// Waypoint
+    //////////////////////////////////////
+
+    Vector3d setpoint_uav;
+
+    Vector3d setpoint_apex;
+
+    //////////////////////////////////////
+    /// Grip Monitoring
+    //////////////////////////////////////
+
+    grip_state_t grip_state;
+
+    double setpoint_nutation;
+
+    double setpoint_grip_depth;
+
+    double err_grip_depth;
+
+    double err_nutation_deg;
+
+    //////////////////////////////////////
+    /// Walking
+    //////////////////////////////////////
+
+    double tau_deg;
+
+    size_t step_count;
+
+};
+
 struct rnw_planner_t {
 
     ///////////////////////////////////////
@@ -98,6 +152,8 @@ private:
     /// Planning
 
     static constexpr double deg2rad = M_PI/180.;
+
+    static constexpr double rad2deg = 180./M_PI;
 
     static constexpr double min_tilt = 10 * deg2rad;
 

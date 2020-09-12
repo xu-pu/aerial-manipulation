@@ -1,5 +1,5 @@
 #include "rnw_ros/pose_utils.h"
-#include "rnw_ros/rnw_utils.h"
+#include "rnw_ros/rnw_planner.h"
 #include <visualization_msgs/Marker.h>
 #include <visualization_msgs/MarkerArray.h>
 #include <rnw_msgs/ConeState.h>

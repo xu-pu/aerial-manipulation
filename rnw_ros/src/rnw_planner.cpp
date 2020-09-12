@@ -69,6 +69,8 @@ void rnw_planner_t::fsm_transition(cone_fsm_e from, cone_fsm_e to ){
   if ( to == cone_fsm_e::idle ) {
     rnw_cmd.fsm = rnw_cmd_t::fsm_idle;
     rnw_cmd.step_count = 0;
+    request_adjust_grip = false;
+    request_adjust_nutation = false;
   }
 
   if ( from != cone_fsm_e::idle && to == cone_fsm_e::idle ) {
@@ -94,28 +96,29 @@ void rnw_planner_t::spin(){
 
   ROS_INFO_STREAM("[rnw] planner main loop spinning");
 
-  if ( uav_odom_init && cone_state_init ) {
-    rnw_cmd.grip_state = grip_state_t(latest_cone_state,latest_uav_odom,rnw_config.flu_T_tcp);
-    pub_grip_state.publish(rnw_cmd.grip_state.to_msg());
+  if (!(uav_odom_init&&cone_state_init)) {
+    ROS_WARN("[rnw_planner] waiting for uav_odom and cone_state");
+    return;
+  }
+
+  rnw_cmd.grip_state = grip_state_t(latest_cone_state,latest_uav_odom,rnw_config.flu_T_tcp);
+  pub_grip_state.publish(rnw_cmd.grip_state.to_msg());
+
+  if ( rnw_cmd.grip_state.grip_valid ) {
+    rnw_cmd.err_grip_depth = rnw_cmd.grip_state.grip_depth - rnw_config.rnw.desired_grip_depth;
+    rnw_cmd.err_nutation_deg = latest_cone_state.euler_angles.y * rad2deg - rnw_config.rnw.desired_nutation;
+  }
+  else {
+    rnw_cmd.err_grip_depth = 0;
+    rnw_cmd.err_nutation_deg = 0;
   }
 
   fsm_update();
 
-  if ( rnw_cmd.fsm == rnw_cmd_t::fsm_pending ) {
-    ROS_INFO_STREAM("[rnw] cmd pending, do not plan");
-    return;
-  }
-  else if ( rnw_cmd.fsm == rnw_cmd_t::fsm_executing ) {
-    ROS_INFO_STREAM("[rnw] cmd executing, do not plan");
-    return;
-  }
-
-  if ( fsm == cone_fsm_e::qstatic ) {
-    ROS_INFO_STREAM("[rnw] cmd idle and object q-static, plan next cmd");
-
-    bool grip_bad = rnw_cmd.grip_state.grip_depth < 0.05;
-    bool posture_bad = latest_cone_state.euler_angles.y < 30;
-
+  if ( rnw_cmd.grip_state.grip_valid && rnw_cmd.fsm == rnw_cmd_t::fsm_idle && fsm == cone_fsm_e::qstatic ) {
+    ROS_INFO_STREAM("[rnw_planner] plan next cmd");
+    bool grip_bad = abs(rnw_cmd.err_grip_depth) > 0.05;
+    bool posture_bad = abs(rnw_cmd.err_nutation_deg) > 10;
     if ( request_adjust_grip || grip_bad ) {
       request_adjust_grip = false;
       request_adjust_nutation = false;
@@ -129,12 +132,15 @@ void rnw_planner_t::spin(){
     else {
       plan_cmd_walk();
     }
+  }
+  else if ( rnw_cmd.fsm == rnw_cmd_t::fsm_pending ) {
+    ROS_INFO_STREAM("[rnw_planner] cmd pending, do not plan");
+  }
+  else if ( rnw_cmd.fsm == rnw_cmd_t::fsm_executing ) {
+    ROS_INFO_STREAM("[rnw_planner] cmd executing, do not plan");
+  }
 
-  }
-  else if ( fsm == cone_fsm_e::idle ) {
-    request_adjust_grip = false;
-    request_adjust_nutation = false;
-  }
+  pub_rocking_cmd.publish(rnw_cmd.to_msg());
 
 }
 
@@ -226,4 +232,21 @@ rnw_cmd_t * rnw_planner_t::take_cmd(){
       ROS_ERROR("[rnw] invalid rnw_cmd state!");
   }
   return &rnw_cmd;
+}
+
+rnw_msgs::RockingCmd rnw_cmd_t::to_msg() const {
+  rnw_msgs::RockingCmd msg;
+  msg.fsm = fsm;
+  msg.cmd_type = cmd_type;
+  msg.cmd_idx = cmd_idx;
+  msg.grip_state = grip_state.to_msg();
+  msg.setpoint_uav = uav_utils::to_point_msg(setpoint_uav);
+  msg.setpoint_apex = uav_utils::to_point_msg(setpoint_apex);
+  msg.setpoint_nutation_deg = setpoint_nutation;
+  msg.setpoint_grip_depth = setpoint_grip_depth;
+  msg.err_nutation_deg = err_nutation_deg;
+  msg.err_grip_depth = err_grip_depth;
+  msg.tau_deg = tau_deg;
+  msg.step_count = step_count;
+  return msg;
 }

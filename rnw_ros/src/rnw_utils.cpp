@@ -151,14 +151,6 @@ double dist( Vector3d const & A, Vector3d const & B ){
   return (A-B).norm();
 }
 
-grip_state_t calc_grip_state(
-        rnw_msgs::ConeState const & _cone_state,
-        nav_msgs::Odometry const & _uav_odom,
-        Vector3d const & _flu_T_tcp )
-{
-  return grip_state_t(_cone_state, _uav_odom, _flu_T_tcp);
-}
-
 double line_point_dist_3d( Vector3d const & A, Vector3d const & B, Vector3d const & C ){
   return ((C-A).cross(C-B)).norm()/(A-B).norm();
 }
@@ -226,19 +218,4 @@ Vector3d rotate_point_along_axis( Vector3d const & X, Vector3d const & O, Vector
   Vector3d V = X-O;
   Vector3d Vrot = V * cos(theta) + K.cross(V) * sin(theta) + K * K.dot(V) * (1-cos(theta));
   return Vrot+O;
-}
-
-rnw_msgs::RockingCmd rnw_cmd_t::to_msg() const {
-  rnw_msgs::RockingCmd msg;
-  msg.fsm = fsm;
-  msg.cmd_type = cmd_type;
-  msg.cmd_idx = cmd_idx;
-  msg.grip_state = grip_state.to_msg();
-  msg.setpoint_uav = uav_utils::to_point_msg(setpoint_uav);
-  msg.setpoint_apex = uav_utils::to_point_msg(setpoint_apex);
-  msg.setpoint_nutation = setpoint_nutation;
-  msg.setpoint_grip_depth = setpoint_grip_depth;
-  msg.tau_deg = tau_deg;
-  msg.step_count = step_count;
-  return msg;
 }
