@@ -15,9 +15,9 @@ void on_cone_state( rnw_msgs::ConeStateConstPtr const & msg ){
   odom.header.stamp = msg->header.stamp;
   odom.header.frame_id = "world";
   odom.pose.pose.orientation = uav_utils::to_quaternion_msg(Eigen::Quaterniond::Identity());
-  Vector3d tip = uav_utils::from_point_msg(msg->tip);
-  Vector3d pos_uav = tip_position_to_uav_position(tip,rnw_config);
-  odom.pose.pose.position = uav_utils::to_point_msg(pos_uav);
+  Vector3d tcp = point_at_grip_depth(*msg,rnw_config.rnw.desired_grip_depth);
+  Vector3d uav = tcp - rnw_config.flu_T_tcp;
+  odom.pose.pose.position = uav_utils::to_point_msg(uav);
   pub_uav_odom.publish(odom);
 }
 

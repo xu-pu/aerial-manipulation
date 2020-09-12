@@ -27,7 +27,7 @@ struct rnw_cmd_t {
         cmd_rocking,
         cmd_adjust_grip,
         cmd_adjust_nutation
-    } cmd_type;
+    } cmd_type = cmd_rocking;
 
     size_t cmd_idx; // same cmd may be published multiple times, use this to keep track
 

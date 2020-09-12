@@ -5,21 +5,20 @@
     <arg name="topic_trigger_zigzag" value="/rnw/trigger/zigzag" />
     <arg name="topic_trigger_topple" value="/rnw/trigger/topple" />
     <arg name="topic_trigger_rnw" value="/rnw/trigger/rnw" />
+    <arg name="topic_dbg_trigger" value="/rnw/trigger/debug" />
 
     <rosparam command="load" file="$(find rnw_ros)/config/rnw_config.yaml"/>
 
-<!--    <node pkg="rnw_ros" type="pub_mock_uav_node" name="pub_mock_uav_node" output="screen" required="true"/>-->
+    <node pkg="rnw_ros" type="pub_mock_uav_node" name="pub_mock_uav_node" output="screen" required="true"/>
 
     <node pkg="mocap_optitrack" type="mocap_node" name="mocap_node" respawn="false" launch-prefix="" required="true" output="log">
         <rosparam file="$(find mocap_optitrack)/config/mocap.yaml" command="load" />
     </node>
 
     <node pkg="pos_vel_mocap" type="pos_vel_mocap" name="pos_vel_mocap" output="screen" required="true">
-<!--        <param name="publish_uav_odom" type="bool" value="false"/>-->
+        <param name="publish_uav_odom" type="bool" value="false"/>
         <rosparam file="$(find pos_vel_mocap)/config/calib.yaml" command="load" />
     </node>
-
-    <node name="rviz" pkg="rviz" type="rviz" output="log" args="-d $(find rnw_ros)/config/traj.rviz"/>
 
     <node pkg="rnw_ros" type="pub_cone_state_node" name="pub_cone_state_node" required="true" output="log">
         <param name="cut_euler_velocity" type="bool" value="true"/>
@@ -29,8 +28,6 @@
     <node pkg="joy" type="joy_node" name="joy_node" output="screen">
         <param name="~autorepeat_rate" value="0" />
     </node>
-
-    <arg name="topic_dbg_trigger" value="/rnw/trigger/debug" />
 
     <node pkg="rnw_ros" type="gamepad_trigger_node" name="gamepad_trigger_node" output="screen">
         <remap from="~B" to="$(arg topic_dbg_trigger)"/>
@@ -53,14 +50,10 @@
         <param name="clear_after_n_sec" type="double" value="0"/>
     </node>
 
-    <node pkg="rqt_multiplot" type="rqt_multiplot" name="rqt_multiplot"
+    <node name="rviz" pkg="rviz" type="rviz" output="log" args="-d $(find rnw_ros)/config/traj.rviz"/>
+
+    <node pkg="rqt_multiplot" type="rqt_multiplot" name="rqt_multiplot" output="log" required="true"
           args="--multiplot-config $(find rnw_ros)/config/rqt_multiplot_grip.xml --multiplot-run-all"/>
 
-    <node pkg="rnw_ros" type="pub_grip_state_node" name="pub_grip_state_node" output="screen" required="true"/>
-
-    <!--    <node pkg="rqt_reconfigure" type="rqt_reconfigure" name="rqt_reconfigure"/>-->
-
-    <!--    <node pkg="rqt_multiplot" type="rqt_multiplot" name="rqt_multiplot" output="log"-->
-<!--          args="&#45;&#45;multiplot-config $(find rnw_ros)/config/rqt_multiplot_cone_state.xml &#45;&#45;multiplot-run-all"/>-->
 
 </launch>

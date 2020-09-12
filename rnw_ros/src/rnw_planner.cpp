@@ -94,7 +94,7 @@ void rnw_planner_t::on_debug_trigger( std_msgs::HeaderConstPtr const & msg ){
 
 void rnw_planner_t::spin(){
 
-  ROS_INFO_STREAM("[rnw] planner main loop spinning");
+  //ROS_INFO_STREAM("[rnw] planner main loop spinning");
 
   if (!(uav_odom_init&&cone_state_init)) {
     ROS_WARN("[rnw_planner] waiting for uav_odom and cone_state");

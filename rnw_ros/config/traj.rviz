@@ -6,7 +6,9 @@ Panels:
       Expanded:
         - /TF1
         - /TF1/Frames1
+        - /Odometry1
         - /Odometry1/Shape1
+        - /Odometry2
         - /Odometry2/Shape1
       Splitter Ratio: 0.421474367
     Tree Height: 722
@@ -40,9 +42,9 @@ Visualization Manager:
       Frames:
         All Enabled: false
         cone:
-          Value: true
+          Value: false
         uav:
-          Value: true
+          Value: false
         world:
           Value: false
       Marker Scale: 1
@@ -170,7 +172,7 @@ Visualization Manager:
       Marker Topic: /traj_visualization/markers/setpoint
       Name: Marker
       Namespaces:
-        visualize_traj_node: true
+        {}
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -178,7 +180,7 @@ Visualization Manager:
       Marker Topic: /traj_visualization/markers/traj
       Name: Marker
       Namespaces:
-        visualize_traj_node: true
+        {}
       Queue Size: 100
       Value: true
     - Alpha: 1
@@ -207,8 +209,8 @@ Visualization Manager:
           Scale: 1
           Value: true
         Value: true
-      Enabled: false
-      Keep: 100
+      Enabled: true
+      Keep: 1
       Name: Odometry
       Position Tolerance: 0.100000001
       Shape:
@@ -221,9 +223,9 @@ Visualization Manager:
         Shaft Length: 1
         Shaft Radius: 0.0500000007
         Value: Axes
-      Topic: /uwb_vicon_odom
+      Topic: /odom/uav
       Unreliable: false
-      Value: false
+      Value: true
     - Angle Tolerance: 0.100000001
       Class: rviz/Odometry
       Covariance:
@@ -241,8 +243,8 @@ Visualization Manager:
           Scale: 1
           Value: true
         Value: true
-      Enabled: false
-      Keep: 100
+      Enabled: true
+      Keep: 1
       Name: Odometry
       Position Tolerance: 0.100000001
       Shape:
@@ -255,9 +257,9 @@ Visualization Manager:
         Shaft Length: 1
         Shaft Radius: 0.0500000007
         Value: Axes
-      Topic: /pos_vel_mocap/odom_TA
+      Topic: /odom/cone
       Unreliable: false
-      Value: false
+      Value: true
     - Class: rviz/MarkerArray
       Enabled: true
       Marker Topic: /visualize_cone_node/markers/cone
@@ -291,25 +293,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/ThirdPersonFollower
-      Distance: 7.20226145
+      Distance: 3.95916581
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0.589292526
-        Y: -1.76612937
+        X: 0.475450754
+        Y: -0.94227159
         Z: 0
       Focal Shape Fixed Size: false
       Focal Shape Size: 0.0500000007
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 0.250398338
+      Pitch: 0.180398405
       Target Frame: world
       Value: ThirdPersonFollower (rviz)
-      Yaw: 0.59039855
+      Yaw: 0.38039881
     Saved: ~
 Window Geometry:
   Displays:

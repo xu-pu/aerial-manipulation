@@ -118,11 +118,11 @@
                                     <field>grip_depth</field>
                                     <field_type>0</field_type>
                                     <scale>
-                                        <absolute_maximum>0.20000000000000001</absolute_maximum>
+                                        <absolute_maximum>0.10000000000000001</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
                                         <relative_minimum>-1000</relative_minimum>
-                                        <type>1</type>
+                                        <type>0</type>
                                     </scale>
                                     <topic>/rnw/grip_state</topic>
                                     <type>rnw_msgs/GripState</type>
