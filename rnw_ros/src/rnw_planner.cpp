@@ -120,11 +120,13 @@ void rnw_planner_t::spin(){
     bool grip_bad = abs(rnw_cmd.err_grip_depth) > 0.05;
     bool posture_bad = abs(rnw_cmd.err_nutation_deg) > 10;
     if ( request_adjust_grip || grip_bad ) {
+      ROS_WARN_STREAM("[rnw_planner] adjusting grip depth");
       request_adjust_grip = false;
       request_adjust_nutation = false;
       plan_cmd_adjust_grip();
     }
     else if ( request_adjust_nutation || posture_bad ) {
+      ROS_WARN_STREAM("[rnw_planner] adjusting nutation");
       request_adjust_grip = false;
       request_adjust_nutation = false;
       plan_cmd_adjust_nutation();
@@ -137,7 +139,7 @@ void rnw_planner_t::spin(){
     ROS_INFO_STREAM("[rnw_planner] cmd pending, do not plan");
   }
   else if ( rnw_cmd.fsm == rnw_cmd_t::fsm_executing ) {
-    ROS_INFO_STREAM("[rnw_planner] cmd executing, do not plan");
+    //ROS_INFO_STREAM("[rnw_planner] cmd executing, do not plan");
   }
 
   pub_rocking_cmd.publish(rnw_cmd.to_msg());
@@ -236,6 +238,7 @@ rnw_cmd_t * rnw_planner_t::take_cmd(){
 
 rnw_msgs::RockingCmd rnw_cmd_t::to_msg() const {
   rnw_msgs::RockingCmd msg;
+  msg.header.stamp = ros::Time::now();
   msg.fsm = fsm;
   msg.cmd_type = cmd_type;
   msg.cmd_idx = cmd_idx;

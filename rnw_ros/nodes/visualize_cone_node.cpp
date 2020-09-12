@@ -137,7 +137,9 @@ struct cone_visualizer_t {
           ROS_ERROR("[rnw_visual] invalid rnw cmd type!");
       }
 
-      if ( (latest_time - latest_rocking_cmd.header.stamp).toSec() > 0.5 ) {
+      bool dont_show_cmd = sec_since_msg(latest_rocking_cmd) > 0.5 || latest_rocking_cmd.fsm == rnw_cmd_t::fsm_idle;
+
+      if ( dont_show_cmd ) {
         marker.action = visualization_msgs::Marker::DELETE;
       }
 
@@ -239,9 +241,9 @@ struct cone_visualizer_t {
       marker.header.stamp = ros::Time::now();
       marker.header.frame_id = "world";
       marker.ns = ns;
-      marker.scale.x = 0.1;
-      marker.scale.y = 0.1;
-      marker.scale.z = 0.1;
+      marker.scale.x = 0.05;
+      marker.scale.y = 0.05;
+      marker.scale.z = 0.05;
       marker.color.r = 0;
       marker.color.g = 0;
       marker.color.b = 1;
@@ -250,7 +252,7 @@ struct cone_visualizer_t {
 
       bool show_grip = grip_state_init
                        && latest_grip_state.grip_valid
-                       && sec_since_msg(latest_grip_state) > 0.5;
+                       && sec_since_msg(latest_grip_state) < 0.5;
 
       if ( show_grip ) {
         marker.action = visualization_msgs::Marker::ADD;

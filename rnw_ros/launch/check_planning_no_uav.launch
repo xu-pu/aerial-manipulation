@@ -52,8 +52,8 @@
 
     <node name="rviz" pkg="rviz" type="rviz" output="log" args="-d $(find rnw_ros)/config/traj.rviz"/>
 
-    <node pkg="rqt_multiplot" type="rqt_multiplot" name="rqt_multiplot" output="log" required="true"
-          args="--multiplot-config $(find rnw_ros)/config/rqt_multiplot_grip.xml --multiplot-run-all"/>
+<!--    <node pkg="rqt_multiplot" type="rqt_multiplot" name="rqt_multiplot" output="log" required="true"-->
+<!--          args="&#45;&#45;multiplot-config $(find rnw_ros)/config/rqt_multiplot_grip.xml &#45;&#45;multiplot-run-all"/>-->
 
 
 </launch>
