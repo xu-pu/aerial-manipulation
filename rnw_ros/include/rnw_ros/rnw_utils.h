@@ -165,6 +165,18 @@ Vector3d tcp2uav( Vector3d const & tcp, nav_msgs::Odometry const & uav_odom, Vec
  */
 Vector3d point_at_grip_depth( rnw_msgs::ConeState const & cone_state, double grip_depth );
 
+/**
+ * Rodrigues's Rotation Formula
+ * see https://en.wikipedia.org/wiki/Rodrigues%27_rotation_formula
+ * rotate point X along axis (O+lambda*K), right-hand-rule theta
+ * @param X - the point to rotate
+ * @param O - origin of the rotation axis
+ * @param K - unit normal vector of the rotation axis
+ * @param theta - radiant
+ * @return
+ */
+Vector3d rotate_point_along_axis( Vector3d const & X, Vector3d const & O, Vector3d const & K, double theta );
+
 template<typename T, size_t window_size>
 struct median_filter_t {
 

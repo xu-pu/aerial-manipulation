@@ -221,3 +221,9 @@ Vector3d point_at_grip_depth( rnw_msgs::ConeState const & cone_state, double gri
   Vector3d dir = (base-tip).normalized();
   return tip - grip_depth * dir;
 }
+
+Vector3d rotate_point_along_axis( Vector3d const & X, Vector3d const & O, Vector3d const & K, double theta ){
+  Vector3d V = X-O;
+  Vector3d Vrot = V * cos(theta) + K.cross(V) * sin(theta) + K * K.dot(V) * (1-cos(theta));
+  return Vrot+O;
+}
