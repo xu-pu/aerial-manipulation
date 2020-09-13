@@ -16,6 +16,8 @@
     <arg name="topic_trigger_topple" value="/rnw/trigger/topple" />
     <arg name="topic_trigger_rnw" value="/rnw/trigger/rnw" />
     <arg name="topic_trigger_push_init" value="/rnw/trigger/push_init" />
+    <arg name="topic_trigger_adjust_nutation" value="/rnw/trigger/adjust_nutation" />
+    <arg name="topic_trigger_adjust_grip" value="/rnw/trigger/adjust_grip" />
 
     <rosparam command="load" file="$(find rnw_ros)/config/rnw_config.yaml"/>
 
@@ -69,8 +71,9 @@
     <node pkg="rnw_ros" type="gamepad_trigger_node" name="gamepad_trigger_node" output="screen">
         <remap from="~A" to="$(arg topic_trigger_rnw)"/>
         <remap from="~X" to="$(arg topic_trigger_zigzag)"/>
-        <remap from="~Y" to="$(arg topic_trigger_topple)"/>
         <remap from="~B" to="$(arg topic_trigger_push_init)"/>
+        <remap from="~LT" to="$(arg topic_trigger_adjust_nutation)"/>
+        <remap from="~RT" to="$(arg topic_trigger_adjust_grip)"/>
     </node>
 
     <node pkg="rnw_ros" type="pub_cone_state_node" name="pub_cone_state_node" required="true" output="log">
