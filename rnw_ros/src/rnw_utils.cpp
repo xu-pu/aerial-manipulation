@@ -63,11 +63,18 @@ vector<Vector3d> gen_wpts_push_topple(
           .toRotationMatrix()
           .col(1)
           .normalized();
+  Vector3d backward_dir = -1 * uav_utils::from_quaternion_msg(cone_state.odom.pose.pose.orientation)
+          .normalized()
+          .toRotationMatrix()
+          .col(0)
+          .normalized();
 
   constexpr double deg2rad = M_PI/180.;
   constexpr size_t segments = 5;
   double rad_step = deg2rad * rnw_config.rnw.desired_nutation / segments;
+  constexpr double backward_space = 0.1;
 
+  waypoints_C.emplace_back( apex_init + backward_space * backward_dir );
   for ( size_t i=0; i<=segments; i++ ) {
     waypoints_C.push_back(rotate_point_along_axis(apex_init,fulcrum,axis,i*rad_step));
   }
@@ -75,7 +82,6 @@ vector<Vector3d> gen_wpts_push_topple(
   /// waypoints for gripping point planned, now convert to uav waypoints
 
   vector<Vector3d> waypoints_uav;
-
   waypoints_uav.push_back(uav_utils::from_point_msg(uav_odom.pose.pose.position));
   for ( auto const & C : waypoints_C ) {
     waypoints_uav.push_back(tcp2uav(C,uav_odom,rnw_config.flu_T_tcp));
