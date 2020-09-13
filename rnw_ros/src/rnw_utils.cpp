@@ -48,30 +48,40 @@ Vector3d tip_position_to_uav_position( Vector3d const & tip, rnw_config_t const 
   return rst;
 }
 
-vector<Vector3d> gen_wpts_push_topple( rnw_config_t const & rnw_config ){
+vector<Vector3d> gen_wpts_push_topple(
+        nav_msgs::Odometry const & uav_odom,
+        rnw_msgs::ConeState const & cone_state,
+        rnw_config_t const & rnw_config )
+{
 
-  constexpr double forward_offset = 0.1;
+  vector<Vector3d> waypoints_C;
 
-  vector<Vector3d> wpts;
-
-  wpts.emplace_back(-forward_offset,0,-rnw_config.rnw.insertion_depth); // in front of the tip
-  wpts.emplace_back(0,0,-rnw_config.rnw.insertion_depth); // push the tip
-
-  Vector3d offset(rnw_config.rnw.topple_init,0,-rnw_config.rnw.insertion_depth);
+  Vector3d apex_init = point_at_grip_depth(cone_state, rnw_config.rnw.desired_grip_depth);
+  Vector3d fulcrum = apex_init; fulcrum.z() = rnw_config.ground_z;
+  Vector3d axis = uav_utils::from_quaternion_msg(cone_state.odom.pose.pose.orientation)
+          .normalized()
+          .toRotationMatrix()
+          .col(1)
+          .normalized();
 
   constexpr double deg2rad = M_PI/180.;
   constexpr size_t segments = 5;
-  double rad_step = rnw_config.rnw.desired_nutation/segments*deg2rad;
+  double rad_step = deg2rad * rnw_config.rnw.desired_nutation / segments;
 
   for ( size_t i=0; i<=segments; i++ ) {
-    double rad = i*rad_step;
-    double forward = sin(rad)*rnw_config.cone.height;
-    double downward = (1-cos(rad))*rnw_config.cone.height;
-    Vector3d v(forward,0,-downward);
-    wpts.emplace_back(offset+v);
+    waypoints_C.push_back(rotate_point_along_axis(apex_init,fulcrum,axis,i*rad_step));
   }
 
-  return wpts;
+  /// waypoints for gripping point planned, now convert to uav waypoints
+
+  vector<Vector3d> waypoints_uav;
+
+  waypoints_uav.push_back(uav_utils::from_point_msg(uav_odom.pose.pose.position));
+  for ( auto const & C : waypoints_C ) {
+    waypoints_uav.push_back(tcp2uav(C,uav_odom,rnw_config.flu_T_tcp));
+  }
+
+  return waypoints_uav;
 
 }
 

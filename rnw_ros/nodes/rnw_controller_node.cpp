@@ -170,18 +170,7 @@ struct rnw_controller_t {
         return;
       }
 
-      Matrix3d R_tip = odom2R(latest_cone_state.odom);
-      Vector3d T_tip = uav_utils::from_point_msg(latest_cone_state.tip);
-      Vector3d cur_pos = odom2T(latest_uav_odom);
-
-      auto wpts_local = gen_wpts_push_topple(rnw_config);
-
-      // wpts_local is the desired positions of tcp in the tip frame
-      // they need to be transformed to positions of the uav in the world frame
-      auto waypoints = transform_pts(transform_pts(wpts_local,R_tip,T_tip),Matrix3d::Identity(),-rnw_config.X_tcp_cage);
-
-      waypoints.insert(waypoints.begin(),cur_pos);
-
+      auto waypoints = gen_wpts_push_topple(latest_uav_odom,latest_cone_state,rnw_config);
       Vector3d v0 = Vector3d::Zero();
       Trajectory traj = traj_generator.genOptimalTrajDTC(waypoints, v0, v0, v0, v0);
       pub_poly_traj.publish(to_ros_msg(traj,ros::Time::now()));

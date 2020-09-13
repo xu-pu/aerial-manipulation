@@ -24,10 +24,15 @@ vector<Vector3d> gen_wpts_insert_topple(rnw_config_t const & rnw_config );
 
 /**
  * For forward mounted open cage, no insertion
+ * waypoints are for the UAV in the world frame
  * @param rnw_config
  * @return
  */
-vector<Vector3d> gen_wpts_push_topple( rnw_config_t const & rnw_config );
+vector<Vector3d> gen_wpts_push_topple(
+        nav_msgs::Odometry const & uav_odom,
+        rnw_msgs::ConeState const & cone_state,
+        rnw_config_t const & rnw_config
+);
 
 /**
  * x-psi-precession
@@ -110,7 +115,7 @@ struct grip_state_t {
 Vector3d tip_position_to_uav_position( Vector3d const & tip, rnw_config_t const & config );
 
 /**
- * Desired TCP position to desired UAV position, all in world frame
+ * Desired TCP position to desired UAV position while keep current rotation
  * @param tcp
  * @param uav_odom
  * @param flu_T_tcp
