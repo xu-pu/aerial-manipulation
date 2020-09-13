@@ -14,7 +14,7 @@ rnw:
   insertion_depth: 0.12 # 0.11
   topple_init: 0.05
   desired_nutation: 30
-  desired_grip_depth: 0.08
+  desired_grip_depth: 0.05
   tau: 40
   max_vel: 0.5 # 0.3
   max_acc: 0.3
