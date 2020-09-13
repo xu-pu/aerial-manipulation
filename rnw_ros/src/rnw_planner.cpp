@@ -159,7 +159,8 @@ void rnw_planner_t::trigger_adjust_nutation(){
 void rnw_planner_t::plan_cmd_walk(){
   rot_dir = -rot_dir;
   Vector3d G = uav_utils::from_point_msg(latest_cone_state.contact_point);
-  Vector3d apex = rnw_cmd.grip_state.grip_point;
+  //Vector3d apex = rnw_cmd.grip_state.grip_point;
+  Vector3d apex = point_at_grip_depth(latest_cone_state,rnw_config.rnw.desired_grip_depth);
   Vector3d v = apex - G;
   Matrix3d rot = Eigen::AngleAxisd( rot_amp_deg*deg2rad*rot_dir, Vector3d::UnitZ() ).toRotationMatrix();
   Vector3d next_v = rot * v;
@@ -225,6 +226,8 @@ void rnw_planner_t::plan_next_cmd(){
   bool grip_bad = abs(rnw_cmd.err_grip_depth) > rnw_config.rnw.adjust_grip_depth_threshold;
 
   bool posture_bad = abs(rnw_cmd.err_nutation_deg) > rnw_config.rnw.adjust_nutation_threshold;
+
+  grip_bad = false; // disable grip ajust
 
   if ( is_walking ) {
 
