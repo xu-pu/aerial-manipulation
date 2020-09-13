@@ -20,6 +20,8 @@ rnw:
   max_acc: 0.3
   rocking_max_vel: 1
   rocking_max_acc: 0.5
+  adjust_nutation_threshold: 5
+  adjust_grip_depth_threshold: 0.05
 topple:
   forward: 0.4
   downward: 0.05

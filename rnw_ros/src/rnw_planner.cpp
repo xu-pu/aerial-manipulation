@@ -222,9 +222,9 @@ void rnw_planner_t::plan_cmd_adjust_nutation(){
 
 void rnw_planner_t::plan_next_cmd(){
 
-  bool grip_bad = abs(rnw_cmd.err_grip_depth) > 0.05;
+  bool grip_bad = abs(rnw_cmd.err_grip_depth) > rnw_config.rnw.adjust_grip_depth_threshold;
 
-  bool posture_bad = abs(rnw_cmd.err_nutation_deg) > 10;
+  bool posture_bad = abs(rnw_cmd.err_nutation_deg) > rnw_config.rnw.adjust_nutation_threshold;
 
   if ( is_walking ) {
 

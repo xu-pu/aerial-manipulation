@@ -76,6 +76,10 @@ struct rnw_config_t {
 
         double hover_above_tip;
 
+        double adjust_nutation_threshold;
+
+        double adjust_grip_depth_threshold;
+
         inline std::string to_string() const {
           std::stringstream ss;
           ss << "RnW Parameters:\n"
