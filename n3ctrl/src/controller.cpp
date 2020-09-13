@@ -50,8 +50,8 @@ void Controller::config_gain(const Parameter_t::Gain& gain)
   Kap(2,2) = gain.Kap2;
 	Kyaw = gain.Kyaw;
   ROS_WARN_STREAM("[n3ctrl] Gains: " << gain);
-  int_e_v.setZero();
-  ROS_INFO("[n3ctrl] integration terms reset!");
+//  int_e_v.setZero();
+//  ROS_INFO("[n3ctrl] integration terms reset!");
 }
 
 void Controller::update(const Desired_State_t& des,const Odom_Data_t& odom,const Imu_Data_t& imu,Controller_Output_t& u,SO3_Controller_Output_t& u_so3){
