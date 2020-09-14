@@ -1,12 +1,12 @@
 <launch>
 
-<!--    <arg name="vicon_topic" value="/pos_vel_mocap/odom_TA"/>-->
-
-    <param name="/use_sim_time" type="bool" value="true"/>
-
     <arg name="imu_topic" default="/djiros/imu"/>
     <arg name="vicon_topic" value="/uwb_vicon_odom"/>
     <arg name="joy_ctrl_topic" value="/djiros/ctrl"/>
+
+    <param name="/use_sim_time" type="bool" value="true"/>
+
+    <rosparam command="load" file="$(find rnw_ros)/config/rnw_config.yaml"/>
 
     <node pkg="rnw_ros" type="visualize_traj_node" name="traj_visualization" output="screen" required="true">
         <param name="lift_dt" type="double" value="0.05"/>
@@ -20,11 +20,10 @@
         <param name="cone_color_b" type="double" value="0"/>
     </node>
 
-<!--    <node pkg="rnw_ros" type="pub_grip_state_node" name="pub_grip_state_node" output="screen" required="true"/>-->
+    <node name="rviz_traj" pkg="rviz" type="rviz" output="log" required="true" args="-d $(find rnw_ros)/config/traj.rviz" />
 
-    <node name="rviz_traj" pkg="rviz" type="rviz" output="log" args="-d $(find rnw_ros)/config/traj.rviz" />
-
-    <rosparam command="load" file="$(find rnw_ros)/config/rnw_config.yaml"/>
+    <node name="rosbag_play" pkg="rosbag" type="play" respawn="false"
+          args="--clock -s 30 /home/sheep/Dropbox/rosbags/2020-09-14-00-58-00.bag"/>
 
     <!--    <node pkg="rnw_ros" type="dbg_atti_loop_node" name="dbg_atti_loop_node" output="screen">-->
 <!--        <remap from="~imu" to="$(arg imu_topic)"/>-->
@@ -33,8 +32,6 @@
 
 <!--    <node pkg="rqt_multiplot" type="rqt_multiplot" name="rqt_multiplot"-->
 <!--          args="&#45;&#45;multiplot-config $(find rnw_ros)/rqt_multiplot.xml &#45;&#45;multiplot-run-all"/>-->
-
-    <node name="rosbag_play" pkg="rosbag" type="play" respawn="false" args="--clock -s 30 /home/sheep/Dropbox/rosbags/2020-09-14-00-58-00.bag"/>
 
 <!--    <node pkg="rqt_multiplot" type="rqt_multiplot" name="rqt_multiplot"-->
 <!--          args="&#45;&#45;multiplot-config $(find rnw_ros)/config/rqt_multiplot_grip.xml &#45;&#45;multiplot-run-all"/>-->
