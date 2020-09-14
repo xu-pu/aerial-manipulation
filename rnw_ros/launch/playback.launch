@@ -2,6 +2,8 @@
 
 <!--    <arg name="vicon_topic" value="/pos_vel_mocap/odom_TA"/>-->
 
+    <param name="/use_sim_time" type="bool" value="true"/>
+
     <arg name="imu_topic" default="/djiros/imu"/>
     <arg name="vicon_topic" value="/uwb_vicon_odom"/>
     <arg name="joy_ctrl_topic" value="/djiros/ctrl"/>
@@ -18,7 +20,7 @@
         <param name="cone_color_b" type="double" value="0"/>
     </node>
 
-    <node pkg="rnw_ros" type="pub_grip_state_node" name="pub_grip_state_node" output="screen" required="true"/>
+<!--    <node pkg="rnw_ros" type="pub_grip_state_node" name="pub_grip_state_node" output="screen" required="true"/>-->
 
     <node name="rviz_traj" pkg="rviz" type="rviz" output="log" args="-d $(find rnw_ros)/config/traj.rviz" />
 
@@ -32,12 +34,9 @@
 <!--    <node pkg="rqt_multiplot" type="rqt_multiplot" name="rqt_multiplot"-->
 <!--          args="&#45;&#45;multiplot-config $(find rnw_ros)/rqt_multiplot.xml &#45;&#45;multiplot-run-all"/>-->
 
-    <node name="rosbag_play" pkg="rosbag" type="play" respawn="false" args="-s 20 /home/sheep/Dropbox/rosbags/2020-09-08-21-20-55.bag.active"/>
+    <node name="rosbag_play" pkg="rosbag" type="play" respawn="false" args="--clock -s 30 /home/sheep/Dropbox/rosbags/2020-09-14-00-58-00.bag"/>
 
-
-    <node pkg="rqt_multiplot" type="rqt_multiplot" name="rqt_multiplot"
-          args="--multiplot-config $(find rnw_ros)/config/rqt_multiplot_grip.xml --multiplot-run-all"/>
-
-    <!--    <node name="rosbag_record" pkg="rosbag" type="record" respawn="false" required="true" args="-o /home/sheep/ -a" output="screen"/>-->
+<!--    <node pkg="rqt_multiplot" type="rqt_multiplot" name="rqt_multiplot"-->
+<!--          args="&#45;&#45;multiplot-config $(find rnw_ros)/config/rqt_multiplot_grip.xml &#45;&#45;multiplot-run-all"/>-->
 
 </launch>
