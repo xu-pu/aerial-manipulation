@@ -269,7 +269,9 @@ void rnw_planner_t::plan_next_cmd(){
 
   bool posture_bad = abs(rnw_cmd.err_nutation_deg) > rnw_config.rnw.adjust_nutation_threshold;
 
-  grip_bad = false; // disable grip ajust
+  grip_bad = false; // disable separate grip adjust
+
+  posture_bad = false; // disable separate nutation adjustment
 
   if ( is_walking ) {
 
@@ -283,7 +285,8 @@ void rnw_planner_t::plan_next_cmd(){
     }
     else {
       ROS_INFO_STREAM("[rnw_planner] plan next step of r-n-w");
-      plan_cmd_walk();
+      //plan_cmd_walk();
+      plan_cmd_walk_with_nutation_adjustment();
     }
 
   }
