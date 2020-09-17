@@ -1,4 +1,4 @@
-#include "N3CtrlFSM.h"
+#include "n3ctrl/N3CtrlFSM.h"
 
 using namespace Eigen;
 using std::cout;

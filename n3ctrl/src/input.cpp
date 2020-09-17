@@ -1,4 +1,4 @@
-#include "input.h"
+#include "n3ctrl/input.h"
 
 using uav_utils::in_range;
 

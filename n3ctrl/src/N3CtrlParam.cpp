@@ -1,4 +1,4 @@
-#include "N3CtrlParam.h"
+#include "n3ctrl/N3CtrlParam.h"
 
 Parameter_t::Parameter_t()
 {

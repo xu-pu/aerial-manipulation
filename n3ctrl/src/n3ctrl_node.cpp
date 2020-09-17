@@ -1,5 +1,5 @@
 #include <ros/ros.h>
-#include "N3CtrlFSM.h"
+#include "n3ctrl/N3CtrlFSM.h"
 
 #include <quadrotor_msgs/SO3Command.h>
 #include <quadrotor_msgs/Float64Stamped.h>
