@@ -6,6 +6,8 @@ uint32 cmd_idx
 geometry_msgs/Point setpoint_uav
 geometry_msgs/Point setpoint_apex
 # walking
+bool is_walking
+uint8 walk_idx
 float64 tau_deg
 uint32 step_count
 # grip monitoring
