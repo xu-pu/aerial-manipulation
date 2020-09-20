@@ -7,18 +7,19 @@
 void rnw_planner_t::start_walking(){
   if ( fsm == cone_fsm_e::idle ) {
     ROS_ERROR_STREAM("[rnw] Can't start walking when object is idle!");
-    is_walking = false;
+    rnw_cmd.is_walking = false;
   }
   else {
-    ROS_INFO_STREAM("[rnw] Start walking");
-    is_walking = true;
+    rnw_cmd.is_walking = true;
+    rnw_cmd.walk_idx++;
+    ROS_INFO_STREAM("[rnw] Start walking, session #" << rnw_cmd.walk_idx);
   }
 }
 
 void rnw_planner_t::stop_walking(){
-  if ( is_walking ) {
+  if ( rnw_cmd.is_walking ) {
     ROS_INFO_STREAM("[rnw] Stop walking");
-    is_walking = false;
+    rnw_cmd.is_walking = false;
   }
 }
 
@@ -86,7 +87,7 @@ void rnw_planner_t::fsm_transition(cone_fsm_e from, cone_fsm_e to ){
 
 void rnw_planner_t::on_debug_trigger( std_msgs::HeaderConstPtr const & msg ){
   ROS_WARN_STREAM("[rnw] Got debug trigger");
-  if ( !is_walking ) {
+  if ( !rnw_cmd.is_walking ) {
     start_walking();
   }
   else {
@@ -273,7 +274,7 @@ void rnw_planner_t::plan_next_cmd(){
 
   posture_bad = false; // disable separate nutation adjustment
 
-  if ( is_walking ) {
+  if ( rnw_cmd.is_walking ) {
 
     if ( request_adjust_grip || grip_bad ) {
       ROS_WARN_STREAM("[rnw_planner] adjusting grip depth");
@@ -335,5 +336,7 @@ rnw_msgs::RockingCmd rnw_cmd_t::to_msg() const {
   msg.err_grip_depth = err_grip_depth;
   msg.tau_deg = tau_deg;
   msg.step_count = step_count;
+  msg.is_walking = is_walking;
+  msg.walk_idx = walk_idx;
   return msg;
 }

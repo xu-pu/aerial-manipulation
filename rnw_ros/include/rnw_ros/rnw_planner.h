@@ -61,6 +61,10 @@ struct rnw_cmd_t {
 
     size_t step_count;
 
+    bool is_walking = false;
+
+    uint8_t walk_idx = 0;
+
 };
 
 struct rnw_planner_t {
@@ -168,8 +172,6 @@ private:
     bool request_adjust_grip = false;
 
     bool request_adjust_nutation = false;
-
-    bool is_walking = false;
 
     void plan_next_cmd();
 
