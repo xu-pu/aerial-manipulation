@@ -1,3 +1,5 @@
 Header header
 uint32 step_count
 rnw_msgs/ConeState cone_state
+float64 tau_deg
+float64 desired_nutation_deg

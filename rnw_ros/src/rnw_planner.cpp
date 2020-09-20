@@ -9,19 +9,21 @@ void rnw_planner_t::start_walking(){
     ROS_ERROR_STREAM("[rnw] Can't start walking when object is idle!");
     rnw_cmd.is_walking = false;
   }
-  else {
+  else if ( !rnw_cmd.is_walking ) {
     rnw_cmd.is_walking = true;
     rnw_cmd.walk_idx++;
+    rnw_cmd.step_count = 0;
     stringstream ss; ss << "/rnw/walking_state/session_" << rnw_cmd.walk_idx;
     pub_walking_state = nh.advertise<rnw_msgs::WalkingState>(ss.str(),100);
-    ROS_INFO_STREAM("[rnw] Start walking, #" << rnw_cmd.walk_idx << ", topic: " << ss.str());
+    ROS_INFO_STREAM("[rnw] Start walking, " << pub_walking_state.getTopic());
   }
 }
 
 void rnw_planner_t::stop_walking(){
   if ( rnw_cmd.is_walking ) {
-    ROS_INFO_STREAM("[rnw] Stop walking");
     rnw_cmd.is_walking = false;
+    pub_walking_state = ros::Publisher();
+    ROS_INFO_STREAM("[rnw] Stop walking");
   }
 }
 
@@ -136,6 +138,16 @@ void rnw_planner_t::spin(){
   }
 
   pub_rocking_cmd.publish(rnw_cmd.to_msg());
+
+  if ( rnw_cmd.is_walking ) {
+    rnw_msgs::WalkingState msg;
+    msg.header = latest_cone_state.header;
+    msg.cone_state = latest_cone_state;
+    msg.step_count = rnw_cmd.step_count;
+    msg.tau_deg = rnw_config.rnw.tau;
+    msg.desired_nutation_deg = rnw_config.rnw.desired_nutation;
+    pub_walking_state.publish(msg);
+  }
 
 }
 
