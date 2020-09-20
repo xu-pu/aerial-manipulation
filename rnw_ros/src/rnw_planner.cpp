@@ -12,7 +12,9 @@ void rnw_planner_t::start_walking(){
   else {
     rnw_cmd.is_walking = true;
     rnw_cmd.walk_idx++;
-    ROS_INFO_STREAM("[rnw] Start walking, session #" << rnw_cmd.walk_idx);
+    stringstream ss; ss << "/rnw/walking_state/session_" << rnw_cmd.walk_idx;
+    pub_walking_state = nh.advertise<rnw_msgs::WalkingState>(ss.str(),100);
+    ROS_INFO_STREAM("[rnw] Start walking, #" << rnw_cmd.walk_idx << ", topic: " << ss.str());
   }
 }
 
@@ -39,7 +41,7 @@ void rnw_planner_t::on_uav_odom( nav_msgs::OdometryConstPtr const & msg ){
   uav_odom_init = true;
 }
 
-rnw_planner_t::rnw_planner_t( ros::NodeHandle & nh, rnw_config_t const & cfg ) : rnw_config(cfg) {
+rnw_planner_t::rnw_planner_t( ros::NodeHandle & h, rnw_config_t const & cfg ) : rnw_config(cfg), nh(h) {
   pub_rocking_cmd = nh.advertise<rnw_msgs::RockingCmd>("/rnw/rocking_cmd",10);
   pub_grip_state = nh.advertise<rnw_msgs::GripState>("/rnw/grip_state",10);
 }

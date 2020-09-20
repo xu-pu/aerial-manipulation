@@ -59,6 +59,7 @@ add_message_files(
         ConeState.msg
         RockingCmd.msg
         GripState.msg
+        WalkingState.msg
 )
 
 

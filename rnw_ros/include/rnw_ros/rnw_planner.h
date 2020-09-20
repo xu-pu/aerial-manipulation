@@ -6,8 +6,9 @@
 #define SRC_RNW_PLANNER_H
 
 #include "rnw_ros/rnw_utils.h"
-#include "rnw_msgs/ConeState.h"
-#include "rnw_msgs/RockingCmd.h"
+#include <rnw_msgs/ConeState.h>
+#include <rnw_msgs/RockingCmd.h>
+#include <rnw_msgs/WalkingState.h>
 
 struct rnw_cmd_t {
 
@@ -138,7 +139,11 @@ private:
     /// ROS Stuff
     //////////////////////////
 
+    ros::NodeHandle & nh;
+
     rnw_config_t const & rnw_config;
+
+    ros::Publisher pub_walking_state;
 
     ros::Publisher pub_rocking_cmd;
 
