@@ -177,7 +177,7 @@ void rnw_planner_t::plan_cmd_walk(){
   //Vector3d apex = rnw_cmd.grip_state.grip_point;
   Vector3d apex = point_at_grip_depth(latest_cone_state,rnw_config.rnw.desired_grip_depth);
   Vector3d v = apex - G;
-  Matrix3d rot = Eigen::AngleAxisd( rot_amp_deg*deg2rad*rot_dir, Vector3d::UnitZ() ).toRotationMatrix();
+  Matrix3d rot = Eigen::AngleAxisd( rnw_config.rnw.tau*deg2rad*rot_dir, Vector3d::UnitZ() ).toRotationMatrix();
   Vector3d next_v = rot * v;
   Vector3d setpoint_apex = G + next_v;
   Vector3d setpoint_uav = tcp2uav(setpoint_apex,latest_uav_odom,rnw_config.flu_T_tcp);
@@ -186,7 +186,7 @@ void rnw_planner_t::plan_cmd_walk(){
   rnw_cmd.setpoint_apex = setpoint_apex;
   rnw_cmd.setpoint_grip_depth = rnw_config.rnw.desired_grip_depth;
   rnw_cmd.setpoint_nutation = rnw_config.rnw.desired_nutation;
-  rnw_cmd.tau_deg = rot_amp_deg;
+  rnw_cmd.tau_deg = rnw_config.rnw.tau;
   rnw_cmd.cmd_type = rnw_cmd_t::cmd_rocking;
   rnw_cmd.cmd_idx++;
   rnw_cmd.step_count++;
@@ -261,7 +261,7 @@ void rnw_planner_t::plan_cmd_walk_with_nutation_adjustment(){
   rot_dir = -rot_dir;
 
   Vector3d v = C_prime - G;
-  Matrix3d rot = Eigen::AngleAxisd( rot_amp_deg*deg2rad*rot_dir, Vector3d::UnitZ() ).toRotationMatrix();
+  Matrix3d rot = Eigen::AngleAxisd( rnw_config.rnw.tau*deg2rad*rot_dir, Vector3d::UnitZ() ).toRotationMatrix();
   Vector3d next_v = rot * v;
   Vector3d setpoint_apex = G + next_v;
   Vector3d setpoint_uav = tcp2uav(setpoint_apex,latest_uav_odom,rnw_config.flu_T_tcp);
@@ -270,7 +270,7 @@ void rnw_planner_t::plan_cmd_walk_with_nutation_adjustment(){
   rnw_cmd.setpoint_apex = setpoint_apex;
   rnw_cmd.setpoint_grip_depth = rnw_config.rnw.desired_grip_depth;
   rnw_cmd.setpoint_nutation = rnw_config.rnw.desired_nutation;
-  rnw_cmd.tau_deg = rot_amp_deg;
+  rnw_cmd.tau_deg = rnw_config.rnw.tau;
   rnw_cmd.cmd_type = rnw_cmd_t::cmd_rocking;
   rnw_cmd.cmd_idx++;
   rnw_cmd.step_count++;
