@@ -277,7 +277,6 @@ void rnw_planner_t::plan_next_cmd(){
     }
     else {
       ROS_INFO_STREAM("[rnw_planner] plan next step of r-n-w");
-      //plan_cmd_walk();
       plan_cmd_walk();
     }
 
