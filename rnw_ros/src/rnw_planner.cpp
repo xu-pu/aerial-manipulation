@@ -13,6 +13,8 @@ void rnw_planner_t::start_walking(){
     rnw_cmd.is_walking = true;
     rnw_cmd.walk_idx++;
     rnw_cmd.step_count = 0;
+    request_adjust_nutation = true;
+    request_adjust_grip = true;
     stringstream ss; ss << "/rnw/walking_state/session_" << int(rnw_cmd.walk_idx);
     pub_walking_state = nh.advertise<rnw_msgs::WalkingState>(ss.str(),100);
     ROS_WARN_STREAM("[rnw] Start walking, " << pub_walking_state.getTopic());
