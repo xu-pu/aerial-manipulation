@@ -172,6 +172,7 @@ void rnw_planner_t::trigger_adjust_nutation(){
 }
 
 void rnw_planner_t::plan_cmd_adjust_grip(){
+  request_adjust_grip = false;
   rnw_cmd.setpoint_apex = point_at_grip_depth(latest_cone_state,rnw_config.rnw.desired_grip_depth);
   rnw_cmd.setpoint_uav = tcp2uav(rnw_cmd.setpoint_apex,latest_uav_odom,rnw_config.flu_T_tcp);
   rnw_cmd.setpoint_grip_depth = rnw_config.rnw.desired_grip_depth;
@@ -184,6 +185,8 @@ void rnw_planner_t::plan_cmd_adjust_grip(){
 }
 
 void rnw_planner_t::plan_cmd_adjust_nutation(){
+
+  request_adjust_nutation = false;
 
   Vector3d O = uav_utils::from_point_msg(latest_cone_state.contact_point);
   Vector3d D = uav_utils::from_point_msg(latest_cone_state.disc_center);
@@ -256,41 +259,18 @@ void rnw_planner_t::plan_cmd_walk(){
 }
 
 void rnw_planner_t::plan_next_cmd(){
-
-  bool grip_bad = abs(rnw_cmd.err_grip_depth) > rnw_config.rnw.adjust_grip_depth_threshold;
-
-  bool posture_bad = abs(rnw_cmd.err_nutation_deg) > rnw_config.rnw.adjust_nutation_threshold;
-
-  grip_bad = false; // disable separate grip adjust
-
-  posture_bad = false; // disable separate nutation adjustment
-
-  if ( rnw_cmd.is_walking ) {
-
-    if ( request_adjust_grip || grip_bad ) {
-      ROS_WARN_STREAM("[rnw_planner] adjusting grip depth");
-      plan_cmd_adjust_grip();
-    }
-    else if ( request_adjust_nutation || posture_bad ) {
-      ROS_WARN_STREAM("[rnw_planner] adjusting nutation");
-      plan_cmd_adjust_nutation();
-    }
-    else {
-      ROS_INFO_STREAM("[rnw_planner] plan next step of r-n-w");
-      plan_cmd_walk();
-    }
-
-  }
-  else if ( request_adjust_grip ) {
+  if ( request_adjust_grip ) {
+    ROS_WARN_STREAM("[rnw_planner] adjusting grip depth");
     plan_cmd_adjust_grip();
   }
   else if ( request_adjust_nutation ) {
+    ROS_WARN_STREAM("[rnw_planner] adjusting nutation");
     plan_cmd_adjust_nutation();
   }
-
-  request_adjust_grip = false;
-  request_adjust_nutation = false;
-
+  else if ( rnw_cmd.is_walking ) {
+    ROS_INFO_STREAM("[rnw_planner] plan next step of r-n-w");
+    plan_cmd_walk();
+  }
 }
 
 rnw_cmd_t * rnw_planner_t::take_cmd(){
