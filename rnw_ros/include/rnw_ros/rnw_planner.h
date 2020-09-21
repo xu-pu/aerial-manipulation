@@ -180,8 +180,6 @@ private:
 
     void plan_cmd_walk();
 
-    void plan_cmd_walk_with_nutation_adjustment();
-
     void plan_cmd_adjust_grip();
 
     void plan_cmd_adjust_nutation();
