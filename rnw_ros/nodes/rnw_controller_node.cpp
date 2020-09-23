@@ -216,17 +216,28 @@ struct rnw_controller_t {
         }
       }
       else if ( rnw_planner.rnw_cmd.fsm == rnw_cmd_t::fsm_pending ) {
-        Vector3d tgt_pt = rnw_planner.take_cmd()->setpoint_uav;
-        Vector3d pt_uav = pose2T(latest_uav_odom.pose.pose);
-        Vector3d v0 = Vector3d::Zero();
-        // there is a wierd bug, use 3 points will solve it.
-        //ROS_INFO_STREAM("[rnw] from " << pt_uav.transpose() << ", to " << tgt_pt.transpose());
-        //ROS_INFO_STREAM("[rnw] offset " << (tgt_pt-pt_uav).transpose());
-        Vector3d mid_point = (pt_uav+tgt_pt)/2;
-        Trajectory traj = rocking_generator.genOptimalTrajDTC({pt_uav, mid_point, tgt_pt}, v0, v0, v0, v0);
-        pub_poly_traj.publish(to_ros_msg(traj,ros::Time::now()));
-        cmd_start_time = ros::Time::now();
-        cmd_duration = ros::Duration(traj.getTotalDuration());
+
+        rnw_cmd_t * cmd = rnw_planner.take_cmd();
+
+        vector<Vector3d> waypoints = {};
+        waypoints.push_back(pose2T(latest_uav_odom.pose.pose));
+        if ( cmd->has_mid_point ) {
+          waypoints.push_back(cmd->midpoint_uav);
+        }
+        waypoints.push_back(cmd->setpoint_uav);
+
+        if (check_waypoints(waypoints)) {
+          Vector3d v0 = Vector3d::Zero();
+          Trajectory traj = rocking_generator.genOptimalTrajDTC(waypoints, v0, v0, v0, v0);
+          pub_poly_traj.publish(to_ros_msg(traj,ros::Time::now()));
+          cmd_start_time = ros::Time::now();
+          cmd_duration = ros::Duration(traj.getTotalDuration());
+        }
+        else {
+          ROS_ERROR_STREAM("[rnw] trajectory is too short! Did not execute!");
+          rnw_planner.cmd_complete();
+        }
+
       }
     }
 

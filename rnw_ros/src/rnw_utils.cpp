@@ -238,3 +238,52 @@ Vector3d rotate_point_along_axis( Vector3d const & X, Vector3d const & O, Vector
   Vector3d Vrot = V * cos(theta) + K.cross(V) * sin(theta) + K * K.dot(V) * (1-cos(theta));
   return Vrot+O;
 }
+
+bool check_waypoints( vector<Vector3d> & wpts ){
+
+  if ( wpts.size() < 2 ) {
+    return false;
+  }
+
+  // first check points too close together
+
+  constexpr double dist_epsi = 0.005;
+
+  vector<Vector3d> pts;
+
+  pts.push_back(wpts.front());
+
+  for ( size_t i=1; i<wpts.size(); i++ ) {
+    Vector3d pt = wpts.at(i);
+    if ( dist(pts.back(),pt) > dist_epsi ) {
+      pts.push_back(pt);
+    }
+    else {
+      ROS_ERROR_STREAM("[rnw] there is redundant waypoint, removed!");
+    }
+  }
+
+  if ( pts.size() < 2 ) {
+    return false;
+  }
+
+  wpts = add_mid_points(pts);
+
+  return true;
+
+}
+
+vector<Vector3d> add_mid_points( vector<Vector3d> const & src ){
+
+  vector<Vector3d> rst;
+  rst.push_back(src.front());
+
+  for ( size_t i=1; i<src.size(); i++ ) {
+    Vector3d pt = src.at(i);
+    rst.emplace_back((rst.back()+pt)/2);
+    rst.push_back(pt);
+  }
+
+  return rst;
+
+}
