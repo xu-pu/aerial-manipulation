@@ -20,15 +20,20 @@
         <param name="cone_color_b" type="double" value="0"/>
     </node>
 
+    <node pkg="rnw_ros" type="pub_obj_trace_node" name="pub_obj_trace_node" output="screen" required="true"/>
+
     <node name="rviz_traj" pkg="rviz" type="rviz" output="log" required="true" args="-d $(find rnw_ros)/config/traj.rviz" />
 
     <node name="rosbag_play" pkg="rosbag" type="play" respawn="false"
-          args="--clock -s 30 /home/sheep/Dropbox/rosbags/2020-09-14-00-58-00.bag"/>
+          args="--clock /home/sheep/Dropbox/rosbags/2020-09-23-13-04-57.ground.manual.v2.bag"/>
 
     <!--    <node pkg="rnw_ros" type="dbg_atti_loop_node" name="dbg_atti_loop_node" output="screen">-->
 <!--        <remap from="~imu" to="$(arg imu_topic)"/>-->
 <!--        <remap from="~joy_ctrl" to="$(arg joy_ctrl_topic)"/>-->
 <!--    </node>-->
+
+    <node pkg="rqt_multiplot" type="rqt_multiplot" name="rqt_multiplot"
+          args="--multiplot-config $(find rnw_ros)/config/rqt_multiplot_cone_state.xml --multiplot-run-all"/>
 
 <!--    <node pkg="rqt_multiplot" type="rqt_multiplot" name="rqt_multiplot"-->
 <!--          args="&#45;&#45;multiplot-config $(find rnw_ros)/rqt_multiplot.xml &#45;&#45;multiplot-run-all"/>-->

@@ -177,6 +177,7 @@ set(RNW_NODES
         gamepad_trigger_node
         dbg_atti_loop_node
         mocap_calib_node
+        pub_obj_trace_node
 )
 
 FOREACH(NODE ${RNW_NODES})
