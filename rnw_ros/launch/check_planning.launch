@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <launch>
 
+    <param name="/use_sim_time" type="bool" value="false"/>
+
     <arg name="topic_trigger_insert" value="/rnw/trigger/insert" />
     <arg name="topic_trigger_zigzag" value="/rnw/trigger/zigzag" />
     <arg name="topic_trigger_topple" value="/rnw/trigger/topple" />
