@@ -1,5 +1,7 @@
 <launch>
 
+    <param name="/use_sim_time" type="bool" value="false"/>
+
     <arg name="imu_topic" default="/djiros/imu"/>
     <arg name="vins_topic" value="/vins_estimator/imu_propagate"/>
 
@@ -15,7 +17,8 @@
         <rosparam file="$(find mocap_optitrack)/config/mocap.yaml" command="load" />
     </node>
 
-    <node pkg="pos_vel_mocap" type="pos_vel_mocap" name="pos_vel_mocap" output="screen" required="true">
+    <node pkg="pos_vel_mocap" type="pos_vel_mocap" name="pos_vel_mocap" output="screen" >
+        <param name="publish_uav_odom" type="bool" value="true"/>
         <rosparam file="$(find pos_vel_mocap)/config/calib.yaml" command="load" />
     </node>
 
