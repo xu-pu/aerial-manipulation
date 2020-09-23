@@ -80,6 +80,10 @@ struct rnw_config_t {
 
         double adjust_grip_depth_threshold;
 
+        double ang_vel_threshold;
+
+        double min_nutation_deg;
+
         inline std::string to_string() const {
           std::stringstream ss;
           ss << "RnW Parameters:\n"

@@ -72,7 +72,7 @@ struct cali_sampler_t {
 
         double dist = (rpy-pt).norm();
 
-        if ( dist < deg2rad(sample_interval_deg) ) {
+        if ( dist < sample_interval_deg * deg2rad ) {
           return false;
         }
 
@@ -155,7 +155,7 @@ struct cali_sampler_t {
 
       ROS_INFO_STREAM("R_MARKER_FLU: " << R_MARKER_FLU.coeffs().transpose() );
       ROS_INFO_STREAM("Eigen::Quat: " << R_MARKER_FLU.w() << ", " << R_MARKER_FLU.x() << ", " << R_MARKER_FLU.y() << ", " << R_MARKER_FLU.z());
-      ROS_INFO_STREAM("Magnitude: " << rad2deg(Eigen::AngleAxisd(R_MARKER_FLU).angle()) );
+      ROS_INFO_STREAM("Magnitude: " << rad2deg * Eigen::AngleAxisd(R_MARKER_FLU).angle() );
 
       cout << "yaml:" << endl;
       cout << "R_MARKER_FLU:\n"

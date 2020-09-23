@@ -69,7 +69,6 @@ vector<Vector3d> gen_wpts_push_topple(
           .col(0)
           .normalized();
 
-  constexpr double deg2rad = M_PI/180.;
   constexpr size_t segments = 5;
   double rad_step = deg2rad * rnw_config.rnw.desired_nutation / segments;
   constexpr double backward_space = 0.1;
@@ -100,7 +99,6 @@ vector<Vector3d> gen_wpts_insert_topple(rnw_config_t const & rnw_config ){
 
   Vector3d offset(rnw_config.rnw.topple_init,0,-rnw_config.rnw.insertion_depth);
 
-  constexpr double deg2rad = M_PI/180.;
   constexpr size_t segments = 5;
   double rad_step = rnw_config.rnw.desired_nutation/segments*deg2rad;
 
@@ -163,6 +161,8 @@ void rnw_config_t::load_from_ros( ros::NodeHandle & nh ){
   rnw.desired_grip_depth = get_param_default<double>(nh, "/rnw/desired_grip_depth", 0.08);
   rnw.adjust_nutation_threshold  = get_param_default<double>(nh,"/rnw/adjust_nutation_threshold",5.);
   rnw.adjust_grip_depth_threshold = get_param_default<double>(nh, "/rnw/adjust_grip_depth_threshold", 0.05);
+  rnw.ang_vel_threshold = get_param_default<double>(nh, "/rnw/ang_vel_threshold", 0);
+  rnw.min_nutation_deg = get_param_default<double>(nh, "/rnw/min_nutation_deg", 0);
 }
 
 double dist( Vector3d const & A, Vector3d const & B ){

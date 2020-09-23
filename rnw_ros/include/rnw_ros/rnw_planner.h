@@ -160,10 +160,6 @@ private:
     ////////////////////////////////////////////
     /// Planning
 
-    static constexpr double deg2rad = M_PI/180.;
-
-    static constexpr double rad2deg = 180./M_PI;
-
     static constexpr double min_tilt = 10 * deg2rad;
 
     double ang_vel_threshold = 1;

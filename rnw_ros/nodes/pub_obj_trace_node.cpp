@@ -26,8 +26,6 @@ private:
 
     static constexpr double spin_zero_thresh_deg = 5;
 
-    static constexpr double deg2rad = M_PI/180.;
-
     bool _found = false;
 
     rnw_msgs::ConeState _rst;

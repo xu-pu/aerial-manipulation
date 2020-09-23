@@ -32,7 +32,7 @@ struct cone_state_estimator_t {
     Vector3d contact_point;
 
     // filters
-    median_filter_t<double,50> ang_vel_z_filter;
+    average_filter_t<double,10> ang_vel_z_filter;
 
     explicit cone_state_estimator_t( ros::NodeHandle & nh );
 

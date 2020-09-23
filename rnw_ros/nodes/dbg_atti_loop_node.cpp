@@ -15,7 +15,7 @@ void on_joy_ctrl(sensor_msgs::JoyConstPtr const & joy ){
   double pitch = joy->axes.at(1);
   double thrust = joy->axes.at(2);
   double yaw = joy->axes.at(3);
-  Vector3d rpy( deg2rad(roll), deg2rad(pitch), deg2rad(yaw) );
+  Vector3d rpy( roll*deg2rad, pitch*deg2rad, yaw*deg2rad );
   pub_rpy_ctrl.publish(eigen2rosv(rpy,joy->header));
 }
 

@@ -20,6 +20,10 @@ using Eigen::Quaterniond;
 
 using namespace std;
 
+constexpr double deg2rad = M_PI/180.;
+constexpr double rad2deg = 180./M_PI;
+
+
 template<typename Derived>
 double msg_time_diff( Derived const & from, Derived const & to ){
   return (to.header.stamp - from.header.stamp).toSec();

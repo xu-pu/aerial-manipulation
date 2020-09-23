@@ -14,6 +14,11 @@
 
 #include "rnw_ros/rnw_config.h"
 
+inline bool cone_is_qstatic( rnw_msgs::ConeState const & cone_state, rnw_config_t const & cfg ){
+  return cone_state.euler_angles.y > cfg.rnw.min_nutation_deg * deg2rad
+         && cone_state.euler_angles_velocity.z <= cfg.rnw.ang_vel_threshold;
+}
+
 /**
  * For downward mounted caging end-effector
  * Waypoints for initialization, insert -> topple

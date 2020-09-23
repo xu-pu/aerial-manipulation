@@ -10,6 +10,8 @@ using namespace std;
 
 struct cone_visualizer_t {
 
+    rnw_config_t rnw_cfg;
+
     double clear_after_n_sec = numeric_limits<double>::max();
 
     ros::Time latest_time;
@@ -43,12 +45,29 @@ struct cone_visualizer_t {
 
     visualization_msgs::Marker marker_contact_path;
 
+    std_msgs::ColorRGBA color_qstatic;
+    std_msgs::ColorRGBA color_default;
+
+    std_msgs::ColorRGBA color;
+
     explicit cone_visualizer_t( ros::NodeHandle & nh ) {
+      rnw_cfg.load_from_ros(nh);
       pub_marker_cone = nh.advertise<visualization_msgs::MarkerArray>("markers/cone", 1);
       clear_after_n_sec = get_param_default(nh,"clear_after_n_sec",numeric_limits<double>::max());
       cone_color_r = get_param_default(nh,"cone_color_r",0);
       cone_color_g = get_param_default(nh,"cone_color_g",0);
       cone_color_b = get_param_default(nh,"cone_color_b",0);
+
+      color_qstatic.r = 1;
+      color_qstatic.g = 0;
+      color_qstatic.b = 0;
+      color_qstatic.a = 1;
+
+      color_default.r = 0;
+      color_default.g = 1;
+      color_default.b = 0;
+      color_default.a = 1;
+
       init_marker_contact_path();
     }
 
@@ -72,6 +91,14 @@ struct cone_visualizer_t {
       latest_cone_state = *msg;
       pub_marker_cone.publish(gen_markers());
       cone_state_init = true;
+
+      if ( cone_is_qstatic(latest_cone_state,rnw_cfg) ) {
+        color = color_qstatic;
+      }
+      else {
+        color = color_default;
+      }
+
     }
 
     void on_rocking_cmd( rnw_msgs::RockingCmdConstPtr const & msg ){
@@ -189,10 +216,7 @@ struct cone_visualizer_t {
       marker.header.frame_id = "world";
       marker.action = visualization_msgs::Marker::ADD;
       marker.ns = ns;
-      marker.color.r = cone_color_r;
-      marker.color.g = cone_color_g;
-      marker.color.b = cone_color_b;
-      marker.color.a = 1.00;
+      marker.color = color;
       marker.pose.orientation.w = 1;
       marker.scale.x = 0.01;
       marker.points.push_back(latest_cone_state.base);
@@ -210,10 +234,7 @@ struct cone_visualizer_t {
       marker.header.frame_id = "world";
       marker.action = visualization_msgs::Marker::ADD;
       marker.ns = ns;
-      marker.color.r = cone_color_r;
-      marker.color.g = cone_color_g;
-      marker.color.b = cone_color_b;
-      marker.color.a = 1.00;
+      marker.color = color;
 
       marker.pose.orientation = latest_cone_state.odom.pose.pose.orientation;
       marker.pose.position = latest_cone_state.disc_center;

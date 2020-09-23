@@ -26,8 +26,8 @@
                         <curve_0>
                             <axes>
                                 <x_axis>
-                                    <field></field>
-                                    <field_type>1</field_type>
+                                    <field>header/stamp</field>
+                                    <field_type>0</field_type>
                                     <scale>
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
@@ -36,7 +36,7 @@
                                         <type>0</type>
                                     </scale>
                                     <topic>/rnw/cone_state</topic>
-                                    <type>rnw_ros/ConeState</type>
+                                    <type>rnw_msgs/ConeState</type>
                                 </x_axis>
                                 <y_axis>
                                     <field>euler_angles/x</field>
@@ -77,8 +77,8 @@
                         <curve_1>
                             <axes>
                                 <x_axis>
-                                    <field>euler_angles</field>
-                                    <field_type>1</field_type>
+                                    <field>header/stamp</field>
+                                    <field_type>0</field_type>
                                     <scale>
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
@@ -87,7 +87,7 @@
                                         <type>0</type>
                                     </scale>
                                     <topic>/rnw/cone_state</topic>
-                                    <type>rnw_ros/ConeState</type>
+                                    <type>rnw_msgs/ConeState</type>
                                 </x_axis>
                                 <y_axis>
                                     <field>euler_angles/y</field>
@@ -128,8 +128,8 @@
                         <curve_2>
                             <axes>
                                 <x_axis>
-                                    <field></field>
-                                    <field_type>1</field_type>
+                                    <field>header/stamp</field>
+                                    <field_type>0</field_type>
                                     <scale>
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
@@ -138,7 +138,7 @@
                                         <type>0</type>
                                     </scale>
                                     <topic>/rnw/cone_state</topic>
-                                    <type>rnw_ros/ConeState</type>
+                                    <type>rnw_msgs/ConeState</type>
                                 </x_axis>
                                 <y_axis>
                                     <field>euler_angles/z</field>
@@ -278,8 +278,8 @@
                         <curve_0>
                             <axes>
                                 <x_axis>
-                                    <field></field>
-                                    <field_type>1</field_type>
+                                    <field>header/stamp</field>
+                                    <field_type>0</field_type>
                                     <scale>
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
@@ -288,7 +288,7 @@
                                         <type>0</type>
                                     </scale>
                                     <topic>/rnw/cone_state</topic>
-                                    <type>rnw_ros/ConeState</type>
+                                    <type>rnw_msgs/ConeState</type>
                                 </x_axis>
                                 <y_axis>
                                     <field>euler_angles_velocity/x</field>
@@ -329,8 +329,8 @@
                         <curve_1>
                             <axes>
                                 <x_axis>
-                                    <field></field>
-                                    <field_type>1</field_type>
+                                    <field>header/stamp</field>
+                                    <field_type>0</field_type>
                                     <scale>
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
@@ -339,7 +339,7 @@
                                         <type>0</type>
                                     </scale>
                                     <topic>/rnw/cone_state</topic>
-                                    <type>rnw_ros/ConeState</type>
+                                    <type>rnw_msgs/ConeState</type>
                                 </x_axis>
                                 <y_axis>
                                     <field>euler_angles_velocity/y</field>
@@ -380,8 +380,8 @@
                         <curve_2>
                             <axes>
                                 <x_axis>
-                                    <field></field>
-                                    <field_type>1</field_type>
+                                    <field>header/stamp</field>
+                                    <field_type>0</field_type>
                                     <scale>
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
@@ -390,7 +390,7 @@
                                         <type>0</type>
                                     </scale>
                                     <topic>/rnw/cone_state</topic>
-                                    <type>rnw_ros/ConeState</type>
+                                    <type>rnw_msgs/ConeState</type>
                                 </x_axis>
                                 <y_axis>
                                     <field>euler_angles_velocity/z</field>
