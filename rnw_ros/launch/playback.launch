@@ -30,7 +30,7 @@
 <!--    </node>-->
 
     <node name="rosbag_play" pkg="rosbag" type="play" respawn="false"
-          args="--clock -s 10 /home/sheep/Dropbox/rosbags/2020-09-23-13-04-57.ground.manual.no.cone.state.bag"/>
+          args="--clock -s 30 /home/sheep/Dropbox/rosbags/2020-09-20-21-22-07.bag"/>
 
     <!--    <node pkg="rnw_ros" type="dbg_atti_loop_node" name="dbg_atti_loop_node" output="screen">-->
 <!--        <remap from="~imu" to="$(arg imu_topic)"/>-->
