@@ -82,3 +82,14 @@ make sure r-n-w planning is correct
 
 
 
+
+
+## r-n-w Playback
+
+
+
+plotjuggler
+
+look at pose angles `/rnw/walk_state/session_X/cone_state/euler_angles`
+
+look at contact point trace `/rnw/walk_state/session_X/cone_state/contact_point`
