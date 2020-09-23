@@ -26,15 +26,16 @@ private:
 
     static constexpr double spin_zero_thresh_deg = 5;
 
-    static constexpr double deg2rad = M_PI/180;
-
-    static constexpr double spin_zero_thresh = spin_zero_thresh_deg * deg2rad;
+    static constexpr double deg2rad = M_PI/180.;
 
     bool _found = false;
 
     rnw_msgs::ConeState _rst;
 
     void update( rnw_msgs::ConeStateConstPtr const & msg ){
+
+      double spin_zero_thresh = spin_zero_thresh_deg * deg2rad;
+
       if ( finding ) {
         double cur = abs(msg->euler_angles.z);
         double last = abs(zero_state.euler_angles.z);

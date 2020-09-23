@@ -74,8 +74,6 @@ void cone_state_estimator_t::publish_cone_state( nav_msgs::OdometryConstPtr cons
 
 void cone_state_estimator_t::update_euler_angles(){
   latest_euler_angles = cone_rot2euler(odom2R(latest_odom));
-  latest_euler_angles.y() = ang_y_filter.update(latest_euler_angles.y());
-  latest_euler_angles.z() = ang_z_filter.update(latest_euler_angles.z());
 }
 
 void cone_state_estimator_t::update_euler_velocity(nav_msgs::OdometryConstPtr const & msg ){
