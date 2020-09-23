@@ -24,6 +24,7 @@ rnw:
   adjust_grip_depth_threshold: 0.05
   ang_vel_threshold: 1
   min_nutation_deg: 10
+  skip_qstatic_check: false
 topple:
   forward: 0.4
   downward: 0.05
