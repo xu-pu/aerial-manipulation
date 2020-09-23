@@ -24,8 +24,13 @@
 
     <node name="rviz_traj" pkg="rviz" type="rviz" output="log" required="true" args="-d $(find rnw_ros)/config/traj.rviz" />
 
+<!--    <node pkg="rnw_ros" type="pub_cone_state_node" name="pub_cone_state_node" required="true" output="log">-->
+<!--        <param name="cut_euler_velocity" type="bool" value="true"/>-->
+<!--        <param name="max_euler_velocity" value="10"/>-->
+<!--    </node>-->
+
     <node name="rosbag_play" pkg="rosbag" type="play" respawn="false"
-          args="--clock /home/sheep/Dropbox/rosbags/2020-09-23-13-04-57.ground.manual.v2.bag"/>
+          args="--clock -s 10 /home/sheep/Dropbox/rosbags/2020-09-23-13-04-57.ground.manual.no.cone.state.bag"/>
 
     <!--    <node pkg="rnw_ros" type="dbg_atti_loop_node" name="dbg_atti_loop_node" output="screen">-->
 <!--        <remap from="~imu" to="$(arg imu_topic)"/>-->

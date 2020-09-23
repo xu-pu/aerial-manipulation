@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <launch>
 
+    <param name="/use_sim_time" type="bool" value="false"/>
+
     <rosparam command="load" file="$(find rnw_ros)/config/rnw_config.yaml"/>
 
     <node pkg="mocap_optitrack" type="mocap_node" name="mocap_node" respawn="false" launch-prefix="" required="true" output="log">
@@ -23,6 +25,8 @@
         <param name="cone_color_g" type="double" value="1"/>
         <param name="cone_color_b" type="double" value="0"/>
     </node>
+
+    <node pkg="rnw_ros" type="pub_obj_trace_node" name="pub_obj_trace_node" output="screen" required="true"/>
 
     <node pkg="rqt_multiplot" type="rqt_multiplot" name="rqt_multiplot" output="log" required="true"
           args="--multiplot-config $(find rnw_ros)/config/rqt_multiplot_cone_state.xml --multiplot-run-all"/>

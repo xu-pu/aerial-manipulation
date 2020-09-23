@@ -160,10 +160,6 @@ private:
     ////////////////////////////////////////////
     /// Planning
 
-    static constexpr double min_tilt = 10 * deg2rad;
-
-    double ang_vel_threshold = 1;
-
     double rot_dir = -1;
 
     // rocking command
