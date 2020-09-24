@@ -8,8 +8,11 @@
 #include "am_traj/am_traj.hpp"
 
 #include <quadrotor_msgs/PolynomialTrajectory.h>
+#include <nav_msgs/Odometry.h>
+#include <uav_utils/converters.h>
+#include <uav_utils/geometry_utils.h>
 
-inline quadrotor_msgs::PolynomialTrajectory to_ros_msg(Trajectory const & traj, ros::Time const & iniStamp ){
+inline quadrotor_msgs::PolynomialTrajectory to_ros_msg(Trajectory const & traj, double yaw_start, double yaw_final, ros::Time const & iniStamp ){
   quadrotor_msgs::PolynomialTrajectory msg;
   msg.header.stamp = iniStamp;
   static uint32_t traj_id = 0;
@@ -21,8 +24,8 @@ inline quadrotor_msgs::PolynomialTrajectory to_ros_msg(Trajectory const & traj, 
   Eigen::Vector3d initialVel, finalVel;
   initialVel = traj.getVel(0.0);
   finalVel = traj.getVel(traj.getTotalDuration());
-  msg.start_yaw = atan2(initialVel(1), initialVel(0));
-  msg.final_yaw = atan2(finalVel(1), finalVel(0));
+  msg.start_yaw = yaw_start;
+  msg.final_yaw = yaw_final;
 
   for (size_t p = 0; p < (size_t)traj.getPieceNum(); p++) {
     msg.time.push_back(traj[p].getDuration());
@@ -61,6 +64,18 @@ inline quadrotor_msgs::PolynomialTrajectory to_ros_msg(Trajectory const & traj, 
 
   return msg;
 
+}
+
+/**
+ * Convert to ros msg while keep current yaw
+ * @param traj
+ * @param odom - current odom, used for yaw calc
+ * @param iniStamp
+ * @return
+ */
+inline quadrotor_msgs::PolynomialTrajectory to_ros_msg(Trajectory const & traj, nav_msgs::Odometry const & odom ,ros::Time const & iniStamp ){
+  double cur_yaw = uav_utils::get_yaw_from_quaternion(uav_utils::from_quaternion_msg(odom.pose.pose.orientation));
+  return to_ros_msg(traj, cur_yaw, cur_yaw, iniStamp);
 }
 
 #endif //SRC_ROS_MSGS_H

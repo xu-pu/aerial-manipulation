@@ -36,7 +36,7 @@ int main( int argc, char** argv ) {
   Trajectory traj = amTrajOpt.genOptimalTrajDTC(waypoints,v0,v0,v0,v0);
   ROS_INFO_STREAM("traj generated");
 
-  auto msg = to_ros_msg(traj,ros::Time::now());
+  auto msg = to_ros_msg(traj,0,0,ros::Time::now());
 
   ros::Rate rate(1);
 

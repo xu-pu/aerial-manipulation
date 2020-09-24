@@ -53,15 +53,21 @@ struct traj_server_t {
 
     uint32_t traj_id = 1;
 
-    double base_yaw;
+    double base_yaw = 0;
+
+    double yaw_rate_deg = 1;
+
+    double yaw_rate = 1;
 
     nav_msgs::Path path_setpoint;
 
     nav_msgs::Path path_plant;
 
-    explicit traj_server_t(){
+    explicit traj_server_t( ros::NodeHandle & nh ){
       path_setpoint.header.frame_id = "world";
       path_plant.header.frame_id = "world";
+      yaw_rate_deg = get_param_default<double>(nh,"yaw_rate_deg",5.);
+      yaw_rate = yaw_rate_deg * deg2rad;
     }
 
     void on_completion(){
@@ -91,7 +97,7 @@ struct traj_server_t {
 
         // position command
         quadrotor_msgs::PositionCommand cmd;
-        poly_traj.gen_pos_cmd(cmd,*odom,t);
+        poly_traj.gen_pos_cmd(cmd,*odom,t,yaw_rate);
         cmd.yaw = base_yaw;
         cmd.yaw_dot = 0;
         cmd.trajectory_flag = cmd.TRAJECTORY_STATUS_READY;
@@ -108,7 +114,7 @@ struct traj_server_t {
       else if ( poly_traj.available ) {
         // traj finished
         quadrotor_msgs::PositionCommand cmd;
-        poly_traj.gen_pos_cmd(cmd,*odom,t);
+        poly_traj.gen_pos_cmd(cmd,*odom,t,yaw_rate);
         cmd.yaw = base_yaw;
         cmd.yaw_dot = 0;
         cmd.trajectory_flag = cmd.TRAJECTORY_STATUS_COMPLETED;
@@ -157,7 +163,7 @@ int main( int argc, char** argv ) {
 
   ros::NodeHandle nh("~");
 
-  traj_server_t traj_server;
+  traj_server_t traj_server(nh);
 
   pub_path_setpoint = nh.advertise<nav_msgs::Path>("/traj/setpoint",10);
   pub_path_plant = nh.advertise<nav_msgs::Path>("/traj/plant",10);

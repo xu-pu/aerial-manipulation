@@ -12,6 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   visualization_msgs
   quadrotor_msgs
+  uav_utils
 )
 
 include_directories(
@@ -28,8 +29,8 @@ catkin_package(
 #  DEPENDS system_lib
 )
 
-add_executable(${PROJECT_NAME}_node src/example0_node.cpp)
+#add_executable(${PROJECT_NAME}_node src/example0_node.cpp)
 
-target_link_libraries(${PROJECT_NAME}_node
-  ${catkin_LIBRARIES}
-)
+#target_link_libraries(${PROJECT_NAME}_node
+#  ${catkin_LIBRARIES}
+#)

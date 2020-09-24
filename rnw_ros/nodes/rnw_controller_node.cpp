@@ -81,7 +81,7 @@ struct rnw_controller_t {
 
       Vector3d v0 = Vector3d::Zero();
       Trajectory traj = traj_generator.genOptimalTrajDTC({pt_uav, pt_tgt, pt_inserted}, v0, v0, v0, v0);
-      pub_poly_traj.publish(to_ros_msg(traj,ros::Time::now()));
+      pub_poly_traj.publish(to_ros_msg(traj,latest_uav_odom,ros::Time::now()));
 
     }
 
@@ -108,7 +108,7 @@ struct rnw_controller_t {
 
       Vector3d v0 = Vector3d::Zero();
       Trajectory traj = traj_generator.genOptimalTrajDTC(waypoints, v0, v0, v0, v0);
-      pub_poly_traj.publish(to_ros_msg(traj,ros::Time::now()));
+      pub_poly_traj.publish(to_ros_msg(traj,latest_uav_odom,ros::Time::now()));
 
     }
 
@@ -157,7 +157,7 @@ struct rnw_controller_t {
 
       Vector3d v0 = Vector3d::Zero();
       Trajectory traj = zigzag_generator.genOptimalTrajDTC(wps,v0,v0,v0,v0);
-      pub_poly_traj.publish(to_ros_msg(traj,ros::Time::now()));
+      pub_poly_traj.publish(to_ros_msg(traj,latest_uav_odom,ros::Time::now()));
 
     }
 
@@ -173,7 +173,7 @@ struct rnw_controller_t {
       auto waypoints = gen_wpts_push_topple(latest_uav_odom,latest_cone_state,rnw_config);
       Vector3d v0 = Vector3d::Zero();
       Trajectory traj = traj_generator.genOptimalTrajDTC(waypoints, v0, v0, v0, v0);
-      pub_poly_traj.publish(to_ros_msg(traj,ros::Time::now()));
+      pub_poly_traj.publish(to_ros_msg(traj,latest_uav_odom,ros::Time::now()));
 
     }
 
@@ -229,7 +229,7 @@ struct rnw_controller_t {
         if (check_waypoints(waypoints)) {
           Vector3d v0 = Vector3d::Zero();
           Trajectory traj = rocking_generator.genOptimalTrajDTC(waypoints, v0, v0, v0, v0);
-          pub_poly_traj.publish(to_ros_msg(traj,ros::Time::now()));
+          pub_poly_traj.publish(to_ros_msg(traj,latest_uav_odom,ros::Time::now()));
           cmd_start_time = ros::Time::now();
           cmd_duration = ros::Duration(traj.getTotalDuration());
         }

@@ -243,7 +243,37 @@ struct poly_traj_t {
       return eval_acc((t-start_time).toSec());
     }
 
-    void gen_pos_cmd( quadrotor_msgs::PositionCommand & _cmd, const nav_msgs::Odometry & _odom, ros::Time const & _cur_t ){
+    double eval_yaw( double T, double yaw_rate ){
+      double yaw_diff = final_yaw - start_yaw;
+      if ( yaw_diff > M_PI ) {
+        yaw_diff = yaw_diff - 2 * M_PI;
+      }
+      else if ( yaw_diff < -M_PI ) {
+        yaw_diff = yaw_diff + 2 * M_PI;
+      }
+
+      double sign = 0;
+      if ( yaw_diff > 0 ) {
+        sign = 1;
+      }
+      else if ( yaw_diff < 0 ) {
+        sign = -1;
+      }
+
+      double yaw_increment = sign * yaw_rate * T;
+
+      if ( yaw_diff > 0 ) {
+        yaw_increment = min(yaw_diff,yaw_increment);
+      }
+      else if ( yaw_diff < 0 ) {
+        yaw_increment = max(yaw_diff,yaw_increment);
+      }
+
+      return start_yaw + yaw_increment;
+
+    }
+
+    void gen_pos_cmd( quadrotor_msgs::PositionCommand & _cmd, const nav_msgs::Odometry & _odom, ros::Time const & _cur_t, double yaw_rate ){
 
       _cmd.header.stamp = _cur_t;
 
@@ -262,6 +292,9 @@ struct poly_traj_t {
            _cmd.position.y,_cmd.velocity.y,_cmd.acceleration.y,
            _cmd.position.z,_cmd.velocity.z,_cmd.acceleration.z
       );
+
+      _cmd.yaw = eval_yaw(dt,yaw_rate);
+      _cmd.yaw_dot = 0;
 
     }
 
