@@ -83,7 +83,9 @@
 
     <node pkg="rnw_ros" type="rnw_controller_node" name="rnw_controller_node" output="screen" respawn="true"/>
 
-    <node pkg="rnw_ros" type="rnw_traj_server_node" name="rnw_traj_server_node" output="screen"/>
+    <node pkg="rnw_ros" type="rnw_traj_server_node" name="rnw_traj_server_node" output="screen">
+        <param name="yaw_rate_deg" type="double" value="30"/>
+    </node>
 
     <node pkg="rnw_ros" type="pub_frames_node" name="pub_frames_node" output="screen">
         <remap from="~imu" to="$(arg imu_topic)"/>

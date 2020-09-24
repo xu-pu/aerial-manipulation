@@ -173,7 +173,12 @@ struct rnw_controller_t {
       auto waypoints = gen_wpts_push_topple(latest_uav_odom,latest_cone_state,rnw_config);
       Vector3d v0 = Vector3d::Zero();
       Trajectory traj = traj_generator.genOptimalTrajDTC(waypoints, v0, v0, v0, v0);
-      pub_poly_traj.publish(to_ros_msg(traj,latest_uav_odom,ros::Time::now()));
+
+      // align the object and uav
+      double uav_yaw = uav_utils::get_yaw_from_quaternion(uav_utils::from_quaternion_msg(latest_uav_odom.pose.pose.orientation));
+      double cone_yaw = uav_utils::get_yaw_from_quaternion(uav_utils::from_quaternion_msg(latest_cone_state.odom.pose.pose.orientation));
+      cone_yaw = uav_utils::normalize_angle(cone_yaw-M_PI);
+      pub_poly_traj.publish(to_ros_msg(traj,uav_yaw,cone_yaw,ros::Time::now()));
 
     }
 

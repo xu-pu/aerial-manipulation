@@ -66,7 +66,7 @@ struct traj_server_t {
     explicit traj_server_t( ros::NodeHandle & nh ){
       path_setpoint.header.frame_id = "world";
       path_plant.header.frame_id = "world";
-      yaw_rate_deg = get_param_default<double>(nh,"yaw_rate_deg",5.);
+      yaw_rate_deg = get_param_default<double>(nh,"yaw_rate_deg",30.);
       yaw_rate = yaw_rate_deg * deg2rad;
     }
 
@@ -98,8 +98,6 @@ struct traj_server_t {
         // position command
         quadrotor_msgs::PositionCommand cmd;
         poly_traj.gen_pos_cmd(cmd,*odom,t,yaw_rate);
-        cmd.yaw = base_yaw;
-        cmd.yaw_dot = 0;
         cmd.trajectory_flag = cmd.TRAJECTORY_STATUS_READY;
         cmd.trajectory_id = traj_id;
         pub_pos_cmd.publish(cmd);
@@ -115,8 +113,6 @@ struct traj_server_t {
         // traj finished
         quadrotor_msgs::PositionCommand cmd;
         poly_traj.gen_pos_cmd(cmd,*odom,t,yaw_rate);
-        cmd.yaw = base_yaw;
-        cmd.yaw_dot = 0;
         cmd.trajectory_flag = cmd.TRAJECTORY_STATUS_COMPLETED;
         cmd.trajectory_id = traj_id;
         pub_pos_cmd.publish(cmd);

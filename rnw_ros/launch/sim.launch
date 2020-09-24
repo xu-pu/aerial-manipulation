@@ -80,7 +80,9 @@
 
     <node pkg="rnw_ros" type="rnw_controller_node" name="rnw_controller_node" output="screen"/>
 
-    <node pkg="rnw_ros" type="rnw_traj_server_node" name="rnw_traj_server_node" output="screen"/>
+    <node pkg="rnw_ros" type="rnw_traj_server_node" name="rnw_traj_server_node" output="screen">
+        <param name="yaw_rate_deg" type="double" value="30"/>
+    </node>
 
     <node pkg="rnw_ros" type="visualize_traj_node" name="traj_visualization" output="screen" required="true">
         <param name="lift_dt" type="double" value="0.2"/>
