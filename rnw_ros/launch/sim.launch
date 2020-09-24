@@ -103,4 +103,7 @@
 
     <node pkg="rostopic" type="rostopic" name="rostopic" args="pub -r 10 /uwb_vicon_odom_cone nav_msgs/Odometry '{ header: { frame_id: world }, pose: { pose: { orientation: { w: 1 } } } }'"/>
 
+<!--    <node pkg="rqt_multiplot" type="rqt_multiplot" name="rqt_multiplot" output="log" required="true"-->
+<!--          args="&#45;&#45;multiplot-config $(find rnw_ros)/config/rqt_multiplot_sdk_cmd.xml &#45;&#45;multiplot-run-all"/>-->
+
 </launch>
