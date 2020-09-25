@@ -133,7 +133,7 @@ void rnw_planner_t::spin(){
     //ROS_INFO_STREAM("[rnw_planner] plan next cmd");
     plan_next_cmd();
   }
-  else if ( rnw_config.rnw.skip_qstatic_check && rnw_cmd.grip_state.grip_valid && rnw_cmd.fsm == rnw_cmd_t::fsm_idle && fsm == cone_fsm_e::qstatic ) {
+  else if ( rnw_config.rnw.skip_qstatic_check && rnw_cmd.grip_state.grip_valid && rnw_cmd.fsm == rnw_cmd_t::fsm_idle && fsm != cone_fsm_e::idle ) {
     ROS_WARN_STREAM("[rnw_planner] skip qstatic check");
     plan_next_cmd();
   }
