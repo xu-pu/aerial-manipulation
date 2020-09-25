@@ -163,7 +163,6 @@ void rnw_config_t::load_from_ros( ros::NodeHandle & nh ){
   rnw.adjust_grip_depth_threshold = get_param_default<double>(nh, "/rnw/adjust_grip_depth_threshold", 0.05);
   rnw.ang_vel_threshold = get_param_default<double>(nh, "/rnw/ang_vel_threshold", 0);
   rnw.min_nutation_deg = get_param_default<double>(nh, "/rnw/min_nutation_deg", 0);
-  rnw.skip_qstatic_check = get_param_default<bool>(nh, "/rnw/skip_qstatic_check", false);
 }
 
 double dist( Vector3d const & A, Vector3d const & B ){
