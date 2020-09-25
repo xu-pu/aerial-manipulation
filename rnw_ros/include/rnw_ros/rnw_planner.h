@@ -76,6 +76,64 @@ struct rnw_cmd_t {
 
 };
 
+/**
+ * positive rot increase yaw
+ */
+struct walking_state_t {
+
+    // states are recorded before the step taken
+
+    size_t step_count = 0;
+
+    inline walking_state_t(){}
+
+    inline void start( rnw_msgs::ConeState const & cone_state ){
+      desired_heading_yaw = cone_yaw(cone_state);
+      cur_relative_yaw = 0;
+      step_count = 0;
+    }
+
+    inline void end(){
+
+    }
+
+    double desired_heading_yaw;
+
+    double cur_relative_yaw;
+
+    rnw_msgs::ConeState last_step_odd;
+
+    rnw_msgs::ConeState last_step_even;
+
+    /**
+     * call before step taken
+     * record latest odd and even step,
+     * update step counter,
+     * update heading direction
+     */
+    inline void step( rnw_msgs::ConeState const & cone_state ){
+
+      if ( step_count % 2 == 0 ) {
+        last_step_even = cone_state;
+      }
+      else {
+        last_step_odd = cone_state;
+      }
+
+      if ( step_count > 1 ) {
+        // update heading direction
+        double diff_odd = uav_utils::normalize_angle(cone_yaw(last_step_odd) - desired_heading_yaw);
+        double diff_even = uav_utils::normalize_angle(cone_yaw(last_step_even) - desired_heading_yaw);
+        cur_relative_yaw = ( diff_odd + diff_even ) / 2;
+
+        ROS_ERROR_STREAM("[rnw_planner] heading direction error " << cur_relative_yaw*rad2deg << " deg");
+      }
+      step_count++;
+    }
+
+};
+
+
 struct rnw_planner_t {
 
     ///////////////////////////////////////
@@ -177,6 +235,8 @@ private:
     bool request_adjust_grip = false;
 
     bool request_adjust_nutation = false;
+
+    walking_state_t walking_state;
 
     void plan_next_cmd();
 

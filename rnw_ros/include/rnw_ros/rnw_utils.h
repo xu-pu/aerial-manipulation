@@ -34,6 +34,8 @@ double uav_yaw_from_cone_state( rnw_msgs::ConeState const & cone_state );
 
 double uav_yaw_from_odom( nav_msgs::Odometry const & odom );
 
+double cone_yaw( rnw_msgs::ConeState const & cone_state );
+
 /**
  * For downward mounted caging end-effector
  * Waypoints for initialization, insert -> topple

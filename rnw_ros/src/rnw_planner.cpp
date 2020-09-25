@@ -10,6 +10,7 @@ void rnw_planner_t::start_walking(){
     rnw_cmd.is_walking = false;
   }
   else if ( !rnw_cmd.is_walking ) {
+    walking_state.start(latest_cone_state);
     rnw_cmd.is_walking = true;
     rnw_cmd.walk_idx++;
     rnw_cmd.step_count = 0;
@@ -24,6 +25,7 @@ void rnw_planner_t::start_walking(){
 
 void rnw_planner_t::stop_walking(){
   if ( rnw_cmd.is_walking ) {
+    walking_state.end();
     rnw_cmd.is_walking = false;
     pub_walking_state = ros::Publisher();
     ROS_INFO_STREAM("[rnw] Stop walking");
@@ -251,7 +253,7 @@ void rnw_planner_t::plan_cmd_walk(){
   rot_dir = -rot_dir;
 
   Vector3d v = C_prime - G;
-  Matrix3d rot = Eigen::AngleAxisd( rnw_config.rnw.tau*deg2rad*rot_dir, Vector3d::UnitZ() ).toRotationMatrix();
+  Matrix3d rot = Eigen::AngleAxisd( rnw_config.rnw.tau*deg2rad*rot_dir - 0.3*walking_state.cur_relative_yaw, Vector3d::UnitZ() ).toRotationMatrix();
   Vector3d next_v = rot * v;
   Vector3d setpoint_apex = G + next_v;
   Vector3d setpoint_uav = tcp2uav(setpoint_apex,latest_uav_odom,rnw_config.flu_T_tcp);
@@ -265,6 +267,8 @@ void rnw_planner_t::plan_cmd_walk(){
   rnw_cmd.cmd_idx++;
   rnw_cmd.step_count++;
   rnw_cmd.fsm = rnw_cmd_t::fsm_pending;
+
+  walking_state.step(latest_cone_state);
 
 }
 

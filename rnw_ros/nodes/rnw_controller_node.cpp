@@ -231,9 +231,6 @@ struct rnw_controller_t {
 
         vector<Vector3d> waypoints = {};
         waypoints.push_back(pose2T(latest_uav_odom.pose.pose));
-//        if ( cmd->has_mid_point ) {
-//          waypoints.push_back(cmd->midpoint_uav);
-//        }
         waypoints.push_back(cmd->setpoint_uav);
 
         if (check_waypoints(waypoints)) {

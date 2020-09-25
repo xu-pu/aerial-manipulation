@@ -163,6 +163,7 @@ void rnw_config_t::load_from_ros( ros::NodeHandle & nh ){
   rnw.adjust_grip_depth_threshold = get_param_default<double>(nh, "/rnw/adjust_grip_depth_threshold", 0.05);
   rnw.ang_vel_threshold = get_param_default<double>(nh, "/rnw/ang_vel_threshold", 0);
   rnw.min_nutation_deg = get_param_default<double>(nh, "/rnw/min_nutation_deg", 0);
+  rnw.yaw_gain = get_param_default<double>(nh, "/rnw/yaw_gain", 0);
 }
 
 double dist( Vector3d const & A, Vector3d const & B ){
@@ -294,4 +295,8 @@ double uav_yaw_from_cone_state( rnw_msgs::ConeState const & cone_state ){
 
 double uav_yaw_from_odom( nav_msgs::Odometry const & odom ){
   return uav_utils::get_yaw_from_quaternion(uav_utils::from_quaternion_msg(odom.pose.pose.orientation));
+}
+
+double cone_yaw( rnw_msgs::ConeState const & cone_state ){
+  return uav_utils::get_yaw_from_quaternion(uav_utils::from_quaternion_msg(cone_state.odom.pose.pose.orientation));
 }

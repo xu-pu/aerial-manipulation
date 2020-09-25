@@ -84,6 +84,8 @@ struct rnw_config_t {
 
         double min_nutation_deg;
 
+        double yaw_gain;
+
         inline std::string to_string() const {
           std::stringstream ss;
           ss << "RnW Parameters:\n"
