@@ -8,12 +8,12 @@ void rnw_planner_t::start_walking(){
   if ( fsm == cone_fsm_e::idle ) {
     ROS_ERROR_STREAM("[rnw] Can't start walking when object is idle!");
     rnw_cmd.is_walking = false;
-    rnw_cmd.desired_yaw = uav_yaw_from_odom(latest_uav_odom);
   }
   else if ( !rnw_cmd.is_walking ) {
     rnw_cmd.is_walking = true;
     rnw_cmd.walk_idx++;
     rnw_cmd.step_count = 0;
+    rnw_cmd.desired_yaw = uav_yaw_from_odom(latest_uav_odom);
     request_adjust_nutation = true;
     request_adjust_grip = true;
     stringstream ss; ss << "/rnw/walking_state/session_" << int(rnw_cmd.walk_idx);
