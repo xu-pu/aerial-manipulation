@@ -122,6 +122,11 @@ struct rnw_controller_t {
       rnw_planner.trigger_adjust_nutation();
     }
 
+    void on_trigger_adjust_yaw( std_msgs::HeaderConstPtr const & msg ){
+      ROS_WARN_STREAM("[rnw] received adjust_yaw trigger!");
+      rnw_planner.trigger_adjust_yaw();
+    }
+
     void on_trigger_rnw( std_msgs::HeaderConstPtr const & msg ){
 
       ROS_WARN_STREAM("[rnw] rnw triggered!");
@@ -175,10 +180,10 @@ struct rnw_controller_t {
       Trajectory traj = traj_generator.genOptimalTrajDTC(waypoints, v0, v0, v0, v0);
 
       // align the object and uav
-      double uav_yaw = uav_utils::get_yaw_from_quaternion(uav_utils::from_quaternion_msg(latest_uav_odom.pose.pose.orientation));
-      double cone_yaw = uav_utils::get_yaw_from_quaternion(uav_utils::from_quaternion_msg(latest_cone_state.odom.pose.pose.orientation));
-      cone_yaw = uav_utils::normalize_angle(cone_yaw-M_PI);
-      pub_poly_traj.publish(to_ros_msg(traj,uav_yaw,cone_yaw,ros::Time::now()));
+      double yaw_start = uav_yaw_from_odom(latest_uav_odom);
+      double yaw_final = uav_yaw_from_cone_state(latest_cone_state);
+
+      pub_poly_traj.publish(to_ros_msg(traj,yaw_start,yaw_final,ros::Time::now()));
 
     }
 
@@ -234,7 +239,9 @@ struct rnw_controller_t {
         if (check_waypoints(waypoints)) {
           Vector3d v0 = Vector3d::Zero();
           Trajectory traj = rocking_generator.genOptimalTrajDTC(waypoints, v0, v0, v0, v0);
-          pub_poly_traj.publish(to_ros_msg(traj,latest_uav_odom,ros::Time::now()));
+          double yaw_start = uav_yaw_from_odom(latest_uav_odom);
+          double yaw_final = cmd->desired_yaw;
+          pub_poly_traj.publish(to_ros_msg(traj,yaw_start,yaw_final,ros::Time::now()));
           cmd_start_time = ros::Time::now();
           cmd_duration = ros::Duration(traj.getTotalDuration());
         }

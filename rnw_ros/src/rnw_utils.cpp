@@ -287,3 +287,12 @@ vector<Vector3d> add_mid_points( vector<Vector3d> const & src ){
   return rst;
 
 }
+
+double uav_yaw_from_cone_state( rnw_msgs::ConeState const & cone_state ){
+  double cone_yaw = uav_utils::get_yaw_from_quaternion(uav_utils::from_quaternion_msg(cone_state.odom.pose.pose.orientation));
+  return uav_utils::normalize_angle(cone_yaw-M_PI);
+}
+
+double uav_yaw_from_odom( nav_msgs::Odometry const & odom ){
+  return uav_utils::get_yaw_from_quaternion(uav_utils::from_quaternion_msg(odom.pose.pose.orientation));
+}

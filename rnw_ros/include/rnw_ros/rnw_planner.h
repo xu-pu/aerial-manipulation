@@ -36,6 +36,8 @@ struct rnw_cmd_t {
     /// Waypoint
     //////////////////////////////////////
 
+    double desired_yaw;
+
     Vector3d setpoint_uav;
 
     Vector3d setpoint_apex;
@@ -122,6 +124,8 @@ struct rnw_planner_t {
     void trigger_adjust_grip();
 
     void trigger_adjust_nutation();
+
+    void trigger_adjust_yaw();
 
     void on_debug_trigger( std_msgs::HeaderConstPtr const & msg );
 

@@ -8,6 +8,7 @@ void rnw_planner_t::start_walking(){
   if ( fsm == cone_fsm_e::idle ) {
     ROS_ERROR_STREAM("[rnw] Can't start walking when object is idle!");
     rnw_cmd.is_walking = false;
+    rnw_cmd.desired_yaw = uav_yaw_from_odom(latest_uav_odom);
   }
   else if ( !rnw_cmd.is_walking ) {
     rnw_cmd.is_walking = true;
@@ -302,6 +303,16 @@ rnw_cmd_t * rnw_planner_t::take_cmd(){
       ROS_ERROR("[rnw] invalid rnw_cmd state!");
   }
   return &rnw_cmd;
+}
+
+void rnw_planner_t::trigger_adjust_yaw(){
+  if ( rnw_cmd.is_walking ) {
+    ROS_WARN_STREAM("[rnw_planner] yaw_adjustment triggered!");
+    rnw_cmd.desired_yaw = uav_yaw_from_cone_state(latest_cone_state);
+  }
+  else {
+    ROS_WARN_STREAM("[rnw_planner] Can't adjust yaw at current state");
+  }
 }
 
 rnw_msgs::RockingCmd rnw_cmd_t::to_msg() const {

@@ -30,6 +30,10 @@ inline bool cone_is_qstatic( rnw_msgs::ConeState const & cone_state, rnw_config_
          && cone_state.euler_angles_velocity.z <= cfg.rnw.ang_vel_threshold;
 }
 
+double uav_yaw_from_cone_state( rnw_msgs::ConeState const & cone_state );
+
+double uav_yaw_from_odom( nav_msgs::Odometry const & odom );
+
 /**
  * For downward mounted caging end-effector
  * Waypoints for initialization, insert -> topple
