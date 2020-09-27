@@ -224,6 +224,19 @@ void rnw_planner_t::plan_cmd_adjust_nutation(){
 
 }
 
+inline double limite_abs( double src, double limit ){
+  double val = min(limit,abs(src));
+  if ( src > 0 ) {
+    return val;
+  }
+  else if ( src < 0 ) {
+    return -val;
+  }
+  else {
+    return 0;
+  }
+}
+
 void rnw_planner_t::plan_cmd_walk(){
 
   // adjust nutation first
@@ -260,10 +273,8 @@ void rnw_planner_t::plan_cmd_walk(){
   double desired_yaw = walking_state.desired_heading_yaw + rot_dir * rnw_config.rnw.tau * deg2rad;
   double yaw_cmd = uav_utils::normalize_angle(desired_yaw - cur_yaw);
 
-  double factor = min(1.,abs(yaw_cmd)/(40*deg2rad));
-
   Vector3d v = C_prime - G;
-  Matrix3d rot = Eigen::AngleAxisd( factor*40*deg2rad, Vector3d::UnitZ() ).toRotationMatrix();
+  Matrix3d rot = Eigen::AngleAxisd( limite_abs(yaw_cmd,40*deg2rad), Vector3d::UnitZ() ).toRotationMatrix();
   Vector3d next_v = rot * v;
   Vector3d setpoint_apex = G + next_v;
   Vector3d setpoint_uav = tcp2uav(setpoint_apex,latest_uav_odom,rnw_config.flu_T_tcp);
