@@ -250,10 +250,18 @@ void rnw_planner_t::plan_cmd_walk(){
 
   // left-right step
 
+  // here should rotate the object's yaw to heading+-tau
+
+  // first calc current yaw
+
   rot_dir = -rot_dir;
 
+  double cur_yaw = cone_yaw(latest_cone_state);
+  double desired_yaw = walking_state.desired_heading_yaw + rot_dir * rnw_config.rnw.tau * deg2rad;
+  double yaw_cmd = uav_utils::normalize_angle(desired_yaw - cur_yaw);
+
   Vector3d v = C_prime - G;
-  Matrix3d rot = Eigen::AngleAxisd( rnw_config.rnw.tau*deg2rad*rot_dir - 0.3*walking_state.cur_relative_yaw, Vector3d::UnitZ() ).toRotationMatrix();
+  Matrix3d rot = Eigen::AngleAxisd( yaw_cmd, Vector3d::UnitZ() ).toRotationMatrix();
   Vector3d next_v = rot * v;
   Vector3d setpoint_apex = G + next_v;
   Vector3d setpoint_uav = tcp2uav(setpoint_apex,latest_uav_odom,rnw_config.flu_T_tcp);
