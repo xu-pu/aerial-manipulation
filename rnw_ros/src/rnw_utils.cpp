@@ -137,7 +137,6 @@ void rnw_config_t::load_from_ros( ros::NodeHandle & nh ){
 
   cone.radius = get_param_default(nh,"/cone/radius",0.15);
   cone.height = get_param_default(nh,"/cone/height",1);
-  cone.apex = get_param_default(nh,"/cone/apex",0.8);
 
   cone.tip.x() = get_param_default<double>(nh,"/cone/tip/x",0.);
   cone.tip.y() = get_param_default<double>(nh,"/cone/tip/y",0.);

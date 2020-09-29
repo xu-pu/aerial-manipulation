@@ -44,8 +44,6 @@ struct rnw_config_t {
 
         double radius;
 
-        double apex;
-
         double height;
 
         Vector3d base_center;
