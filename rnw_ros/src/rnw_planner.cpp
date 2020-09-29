@@ -263,7 +263,7 @@ void rnw_planner_t::plan_cmd_walk(){
   double factor = min(1.,abs(yaw_cmd)/(40*deg2rad));
 
   Vector3d v = C_prime - G;
-  Matrix3d rot = Eigen::AngleAxisd( factor*40*deg2rad, Vector3d::UnitZ() ).toRotationMatrix();
+  Matrix3d rot = Eigen::AngleAxisd( yaw_cmd*factor, Vector3d::UnitZ() ).toRotationMatrix();
   Vector3d next_v = rot * v;
   Vector3d setpoint_apex = G + next_v;
   Vector3d setpoint_uav = tcp2uav(setpoint_apex,latest_uav_odom,rnw_config.flu_T_tcp);
