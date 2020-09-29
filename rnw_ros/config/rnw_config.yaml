@@ -36,8 +36,6 @@ zigzag:
   max_acc: 0.5
 cone:
   radius: 0.15
-  apex: 0.8
-  height: 1
   base_center:
     x: -0.0530555
     y: 0.013382

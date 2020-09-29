@@ -44,11 +44,13 @@ struct rnw_config_t {
 
         double radius;
 
-        double height;
-
         Vector3d base_center;
 
         Vector3d tip;
+
+        inline double height() const {
+          return tip.z() - base_center.z();
+        }
 
     } cone;
 

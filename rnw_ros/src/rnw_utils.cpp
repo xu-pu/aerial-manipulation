@@ -104,8 +104,8 @@ vector<Vector3d> gen_wpts_insert_topple(rnw_config_t const & rnw_config ){
 
   for ( size_t i=0; i<=segments; i++ ) {
     double rad = i*rad_step;
-    double forward = sin(rad)*rnw_config.cone.height;
-    double downward = (1-cos(rad))*rnw_config.cone.height;
+    double forward = sin(rad)*rnw_config.cone.height();
+    double downward = (1-cos(rad))*rnw_config.cone.height();
     Vector3d v(forward,0,-downward);
     wpts.emplace_back(offset+v);
   }
@@ -136,7 +136,6 @@ void rnw_config_t::load_from_ros( ros::NodeHandle & nh ){
   topple.downward = get_param_default(nh,"/topple/downward",0.03);
 
   cone.radius = get_param_default(nh,"/cone/radius",0.15);
-  cone.height = get_param_default(nh,"/cone/height",1);
 
   cone.tip.x() = get_param_default<double>(nh,"/cone/tip/x",0.);
   cone.tip.y() = get_param_default<double>(nh,"/cone/tip/y",0.);
