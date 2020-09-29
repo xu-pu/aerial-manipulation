@@ -252,8 +252,11 @@ void rnw_planner_t::plan_cmd_walk(){
 
   rot_dir = -rot_dir;
 
+  // P controller for steering
+  double rot_rad = rot_dir * rnw_config.rnw.tau * deg2rad - rnw_config.rnw.yaw_gain * walking_state.cur_relative_yaw;
+
+  Matrix3d rot = Eigen::AngleAxisd(rot_rad,Vector3d::UnitZ()).toRotationMatrix();
   Vector3d v = C_prime - G;
-  Matrix3d rot = Eigen::AngleAxisd( rnw_config.rnw.tau*deg2rad*rot_dir - 0.3*walking_state.cur_relative_yaw, Vector3d::UnitZ() ).toRotationMatrix();
   Vector3d next_v = rot * v;
   Vector3d setpoint_apex = G + next_v;
   Vector3d setpoint_uav = tcp2uav(setpoint_apex,latest_uav_odom,rnw_config.flu_T_tcp);
