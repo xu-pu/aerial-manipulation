@@ -153,7 +153,7 @@ void cone_state_estimator_t::update_contact_point(){
 
   double ratio = dist/rnw_config.cone.radius;
 
-  if ( ratio > 1.1 ) {
+  if ( ratio > 1.5 ) {
     // lifted off the ground
     ROS_WARN_STREAM("lifted off the ground");
     contact_valid = false;

@@ -15,7 +15,7 @@ rnw:
   topple_init: 0.05
   desired_nutation: 30
   desired_grip_depth: 0.05
-  tau: 30
+  tau: 40
   max_vel: 0.5
   max_acc: 0.3
   rocking_max_vel: 1
@@ -35,12 +35,12 @@ zigzag:
   max_vel: 1
   max_acc: 0.5
 cone:
-  radius: 0.35
+  radius: 0.15
   base_center:
-    x: -0.179636
-    y: 0.0249129
-    z: -0.304748
+    x: -0.00950682
+    y: -0.00453934
+    z: -0.053012
   tip:
-    x: 0.197873
-    y: 0.0230921
-    z: 1.18338
+    x: 0.140446
+    y: -0.00314827
+    z: 0.949205
