@@ -1,5 +1,5 @@
-#ground_z: -0.035
-ground_z: -0.04
+#ground_z: -0.04
+ground_z: -0.07
 X_tcp_cage:
   x: 0.000548455
   y: 0.00354947
