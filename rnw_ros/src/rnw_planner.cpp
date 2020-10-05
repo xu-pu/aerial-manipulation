@@ -296,7 +296,7 @@ rnw_cmd_t * rnw_planner_t::take_cmd(){
       ROS_ERROR("[rnw] there is no command at the moment");
       break;
     case rnw_cmd_t::fsm_pending:
-      ROS_INFO_STREAM("[rnw] command is taken, now executing");
+      ROS_INFO_STREAM("[rnw] command is taken, now executing, step #" << rnw_cmd.step_count);
       rnw_cmd.fsm = rnw_cmd_t::fsm_executing;
       break;
     case rnw_cmd_t::fsm_executing:
