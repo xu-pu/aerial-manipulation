@@ -230,7 +230,7 @@ private:
 
     double rot_dir = -1;
 
-    double int_err = 0;
+    double integration_term = 0;
 
     // rocking command
 

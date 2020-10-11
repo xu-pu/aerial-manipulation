@@ -17,7 +17,7 @@ void rnw_planner_t::start_walking(){
     rnw_cmd.desired_yaw = uav_yaw_from_odom(latest_uav_odom);
     request_adjust_nutation = true;
     request_adjust_grip = true;
-    int_err = 0;
+    integration_term = 0;
     stringstream ss; ss << "/rnw/walking_state/session_" << int(rnw_cmd.walk_idx);
     pub_walking_state = nh.advertise<rnw_msgs::WalkingState>(ss.str(),100);
     ROS_WARN_STREAM("[rnw] Start walking, " << pub_walking_state.getTopic());
@@ -310,9 +310,11 @@ void rnw_planner_t::plan_cmd_walk_no_feedforward(){
 
   double desired_spin = deg2rad * rnw_config.rnw.desired_spin_deg;
   double spin_err = desired_spin - abs(latest_cone_state.euler_angles.z);
-  int_err += spin_err;
-  int_err = max(min(int_err,max_int_term),0.); // constrain integration term to [0,PI/2]
-  double PI_term = rnw_config.rnw.spin_Kp * spin_err + rnw_config.rnw.spin_Ki * int_err;
+  integration_term += spin_err * rnw_config.rnw.spin_Ki;
+  integration_term = max(min(integration_term, max_int_term), 0.); // constrain integration term to [0,PI/2]
+  ROS_ERROR_STREAM("int_err " << integration_term << ", spin_err: " << spin_err);
+
+  double PI_term = rnw_config.rnw.spin_Kp * spin_err + integration_term;
 
   double rot_rad = rot_dir * PI_term + yaw_term;
 
