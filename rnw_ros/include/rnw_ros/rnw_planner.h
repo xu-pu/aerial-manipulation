@@ -230,6 +230,8 @@ private:
 
     double rot_dir = -1;
 
+    double int_err = 0;
+
     // rocking command
 
     bool request_adjust_grip = false;
@@ -241,6 +243,8 @@ private:
     void plan_next_cmd();
 
     void plan_cmd_walk();
+
+    void plan_cmd_walk_no_feedforward();
 
     void plan_cmd_adjust_grip();
 

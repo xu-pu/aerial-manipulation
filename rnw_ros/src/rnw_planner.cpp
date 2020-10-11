@@ -17,6 +17,7 @@ void rnw_planner_t::start_walking(){
     rnw_cmd.desired_yaw = uav_yaw_from_odom(latest_uav_odom);
     request_adjust_nutation = true;
     request_adjust_grip = true;
+    int_err = 0;
     stringstream ss; ss << "/rnw/walking_state/session_" << int(rnw_cmd.walk_idx);
     pub_walking_state = nh.advertise<rnw_msgs::WalkingState>(ss.str(),100);
     ROS_WARN_STREAM("[rnw] Start walking, " << pub_walking_state.getTopic());
@@ -254,6 +255,66 @@ void rnw_planner_t::plan_cmd_walk(){
 
   // P controller for steering
   double rot_rad = rot_dir * rnw_config.rnw.tau * deg2rad - rnw_config.rnw.yaw_gain * walking_state.cur_relative_yaw;
+
+  Matrix3d rot = Eigen::AngleAxisd(rot_rad,Vector3d::UnitZ()).toRotationMatrix();
+  Vector3d v = C_prime - G;
+  Vector3d next_v = rot * v;
+  Vector3d setpoint_apex = G + next_v;
+  Vector3d setpoint_uav = tcp2uav(setpoint_apex,latest_uav_odom,rnw_config.flu_T_tcp);
+
+  rnw_cmd.setpoint_uav = setpoint_uav;
+  rnw_cmd.setpoint_apex = setpoint_apex;
+  rnw_cmd.setpoint_grip_depth = rnw_config.rnw.desired_grip_depth;
+  rnw_cmd.setpoint_nutation = rnw_config.rnw.desired_nutation;
+  rnw_cmd.tau_deg = rnw_config.rnw.tau;
+  rnw_cmd.cmd_type = rnw_cmd_t::cmd_rocking;
+  rnw_cmd.cmd_idx++;
+  rnw_cmd.step_count++;
+  rnw_cmd.fsm = rnw_cmd_t::fsm_pending;
+
+  walking_state.step(latest_cone_state);
+
+}
+
+void rnw_planner_t::plan_cmd_walk_no_feedforward(){
+
+  // adjust nutation first
+
+  Vector3d G = uav_utils::from_point_msg(latest_cone_state.contact_point);
+  Vector3d D = uav_utils::from_point_msg(latest_cone_state.disc_center);
+  Vector3d Dg = D; Dg.z() = rnw_config.ground_z;
+
+  Vector3d e1 = (Dg-G).normalized();
+  Vector3d e2 = Vector3d::UnitZ();
+  Vector3d K = e1.cross(e2);
+  Vector3d C = point_at_grip_depth(latest_cone_state,rnw_config.rnw.desired_grip_depth);
+
+  // make sure they are radiant
+  double cur_nutation = latest_cone_state.euler_angles.y;
+  double desired_nutation = rnw_config.rnw.desired_nutation*deg2rad;
+  double theta = desired_nutation - cur_nutation;
+  // rotate along K, positive rotation increase nutation
+  Vector3d C_prime = rotate_point_along_axis(C,G,K,theta);
+
+  rnw_cmd.midpoint_apex = C_prime;
+  rnw_cmd.midpoint_uav = tcp2uav(rnw_cmd.midpoint_apex,latest_uav_odom,rnw_config.flu_T_tcp);
+  rnw_cmd.has_mid_point = true;
+
+  // left-right step
+
+  rot_dir = -rot_dir;
+
+  double constexpr max_int_term = M_PI_2;
+
+  double yaw_term = - rnw_config.rnw.yaw_gain * walking_state.cur_relative_yaw;
+
+  double desired_spin = deg2rad * rnw_config.rnw.desired_spin_deg;
+  double spin_err = desired_spin - abs(latest_cone_state.euler_angles.z);
+  int_err += spin_err;
+  int_err = max(min(int_err,max_int_term),0.); // constrain integration term to [0,PI/2]
+  double PI_term = rnw_config.rnw.spin_Kp * spin_err + rnw_config.rnw.spin_Ki * int_err;
+
+  double rot_rad = rot_dir * PI_term + yaw_term;
 
   Matrix3d rot = Eigen::AngleAxisd(rot_rad,Vector3d::UnitZ()).toRotationMatrix();
   Vector3d v = C_prime - G;
