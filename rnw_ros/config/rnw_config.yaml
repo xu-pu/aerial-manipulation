@@ -1,5 +1,5 @@
-#ground_z: -0.04
-ground_z: -0.07
+ground_z: -0.04
+#ground_z: -0.07
 X_tcp_cage:
   x: 0.000548455
   y: 0.00354947
@@ -25,6 +25,9 @@ rnw:
   ang_vel_threshold: 1
   min_nutation_deg: 10
   yaw_gain: 0.3
+  desired_spin_deg: 30
+  spin_Ki: 1
+  spin_Kp: 1
 topple:
   forward: 0.4
   downward: 0.05

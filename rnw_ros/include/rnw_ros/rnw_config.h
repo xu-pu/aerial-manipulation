@@ -86,6 +86,12 @@ struct rnw_config_t {
 
         double yaw_gain;
 
+        double desired_spin_deg;
+
+        double spin_Ki;
+
+        double spin_Kp;
+
         inline std::string to_string() const {
           std::stringstream ss;
           ss << "RnW Parameters:\n"
