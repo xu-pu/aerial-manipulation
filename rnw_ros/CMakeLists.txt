@@ -178,6 +178,7 @@ set(RNW_NODES
         dbg_atti_loop_node
         mocap_calib_node
         pub_obj_trace_node
+        gen_paper_data_node
 )
 
 FOREACH(NODE ${RNW_NODES})
