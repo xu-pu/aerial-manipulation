@@ -30,7 +30,7 @@ struct rnw_cmd_t {
         cmd_adjust_nutation
     } cmd_type = cmd_rocking;
 
-    size_t cmd_idx; // same cmd may be published multiple times, use this to keep track
+    size_t cmd_idx = 0; // same cmd may be published multiple times, use this to keep track
 
     //////////////////////////////////////
     /// Waypoint
