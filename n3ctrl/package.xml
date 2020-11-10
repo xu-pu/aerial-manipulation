@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<package format="2">
+<package>
   <name>n3ctrl</name>
   <version>0.0.0</version>
   <description>The n3ctrl package</description>
@@ -41,11 +41,12 @@
   <!--   <test_depend>gtest</test_depend> -->
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>cmake_modules</build_depend>
-  <depend>roscpp</depend>
-  <depend>rospy</depend>
-  <depend>uav_utils</depend>
-  <depend>geometry_msgs</depend>
-  <depend>quadrotor_msgs</depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>rospy</build_depend>
+  <build_depend>uav_utils</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <build_depend>geometry_msgs</build_depend>
+  <build_depend>quadrotor_msgs</build_depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>
