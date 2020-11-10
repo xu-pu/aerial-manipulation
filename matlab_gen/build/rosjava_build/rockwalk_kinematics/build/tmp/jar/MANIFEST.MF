@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Bundle-SymbolicName: org.ros.rosjava_messages.rockwalk_kinematics
+Bundle-Version: 0.0.0
+Bundle-Name: rockwalk_kinematics
+Bundle-ManifestVersion: 2
+Bnd-LastModified: 1604673820000
+Created-By: 1.8.0_222 (AdoptOpenJDK)
+Tool: Bnd-2.1.0.20130426-122213
+

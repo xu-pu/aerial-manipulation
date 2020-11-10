@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Export-Package: quadrotor_msgs;version="0.0.0";uses:="geometry_msgs,na
+ v_msgs,org.jboss.netty.buffer,org.ros.internal.message,org.ros.messag
+ e,std_msgs"
+Bundle-SymbolicName: org.ros.rosjava_messages.quadrotor_msgs
+Bundle-Version: 0.0.0
+Bundle-Name: quadrotor_msgs
+Bundle-ManifestVersion: 2
+Bnd-LastModified: 1604673820000
+Import-Package: geometry_msgs;version="[1.10,2)",nav_msgs;version="[1.
+ 10,2)",org.jboss.netty.buffer;version="[3.5,4)",org.ros.internal.mess
+ age,org.ros.message,std_msgs;version="[0.5,1)"
+Created-By: 1.8.0_222 (AdoptOpenJDK)
+Tool: Bnd-2.1.0.20130426-122213
+

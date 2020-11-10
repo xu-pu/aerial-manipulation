@@ -1,0 +1,40 @@
+package quadrotor_msgs;
+
+public interface PPROutputData extends org.ros.internal.message.Message {
+  static final java.lang.String _TYPE = "quadrotor_msgs/PPROutputData";
+  static final java.lang.String _DEFINITION = "Header header\nuint16 quad_time\nfloat64 des_thrust\nfloat64 des_roll\nfloat64 des_pitch\nfloat64 des_yaw\nfloat64 est_roll\nfloat64 est_pitch\nfloat64 est_yaw\nfloat64 est_angvel_x\nfloat64 est_angvel_y\nfloat64 est_angvel_z\nfloat64 est_acc_x\nfloat64 est_acc_y\nfloat64 est_acc_z\nuint16[4] pwm\n";
+  static final boolean _IS_SERVICE = false;
+  static final boolean _IS_ACTION = false;
+  std_msgs.Header getHeader();
+  void setHeader(std_msgs.Header value);
+  short getQuadTime();
+  void setQuadTime(short value);
+  double getDesThrust();
+  void setDesThrust(double value);
+  double getDesRoll();
+  void setDesRoll(double value);
+  double getDesPitch();
+  void setDesPitch(double value);
+  double getDesYaw();
+  void setDesYaw(double value);
+  double getEstRoll();
+  void setEstRoll(double value);
+  double getEstPitch();
+  void setEstPitch(double value);
+  double getEstYaw();
+  void setEstYaw(double value);
+  double getEstAngvelX();
+  void setEstAngvelX(double value);
+  double getEstAngvelY();
+  void setEstAngvelY(double value);
+  double getEstAngvelZ();
+  void setEstAngvelZ(double value);
+  double getEstAccX();
+  void setEstAccX(double value);
+  double getEstAccY();
+  void setEstAccY(double value);
+  double getEstAccZ();
+  void setEstAccZ(double value);
+  short[] getPwm();
+  void setPwm(short[] value);
+}

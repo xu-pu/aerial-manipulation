@@ -1,0 +1,41 @@
+package quadrotor_msgs;
+
+public interface PolynomialTrajectory extends org.ros.internal.message.Message {
+  static final java.lang.String _TYPE = "quadrotor_msgs/PolynomialTrajectory";
+  static final java.lang.String _DEFINITION = "Header header\n\n# the trajectory id, starts from \"1\".\nuint32 trajectory_id\n\n# the action command for trajectory server.\nuint32 ACTION_ADD                  =   1\nuint32 ACTION_ABORT                =   2\nuint32 ACTION_WARN_START           =   3\nuint32 ACTION_WARN_FINAL           =   4\nuint32 ACTION_WARN_IMPOSSIBLE      =   5\nuint32 action\n\n# the order of trajectory.\nuint32 num_order\nuint32 num_segment\n\n# the polynomial coecfficients of the trajectory.\nfloat64 start_yaw\nfloat64 final_yaw\nfloat64[] coef_x\nfloat64[] coef_y\nfloat64[] coef_z\nfloat64[] time\nfloat64   mag_coeff\nuint32[]  order\n\nstring debug_info";
+  static final boolean _IS_SERVICE = false;
+  static final boolean _IS_ACTION = false;
+  static final int ACTION_ADD = 1;
+  static final int ACTION_ABORT = 2;
+  static final int ACTION_WARN_START = 3;
+  static final int ACTION_WARN_FINAL = 4;
+  static final int ACTION_WARN_IMPOSSIBLE = 5;
+  std_msgs.Header getHeader();
+  void setHeader(std_msgs.Header value);
+  int getTrajectoryId();
+  void setTrajectoryId(int value);
+  int getAction();
+  void setAction(int value);
+  int getNumOrder();
+  void setNumOrder(int value);
+  int getNumSegment();
+  void setNumSegment(int value);
+  double getStartYaw();
+  void setStartYaw(double value);
+  double getFinalYaw();
+  void setFinalYaw(double value);
+  double[] getCoefX();
+  void setCoefX(double[] value);
+  double[] getCoefY();
+  void setCoefY(double[] value);
+  double[] getCoefZ();
+  void setCoefZ(double[] value);
+  double[] getTime();
+  void setTime(double[] value);
+  double getMagCoeff();
+  void setMagCoeff(double value);
+  int[] getOrder();
+  void setOrder(int[] value);
+  java.lang.String getDebugInfo();
+  void setDebugInfo(java.lang.String value);
+}

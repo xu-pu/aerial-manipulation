@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Export-Package: djiros;version="3.1.0";uses:="org.jboss.netty.buffer,o
+ rg.ros.internal.message,std_msgs"
+Bundle-SymbolicName: org.ros.rosjava_messages.djiros
+Bundle-Version: 3.1.0
+Bundle-Name: djiros
+Bundle-ManifestVersion: 2
+Bnd-LastModified: 1604673819000
+Import-Package: org.jboss.netty.buffer;version="[3.5,4)",org.ros.inter
+ nal.message,std_msgs;version="[0.5,1)"
+Created-By: 1.8.0_222 (AdoptOpenJDK)
+Tool: Bnd-2.1.0.20130426-122213
+
