@@ -303,3 +303,7 @@ double uav_yaw_from_odom( nav_msgs::Odometry const & odom ){
 double cone_yaw( rnw_msgs::ConeState const & cone_state ){
   return uav_utils::get_yaw_from_quaternion(uav_utils::from_quaternion_msg(cone_state.odom.pose.pose.orientation));
 }
+
+double uav_yaw_from_cone_yaw( double cone_yaw ){
+  return uav_utils::normalize_angle(cone_yaw-M_PI);
+}

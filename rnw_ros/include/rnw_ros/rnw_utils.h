@@ -34,6 +34,13 @@ double uav_yaw_from_cone_state( rnw_msgs::ConeState const & cone_state );
 
 double uav_yaw_from_odom( nav_msgs::Odometry const & odom );
 
+/**
+ * End-effector is mounted on the back, there is a 180 degree offset
+ * @param cone_yaw
+ * @return
+ */
+double uav_yaw_from_cone_yaw( double cone_yaw );
+
 double cone_yaw( rnw_msgs::ConeState const & cone_state );
 
 /**

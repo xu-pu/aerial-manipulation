@@ -83,21 +83,11 @@ struct walking_state_t {
 
     // states are recorded before the step taken
 
+    explicit walking_state_t( rnw_config_t const & c );
+
     size_t step_count = 0;
 
     rnw_config_t const & rnw_config;
-
-    inline explicit walking_state_t( rnw_config_t const & c ) : rnw_config(c) {}
-
-    inline void start( rnw_msgs::ConeState const & cone_state ){
-      desired_heading_yaw = cone_yaw(cone_state);
-      cur_relative_yaw = 0;
-      step_count = 0;
-    }
-
-    inline void end(){
-
-    }
 
     double desired_heading_yaw;
 
@@ -113,30 +103,17 @@ struct walking_state_t {
      * update step counter,
      * update heading direction
      */
-    inline void step( rnw_msgs::ConeState const & cone_state ){
+    void step( rnw_msgs::ConeState const & cone_state );
 
-      if ( step_count % 2 == 0 ) {
-        last_step_even = cone_state;
-      }
-      else {
-        last_step_odd = cone_state;
-      }
+    void start( rnw_msgs::ConeState const & cone_state );
 
-      if ( step_count >= rnw_config.rnw.lap_start ) {
-        desired_heading_yaw += ( deg2rad * rnw_config.rnw.lap_ang_vel_deg );
-        desired_heading_yaw = uav_utils::normalize_angle(desired_heading_yaw);
-      }
+    /**
+     * call after start()
+     * @return
+     */
+    double desired_uav_yaw() const;
 
-      if ( step_count > 1 ) {
-        // update heading direction
-        double diff_odd = uav_utils::normalize_angle(cone_yaw(last_step_odd) - desired_heading_yaw);
-        double diff_even = uav_utils::normalize_angle(cone_yaw(last_step_even) - desired_heading_yaw);
-        cur_relative_yaw = ( diff_odd + diff_even ) / 2;
-
-        ROS_ERROR_STREAM("[rnw_planner] heading direction error " << cur_relative_yaw*rad2deg << " deg");
-      }
-      step_count++;
-    }
+    void end();
 
 };
 

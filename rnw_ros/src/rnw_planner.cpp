@@ -2,6 +2,7 @@
 // Created by sheep on 2020/9/8.
 //
 #include "rnw_ros/rnw_planner.h"
+#include "rnw_ros/rnw_utils.h"
 #include <uav_utils/converters.h>
 
 void rnw_planner_t::start_walking(){
@@ -11,10 +12,10 @@ void rnw_planner_t::start_walking(){
   }
   else if ( !rnw_cmd.is_walking ) {
     walking_state.start(latest_cone_state);
+    rnw_cmd.desired_yaw = walking_state.desired_uav_yaw();
     rnw_cmd.is_walking = true;
     rnw_cmd.walk_idx++;
     rnw_cmd.step_count = 0;
-    rnw_cmd.desired_yaw = uav_yaw_from_odom(latest_uav_odom);
     request_adjust_nutation = true;
     request_adjust_grip = true;
     integration_term = 0;
@@ -271,6 +272,7 @@ void rnw_planner_t::plan_cmd_walk(){
   rnw_cmd.cmd_idx++;
   rnw_cmd.step_count++;
   rnw_cmd.fsm = rnw_cmd_t::fsm_pending;
+  rnw_cmd.desired_yaw = walking_state.desired_uav_yaw();
 
   walking_state.step(latest_cone_state);
 
@@ -400,4 +402,43 @@ rnw_msgs::RockingCmd rnw_cmd_t::to_msg() const {
   msg.is_walking = is_walking;
   msg.walk_idx = walk_idx;
   return msg;
+}
+
+walking_state_t::walking_state_t( rnw_config_t const & c ) : rnw_config(c) {}
+
+double walking_state_t::desired_uav_yaw() const {
+  return uav_yaw_from_cone_yaw(desired_heading_yaw);
+}
+
+void walking_state_t::start( rnw_msgs::ConeState const & cone_state ){
+  desired_heading_yaw = cone_yaw(cone_state);
+  cur_relative_yaw = 0;
+  step_count = 0;
+}
+
+void walking_state_t::end(){}
+
+void walking_state_t::step( rnw_msgs::ConeState const & cone_state ){
+
+  if ( step_count % 2 == 0 ) {
+    last_step_even = cone_state;
+  }
+  else {
+    last_step_odd = cone_state;
+  }
+
+  if ( step_count >= rnw_config.rnw.lap_start ) {
+    desired_heading_yaw += ( deg2rad * rnw_config.rnw.lap_ang_vel_deg );
+    desired_heading_yaw = uav_utils::normalize_angle(desired_heading_yaw);
+  }
+
+  if ( step_count > 1 ) {
+    // update heading direction
+    double diff_odd = uav_utils::normalize_angle(cone_yaw(last_step_odd) - desired_heading_yaw);
+    double diff_even = uav_utils::normalize_angle(cone_yaw(last_step_even) - desired_heading_yaw);
+    cur_relative_yaw = ( diff_odd + diff_even ) / 2;
+
+    ROS_ERROR_STREAM("[rnw_planner] heading direction error " << cur_relative_yaw*rad2deg << " deg");
+  }
+  step_count++;
 }
