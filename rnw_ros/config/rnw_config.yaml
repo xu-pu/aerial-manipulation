@@ -28,6 +28,8 @@ rnw:
   desired_spin_deg: 30
   spin_Ki: 0.1
   spin_Kp: 0.1
+  lap_ang_vel_deg: 5
+  lap_start: 6
 topple:
   forward: 0.4
   downward: 0.05

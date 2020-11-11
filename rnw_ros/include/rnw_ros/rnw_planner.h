@@ -85,7 +85,9 @@ struct walking_state_t {
 
     size_t step_count = 0;
 
-    inline walking_state_t(){}
+    rnw_config_t const & rnw_config;
+
+    inline explicit walking_state_t( rnw_config_t const & c ) : rnw_config(c) {}
 
     inline void start( rnw_msgs::ConeState const & cone_state ){
       desired_heading_yaw = cone_yaw(cone_state);
@@ -118,6 +120,11 @@ struct walking_state_t {
       }
       else {
         last_step_odd = cone_state;
+      }
+
+      if ( step_count >= rnw_config.rnw.lap_start ) {
+        desired_heading_yaw += ( deg2rad * rnw_config.rnw.lap_ang_vel_deg );
+        desired_heading_yaw = uav_utils::normalize_angle(desired_heading_yaw);
       }
 
       if ( step_count > 1 ) {

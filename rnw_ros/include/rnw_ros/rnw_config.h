@@ -92,6 +92,10 @@ struct rnw_config_t {
 
         double spin_Kp;
 
+        double lap_ang_vel_deg;
+
+        size_t lap_start;
+
         inline std::string to_string() const {
           std::stringstream ss;
           ss << "RnW Parameters:\n"
