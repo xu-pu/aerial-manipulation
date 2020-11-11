@@ -78,12 +78,11 @@ struct rnw_cmd_t {
 
 /**
  * positive rot increase yaw
+ * states are recorded before the step taken
  */
-struct walking_state_t {
+struct steering_controller_t {
 
-    // states are recorded before the step taken
-
-    explicit walking_state_t( rnw_config_t const & c );
+    explicit steering_controller_t(rnw_config_t const & c );
 
     size_t step_count = 0;
 
@@ -107,13 +106,13 @@ struct walking_state_t {
 
     void start( rnw_msgs::ConeState const & cone_state );
 
+    void end();
+
     /**
      * call after start()
      * @return
      */
     double desired_uav_yaw() const;
-
-    void end();
 
 };
 
@@ -222,7 +221,7 @@ private:
 
     bool request_adjust_nutation = false;
 
-    walking_state_t walking_state;
+    steering_controller_t walking_state;
 
     void plan_next_cmd();
 

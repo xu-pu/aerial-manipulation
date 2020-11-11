@@ -404,21 +404,21 @@ rnw_msgs::RockingCmd rnw_cmd_t::to_msg() const {
   return msg;
 }
 
-walking_state_t::walking_state_t( rnw_config_t const & c ) : rnw_config(c) {}
+steering_controller_t::steering_controller_t(rnw_config_t const & c ) : rnw_config(c) {}
 
-double walking_state_t::desired_uav_yaw() const {
+double steering_controller_t::desired_uav_yaw() const {
   return uav_yaw_from_cone_yaw(desired_heading_yaw);
 }
 
-void walking_state_t::start( rnw_msgs::ConeState const & cone_state ){
+void steering_controller_t::start(rnw_msgs::ConeState const & cone_state ){
   desired_heading_yaw = cone_yaw(cone_state);
   cur_relative_yaw = 0;
   step_count = 0;
 }
 
-void walking_state_t::end(){}
+void steering_controller_t::end(){}
 
-void walking_state_t::step( rnw_msgs::ConeState const & cone_state ){
+void steering_controller_t::step(rnw_msgs::ConeState const & cone_state ){
 
   if ( step_count % 2 == 0 ) {
     last_step_even = cone_state;
