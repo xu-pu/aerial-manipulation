@@ -29,7 +29,7 @@ rnw:
   spin_Ki: 0.1
   spin_Kp: 0.1
   lap_ang_vel_deg: 5
-  lap_start: 6
+  lap_start: 2
 topple:
   forward: 0.4
   downward: 0.05
