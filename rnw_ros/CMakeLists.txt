@@ -179,6 +179,7 @@ set(RNW_NODES
         mocap_calib_node
         pub_obj_trace_node
         gen_paper_data_node
+        pub_energy_node
 )
 
 FOREACH(NODE ${RNW_NODES})
