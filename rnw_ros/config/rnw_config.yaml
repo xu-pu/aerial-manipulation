@@ -30,6 +30,7 @@ rnw:
   spin_Kp: 0.1
   lap_ang_vel_deg: 0
   lap_start: 2
+  enable_steering: true
 topple:
   forward: 0.4
   downward: 0.05

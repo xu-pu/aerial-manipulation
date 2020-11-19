@@ -96,6 +96,8 @@ struct rnw_config_t {
 
         size_t lap_start;
 
+        bool enable_steering = true;
+
         inline std::string to_string() const {
           std::stringstream ss;
           ss << "RnW Parameters:\n"
