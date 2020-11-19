@@ -59,9 +59,9 @@ void rnw_planner_t::fsm_update(){
   if ( latest_cone_state.euler_angles.y < rnw_config.rnw.min_nutation_deg * deg2rad ) {
     fsm_transition(fsm, cone_fsm_e::idle);
   }
-  else if ( !latest_cone_state.is_point_contact ){
-    fsm_transition(fsm, cone_fsm_e::idle);
-  }
+//  else if ( !latest_cone_state.is_point_contact ){
+//    fsm_transition(fsm, cone_fsm_e::idle);
+//  }
   else if ( abs(latest_cone_state.euler_angles_velocity.z) < rnw_config.rnw.ang_vel_threshold ) {
     fsm_transition(fsm, cone_fsm_e::qstatic);
   }
