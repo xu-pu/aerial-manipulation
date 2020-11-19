@@ -23,7 +23,6 @@
 <!--    <node pkg="rnw_ros" type="pub_obj_trace_node" name="pub_obj_trace_node" output="screen" required="true"/>-->
 
 <!--    <node pkg="rnw_ros" type="gen_paper_data_node" name="gen_paper_data_node" output="screen" required="true"/>-->
-    <node pkg="rnw_ros" type="pub_energy_node" name="pub_energy_node" output="screen" required="true"/>
 
     <node name="rviz_traj" pkg="rviz" type="rviz" output="log" required="true" args="-d $(find rnw_ros)/config/traj.rviz" />
 
@@ -34,6 +33,9 @@
 
     <node name="rosbag_play" pkg="rosbag" type="play" respawn="false"
           args="--clock -r 2 /home/sheep/Dropbox/rosbags/2020-10-11-16-25-05.table.n25t40.bag"/>
+
+    <node name="rosbag_reocrd" pkg="rosbag" type="record" respawn="false" args="/rnw/cone_energy"/>
+    <node pkg="rnw_ros" type="pub_energy_node" name="pub_energy_node" output="screen" required="true"/>
 
     <!--    <node pkg="rnw_ros" type="dbg_atti_loop_node" name="dbg_atti_loop_node" output="screen">-->
 <!--        <remap from="~imu" to="$(arg imu_topic)"/>-->
