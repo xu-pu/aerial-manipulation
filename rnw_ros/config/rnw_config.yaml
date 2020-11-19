@@ -1,4 +1,4 @@
-ground_z: -0.015
+ground_z: -0.04
 #ground_z: -0.07
 X_tcp_cage:
   x: 0.000548455
@@ -28,7 +28,7 @@ rnw:
   desired_spin_deg: 30
   spin_Ki: 0.1
   spin_Kp: 0.1
-  lap_ang_vel_deg: 5
+  lap_ang_vel_deg: 0
   lap_start: 2
 topple:
   forward: 0.4
