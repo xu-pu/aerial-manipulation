@@ -52,6 +52,13 @@ struct rnw_config_t {
 
         double CoM_z;
 
+        inline Vector3d CoM() const {
+          Vector3d rst = base_center;
+          rst.x() = rst.x() + CoM_x;
+          rst.z() = rst.z() + CoM_z;
+          return rst;
+        }
+
         inline double height() const {
           return tip.z() - base_center.z();
         }
