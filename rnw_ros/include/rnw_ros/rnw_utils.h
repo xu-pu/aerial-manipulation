@@ -43,6 +43,10 @@ double uav_yaw_from_cone_yaw( double cone_yaw );
 
 double cone_yaw( rnw_msgs::ConeState const & cone_state );
 
+double calc_obj_heading( rnw_msgs::ConeState const & s1, rnw_msgs::ConeState const & s2 );
+
+double calc_mid_rad( double r1, double r2 );
+
 /**
  * For downward mounted caging end-effector
  * Waypoints for initialization, insert -> topple

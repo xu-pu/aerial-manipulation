@@ -92,6 +92,8 @@ struct steering_controller_t {
 
     double cur_relative_yaw;
 
+    rnw_msgs::ConeState last_step;
+
     rnw_msgs::ConeState last_step_odd;
 
     rnw_msgs::ConeState last_step_even;

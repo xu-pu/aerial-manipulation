@@ -284,7 +284,15 @@ void rnw_planner_t::plan_cmd_walk(){
   rnw_cmd.cmd_idx++;
   rnw_cmd.step_count++;
   rnw_cmd.fsm = rnw_cmd_t::fsm_pending;
-  rnw_cmd.desired_yaw = walking_state.desired_uav_yaw();
+
+  if ( rnw_config.rnw.enable_steering ) {
+    rnw_cmd.desired_yaw = walking_state.desired_uav_yaw();
+  }
+  else {
+    double obj_heading = calc_obj_heading(latest_cone_state,walking_state.last_step);
+    ROS_INFO_STREAM("[rnw] object heading dir " << obj_heading);
+    rnw_cmd.desired_yaw = uav_yaw_from_cone_yaw(obj_heading);
+  }
 
   walking_state.step(latest_cone_state);
 
@@ -426,6 +434,7 @@ void steering_controller_t::start(rnw_msgs::ConeState const & cone_state ){
   desired_heading_yaw = cone_yaw(cone_state);
   cur_relative_yaw = 0;
   step_count = 0;
+  last_step = cone_state;
 }
 
 void steering_controller_t::end(){}
@@ -453,9 +462,10 @@ void steering_controller_t::step(rnw_msgs::ConeState const & cone_state ){
     ROS_ERROR_STREAM("[rnw_planner] heading direction error " << cur_relative_yaw*rad2deg << " deg");
   }
   step_count++;
+
+  last_step = cone_state;
+
 }
-
-
 
 void energy_feedback_t::init( rnw_msgs::ConeState const & cone_state ){
   _init = true;

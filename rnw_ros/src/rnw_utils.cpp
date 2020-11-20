@@ -315,6 +315,20 @@ double cone_yaw( rnw_msgs::ConeState const & cone_state ){
   return uav_utils::get_yaw_from_quaternion(uav_utils::from_quaternion_msg(cone_state.odom.pose.pose.orientation));
 }
 
+double calc_mid_rad( double r1, double r2 ){
+  double r = uav_utils::normalize_angle((r1+r2)/2);
+  if ( abs(uav_utils::normalize_angle(r-r1)) > M_PI_2 ) {
+    r = uav_utils::normalize_angle(r+M_PI);
+  }
+  return r;
+}
+
+double calc_obj_heading( rnw_msgs::ConeState const & s1, rnw_msgs::ConeState const & s2 ){
+  double y1 = cone_yaw(s1);
+  double y2 = cone_yaw(s2);
+  return calc_mid_rad(y1,y2);
+}
+
 double uav_yaw_from_cone_yaw( double cone_yaw ){
   return uav_utils::normalize_angle(cone_yaw-M_PI);
 }
