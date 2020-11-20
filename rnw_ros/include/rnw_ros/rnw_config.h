@@ -48,6 +48,10 @@ struct rnw_config_t {
 
         Vector3d tip;
 
+        double CoM_x;
+
+        double CoM_z;
+
         inline double height() const {
           return tip.z() - base_center.z();
         }
