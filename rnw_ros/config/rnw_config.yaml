@@ -30,9 +30,9 @@ rnw:
   spin_Kp: 0.1
   lap_ang_vel_deg: 0
   lap_start: 2
-  enable_steering: true
+  enable_steering: false
   enable_energy_feedback: true
-  EKp: 0.3
+  EKp: 1
   EKi: 0
   EKd: 0
 topple:
