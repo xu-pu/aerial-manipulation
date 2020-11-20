@@ -148,6 +148,8 @@ void rnw_config_t::load_from_ros( ros::NodeHandle & nh ){
   cone.CoM_x = get_param_default<double>(nh,"/cone/CoM_x",0.);
   cone.CoM_z = get_param_default<double>(nh,"/cone/CoM_z",0.);
 
+  cone.mass = get_param_default<double>(nh,"/cone/mass",0.5);
+
   ground_z = get_param_default<double>(nh, "/ground_z", 0.);
 
   rnw.insertion_depth  = get_param_default<double>(nh, "/rnw/insertion_depth", 0.);

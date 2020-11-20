@@ -52,6 +52,8 @@ struct rnw_config_t {
 
         double CoM_z;
 
+        double mass;
+
         inline Vector3d CoM() const {
           Vector3d rst = base_center;
           rst.x() = rst.x() + CoM_x;
