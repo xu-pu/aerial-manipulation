@@ -261,11 +261,13 @@ void rnw_planner_t::plan_cmd_walk(){
   }
 
   // energy feedback term
-  energy_feedback.step(latest_cone_state);
-  //double energy_term = Kep * energy_feedback.E_dot;
+  double energy_term = 0;
+  if ( rnw_config.rnw.enable_energy_feedback ) {
+    energy_feedback.step(latest_cone_state);
+    energy_term = rnw_config.rnw.EKp * energy_feedback.E_dot;
+  }
 
-
-  double rot_rad = rot_dir * rnw_config.rnw.tau * deg2rad + steering_term;
+  double rot_rad = rot_dir * ( rnw_config.rnw.tau * deg2rad - energy_term ) + steering_term;
 
   Matrix3d rot = Eigen::AngleAxisd(rot_rad,Vector3d::UnitZ()).toRotationMatrix();
   Vector3d v = C_prime - G;
