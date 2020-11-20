@@ -8,6 +8,7 @@
 ros::Publisher pub_energy;
 ros::Publisher pub_energy_T;
 ros::Publisher pub_energy_V;
+ros::Publisher pub_energy_diff;
 
 rnw_config_t rnw_config;
 
@@ -17,7 +18,41 @@ Vector3d pt_on_cone( Vector3d const & pt, rnw_msgs::ConeState const & cone_state
   return R * pt + T;
 }
 
+void calc_energy_diff( rnw_msgs::WalkingStateConstPtr const & msg ){
+  static bool init = false;
+  static rnw_msgs::WalkingState pre_msg;
+  static size_t cur_step;
+  static Vector3d CoM_last_step;
+  static double latest_ed = 0;
+
+  double m = 0.5;
+  double g = 9.8;
+
+  Vector3d cur_CoM = pt_on_cone(rnw_config.cone.CoM(),msg->cone_state);
+
+  if ( init ) {
+    if ( msg->step_count > cur_step ) {
+      cur_step = msg->step_count;
+      latest_ed = m * g * ( cur_CoM.z() - CoM_last_step.z() );
+      CoM_last_step = cur_CoM;
+    }
+  }
+  else {
+    init = true;
+    cur_step = msg->step_count;
+    CoM_last_step = cur_CoM;
+  }
+
+  quadrotor_msgs::Float64Stamped msg_out;
+  msg_out.header = msg->header;
+  msg_out.value = latest_ed;
+  pub_energy_diff.publish(msg_out);
+
+}
+
 void on_walking_state( rnw_msgs::WalkingStateConstPtr const & msg ){
+
+  calc_energy_diff(msg);
 
   double com_z = 0.05;
   double com_x = 0.08;
@@ -90,6 +125,8 @@ int main( int argc, char** argv ) {
   pub_energy_T = nh.advertise<quadrotor_msgs::Float64Stamped>("/rnw/cone_energy_T",100);
 
   pub_energy_V = nh.advertise<quadrotor_msgs::Float64Stamped>("/rnw/cone_energy_V",100);
+
+  pub_energy_diff = nh.advertise<quadrotor_msgs::Float64Stamped>("/rnw/cone_energy_diff",100);
 
   ros::spin();
 
