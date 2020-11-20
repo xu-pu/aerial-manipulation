@@ -1,4 +1,4 @@
-L = 0.15;
+L = 0.30;
 
-z = L/(cot(deg2rad(20))+cot(deg2rad(20)));
+z = L/(cot(deg2rad(15))+cot(deg2rad(20)));
 x = z * cot(deg2rad(20))

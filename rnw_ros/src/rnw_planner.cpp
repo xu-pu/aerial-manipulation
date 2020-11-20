@@ -12,6 +12,7 @@ void rnw_planner_t::start_walking(){
   }
   else if ( !rnw_cmd.is_walking ) {
     walking_state.start(latest_cone_state);
+    energy_feedback.init(latest_cone_state);
     rnw_cmd.desired_yaw = walking_state.desired_uav_yaw();
     rnw_cmd.is_walking = true;
     rnw_cmd.walk_idx++;
@@ -260,6 +261,9 @@ void rnw_planner_t::plan_cmd_walk(){
   }
 
   // energy feedback term
+  energy_feedback.step(latest_cone_state);
+  //double energy_term = Kep * energy_feedback.E_dot;
+
 
   double rot_rad = rot_dir * rnw_config.rnw.tau * deg2rad + steering_term;
 

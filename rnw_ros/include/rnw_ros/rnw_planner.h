@@ -241,6 +241,8 @@ private:
 
     steering_controller_t walking_state;
 
+    energy_feedback_t energy_feedback;
+
     void plan_next_cmd();
 
     void plan_cmd_walk();

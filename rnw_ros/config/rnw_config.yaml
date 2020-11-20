@@ -31,6 +31,10 @@ rnw:
   lap_ang_vel_deg: 0
   lap_start: 2
   enable_steering: true
+  enable_energy_feedback: true
+  EKp: 0
+  EKi: 0
+  EKd: 0
 topple:
   forward: 0.4
   downward: 0.05

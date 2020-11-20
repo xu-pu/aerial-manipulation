@@ -111,6 +111,14 @@ struct rnw_config_t {
 
         bool enable_steering = true;
 
+        bool enable_energy_feedback = true;
+
+        double EKp = 0;
+
+        double EKi = 0;
+
+        double EKd = 0;
+
         inline std::string to_string() const {
           std::stringstream ss;
           ss << "RnW Parameters:\n"
