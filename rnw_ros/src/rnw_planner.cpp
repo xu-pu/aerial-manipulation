@@ -259,6 +259,8 @@ void rnw_planner_t::plan_cmd_walk(){
     steering_term = - rnw_config.rnw.yaw_gain * walking_state.cur_relative_yaw;
   }
 
+  // energy feedback term
+
   double rot_rad = rot_dir * rnw_config.rnw.tau * deg2rad + steering_term;
 
   Matrix3d rot = Eigen::AngleAxisd(rot_rad,Vector3d::UnitZ()).toRotationMatrix();
@@ -445,4 +447,23 @@ void steering_controller_t::step(rnw_msgs::ConeState const & cone_state ){
     ROS_ERROR_STREAM("[rnw_planner] heading direction error " << cur_relative_yaw*rad2deg << " deg");
   }
   step_count++;
+}
+
+
+
+void energy_feedback_t::init( rnw_msgs::ConeState const & cone_state ){
+  _init = true;
+  step_count = 0;
+  E = abs(cone_state.euler_angles.z);
+  E_dot = 0;
+  E_dot_dot = 0;
+}
+
+void energy_feedback_t::step( rnw_msgs::ConeState const & cone_state ){
+  step_count++;
+  double cur_E = abs(cone_state.euler_angles.z);
+  double cur_E_dot = cur_E - E;
+  E_dot_dot = cur_E_dot - E_dot;
+  E_dot = cur_E_dot;
+  E = cur_E;
 }

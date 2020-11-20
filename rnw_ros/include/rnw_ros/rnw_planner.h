@@ -116,6 +116,24 @@ struct steering_controller_t {
 
 };
 
+/**
+ * E is energy, we use E := abs(phi), phi_dot == 0
+ */
+struct energy_feedback_t {
+
+    size_t step_count = 0;
+
+    bool _init = false;
+
+    void init( rnw_msgs::ConeState const & cone_state );
+
+    void step( rnw_msgs::ConeState const & cone_state );
+
+    double E;
+    double E_dot;
+    double E_dot_dot;
+
+};
 
 struct rnw_planner_t {
 
