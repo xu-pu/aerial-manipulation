@@ -31,6 +31,17 @@ struct data_logger_t {
       ofs.flush();
     }
 
+    void log_reloc_length(  quadrotor_msgs::PolynomialTrajectoryConstPtr const & msg  ){
+      latest_msg = *msg;
+      poly_traj = poly_traj_t(latest_msg);
+      Vector3d start_pt = poly_traj.eval_pos(poly_traj.start_time);
+      Vector3d end_pt = poly_traj.eval_pos(poly_traj.final_time);
+      double dist = (start_pt-end_pt).norm();
+      cout << poly_traj.traj_id << " " << dist << endl;
+      ofs << dist << endl;
+      ofs.flush();
+    }
+
     rnw_msgs::RockingCmd pre_cmd;
     bool cmd_init = false;
 
@@ -63,9 +74,9 @@ int main( int argc, char** argv ) {
 
   data_logger_t data_logger(nh);
 
-  //ros::Subscriber sub_traj = nh.subscribe<quadrotor_msgs::PolynomialTrajectory>("/rnw/poly_traj", 100, &data_logger_t::on_traj, &data_logger );
+  ros::Subscriber sub_traj = nh.subscribe<quadrotor_msgs::PolynomialTrajectory>("/rnw/poly_traj", 100, &data_logger_t::log_reloc_length, &data_logger );
 
-  ros::Subscriber sub_cmd = nh.subscribe<rnw_msgs::RockingCmd>("/rnw/rocking_cmd", 10000, &data_logger_t::on_cmd, &data_logger );
+  //ros::Subscriber sub_cmd = nh.subscribe<rnw_msgs::RockingCmd>("/rnw/rocking_cmd", 10000, &data_logger_t::on_cmd, &data_logger );
 
   ros::spin();
 

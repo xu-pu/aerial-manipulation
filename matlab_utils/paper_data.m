@@ -3,9 +3,9 @@
 
 
 %size(dat,1)
-load('amp25.mat');
+%load('amp25.mat');
 
-plot(1:73,dat);
+%plot(1:73,dat);
 
 amps = calc_amps(dat);
 
