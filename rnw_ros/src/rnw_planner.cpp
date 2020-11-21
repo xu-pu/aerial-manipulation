@@ -554,3 +554,21 @@ void energy_feedback_t::step( rnw_msgs::ConeState const & cone_state ){
   E_dot = cur_E_dot;
   E = cur_E;
 }
+
+
+corridor_controller_t::corridor_controller_t( rnw_config_t const & cfg ): config(cfg) {}
+
+void corridor_controller_t::init( rnw_msgs::ConeState const & cone_state ){
+  Vector3d C = point_at_grip_depth(cone_state,config.rnw.desired_grip_depth);
+  corridor_origin = C;
+  corridor_dir = cone_yaw(cone_state);
+  //corridor_width
+}
+
+void corridor_controller_t::update_cone_state( rnw_msgs::ConeState const & cone_state ){
+  // no nothing for now
+}
+
+Vector3d corridor_controller_t::calc_next_c( rnw_msgs::ConeState const & cone_state, int dir ){
+  return corridor_origin;
+}

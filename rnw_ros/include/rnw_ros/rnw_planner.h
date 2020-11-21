@@ -118,6 +118,40 @@ struct steering_controller_t {
 
 };
 
+struct corridor_controller_t {
+
+    rnw_config_t const & config;
+
+    Vector3d corridor_origin;
+
+    double corridor_dir = 0; // yaw angle of the walking direction
+
+    double corridor_width = 0; // tau
+
+    explicit corridor_controller_t( rnw_config_t const & cfg );
+
+    /**
+     * setup the corridor, origin+dir+width
+     * @param cone_state
+     */
+    void init( rnw_msgs::ConeState const & cone_state );
+
+    /**
+     * update corridor width based on energy
+     * @param cone_state
+     */
+    void update_cone_state( rnw_msgs::ConeState const & cone_state );
+
+    /**
+     * Calculate the next C position
+     * @param cone_state
+     * @param dir - >0 := left, <0 := right
+     * @return
+     */
+    Vector3d calc_next_c( rnw_msgs::ConeState const & cone_state, int dir );
+
+};
+
 /**
  * E is energy, we use E := abs(phi), phi_dot == 0
  */
