@@ -177,7 +177,7 @@ void rnw_config_t::load_from_ros( ros::NodeHandle & nh ){
   rnw.EKp = get_param_default<double>(nh, "/rnw/EKp", 0);
   rnw.EKi = get_param_default<double>(nh, "/rnw/EKi", 0);
   rnw.EKd = get_param_default<double>(nh, "/rnw/EKd", 0);
-
+  rnw.tau_ff = get_param_default<double>(nh, "/rnw/tau_ff", 0);
 }
 
 double dist( Vector3d const & A, Vector3d const & B ){

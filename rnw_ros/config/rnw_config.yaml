@@ -35,6 +35,7 @@ rnw:
   EKp: 0.2
   EKi: 0
   EKd: 0
+  tau_ff: 0.1
 topple:
   forward: 0.4
   downward: 0.05

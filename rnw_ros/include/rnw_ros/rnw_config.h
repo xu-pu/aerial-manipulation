@@ -119,6 +119,8 @@ struct rnw_config_t {
 
         double EKd = 0;
 
+        double tau_ff = 0;
+
         inline std::string to_string() const {
           std::stringstream ss;
           ss << "RnW Parameters:\n"
