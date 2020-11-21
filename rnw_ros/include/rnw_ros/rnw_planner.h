@@ -249,6 +249,8 @@ private:
 
     void plan_cmd_walk();
 
+    void plan_cmd_walk_corridor();
+
     void plan_cmd_walk_no_feedforward();
 
     void plan_cmd_adjust_grip();
