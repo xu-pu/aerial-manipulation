@@ -42,12 +42,6 @@ struct rnw_cmd_t {
 
     Vector3d setpoint_apex;
 
-    Vector3d midpoint_uav;
-
-    Vector3d midpoint_apex;
-
-    bool has_mid_point = false;
-
     //////////////////////////////////////
     /// Grip Monitoring
     //////////////////////////////////////

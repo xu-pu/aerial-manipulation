@@ -181,7 +181,6 @@ void rnw_planner_t::trigger_adjust_nutation(){
 
 void rnw_planner_t::plan_cmd_adjust_grip(){
   request_adjust_grip = false;
-  rnw_cmd.has_mid_point = false;
   rnw_cmd.setpoint_apex = point_at_grip_depth(latest_cone_state,rnw_config.rnw.desired_grip_depth);
   rnw_cmd.setpoint_uav = tcp2uav(rnw_cmd.setpoint_apex,latest_uav_odom,rnw_config.flu_T_tcp);
   rnw_cmd.setpoint_grip_depth = rnw_config.rnw.desired_grip_depth;
@@ -196,8 +195,6 @@ void rnw_planner_t::plan_cmd_adjust_grip(){
 void rnw_planner_t::plan_cmd_adjust_nutation(){
 
   request_adjust_nutation = false;
-
-  rnw_cmd.has_mid_point = false;
 
   Vector3d O = uav_utils::from_point_msg(latest_cone_state.contact_point);
   Vector3d D = uav_utils::from_point_msg(latest_cone_state.disc_center);
@@ -246,10 +243,6 @@ void rnw_planner_t::plan_cmd_walk(){
   double theta = desired_nutation - cur_nutation;
   // rotate along K, positive rotation increase nutation
   Vector3d C_prime = rotate_point_along_axis(C,G,K,theta);
-
-  rnw_cmd.midpoint_apex = C_prime;
-  rnw_cmd.midpoint_uav = tcp2uav(rnw_cmd.midpoint_apex,latest_uav_odom,rnw_config.flu_T_tcp);
-  rnw_cmd.has_mid_point = true;
 
   // left-right step
 
@@ -318,10 +311,6 @@ void rnw_planner_t::plan_cmd_walk_corridor(){
   // rotate along K, positive rotation increase nutation
   Vector3d C_prime = rotate_point_along_axis(C,G,K,theta);
 
-  rnw_cmd.midpoint_apex = C_prime;
-  rnw_cmd.midpoint_uav = tcp2uav(rnw_cmd.midpoint_apex,latest_uav_odom,rnw_config.flu_T_tcp);
-  rnw_cmd.has_mid_point = true;
-
   // left-right step
 
   rot_dir = -rot_dir;
@@ -388,10 +377,6 @@ void rnw_planner_t::plan_cmd_walk_no_feedforward(){
   double theta = desired_nutation - cur_nutation;
   // rotate along K, positive rotation increase nutation
   Vector3d C_prime = rotate_point_along_axis(C,G,K,theta);
-
-  rnw_cmd.midpoint_apex = C_prime;
-  rnw_cmd.midpoint_uav = tcp2uav(rnw_cmd.midpoint_apex,latest_uav_odom,rnw_config.flu_T_tcp);
-  rnw_cmd.has_mid_point = true;
 
   // left-right step
 
