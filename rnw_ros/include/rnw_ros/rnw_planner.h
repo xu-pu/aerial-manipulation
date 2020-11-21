@@ -116,6 +116,8 @@ struct corridor_controller_t {
 
     rnw_config_t const & config;
 
+    bool _init = false;
+
     Vector3d corridor_origin;
 
     double corridor_dir = 0; // yaw angle of the walking direction
@@ -280,6 +282,8 @@ private:
     steering_controller_t walking_state;
 
     energy_feedback_t energy_feedback;
+
+    corridor_controller_t corridor;
 
     void plan_next_cmd();
 

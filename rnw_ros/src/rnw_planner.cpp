@@ -13,6 +13,7 @@ void rnw_planner_t::start_walking(){
   else if ( !rnw_cmd.is_walking ) {
     walking_state.start(latest_cone_state);
     energy_feedback.init(latest_cone_state);
+    corridor.init(latest_cone_state);
     rnw_cmd.desired_yaw = walking_state.desired_uav_yaw();
     rnw_cmd.is_walking = true;
     rnw_cmd.walk_idx++;
@@ -51,7 +52,7 @@ void rnw_planner_t::on_uav_odom( nav_msgs::OdometryConstPtr const & msg ){
   uav_odom_init = true;
 }
 
-rnw_planner_t::rnw_planner_t( ros::NodeHandle & h, rnw_config_t const & cfg ) : rnw_config(cfg), nh(h), walking_state(cfg) {
+rnw_planner_t::rnw_planner_t( ros::NodeHandle & h, rnw_config_t const & cfg ) : rnw_config(cfg), nh(h), walking_state(cfg), corridor(cfg) {
   pub_rocking_cmd = nh.advertise<rnw_msgs::RockingCmd>("/rnw/rocking_cmd",10);
   pub_grip_state = nh.advertise<rnw_msgs::GripState>("/rnw/grip_state",10);
 }
@@ -293,46 +294,10 @@ void rnw_planner_t::plan_cmd_walk(){
 
 void rnw_planner_t::plan_cmd_walk_corridor(){
 
-  // adjust nutation first
-
-  Vector3d G = uav_utils::from_point_msg(latest_cone_state.contact_point);
-  Vector3d D = uav_utils::from_point_msg(latest_cone_state.disc_center);
-  Vector3d Dg = D; Dg.z() = rnw_config.ground_z;
-
-  Vector3d e1 = (Dg-G).normalized();
-  Vector3d e2 = Vector3d::UnitZ();
-  Vector3d K = e1.cross(e2);
-  Vector3d C = point_at_grip_depth(latest_cone_state,rnw_config.rnw.desired_grip_depth);
-
-  // make sure they are radiant
-  double cur_nutation = latest_cone_state.euler_angles.y;
-  double desired_nutation = rnw_config.rnw.desired_nutation*deg2rad;
-  double theta = desired_nutation - cur_nutation;
-  // rotate along K, positive rotation increase nutation
-  Vector3d C_prime = rotate_point_along_axis(C,G,K,theta);
-
   // left-right step
-
   rot_dir = -rot_dir;
-
-  double steering_term = 0;
-  if ( rnw_config.rnw.enable_steering ) {
-    steering_term = - rnw_config.rnw.yaw_gain * walking_state.cur_relative_yaw;
-  }
-
-  // energy feedback term
-  double energy_term = 0;
-  if ( rnw_config.rnw.enable_energy_feedback ) {
-    energy_feedback.step(latest_cone_state);
-    energy_term = rnw_config.rnw.EKp * energy_feedback.E_dot;
-  }
-
-  double rot_rad = rot_dir * ( rnw_config.rnw.tau * deg2rad - energy_term ) + steering_term;
-
-  Matrix3d rot = Eigen::AngleAxisd(rot_rad,Vector3d::UnitZ()).toRotationMatrix();
-  Vector3d v = C_prime - G;
-  Vector3d next_v = rot * v;
-  Vector3d setpoint_apex = G + next_v;
+  corridor.update_cone_state(latest_cone_state);
+  Vector3d setpoint_apex = corridor.calc_next_c(latest_cone_state,(int)rot_dir);
   Vector3d setpoint_uav = tcp2uav(setpoint_apex,latest_uav_odom,rnw_config.flu_T_tcp);
 
   rnw_cmd.setpoint_uav = setpoint_uav;
@@ -344,15 +309,7 @@ void rnw_planner_t::plan_cmd_walk_corridor(){
   rnw_cmd.cmd_idx++;
   rnw_cmd.step_count++;
   rnw_cmd.fsm = rnw_cmd_t::fsm_pending;
-
-  if ( rnw_config.rnw.enable_steering ) {
-    rnw_cmd.desired_yaw = walking_state.desired_uav_yaw();
-  }
-  else {
-    double obj_heading = calc_obj_heading(latest_cone_state,walking_state.last_step);
-    ROS_INFO_STREAM("[rnw] object heading dir " << obj_heading);
-    rnw_cmd.desired_yaw = uav_yaw_from_cone_yaw(obj_heading);
-  }
+  rnw_cmd.desired_yaw = uav_yaw_from_cone_yaw(corridor.corridor_dir);
 
   walking_state.step(latest_cone_state);
 
@@ -557,6 +514,7 @@ void corridor_controller_t::init( rnw_msgs::ConeState const & cone_state ){
   Twc = Eigen::Vector2d( corridor_origin.x(), corridor_origin.y() );
   Rcw = Rwc.transpose();
   Tcw = -Rcw * Twc;
+  _init = true;
 }
 
 void corridor_controller_t::update_cone_state( rnw_msgs::ConeState const & cone_state ){
@@ -575,6 +533,11 @@ Vector3d corridor_controller_t::calc_next_c( rnw_msgs::ConeState const & cone_st
   Vector3d e2 = Vector3d::UnitZ();
   Vector3d K = e1.cross(e2);
   Vector3d C = point_at_grip_depth(cone_state,config.rnw.desired_grip_depth);
+
+  if ( !_init ) {
+    ROS_ERROR_STREAM("[rnw] did not init corridor!");
+    return C;
+  }
 
   // make sure they are radiant
   double cur_nutation = cone_state.euler_angles.y;
