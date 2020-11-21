@@ -579,5 +579,34 @@ void corridor_controller_t::update_cone_state( rnw_msgs::ConeState const & cone_
 }
 
 Vector3d corridor_controller_t::calc_next_c( rnw_msgs::ConeState const & cone_state, int dir ){
-  return corridor_origin;
+
+  // adjust nutation first
+
+  Vector3d G = uav_utils::from_point_msg(cone_state.contact_point);
+  Vector3d D = uav_utils::from_point_msg(cone_state.disc_center);
+  Vector3d Dg = D; Dg.z() = config.ground_z;
+
+  Vector3d e1 = (Dg-G).normalized();
+  Vector3d e2 = Vector3d::UnitZ();
+  Vector3d K = e1.cross(e2);
+  Vector3d C = point_at_grip_depth(cone_state,config.rnw.desired_grip_depth);
+
+  // make sure they are radiant
+  double cur_nutation = cone_state.euler_angles.y;
+  double desired_nutation = config.rnw.desired_nutation*deg2rad;
+  double theta = desired_nutation - cur_nutation;
+  // rotate along K, positive rotation increase nutation
+  Vector3d C_prime = rotate_point_along_axis(C,G,K,theta);
+
+  // then sideways
+
+  Eigen::Vector2d C_prime_2d(C_prime.x(), C_prime.y());
+  Eigen::Vector2d ptc = Rcw * C_prime_2d + Tcw;
+  ptc.y() = dir * corridor_width;
+  Eigen::Vector2d C_next_2d = Rwc * ptc + Twc;
+
+  Vector3d C_next(C_next_2d.x(), C_next_2d.y(), C_prime.z() );
+
+
+  return C_next;
 }
