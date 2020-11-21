@@ -128,6 +128,14 @@ struct corridor_controller_t {
 
     double corridor_width = 0; // tau
 
+    // T_corridor_world
+    Eigen::Matrix2d Rcw;
+    Eigen::Vector2d Tcw;
+
+    // T_world_corridor
+    Eigen::Matrix2d Rwc;
+    Eigen::Vector2d Twc;
+
     explicit corridor_controller_t( rnw_config_t const & cfg );
 
     /**

@@ -562,7 +562,16 @@ void corridor_controller_t::init( rnw_msgs::ConeState const & cone_state ){
   Vector3d C = point_at_grip_depth(cone_state,config.rnw.desired_grip_depth);
   corridor_origin = C;
   corridor_dir = cone_yaw(cone_state);
-  //corridor_width
+  corridor_width = config.rnw.tau_ff/2;
+  double theta = corridor_dir;
+  // setup the ref frame
+  Eigen::Vector2d ex( cos(theta), sin(theta) );
+  Eigen::Vector2d ey( -sin(theta), cos(theta) );
+  Rwc.col(0) = ex;
+  Rwc.col(1) = ey;
+  Twc = Eigen::Vector2d( corridor_origin.x(), corridor_origin.y() );
+  Rcw = Rwc.transpose();
+  Tcw = -Rcw * Twc;
 }
 
 void corridor_controller_t::update_cone_state( rnw_msgs::ConeState const & cone_state ){
