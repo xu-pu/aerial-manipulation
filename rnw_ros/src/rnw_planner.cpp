@@ -549,6 +549,20 @@ Vector3d corridor_controller_t::calc_next_c( rnw_msgs::ConeState const & cone_st
 
   // then sideways
 
+  if ( abs(cone_state.euler_angles.z) > (10 * deg2rad) ) {
+    if ( cone_state.euler_angles.z > 0 ){
+      dir = -1;
+    }
+    else {
+      dir = 1;
+    }
+
+    if ( abs(cone_state.euler_angles.z) > 1 ) {
+      dir = -dir;
+    }
+
+  }
+
   Eigen::Vector2d C_prime_2d(C_prime.x(), C_prime.y());
   Eigen::Vector2d ptc = Rcw * C_prime_2d + Tcw;
   ptc.y() = dir * corridor_width;
