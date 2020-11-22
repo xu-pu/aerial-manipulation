@@ -22,7 +22,7 @@ rnw:
   rocking_max_acc: 0.5
   adjust_nutation_threshold: 5
   adjust_grip_depth_threshold: 0.05
-  ang_vel_threshold: 1
+  ang_vel_threshold: 0.3
   min_nutation_deg: 5
   yaw_gain: 0.2
   desired_spin_deg: 30
