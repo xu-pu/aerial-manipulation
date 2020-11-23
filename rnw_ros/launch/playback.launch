@@ -22,7 +22,7 @@
 
 <!--    <node pkg="rnw_ros" type="pub_obj_trace_node" name="pub_obj_trace_node" output="screen" required="true"/>-->
 
-    <node pkg="rnw_ros" type="gen_paper_data_node" name="gen_paper_data_node" output="screen" required="true"/>
+<!--    <node pkg="rnw_ros" type="gen_paper_data_node" name="gen_paper_data_node" output="screen" required="true"/>-->
 
     <node name="rviz_traj" pkg="rviz" type="rviz" output="log" required="true" args="-d $(find rnw_ros)/config/traj.rviz" />
 
@@ -32,18 +32,18 @@
 <!--    </node>-->
 
     <node name="rosbag_play" pkg="rosbag" type="play" respawn="false"
-          args="--clock -r 5 /home/sheep/Dropbox/rosbags/2020-11-20-23-26-58.labfloor.30.v2.bag"/>
+          args="--clock -r 5 /home/sheep/Dropbox/rosbags/2020-11-22-22-59-37.n30.6.bag"/>
 
-<!--    <node name="rosbag_reocrd" pkg="rosbag" type="record" respawn="false" args="/rnw/cone_energy_diff"/>-->
-<!--    <node pkg="rnw_ros" type="pub_energy_node" name="pub_energy_node" output="screen" required="true"/>-->
+    <node name="rosbag_reocrd" pkg="rosbag" type="record" respawn="false" args="/rnw/cone_energy_diff"/>
+    <node pkg="rnw_ros" type="pub_energy_node" name="pub_energy_node" output="screen" required="true"/>
 
     <!--    <node pkg="rnw_ros" type="dbg_atti_loop_node" name="dbg_atti_loop_node" output="screen">-->
 <!--        <remap from="~imu" to="$(arg imu_topic)"/>-->
 <!--        <remap from="~joy_ctrl" to="$(arg joy_ctrl_topic)"/>-->
 <!--    </node>-->
 
-<!--        <node pkg="rqt_multiplot" type="rqt_multiplot" name="rqt_multiplot"-->
-<!--              args="&#45;&#45;multiplot-config $(find rnw_ros)/config/rqt_multiplot_energy.xml &#45;&#45;multiplot-run-all"/>-->
+        <node pkg="rqt_multiplot" type="rqt_multiplot" name="rqt_multiplot"
+              args="--multiplot-config $(find rnw_ros)/config/rqt_multiplot_energy.xml --multiplot-run-all"/>
 
 <!--    <node pkg="rqt_multiplot" type="rqt_multiplot" name="rqt_multiplot"-->
 <!--          args="&#45;&#45;multiplot-config $(find rnw_ros)/config/rqt_multiplot_cone_state.xml &#45;&#45;multiplot-run-all"/>-->

@@ -74,9 +74,9 @@ int main( int argc, char** argv ) {
 
   data_logger_t data_logger(nh);
 
-  ros::Subscriber sub_traj = nh.subscribe<quadrotor_msgs::PolynomialTrajectory>("/rnw/poly_traj", 100, &data_logger_t::log_reloc_length, &data_logger );
+  //ros::Subscriber sub_traj = nh.subscribe<quadrotor_msgs::PolynomialTrajectory>("/rnw/poly_traj", 100, &data_logger_t::on_traj, &data_logger );
 
-  //ros::Subscriber sub_cmd = nh.subscribe<rnw_msgs::RockingCmd>("/rnw/rocking_cmd", 10000, &data_logger_t::on_cmd, &data_logger );
+  ros::Subscriber sub_cmd = nh.subscribe<rnw_msgs::RockingCmd>("/rnw/rocking_cmd", 10000, &data_logger_t::on_cmd, &data_logger );
 
   ros::spin();
 

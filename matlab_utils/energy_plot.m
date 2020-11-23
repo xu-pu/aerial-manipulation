@@ -1,4 +1,4 @@
-bag = rosbag('2020-11-20-16-03-46.bag');
+bag = rosbag('2020-11-23-21-15-28.bag');
 bSel = select(bag,'Topic','/rnw/cone_energy_diff');
 ts_energy = timeseries(bSel, 'Value');
 
