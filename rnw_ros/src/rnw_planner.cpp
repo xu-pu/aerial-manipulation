@@ -549,7 +549,7 @@ Vector3d corridor_controller_t::calc_next_c( rnw_msgs::ConeState const & cone_st
 
   // then sideways
 
-  if ( abs(cone_state.euler_angles.z) > (10 * deg2rad) ) {
+  if ( abs(cone_state.euler_angles.z) > (5 * deg2rad) ) {
     if ( cone_state.euler_angles.z > 0 ){
       dir = -1;
     }
@@ -557,7 +557,8 @@ Vector3d corridor_controller_t::calc_next_c( rnw_msgs::ConeState const & cone_st
       dir = 1;
     }
 
-    if ( abs(cone_state.euler_angles.z) > 1 ) {
+    if ( abs(cone_state.euler_angles.z) > 1.2 ) {
+      ROS_ERROR_STREAM("[rnw] amp too large!!!");
       dir = -dir;
     }
 
