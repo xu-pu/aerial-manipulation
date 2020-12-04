@@ -559,7 +559,7 @@ Vector3d corridor_controller_t::calc_next_c( rnw_msgs::ConeState const & cone_st
 
     if ( abs(cone_state.euler_angles.z) > 1.2 ) {
       ROS_ERROR_STREAM("[rnw] amp too large!!!");
-      dir = -dir;
+      //dir = -dir;
     }
 
   }
