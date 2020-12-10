@@ -63,12 +63,19 @@
 % t = 163;
 
 % nominal 25 nutation
-px1 = 0.483 ;
-py1 = -2.557 ;
-px2 = 0.703 ;
-py2 = -1.678 ;
-t = 155.1052;
+% px1 = 0.483 ;
+% py1 = -2.557 ;
+% px2 = 0.703 ;
+% py2 = -1.678 ;
+% t = 155.1052;
 
+% labfloor long
+px1 = -0.446 ;
+py1 = -2.909 ;
+px2 = 0.263 ;
+py2 = -0.073 ;
+t = 100;
+steps = 130;
 
 
 % calculate table data
@@ -80,3 +87,5 @@ dist = sqrt(dist_sqr);
 dist_CBL = dist / CBL;
 vel_CBL = dist_CBL / t;
 vel_CBL_1000 = vel_CBL * 1000;
+
+per_step = dist/steps;
