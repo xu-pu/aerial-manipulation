@@ -1,9 +1,0 @@
-Manifest-Version: 1.0
-Bundle-SymbolicName: org.ros.rosjava_messages.am_traj
-Bundle-Version: 0.1.0
-Bundle-Name: am_traj
-Bundle-ManifestVersion: 2
-Bnd-LastModified: 1604673818000
-Created-By: 1.8.0_222 (AdoptOpenJDK)
-Tool: Bnd-2.1.0.20130426-122213
-

@@ -1,9 +1,0 @@
-Manifest-Version: 1.0
-Bundle-SymbolicName: org.ros.rosjava_messages.poly_traj
-Bundle-Version: 0.0.0
-Bundle-Name: poly_traj
-Bundle-ManifestVersion: 2
-Bnd-LastModified: 1604673820000
-Created-By: 1.8.0_222 (AdoptOpenJDK)
-Tool: Bnd-2.1.0.20130426-122213
-
