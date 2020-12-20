@@ -7,11 +7,24 @@ base rim.
 %}
 
 
+% obj_height = 1.35;
+% obj_radius = 0.35;
+% nutation_deg = 30;
+
+
+% obj_height = 7.35*0.4082;
+% obj_radius = 1.26*0.4082;
+% nutation_deg = 26;
+
+obj_height = 3;
+obj_radius = 0.6;
+nutation_deg = 10;
+
 %Set parameter values
-R = sym(0.35); % Base radius of the cone
-hc = sym(1.35*sind(90)); % Vertical height of the cone
-r = sym(0.35 + 1.5*cosd(90)); % Oblique cone's eccentricity. Horizontal distance between 
-h = sym(1.26); % Height of the cone's apex (assumed fixed) above ground 
+R = sym(obj_radius); % Base radius of the cone
+hc = sym(obj_height*sind(90)); % Vertical height of the cone
+r = sym(obj_radius); % Oblique cone's eccentricity. Horizontal distance between 
+h = sym(obj_height*cosd(nutation_deg)); % Height of the cone's apex (assumed fixed) above ground 
 
 %Compute bounds on delta
 dist_AB = sqrt((r-R)^2 + hc^2);
@@ -168,7 +181,7 @@ for del_query = linspace(del_lb, del_ub, radial_res)
 
 end
 
-start_pt = flowGivenPhi(pi-0.9, AX, h, deg2rad(0), del_lb); 
+start_pt = flowGivenPhi(deg2rad(32.7510), AX, h, deg2rad(0), del_lb); 
 
 [stream_x, stream_y] = flowField(...
      start_pt, X_ann_pos, Y_ann_pos, U_ann_pos, V_ann_pos);

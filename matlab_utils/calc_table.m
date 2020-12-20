@@ -70,13 +70,20 @@
 % t = 155.1052;
 
 % labfloor long
+% px1 = -0.446 ;
+% py1 = -2.909 ;
+% px2 = 0.263 ;
+% py2 = -0.073 ;
+% t = 100;
+% steps = 130;
+
+% labfloor truncated
 px1 = -0.446 ;
 py1 = -2.909 ;
-px2 = 0.263 ;
-py2 = -0.073 ;
+px2 = 0.048  ;
+py2 = -0.676  ;
 t = 100;
-steps = 130;
-
+steps = 100;
 
 % calculate table data
 

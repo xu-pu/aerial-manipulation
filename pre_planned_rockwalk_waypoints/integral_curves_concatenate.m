@@ -23,7 +23,7 @@ right_rock = zeros(total_rocking_steps-1, 2);
 left_rock = zeros(total_rocking_steps, 2);
 
 
-rocking_angle = deg2rad(15);
+rocking_angle = deg2rad(26);
 
 start_pt = flowGivenPhi(rocking_angle, AX, h, 90);
 new_start_pt = double([start_pt(1); start_pt(2)]);
@@ -99,7 +99,7 @@ for rocking_step = 2:total_rocking_steps
     drawAnchorPoints(anchor_point, 'k*')
 %     drawAnchorPointArrows(prev_anchor_point, anchor_point)
 %     prev_anchor_point = anchor_point;
-    drawStreamLines(stream_x, stream_y, 'k')
+    drawStreamLines(stream_x, stream_y, 'b')
     
     
 %     cla
