@@ -1,10 +1,25 @@
-# Aerial Manipulation
+# Aerial Rock-and-Walk
 
-This repo contains code for aerial manipulation experiments.
+In this directory contains code for the aerial experiments, including:
+
+- `rnw_ros` and `rnw_msgs` are specific to rock-and-walk.
+- `uwb_mocap_broadcast` for transmitting mocap information.
+- `djiros` and `n3ctrl` for the underlying quadrotor control
 
 
 
-### Run as hardware-in-the-loop (HIL) simulation
+__Hardware Requirements__
+
+- DJI N3 Flight Controller
+- DJI Manifold 2-G Onboard Computer
+- OptiTrack Motion Capture System
+- 2 x Nooploop UWB Transmitter
+- Logitech F710 Wireless Gamepad
+- Custom end-effector for aerial rock-and-walk
+
+
+
+__Run as hardware-in-the-loop (HIL) simulation__
 
 1. Connect DJI N3 Autopilot to a PC/Mac with DJI Assistant installed
 2. Enter simulation in DJI Assistant
@@ -12,84 +27,72 @@ This repo contains code for aerial manipulation experiments.
 
 
 
-### Run real experiments
+__Run real experiments__
 
-1. Open OptiTrack Motive using my config file 
+1. Open OptiTrack
 2. `roslaunch rnw_ros ground_station.launch` on ground station i.e. your laptop
 3. SSH into the aircraft and `roslaunch rnw_ros real.launch`
 
 
 
-### Run software-only simulation
+__Pre-Flight Checklist__
 
+Make sure UAV odometry is correct
 
+- Fly it using `real.launch`, hover and moving around
 
-## Preparation
+Make sure `ConeState` is correct
 
+- Calibrate the center point and tip point using `roslaunch rnw_ros mocap_calib.launch`
+- Calibrate `ground_z` by placing a marker on the ground
+- Run `roslaunch rnw_ros check_cone_state.launch`, check the cone state visually
+- Check the estimated radius and the true radius, make sure they mactch.
 
+Make sure `GripState` is correct
 
-make sure UAV odometry is correct
+- Calibrate `flu_T_tcp` using `roslaunch rnw_ros mocap_calib.launch`
+- Run `roslaunch rnw_ros check_grip_state.launch`, see does it make sense intuitively.
+- Move the quadrotor along cone's shaft, see is the estimated `grip_depth` correct, adjust `flu_T_tcp` to make `grip_depth` match reality.
 
-- fly it using `real.launch`, hover and moving around
+Make sure rock-and-walk planning is correct
 
-
-
-make sure `ConeState` is correct
-
-- calibrate the center point and tip point using `roslaunch rnw_ros mocap_calib.launch`
-- calibrate `ground_z` by placing a marker on the ground
-- run `roslaunch rnw_ros check_cone_state.launch`, check the cone state visually
-- check the estimated radius and true radius.
-
-
-
-make sure `GripState` is correct
-
-- calibrate `flu_T_tcp` using `roslaunch rnw_ros mocap_calib.launch`
-- run `roslaunch rnw_ros check_grip_state.launch`, see does it make sense intuitively.
-- move uav along the shaft, see is the estimated `grip_depth` correct, adjust `flu_T_tcp` to make `grip_depth` reflect reality.
-
-
-
-make sure r-n-w planning is correct
-
-- make sure `ConeState` and `GripState` is correct, following the instructions above
+- make sure `ConeState` and `GripState` are correct following the instructions above
 - run `roslaunch rnw_ros check_rnw_planning.launch` 
 
 
 
-## DOC
+## Documentation
 
 
 
-### Control Flow
+__Control Flow__
 
-`rnw_controller_node` sends trajectory to  `rnw_traj_server_node`
+1. `rnw_controller_node` sends trajectory to  `rnw_traj_server_node`
 
-`rnw_traj_server_node` transform the trajectory into feedforward command, send to `n3ctrl_node`
+2. `rnw_traj_server_node` transform the trajectory into position command, send to `n3ctrl_node`
 
-`n3ctrl_node` performs cascade PID control, send attitude and trust command to `djiros_node`
-
-
-
-### State Flow
-
-`uart_odom` receive odometry of aircraft and object from the ground station, publish to ROS
-
-`pub_cone_state_node` reads odometry and configuration files, calculate cone state, including contact point, apex point, angular velocity etc, and publish to ROS
-
-`rnw_controller_node` read cone state, and plan trajectories accordingly
+3. `n3ctrl_node` performs position control, sends attitude and trust commands to `djiros_node`
 
 
 
+__State Flow__
+
+1. OptiTrack sends out mocap for the aircraft and object throught Ethernet.
+2. `ground_station.launch` receives mocap from Ethernet and sends odometry to the onboard computer through UWB.
+3. `uart_odom` receives odometry from the ground station, then publish to ROS
+
+2. `pub_cone_state_node` reads odometry and configuration files, calculate `cone_state`, then publish to ROS
+
+3. `rnw_controller_node` read `cone_state`, and performs rock-and-walk.
 
 
-## r-n-w Playback
 
+__Playback__
 
+`rosbag record -a` is called by default, the `.bag` files can be retrieved after flight.
 
-plotjuggler
+Inspect them using:
 
-look at pose angles `/rnw/walk_state/session_X/cone_state/euler_angles`
-
-look at contact point trace `/rnw/walk_state/session_X/cone_state/contact_point`
+- `playback.launch` will replay the experiments in RViz.
+- PlotJuggler
+- MATLAB
