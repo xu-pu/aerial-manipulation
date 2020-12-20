@@ -77,7 +77,7 @@ __Control Flow__
 
 __State Flow__
 
-1. OptiTrack sends out mocap for the aircraft and object throught Ethernet.
+1. OptiTrack sends out mocap for the aircraft and object through Ethernet.
 2. `ground_station.launch` receives mocap from Ethernet and sends odometry to the onboard computer through UWB.
 3. `uart_odom` receives odometry from the ground station, then publish to ROS
 
