@@ -1,6 +1,6 @@
 # Aerial Rock-and-Walk
 
-In this directory contains code for the aerial experiments, including:
+This directory contains code for the aerial experiments, including:
 
 - `rnw_ros` and `rnw_msgs` are specific to rock-and-walk.
 - `uwb_mocap_broadcast` for transmitting mocap information.
