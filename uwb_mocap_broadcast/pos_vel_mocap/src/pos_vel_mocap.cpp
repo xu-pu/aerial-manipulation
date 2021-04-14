@@ -119,12 +119,11 @@ struct uav_odom_filter_t {
 
 struct mocap_processor_t {
 
-    ros::Publisher pub_odom_uav;
-    ros::Publisher pub_odom_cone;
-
     ros::NodeHandle & nh;
 
-    bool publish_uav_odom = true;
+    ros::Publisher pub_odom_cone;
+    ros::Publisher pub_odom_drone1;
+    ros::Publisher pub_odom_drone2;
 
     uav_odom_filter_t drone1;
     uav_odom_filter_t drone2;
@@ -153,18 +152,23 @@ struct mocap_processor_t {
        * Setup Publishers
        */
 
-      publish_uav_odom = get_param_default<bool>(nh, "publish_uav_odom", true);
-
       pub_odom_cone = nh.advertise<nav_msgs::Odometry>("/odom/cone", 100);
 
+      bool publish_uav_odom = get_param_default<bool>(nh, "publish_uav_odom", true);
+
       if(publish_uav_odom){
-        pub_odom_uav = nh.advertise<nav_msgs::Odometry>("/odom/uav", 100);
+        pub_odom_drone1 = nh.advertise<nav_msgs::Odometry>("/odom/drone1", 100);
+        pub_odom_drone2 = nh.advertise<nav_msgs::Odometry>("/odom/drone2", 100);
       }
 
     }
 
-    void pose_callback( geometry_msgs::PoseStampedConstPtr const & msg ) {
-      pub_odom_uav.publish(drone1.update(msg));
+    void drone1_pose_callback(geometry_msgs::PoseStampedConstPtr const & msg ) {
+      pub_odom_drone1.publish(drone1.update(msg));
+    }
+
+    void drone2_pose_callback(geometry_msgs::PoseStampedConstPtr const & msg ) {
+      pub_odom_drone2.publish(drone2.update(msg));
     }
 
     void pose_cone_callback( geometry_msgs::PoseStampedConstPtr const & msg ) const {
@@ -207,10 +211,18 @@ int main( int argc, char **argv ){
 
   mocap_processor_t mocap_processor(n);
 
-  ros::Subscriber sub_uav = n.subscribe<geometry_msgs::PoseStamped>(
-          "/mocap/uav",
+  ros::Subscriber sub_drone_1 = n.subscribe<geometry_msgs::PoseStamped>(
+          "/mocap/drone1",
           100,
-          &mocap_processor_t::pose_callback,
+          &mocap_processor_t::drone1_pose_callback,
+          &mocap_processor,
+          ros::TransportHints().tcpNoDelay()
+  );
+
+  ros::Subscriber sub_drone_2 = n.subscribe<geometry_msgs::PoseStamped>(
+          "/mocap/drone2",
+          100,
+          &mocap_processor_t::drone2_pose_callback,
           &mocap_processor,
           ros::TransportHints().tcpNoDelay()
   );
