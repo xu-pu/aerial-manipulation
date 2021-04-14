@@ -3,9 +3,7 @@
 #include <Eigen/Eigen>
 #include <ros/ros.h>
 #include <geometry_msgs/PoseStamped.h>
-#include <dynamic_reconfigure/server.h>
 #include <nav_msgs/Odometry.h>
-#include <pos_vel_mocap/ViconCalibConfig.h>
 
 using namespace std;
 
@@ -21,15 +19,6 @@ T get_param_default( ros::NodeHandle & nh, string const & key, T const & default
     val = default_val;
   }
   return val;
-}
-
-static constexpr double DEG2RAD = M_PI/180;
-
-inline Matrix3d rpy2rot( Vector3d const & rpy ){
-  return AngleAxisd(rpy.z(), Vector3d::UnitZ()) *
-         AngleAxisd(rpy.y(), Vector3d::UnitY()) *
-         AngleAxisd(rpy.x(), Vector3d::UnitX())
-                 .toRotationMatrix();
 }
 
 struct uav_odom_filter_t {
@@ -133,11 +122,6 @@ struct mocap_processor_t {
     ros::Publisher pub_odom_uav;
     ros::Publisher pub_odom_cone;
 
-    Quaterniond R_MARKER_FLU;
-    Vector3d T_MARKER_FLU;
-
-    Vector3d rpy_markers;
-
     ros::NodeHandle & nh;
 
     bool publish_uav_odom = true;
@@ -151,16 +135,19 @@ struct mocap_processor_t {
        * Load Vicon-IMU Calibration
        */
 
-      rpy_markers.setZero();
-      R_MARKER_FLU.setIdentity();
+      drone1.R_MARKER_FLU.setIdentity();
+      drone1.T_MARKER_FLU.x() = get_param_default(nh,"drone1/T_MARKER_FLU/x",0.);
+      drone1.T_MARKER_FLU.y() = get_param_default(nh,"drone1/T_MARKER_FLU/y",0.);
+      drone1.T_MARKER_FLU.z() = get_param_default(nh,"drone1/T_MARKER_FLU/z",0.);
 
-      T_MARKER_FLU.x() = get_param_default(nh,"T_MARKER_FLU/x",0.);
-      T_MARKER_FLU.y() = get_param_default(nh,"T_MARKER_FLU/y",0.);
-      T_MARKER_FLU.z() = get_param_default(nh,"T_MARKER_FLU/z",0.);
+      drone2.R_MARKER_FLU.setIdentity();
+      drone2.T_MARKER_FLU.x() = get_param_default(nh,"drone2/T_MARKER_FLU/x",0.);
+      drone2.T_MARKER_FLU.y() = get_param_default(nh,"drone2/T_MARKER_FLU/y",0.);
+      drone2.T_MARKER_FLU.z() = get_param_default(nh,"drone2/T_MARKER_FLU/z",0.);
 
-      ROS_INFO_STREAM("Load T_MARKER_FLU: " << T_MARKER_FLU.transpose());
-
-      drone1.T_MARKER_FLU = T_MARKER_FLU;
+      ROS_INFO_STREAM("Extrinsics:");
+      ROS_INFO_STREAM("Drone #1 T_MARKER_FLU: " << drone1.T_MARKER_FLU.transpose());
+      ROS_INFO_STREAM("Drone #2 T_MARKER_FLU: " << drone2.T_MARKER_FLU.transpose());
 
       /**
        * Setup Publishers
@@ -213,26 +200,10 @@ struct mocap_processor_t {
 
 };
 
-//void calib_cfg_callback(pos_vel_mocap::ViconCalibConfig & config, uint32_t level ){
-//
-//  rpy_markers.x() = DEG2RAD * config.yaw;
-//  rpy_markers.y() = DEG2RAD * config.pitch;
-//  rpy_markers.z() = DEG2RAD * config.roll;
-//
-//  Matrix3d R_FLU_MARKER = rpy2rot(rpy_markers);
-//
-//  R_MARKER_FLU = R_FLU_MARKER.transpose();
-//
-//}
-
 int main( int argc, char **argv ){
 
   ros::init( argc, argv, "pos_vel_mocap" );
   ros::NodeHandle n( "~" );
-
-//  dynamic_reconfigure::Server<pos_vel_mocap::ViconCalibConfig> server;
-//  dynamic_reconfigure::Server<pos_vel_mocap::ViconCalibConfig>::CallbackType f;
-//  server.setCallback(calib_cfg_callback);
 
   mocap_processor_t mocap_processor(n);
 
