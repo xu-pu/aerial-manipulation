@@ -160,8 +160,8 @@ struct mocap_processor_t {
       bool publish_uav_odom = get_param_default<bool>(nh, "publish_uav_odom", true);
 
       if(publish_uav_odom){
-        pub_odom_drone1 = nh.advertise<nav_msgs::Odometry>("/odom/drone1", 100);
-        pub_odom_drone2 = nh.advertise<nav_msgs::Odometry>("/odom/drone2", 100);
+        pub_odom_drone1 = nh.advertise<nav_msgs::Odometry>("/drone1/odom", 100);
+        pub_odom_drone2 = nh.advertise<nav_msgs::Odometry>("/drone2/odom", 100);
       }
 
     }
