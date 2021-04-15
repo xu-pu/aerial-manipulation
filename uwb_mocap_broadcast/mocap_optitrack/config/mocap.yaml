@@ -4,11 +4,16 @@
 #
 rigid_bodies:
     '1':
-        pose: mocap/uav
-        pose2d: uav/ground_pose
-        child_frame_id: uav
+        pose: mocap/drone1
+        pose2d: mocap_2d/drone1
+        child_frame_id: drone1
         parent_frame_id: world
     '2':
+      pose: mocap/drone2
+      pose2d: mocap_2d/drone2
+      child_frame_id: drone2
+      parent_frame_id: world
+    '3':
       pose: mocap/cone
       pose2d: cone/ground_pose
       child_frame_id: cone

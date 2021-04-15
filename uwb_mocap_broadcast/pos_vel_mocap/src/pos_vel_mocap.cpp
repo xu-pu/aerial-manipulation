@@ -27,7 +27,7 @@ struct uav_odom_filter_t {
 
     Vector3d    init_P, last_P;
     Quaterniond init_Q, last_Q, vins_Q;
-    ros::Time          now_t, last_odom_t;
+    ros::Time   now_t, last_odom_t;
     Vector3d    Vi0, Vi1, Vi2, Vi3, Vi4, Vo0;
 
     Quaterniond R_MARKER_FLU;
@@ -36,6 +36,12 @@ struct uav_odom_filter_t {
     uav_odom_filter_t(){
       T_MARKER_FLU = Vector3d::Zero();
       R_MARKER_FLU = Matrix3d::Identity();
+      Vi0.setZero();
+      Vi1.setZero();
+      Vi2.setZero();
+      Vi3.setZero();
+      Vi4.setZero();
+      Vo0.setZero();
     }
 
     nav_msgs::Odometry update( geometry_msgs::PoseStampedConstPtr const & msg ) {
@@ -49,6 +55,15 @@ struct uav_odom_filter_t {
       Quaterniond R_VICON_FLU = R_VICON_MARKER * R_MARKER_FLU;
       Vector3d T_VICON_FLU = R_VICON_MARKER * T_MARKER_FLU + T_VICON_MARKER;
 
+      Vector3d now_P, P_w;
+      Quaterniond now_Q, Q_w;
+
+      now_Q = R_VICON_FLU;
+      now_P = T_VICON_FLU;
+
+      Q_w = now_Q.normalized().toRotationMatrix();
+      P_w = now_P;
+
       if (!init_ok) {
         init_ok = true;
         init_Q = R_VICON_FLU;
@@ -56,21 +71,9 @@ struct uav_odom_filter_t {
         last_P = init_P;
         last_Q = init_Q;
         last_odom_t = msg->header.stamp;
-      } else {
+      }
+      else {
         now_t = msg->header.stamp;
-
-        Vector3d now_P, P_w;
-        Quaterniond now_Q, Q_w;
-
-        now_Q = R_VICON_FLU;
-        now_P = T_VICON_FLU;
-
-        //std::cout << "x :" << msg->pose.position.x << "y:" << msg->pose.position.y
-        //          << " z :" << msg->pose.position.z << std::endl;
-        // Q_w = init_Q.normalized().toRotationMatrix().transpose() *
-        // now_Q.normalized().toRotationMatrix();
-        Q_w = now_Q.normalized().toRotationMatrix();
-        P_w = now_P;
 
         Vector3d now_vel;
 
@@ -94,26 +97,26 @@ struct uav_odom_filter_t {
             last_Q = Q_w;
           }
         }
-
-
-        /*********************/
-
-        nav_msgs::Odometry odom;
-        odom.header.stamp = now_t;
-        odom.header.frame_id = "world";
-        odom.pose.pose.position.x = P_w.x();
-        odom.pose.pose.position.y = P_w.y();
-        odom.pose.pose.position.z = P_w.z();
-        odom.pose.pose.orientation.w = Q_w.w();
-        odom.pose.pose.orientation.x = Q_w.x();
-        odom.pose.pose.orientation.y = Q_w.y();
-        odom.pose.pose.orientation.z = Q_w.z();
-        odom.twist.twist.linear.x = Vo0.x(); // now_vel.x();
-        odom.twist.twist.linear.y = Vo0.y(); // now_vel.y();
-        odom.twist.twist.linear.z = Vo0.z(); // now_vel.z();
-        return odom;
-
       }
+
+      /*********************/
+
+      nav_msgs::Odometry odom;
+      odom.header.stamp = now_t;
+      odom.header.frame_id = "world";
+      odom.pose.pose.position.x = P_w.x();
+      odom.pose.pose.position.y = P_w.y();
+      odom.pose.pose.position.z = P_w.z();
+      odom.pose.pose.orientation.w = Q_w.w();
+      odom.pose.pose.orientation.x = Q_w.x();
+      odom.pose.pose.orientation.y = Q_w.y();
+      odom.pose.pose.orientation.z = Q_w.z();
+      odom.twist.twist.linear.x = Vo0.x(); // now_vel.x();
+      odom.twist.twist.linear.y = Vo0.y(); // now_vel.y();
+      odom.twist.twist.linear.z = Vo0.z(); // now_vel.z();
+
+      return odom;
+
     }
 };
 
@@ -164,11 +167,13 @@ struct mocap_processor_t {
     }
 
     void drone1_pose_callback(geometry_msgs::PoseStampedConstPtr const & msg ) {
-      pub_odom_drone1.publish(drone1.update(msg));
+      nav_msgs::Odometry odom = drone1.update(msg);
+      pub_odom_drone1.publish(odom);
     }
 
     void drone2_pose_callback(geometry_msgs::PoseStampedConstPtr const & msg ) {
-      pub_odom_drone2.publish(drone2.update(msg));
+      nav_msgs::Odometry odom = drone2.update(msg);
+      pub_odom_drone2.publish(odom);
     }
 
     void pose_cone_callback( geometry_msgs::PoseStampedConstPtr const & msg ) const {
