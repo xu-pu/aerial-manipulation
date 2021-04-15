@@ -15,8 +15,8 @@ int main( int argc, char** argv ) {
 
   ros::NodeHandle nh("~");
 
-  tf_parent_name = get_param_default<string>(nh,"name","name");
-  tf_frame_name = get_param_default<string>(nh,"parent","world");
+  tf_frame_name = get_param_default<string>(nh,"name","name");
+  tf_parent_name = get_param_default<string>(nh,"parent","world");
 
   ros::Subscriber sub_odom = nh.subscribe<nav_msgs::Odometry>("odom",1,on_odom);
 

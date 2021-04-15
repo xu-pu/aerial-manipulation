@@ -34,6 +34,16 @@
         <remap from="~odom_in" to="/odom/drone2"/>
     </node>
 
+    <node pkg="rnw_ros" type="odom2tf_node" name="drone1_tf" output="screen">
+        <remap from="~odom" to="/odom/drone1"/>
+        <param name="name" value="odom_drone1" />
+    </node>
+
+    <node pkg="rnw_ros" type="odom2tf_node" name="drone2_tf" output="screen">
+        <remap from="~odom" to="/odom/drone2"/>
+        <param name="name" value="odom_drone2" />
+    </node>
+
     <!--    <node pkg="rnw_ros" type="pub_frames_node" name="pub_frames_node" output="screen">-->
 <!--        <remap from="~imu" to="$(arg imu_topic)"/>-->
 <!--        <remap from="~vins" to="$(arg vins_topic)"/>-->
