@@ -211,7 +211,7 @@ struct mocap_processor_t {
 
 int main( int argc, char **argv ){
 
-  ros::init( argc, argv, "pos_vel_mocap" );
+  ros::init( argc, argv, "mocap2odom" );
   ros::NodeHandle n( "~" );
 
   mocap_processor_t mocap_processor(n);

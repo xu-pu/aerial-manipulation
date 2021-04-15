@@ -17,9 +17,9 @@
         <rosparam file="$(find mocap_optitrack)/config/mocap.yaml" command="load" />
     </node>
 
-    <node pkg="pos_vel_mocap" type="pos_vel_mocap" name="pos_vel_mocap" output="screen" >
+    <node pkg="mocap2odom" type="mocap2odom" name="mocap2odom" output="screen" >
         <param name="publish_uav_odom" type="bool" value="true"/>
-        <rosparam file="$(find pos_vel_mocap)/config/calib.yaml" command="load" />
+        <rosparam file="$(find mocap2odom)/config/calib.yaml" command="load" />
     </node>
 
     <node pkg="uart_odom" type="uart_odom" name="drone1_uwb_server" output="screen">

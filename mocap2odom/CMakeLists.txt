@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(pos_vel_mocap)
+project(mocap2odom)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -126,7 +126,7 @@ INCLUDE_DIRECTORIES(
 #)
 
 
-add_executable(pos_vel_mocap src/pos_vel_mocap.cpp)
-target_link_libraries(pos_vel_mocap ${catkin_LIBRARIES})
+add_executable(mocap2odom src/mocap2odom.cpp)
+target_link_libraries(mocap2odom ${catkin_LIBRARIES})
 
-add_dependencies(pos_vel_mocap ${PROJECT_NAME}_gencfg)
+add_dependencies(mocap2odom ${PROJECT_NAME}_gencfg)

@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package>
-  <name>pos_vel_mocap</name>
+  <name>mocap2odom</name>
   <version>0.0.0</version>
   <description>The mavlink_message package</description>
 
