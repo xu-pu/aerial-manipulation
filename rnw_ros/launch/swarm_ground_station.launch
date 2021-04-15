@@ -22,7 +22,19 @@
         <rosparam file="$(find pos_vel_mocap)/config/calib.yaml" command="load" />
     </node>
 
-<!--    <node pkg="rnw_ros" type="pub_frames_node" name="pub_frames_node" output="screen">-->
+    <node pkg="uart_odom" type="uart_odom" name="drone1_uwb_server" output="screen">
+        <rosparam command="load" file="$(find uart_odom)/config/uart_odom_config.yaml" />
+        <param name="serial_port" value="/dev/tty.uwb.master1"/>
+        <remap from="~odom_in" to="/odom/drone1"/>
+    </node>
+
+    <node pkg="uart_odom" type="uart_odom" name="drone2_uwb_server" output="screen">
+        <rosparam command="load" file="$(find uart_odom)/config/uart_odom_config.yaml" />
+        <param name="serial_port" value="/dev/tty.uwb.master2"/>
+        <remap from="~odom_in" to="/odom/drone2"/>
+    </node>
+
+    <!--    <node pkg="rnw_ros" type="pub_frames_node" name="pub_frames_node" output="screen">-->
 <!--        <remap from="~imu" to="$(arg imu_topic)"/>-->
 <!--        <remap from="~vins" to="$(arg vins_topic)"/>-->
 <!--        <rosparam command="load" file="$(find rnw_ros)/config/rnw_config.yaml"/>-->
