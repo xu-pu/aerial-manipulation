@@ -26,6 +26,10 @@ __Run as hardware-in-the-loop (HIL) simulation__
 3. `roslaunch rnw_ros sim.launch`
 
 
+__UWB Config__
+Channel #9 is Drone #1
+Channel #4 is Drone #2
+
 
 __Run real experiments__
 

@@ -1,0 +1,40 @@
+<launch>
+
+    <param name="/use_sim_time" type="bool" value="false"/>
+
+    <arg name="imu_topic" default="/djiros/imu"/>
+    <arg name="vins_topic" value="/vins_estimator/imu_propagate"/>
+
+    <arg name="topic_mocap_uav" default="/mocap/uav"/>
+    <arg name="topic_mocap_cone" default="/mocap/cone"/>
+    <arg name="topic_odom_uav" default="/odom/uav"/>
+    <arg name="topic_odom_cone" default="/odom/cone"/>
+    <arg name="topic_cone_state" value="/rnw/cone_state"/>
+
+<!--    <rosparam command="load" file="$(find rnw_ros)/config/rnw_config.yaml"/>-->
+
+    <node pkg="mocap_optitrack" type="mocap_node" name="mocap_node" respawn="false" launch-prefix="" required="true" output="log">
+        <rosparam file="$(find mocap_optitrack)/config/mocap.yaml" command="load" />
+    </node>
+
+    <node pkg="pos_vel_mocap" type="pos_vel_mocap" name="pos_vel_mocap" output="screen" >
+        <param name="publish_uav_odom" type="bool" value="true"/>
+        <rosparam file="$(find pos_vel_mocap)/config/calib.yaml" command="load" />
+    </node>
+
+<!--    <node pkg="rnw_ros" type="pub_frames_node" name="pub_frames_node" output="screen">-->
+<!--        <remap from="~imu" to="$(arg imu_topic)"/>-->
+<!--        <remap from="~vins" to="$(arg vins_topic)"/>-->
+<!--        <rosparam command="load" file="$(find rnw_ros)/config/rnw_config.yaml"/>-->
+<!--    </node>-->
+
+<!--    <node pkg="uart_odom" type="uart_odom" name="uart_odom" output="screen">-->
+<!--        <rosparam command="load" file="$(find uart_odom)/config/uart_odom_config.yaml" />-->
+<!--        <param name="work_mode" value="real-time" />-->
+<!--        <param name="js_ctrl_mode" value="feedback" />-->
+<!--        <param name="serial_port" value="/dev/tty.uwb.master"/>-->
+<!--    </node>-->
+
+    <node name="rviz_traj" pkg="rviz" type="rviz" output="log" args="-d $(find rnw_ros)/config/swarm.rviz" />
+
+</launch>
