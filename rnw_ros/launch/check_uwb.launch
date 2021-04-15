@@ -1,0 +1,24 @@
+<launch>
+
+    <arg name="topic_odom_uav" default="/odom/uav"/>
+    <arg name="topic_odom_cone" default="/odom/cone"/>
+  
+    <node pkg="uart_odom" type="uart_odom" name="uart_odom_client" output="log" respawn="true">
+        <!--publishers-->
+        <remap from="~out_odom_uav" to="$(arg topic_odom_uav)"/>
+        <remap from="~out_odom_cone" to="$(arg topic_odom_cone)"/>
+        <!--params-->
+        <rosparam command="load" file="$(find uart_odom)/config/uart_odom_config.yaml"/>
+        <param name="work_mode" value="real-time"/>
+        <param name="js_ctrl_mode" value="feedback"/>
+        <param name="serial_port" value="/dev/tty.uwb.slave"/>
+    </node>
+
+    <node pkg="rnw_ros" type="odom2tf_node" name="drone2_tf" output="screen">
+      <remap from="~odom" to="$(arg topic_odom_uav)"/>
+      <param name="name" value="drone_odom" />
+    </node>
+    
+    <node name="rviz" pkg="rviz" type="rviz" output="log" args="-d $(find rnw_ros)/config/drone.rviz"/>
+
+</launch>
