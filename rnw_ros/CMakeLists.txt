@@ -180,6 +180,7 @@ set(RNW_NODES
         pub_obj_trace_node
         gen_paper_data_node
         pub_energy_node
+        odom2tf_node
 )
 
 FOREACH(NODE ${RNW_NODES})
