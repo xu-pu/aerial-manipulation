@@ -26,9 +26,11 @@ __Run as hardware-in-the-loop (HIL) simulation__
 3. `roslaunch rnw_ros sim.launch`
 
 
+
 __UWB Config__
 Channel #9 is Drone #1
 Channel #4 is Drone #2
+
 
 
 __Run real experiments__
@@ -100,3 +102,50 @@ Inspect them using:
 - `playback.launch` will replay the experiments in RViz.
 - PlotJuggler
 - MATLAB
+
+
+
+
+
+## Swarm Ground Station
+
+### Topics
+
+`/drone1`
+
+- `/drone1/odom`
+- `/drone1/traj`
+- `/drone1/position_cmd`
+
+`/drone2`
+
+- `/drone2/odom`
+- `/drone2/traj`
+- `/drone2/position_cmd`
+
+### Nodes
+
+`swarm_planner_node` takes all `/droneX/odom`, and sets all `/droneX/traj`
+
+`traj_server_node` takes `/drone1/traj` and sets `/drone1/position_cmd`
+
+`uart_odom` takes `/drone1/odom` and `/done1/position_cmd` and send it to the drone
+
+
+
+## Swarm Drone
+
+### Topics
+
+`/odom/uav`
+
+`/position_cmd`
+
+`/djiros/rc`
+
+### Nodes
+
+`uart_odom` sets `/odom/uav` and `/position_cmd`
+
+`n3ctrl` executes `/position_cmd` while monitoring `/uav/odom` and `/djiros/rc`
+
