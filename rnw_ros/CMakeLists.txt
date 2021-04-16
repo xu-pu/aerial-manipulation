@@ -181,6 +181,7 @@ set(RNW_NODES
         gen_paper_data_node
         pub_energy_node
         odom2tf_node
+        test_swarm_planner_node
 )
 
 FOREACH(NODE ${RNW_NODES})
