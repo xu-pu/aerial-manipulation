@@ -1,0 +1,44 @@
+<launch>
+
+    <param name="/use_sim_time" type="bool" value="false"/>
+
+    <arg name="topic_mocap_uav" default="/mocap/uav"/>
+    <arg name="topic_mocap_cone" default="/mocap/cone"/>
+
+<!--    <rosparam command="load" file="$(find rnw_ros)/config/rnw_config.yaml"/>-->
+
+
+    <node pkg="rostopic" type="rostopic" name="fake_odom_drone1" args="pub -r 10 /drone1/odom nav_msgs/Odometry '{ header: { frame_id: world }, pose: { pose: { position: { x: 1 }, orientation: { w: 1 } } } }'"/>
+
+    <node pkg="rostopic" type="rostopic" name="fake_odom_drone2" args="pub -r 10 /drone2/odom nav_msgs/Odometry '{ header: { frame_id: world }, pose: { pose: { position: { x: 2 }, orientation: { w: 1 } } } }'"/>
+
+    <node pkg="rnw_ros" type="odom2tf_node" name="drone1_tf" output="screen">
+        <remap from="~odom" to="/drone1/odom"/>
+        <param name="name" value="odom_drone1" />
+    </node>
+
+    <node pkg="rnw_ros" type="odom2tf_node" name="drone2_tf" output="screen">
+        <remap from="~odom" to="/drone2/odom"/>
+        <param name="name" value="odom_drone2" />
+    </node>
+
+    <node pkg="joy" type="joy_node" name="joy_node" output="screen">
+        <param name="~autorepeat_rate" value="0" />
+    </node>
+
+    <node pkg="rnw_ros" type="gamepad_trigger_node" name="gamepad_trigger_node" output="screen">
+        <remap from="~A" to="/gamepad/A"/>
+    </node>
+
+    <node pkg="rnw_ros" type="test_swarm_planner_node" name="test_swarm_planner_node"/>
+
+    <node name="rviz_traj" pkg="rviz" type="rviz" output="log" args="-d $(find rnw_ros)/config/swarm.rviz" />
+
+    <!--    <node pkg="rnw_ros" type="pub_euler_angles_node" name="pub_euler_angles_node" required="true" output="screen">-->
+    <!--        <remap from="~odom" to="/drone2/odom"/>-->
+    <!--    </node>-->
+
+    <!--    <node pkg="rqt_multiplot" type="rqt_multiplot" name="rqt_multiplot"-->
+    <!--          args="&#45;&#45;multiplot-config $(find rnw_ros)/config/rqt_multiplot_vicon_imu.xml &#45;&#45;multiplot-run-all"/>-->
+
+</launch>
