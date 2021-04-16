@@ -6,9 +6,7 @@ Panels:
       Expanded:
         - /TF1
         - /TF1/Frames1
-        - /Odometry1
         - /Odometry1/Shape1
-        - /Odometry2
         - /Odometry2/Shape1
       Splitter Ratio: 0.421474367
     Tree Height: 750
@@ -41,10 +39,6 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: false
-        drone1:
-          Value: false
-        drone2:
-          Value: false
         odom_drone1:
           Value: true
         odom_drone2:
@@ -58,10 +52,6 @@ Visualization Manager:
       Show Names: true
       Tree:
         world:
-          drone1:
-            {}
-          drone2:
-            {}
           odom_drone1:
             {}
           odom_drone2:
@@ -154,6 +144,38 @@ Visualization Manager:
       Topic: /odom/drone2
       Unreliable: false
       Value: false
+    - Class: rviz/Marker
+      Enabled: true
+      Marker Topic: /traj_viz_drone1/traj
+      Name: Marker
+      Namespaces:
+        visualize_traj_node: true
+      Queue Size: 100
+      Value: true
+    - Class: rviz/Marker
+      Enabled: true
+      Marker Topic: /traj_viz_drone2/traj
+      Name: Marker
+      Namespaces:
+        visualize_traj_node: true
+      Queue Size: 100
+      Value: true
+    - Class: rviz/Marker
+      Enabled: true
+      Marker Topic: /traj_viz_drone2/setpoint
+      Name: Marker
+      Namespaces:
+        visualize_traj_node: true
+      Queue Size: 100
+      Value: true
+    - Class: rviz/Marker
+      Enabled: true
+      Marker Topic: /traj_viz_drone1/setpoint
+      Name: Marker
+      Namespaces:
+        visualize_traj_node: true
+      Queue Size: 100
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -179,25 +201,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/ThirdPersonFollower
-      Distance: 3.55478954
+      Distance: 2.50865364
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: -0.342365712
-        Y: -1.9844594
-        Z: -1.31130219e-06
+        X: 2.03366733
+        Y: -0.434201896
+        Z: -8.34465027e-07
       Focal Shape Fixed Size: false
       Focal Shape Size: 0.0500000007
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 0.435397923
+      Pitch: 0.555398345
       Target Frame: world
       Value: ThirdPersonFollower (rviz)
-      Yaw: 4.70363951
+      Yaw: 5.4868207
     Saved: ~
 Window Geometry:
   Displays:

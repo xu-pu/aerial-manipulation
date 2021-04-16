@@ -34,6 +34,20 @@
 
     <node name="rviz_traj" pkg="rviz" type="rviz" output="log" args="-d $(find rnw_ros)/config/swarm.rviz" />
 
+    <node pkg="rnw_ros" type="visualize_traj_node" name="traj_viz_drone1" output="screen" required="true">
+        <param name="lift_dt" type="double" value="0.05"/>
+        <param name="length_g" type="double" value="0.5"/>
+        <param name="clear_after_n_sec" type="double" value="0"/>
+        <remap from="~poly_traj" to="/drone1/traj"/>
+    </node>
+
+    <node pkg="rnw_ros" type="visualize_traj_node" name="traj_viz_drone2" output="screen" required="true">
+        <param name="lift_dt" type="double" value="0.05"/>
+        <param name="length_g" type="double" value="0.5"/>
+        <param name="clear_after_n_sec" type="double" value="0"/>
+        <remap from="~poly_traj" to="/drone2/traj"/>
+    </node>
+
     <!--    <node pkg="rnw_ros" type="pub_euler_angles_node" name="pub_euler_angles_node" required="true" output="screen">-->
     <!--        <remap from="~odom" to="/drone2/odom"/>-->
     <!--    </node>-->

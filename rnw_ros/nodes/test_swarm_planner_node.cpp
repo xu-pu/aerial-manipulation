@@ -67,6 +67,7 @@ struct test_swarm_planner_t {
       }
 
       std::vector<Eigen::Vector3d> wpts;
+      wpts.emplace_back(0,0,0);
       wpts.emplace_back(0.1,0,0);
       wpts.emplace_back(0.2,0,0);
       wpts.emplace_back(0.3,0,0);
@@ -115,7 +116,7 @@ int main( int argc, char** argv ) {
   );
 
   ros::Subscriber sub_odom_drone2 = nh.subscribe<nav_msgs::Odometry>(
-          "/drone1/odom",
+          "/drone2/odom",
           10,
           &test_swarm_planner_t::on_odom_drone2,
           &planner,

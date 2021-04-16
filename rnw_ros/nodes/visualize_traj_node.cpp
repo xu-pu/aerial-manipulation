@@ -51,10 +51,10 @@ struct traj_visualizer_t {
     ros::Publisher pub_marker_lift;
 
     explicit traj_visualizer_t( ros::NodeHandle & nh ) {
-      pub_marker_traj = nh.advertise<visualization_msgs::Marker>("markers/traj", 1);
-      pub_marker_setpoint = nh.advertise<visualization_msgs::Marker>("markers/setpoint", 1);
-      pub_marker_acc = nh.advertise<visualization_msgs::MarkerArray>("markers/acc", 1);
-      pub_marker_lift = nh.advertise<visualization_msgs::MarkerArray>("markers/lift", 1);
+      pub_marker_traj = nh.advertise<visualization_msgs::Marker>("traj", 1);
+      pub_marker_setpoint = nh.advertise<visualization_msgs::Marker>("setpoint", 1);
+      pub_marker_acc = nh.advertise<visualization_msgs::MarkerArray>("acc", 1);
+      pub_marker_lift = nh.advertise<visualization_msgs::MarkerArray>("lift", 1);
 
       clear_after_n_sec = get_param_default(nh,"clear_after_n_sec",numeric_limits<double>::max());
       lift_dt = get_param_default(nh,"lift_dt",0.15);
@@ -312,7 +312,7 @@ int main( int argc, char** argv ) {
 
   auto timer = nh.createTimer( ros::Rate(30), &traj_visualizer_t::on_spin, &traj_viz );
 
-  ros::Subscriber sub_traj = nh.subscribe<quadrotor_msgs::PolynomialTrajectory>("/rnw/poly_traj", 100, &traj_visualizer_t::on_traj, &traj_viz );
+  ros::Subscriber sub_traj = nh.subscribe<quadrotor_msgs::PolynomialTrajectory>("poly_traj", 100, &traj_visualizer_t::on_traj, &traj_viz );
 
   ros::spin();
 
