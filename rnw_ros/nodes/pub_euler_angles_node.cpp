@@ -50,7 +50,7 @@ int main( int argc, char** argv ) {
   );
 
   ros::Subscriber sub_odom = nh.subscribe<nav_msgs::Odometry>(
-          "/odom/uav",
+          "odom",
           10,
           on_odom,
           ros::TransportHints().tcpNoDelay()
