@@ -28,6 +28,13 @@
         <remap from="~odom_in" to="/drone1/odom"/>
     </node>
 
+<!--    <node pkg="rnw_ros" type="pub_euler_angles_node" name="pub_euler_angles_node" required="true" output="screen">-->
+<!--        <remap from="~odom" to="/drone2/odom"/>-->
+<!--    </node>-->
+
+<!--    <node pkg="rqt_multiplot" type="rqt_multiplot" name="rqt_multiplot"-->
+<!--          args="&#45;&#45;multiplot-config $(find rnw_ros)/config/rqt_multiplot_vicon_imu.xml &#45;&#45;multiplot-run-all"/>-->
+
     <node pkg="uart_odom" type="uart_odom" name="drone2_uwb_server" output="screen">
         <rosparam command="load" file="$(find uart_odom)/config/uart_odom_config.yaml" />
         <param name="serial_port" value="/dev/tty.uwb.master2"/>
