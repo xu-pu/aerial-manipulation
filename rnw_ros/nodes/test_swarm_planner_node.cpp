@@ -68,10 +68,10 @@ struct test_swarm_planner_t {
 
       std::vector<Eigen::Vector3d> wpts;
       wpts.emplace_back(0,0,0);
-      wpts.emplace_back(0.1,0,0);
-      wpts.emplace_back(0.2,0,0);
-      wpts.emplace_back(0.3,0,0);
-      wpts.emplace_back(0.4,0,0);
+      wpts.emplace_back(0.1,0,0.1);
+      wpts.emplace_back(0.2,0,0.15);
+      wpts.emplace_back(0.3,0,0.2);
+      wpts.emplace_back(0.4,0,0.2);
 
       pub_traj_drone1.publish(local_wpts2traj(latest_odom_drone1,wpts));
       pub_traj_drone2.publish(local_wpts2traj(latest_odom_drone2,wpts));
