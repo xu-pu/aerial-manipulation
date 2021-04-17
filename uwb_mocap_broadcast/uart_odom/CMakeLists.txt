@@ -166,13 +166,12 @@ include_directories(
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 add_executable( ${PROJECT_NAME}
-    ./src/uart_odom.cpp
     ./src/serial_protocal.c
     ./src/serial_service.cpp
-    ./src/main.cpp
+#    ./src/payload.cpp
+#    ./src/drone_swarm_payload.cpp
+    ./src/uwb_transceiver_node.cpp
     )
-
-add_executable(pub_tf_node src/pub_tf.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -188,10 +187,6 @@ add_executable(pub_tf_node src/pub_tf.cpp)
 target_link_libraries(${PROJECT_NAME}
    ${catkin_LIBRARIES}
  )
-
-target_link_libraries(pub_tf_node
-        ${catkin_LIBRARIES}
-)
 
 #############
 ## Install ##

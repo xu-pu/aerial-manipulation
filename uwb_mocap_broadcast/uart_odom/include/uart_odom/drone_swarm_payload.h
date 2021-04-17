@@ -1,0 +1,8 @@
+//
+// Created by sheep on 2021/4/18.
+//
+
+#ifndef UWB_COMM_DRONE_SWARM_PAYLOAD_H
+#define UWB_COMM_DRONE_SWARM_PAYLOAD_H
+
+#endif //UWB_COMM_DRONE_SWARM_PAYLOAD_H
