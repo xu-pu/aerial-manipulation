@@ -20,6 +20,12 @@ struct test_swarm_planner_t {
 
     ros::Publisher pub_traj_drone2;
 
+    ros::Subscriber sub_odom_drone1;
+
+    ros::Subscriber sub_odom_drone2;
+
+    ros::Subscriber sub_trigger_hello_world;
+
     bool init_drone1 = false;
 
     bool init_drone2 = false;
@@ -31,8 +37,30 @@ struct test_swarm_planner_t {
     AmTraj traj_generator;
 
     explicit test_swarm_planner_t( ros::NodeHandle & _nh ) : nh(_nh), traj_generator(1024, 16, 0.4, 0.5, 0.5, 23, 0.02) {
+
       pub_traj_drone1 = nh.advertise<quadrotor_msgs::PolynomialTrajectory>("/drone1/traj",10);
+
       pub_traj_drone2 = nh.advertise<quadrotor_msgs::PolynomialTrajectory>("/drone2/traj",10);
+
+      sub_odom_drone1 = nh.subscribe<nav_msgs::Odometry>(
+              "/drone1/odom",
+              10,
+              &test_swarm_planner_t::on_odom_drone1,
+              this,
+              ros::TransportHints().tcpNoDelay()
+      );
+
+      sub_odom_drone2 = nh.subscribe<nav_msgs::Odometry>(
+              "/drone2/odom",
+              10,
+              &test_swarm_planner_t::on_odom_drone2,
+              this,
+              ros::TransportHints().tcpNoDelay()
+      );
+
+      sub_trigger_hello_world = nh.subscribe<std_msgs::Header>(
+              "/gamepad/A", 10, &test_swarm_planner_t::trigger_hello_world, this);
+
     }
 
     /**
@@ -106,25 +134,6 @@ int main( int argc, char** argv ) {
   ros::NodeHandle nh("~");
 
   test_swarm_planner_t planner(nh);
-
-  ros::Subscriber sub_odom_drone1 = nh.subscribe<nav_msgs::Odometry>(
-          "/drone1/odom",
-          10,
-          &test_swarm_planner_t::on_odom_drone1,
-          &planner,
-          ros::TransportHints().tcpNoDelay()
-  );
-
-  ros::Subscriber sub_odom_drone2 = nh.subscribe<nav_msgs::Odometry>(
-          "/drone2/odom",
-          10,
-          &test_swarm_planner_t::on_odom_drone2,
-          &planner,
-          ros::TransportHints().tcpNoDelay()
-  );
-
-  ros::Subscriber sub_trigger_hello_world = nh.subscribe<std_msgs::Header>(
-          "/gamepad/A", 10, &test_swarm_planner_t::trigger_hello_world, &planner);
 
   ros::spin();
 
