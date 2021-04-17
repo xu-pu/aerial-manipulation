@@ -1,5 +1,9 @@
 #include "uart_odom/rnw_payload.h"
 
+#include "mini_odom.h"
+
+using mini_odom_t = Mini_odom<float,int>;
+
 using namespace uwb_comm;
 
 rnw_payload_t::rnw_payload_t( ros::NodeHandle & _nh ) : nh(_nh) {}

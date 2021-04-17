@@ -82,4 +82,29 @@
     <!--    <node pkg="rqt_multiplot" type="rqt_multiplot" name="rqt_multiplot"-->
     <!--          args="&#45;&#45;multiplot-config $(find rnw_ros)/config/rqt_multiplot_vicon_imu.xml &#45;&#45;multiplot-run-all"/>-->
 
+    <node pkg="uart_odom" type="uart_odom" name="drone2_uwb_server" output="screen">
+        <rosparam command="load" file="$(find uart_odom)/config/uart_odom_config.yaml" />
+        <param name="serial_port" value="/dev/tty.uwb.master2"/>
+        <remap from="~odom_in" to="/drone2/odom"/>
+        <param name="role" type="int" value="1"/> <!--master-->
+    </node>
+
+    <arg name="topic_odom_uav" default="/odom/uav"/>
+    <arg name="topic_odom_cone" default="/odom/cone"/>
+
+    <node pkg="uart_odom" type="uart_odom" name="uart_odom_client" output="log" respawn="true">
+        <!--publishers-->
+        <remap from="~out_odom_uav" to="$(arg topic_odom_uav)"/>
+        <remap from="~out_odom_cone" to="$(arg topic_odom_cone)"/>
+        <!--params-->
+        <rosparam command="load" file="$(find uart_odom)/config/uart_odom_config.yaml"/>
+        <param name="serial_port" value="/dev/tty.uwb.slave"/>
+        <param name="role" type="int" value="2"/> <!--slave-->
+    </node>
+
+    <node pkg="rnw_ros" type="odom2tf_node" name="test_uwb_tf" output="screen">
+        <remap from="~odom" to="$(arg topic_odom_uav)"/>
+        <param name="name" value="test" />
+    </node>
+
 </launch>

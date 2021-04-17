@@ -1,15 +1,9 @@
-//
-// Created by sheep on 2021/4/18.
-//
-
 #ifndef UWB_COMM_RNW_PAYLOAD_H
 #define UWB_COMM_RNW_PAYLOAD_H
 
-#include "uart_odom/payload.h"
 #include <nav_msgs/Odometry.h>
-#include "mini_odom.h"
 
-using mini_odom_t = Mini_odom<float,int>;
+#include "uart_odom/payload.h"
 
 namespace uwb_comm {
 
