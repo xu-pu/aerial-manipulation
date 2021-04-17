@@ -36,7 +36,7 @@ visualization_msgs::Marker gen_maker_vel( quadrotor_msgs::PositionCommand const 
 
   visualization_msgs::Marker marker;
 
-  marker.id = marker_id_acc;
+  marker.id = marker_id_vel;
   marker.header.stamp = ros::Time::now();
   marker.header.frame_id = "world";
   marker.pose.orientation.w = 1.00;

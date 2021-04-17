@@ -161,19 +161,35 @@ Visualization Manager:
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
-      Enabled: true
+      Enabled: false
       Marker Topic: /traj_viz_drone2/setpoint
       Name: Marker
       Namespaces:
-        visualize_traj_node: true
+        {}
       Queue Size: 100
-      Value: true
+      Value: false
     - Class: rviz/Marker
-      Enabled: true
+      Enabled: false
       Marker Topic: /traj_viz_drone1/setpoint
       Name: Marker
       Namespaces:
-        visualize_traj_node: true
+        {}
+      Queue Size: 100
+      Value: false
+    - Class: rviz/MarkerArray
+      Enabled: true
+      Marker Topic: /pos_cmd_viz_drone1/makers
+      Name: MarkerArray
+      Namespaces:
+        viz_lift: true
+      Queue Size: 100
+      Value: true
+    - Class: rviz/MarkerArray
+      Enabled: true
+      Marker Topic: /pos_cmd_viz_drone2/makers
+      Name: MarkerArray
+      Namespaces:
+        viz_lift: true
       Queue Size: 100
       Value: true
   Enabled: true
@@ -201,7 +217,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/ThirdPersonFollower
-      Distance: 2.50865364
+      Distance: 4.32217407
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
@@ -216,10 +232,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 0.555398345
+      Pitch: 0.334797621
       Target Frame: world
       Value: ThirdPersonFollower (rviz)
-      Yaw: 5.4868207
+      Yaw: 6.21682787
     Saved: ~
 Window Geometry:
   Displays:

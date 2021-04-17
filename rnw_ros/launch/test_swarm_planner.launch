@@ -67,6 +67,14 @@
         <remap from="~poly_traj" to="/drone2/traj"/>
     </node>
 
+    <node pkg="rnw_ros" type="visualize_pos_cmd_node" name="pos_cmd_viz_drone1" output="screen" required="true">
+        <remap from="~position_cmd" to="/drone1/position_cmd"/>
+    </node>
+
+    <node pkg="rnw_ros" type="visualize_pos_cmd_node" name="pos_cmd_viz_drone2" output="screen" required="true">
+        <remap from="~position_cmd" to="/drone2/position_cmd"/>
+    </node>
+
     <!--    <node pkg="rnw_ros" type="pub_euler_angles_node" name="pub_euler_angles_node" required="true" output="screen">-->
     <!--        <remap from="~odom" to="/drone2/odom"/>-->
     <!--    </node>-->
