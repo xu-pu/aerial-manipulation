@@ -183,6 +183,7 @@ set(RNW_NODES
         odom2tf_node
         test_swarm_planner_node
         fake_drone_node
+        traj2cmd_node
 )
 
 FOREACH(NODE ${RNW_NODES})
