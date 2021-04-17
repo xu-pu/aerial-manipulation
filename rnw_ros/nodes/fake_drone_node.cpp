@@ -1,0 +1,85 @@
+//
+// Created by sheep on 2021/4/17.
+//
+#include <ros/ros.h>
+#include <quadrotor_msgs/PositionCommand.h>
+#include <nav_msgs/Odometry.h>
+
+#include "rnw_ros/ros_utils.h"
+
+nav_msgs::Odometry cmd2odom( quadrotor_msgs::PositionCommand const & cmd ){
+  nav_msgs::Odometry odom;
+  odom.header.frame_id = "world";
+  odom.header.stamp = cmd.header.stamp;
+  odom.pose.pose.position = cmd.position;
+  odom.pose.pose.orientation.w = 1;
+  return odom;
+}
+
+nav_msgs::Odometry pos2odom( double x, double y, double z ){
+  nav_msgs::Odometry odom;
+  odom.header.frame_id = "world";
+  odom.header.stamp = ros::Time::now();
+  odom.pose.pose.position.x = x;
+  odom.pose.pose.position.y = y;
+  odom.pose.pose.position.z = z;
+  odom.pose.pose.orientation.w = 1;
+  return odom;
+}
+
+struct fake_drone_t {
+
+    ros::NodeHandle & nh;
+
+    ros::Publisher pub_odom;
+
+    quadrotor_msgs::PositionCommand latest_position_cmd;
+
+    nav_msgs::Odometry latest_odom;
+
+    explicit fake_drone_t( ros::NodeHandle & _nh ): nh(_nh) {
+      pub_odom = nh.advertise<nav_msgs::Odometry>("odom",10);
+      double init_x = get_param_default<double>(nh,"init_x",0);
+      double init_y = get_param_default<double>(nh,"init_y",0);
+      double init_z = get_param_default<double>(nh,"init_z",0);
+      latest_odom = pos2odom(init_x,init_y,init_z);
+    }
+
+    void on_position_cmd( quadrotor_msgs::PositionCommandConstPtr const & msg ){
+      latest_position_cmd = *msg;
+    }
+
+    void on_timer( ros::TimerEvent const & event ){
+      if ( latest_position_cmd.header.stamp > latest_odom.header.stamp ) {
+        latest_odom = cmd2odom(latest_position_cmd);
+      }
+      pub_odom.publish(latest_odom);
+    }
+
+};
+
+int main( int argc, char** argv ) {
+
+  ros::init(argc,argv,"fake_drone_node");
+
+  ros::NodeHandle nh("~");
+
+  fake_drone_t fake_drone(nh);
+
+  auto timer = nh.createTimer(ros::Rate(90),&fake_drone_t::on_timer,&fake_drone);
+
+  ros::Subscriber sub_pos_cmd = nh.subscribe<quadrotor_msgs::PositionCommand>(
+          "position_cmd",
+          10,
+          &fake_drone_t::on_position_cmd,
+          &fake_drone,
+          ros::TransportHints().tcpNoDelay()
+  );
+
+  ros::spin();
+
+  ros::shutdown();
+
+  return 0;
+
+}
