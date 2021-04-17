@@ -1,10 +1,7 @@
-#include "mini_odom.h"
-#include "serial_protocal.h"
 #include "serial_service.h"
 #include <iostream>
 #include <nav_msgs/Odometry.h>
 #include <ros/ros.h>
-#include <sstream>
 #include <std_msgs/String.h>
 #include <stdio.h>
 
@@ -192,16 +189,7 @@ public:
 
           //cout << __FUNCTION__ << "  " << __LINE__ << endl;
 
-          mini_odom_t m_read_mini_odom_uav, m_read_mini_odom_cone;
-          memcpy(&m_read_mini_odom_uav, temp_serial_pack.data, sizeof(mini_odom_t));
-          memcpy(&m_read_mini_odom_cone, temp_serial_pack.data+sizeof(mini_odom_t), sizeof(mini_odom_t));
-          nav_msgs::Odometry odom_uav, odom_cone;
-          miniodom_to_odom(m_read_mini_odom_uav, odom_uav);
-          miniodom_to_odom(m_read_mini_odom_cone, odom_cone);
-          odom_uav.header.frame_id = "world";
-          odom_cone.header.frame_id = "world";
-          m_pub_odom.publish(odom_uav);
-          m_pub_odom_cone.publish(odom_cone);
+          payload_ptr->decode(temp_serial_pack.data);
 
           //cout << "Finish publish" << endl;
         }
@@ -230,9 +218,7 @@ public:
       ROS_INFO( "[UART_odom]: I have receive the odom,  therefore I am master." );
       m_timer_send_odom = m_ros_nh.createTimer( ros::Duration( 1.0 / m_para_sent_timer_frequency ), &Uart_odom::send_service_odom_message, this );
       m_timer_test_send.stop(); // Turn of test sender.
-
       payload_ptr->init_as_master();
-
     }
 
     void init_as_slave(){

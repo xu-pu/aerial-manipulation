@@ -28,7 +28,16 @@ int rnw_payload_t::data_length() {
 }
 
 void rnw_payload_t::decode(const char *buffer) {
-
+  mini_odom_t m_read_mini_odom_uav, m_read_mini_odom_cone;
+  memcpy(&m_read_mini_odom_uav, buffer, sizeof(mini_odom_t));
+  memcpy(&m_read_mini_odom_cone, buffer+sizeof(mini_odom_t), sizeof(mini_odom_t));
+  nav_msgs::Odometry odom_uav, odom_cone;
+  miniodom_to_odom(m_read_mini_odom_uav, odom_uav);
+  miniodom_to_odom(m_read_mini_odom_cone, odom_cone);
+  odom_uav.header.frame_id = "world";
+  odom_cone.header.frame_id = "world";
+  pub_odom_uav.publish(odom_uav);
+  pub_odom_cone.publish(odom_cone);
 }
 
 void rnw_payload_t::encode(char *buffer) {
