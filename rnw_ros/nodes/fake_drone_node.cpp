@@ -37,12 +37,30 @@ struct fake_drone_t {
 
     nav_msgs::Odometry latest_odom;
 
+    ros::Timer timer;
+
+    ros::Subscriber sub_pos_cmd;
+
     explicit fake_drone_t( ros::NodeHandle & _nh ): nh(_nh) {
+
+      latest_odom = pos2odom(
+              get_param_default<double>(nh,"init_x",0),
+              get_param_default<double>(nh,"init_y",0),
+              get_param_default<double>(nh,"init_z",0)
+      );
+
       pub_odom = nh.advertise<nav_msgs::Odometry>("odom",10);
-      double init_x = get_param_default<double>(nh,"init_x",0);
-      double init_y = get_param_default<double>(nh,"init_y",0);
-      double init_z = get_param_default<double>(nh,"init_z",0);
-      latest_odom = pos2odom(init_x,init_y,init_z);
+
+      timer = nh.createTimer(ros::Rate(90),&fake_drone_t::on_timer,this);
+
+      sub_pos_cmd = nh.subscribe<quadrotor_msgs::PositionCommand>(
+              "position_cmd",
+              10,
+              &fake_drone_t::on_position_cmd,
+              this,
+              ros::TransportHints().tcpNoDelay()
+      );
+
     }
 
     void on_position_cmd( quadrotor_msgs::PositionCommandConstPtr const & msg ){
@@ -65,16 +83,6 @@ int main( int argc, char** argv ) {
   ros::NodeHandle nh("~");
 
   fake_drone_t fake_drone(nh);
-
-  auto timer = nh.createTimer(ros::Rate(90),&fake_drone_t::on_timer,&fake_drone);
-
-  ros::Subscriber sub_pos_cmd = nh.subscribe<quadrotor_msgs::PositionCommand>(
-          "position_cmd",
-          10,
-          &fake_drone_t::on_position_cmd,
-          &fake_drone,
-          ros::TransportHints().tcpNoDelay()
-  );
 
   ros::spin();
 
