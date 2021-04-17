@@ -13,6 +13,10 @@ struct traj_server_t {
 
     ros::Publisher pub_pos_cmd;
 
+    ros::Subscriber sub_odom;
+
+    ros::Subscriber sub_poly_traj;
+
     poly_traj_t poly_traj;
 
     quadrotor_msgs::PolynomialTrajectory latest_poly_traj;
@@ -28,9 +32,28 @@ struct traj_server_t {
     double yaw_rate = 1;
 
     explicit traj_server_t( ros::NodeHandle & nh ){
-      pub_pos_cmd = nh.advertise<quadrotor_msgs::PositionCommand>("position_cmd",10);
+
       yaw_rate_deg = get_param_default<double>(nh,"yaw_rate_deg",30.);
       yaw_rate = yaw_rate_deg * deg2rad;
+
+      pub_pos_cmd = nh.advertise<quadrotor_msgs::PositionCommand>("position_cmd",10);
+
+      sub_odom = nh.subscribe<nav_msgs::Odometry>(
+              "odom",
+              10,
+              &traj_server_t::on_odom,
+              this,
+              ros::TransportHints().tcpNoDelay()
+      );
+
+      sub_poly_traj = nh.subscribe<quadrotor_msgs::PolynomialTrajectory>(
+              "traj",
+              10,
+              &traj_server_t::on_poly_traj,
+              this,
+              ros::TransportHints().tcpNoDelay()
+      );
+
     }
 
     void on_cleanup(){
@@ -84,22 +107,6 @@ int main( int argc, char** argv ) {
   ros::NodeHandle nh("~");
 
   traj_server_t traj_server(nh);
-
-  ros::Subscriber sub_odom = nh.subscribe<nav_msgs::Odometry>(
-          "odom",
-          10,
-          &traj_server_t::on_odom,
-          &traj_server,
-          ros::TransportHints().tcpNoDelay()
-  );
-
-  ros::Subscriber sub_poly_traj = nh.subscribe<quadrotor_msgs::PolynomialTrajectory>(
-          "traj",
-          10,
-          &traj_server_t::on_poly_traj,
-          &traj_server,
-          ros::TransportHints().tcpNoDelay()
-  );
 
   ros::spin();
 
