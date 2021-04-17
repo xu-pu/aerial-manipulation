@@ -8,6 +8,8 @@
 #include <std_msgs/String.h>
 #include <stdio.h>
 
+#include "uart_odom/payload.h"
+
 using namespace std;
 
 using mini_odom_t = Mini_odom<float,int>;
@@ -65,6 +67,8 @@ public:
     int                m_if_odom_init = 0;
     int                m_idx_odom;
 
+    std::shared_ptr<uwb_comm::payload_base_t> payload_ptr;
+
 public:
     void send_service_odom_message( const ros::TimerEvent &event )
     {
@@ -88,7 +92,6 @@ public:
 
     void odom_callback( const nav_msgs::Odometry &msg )
     {
-      //        cout << "Enter odom callback" <<endl;
       m_idx_odom++;
       m_current_odom = msg;
       if ( m_if_odom_init == 0 )
@@ -96,22 +99,6 @@ public:
         m_init_odom = msg;
         m_if_odom_init = 1;
       }
-
-      if ( m_role == e_role_unset )
-      {
-        m_role = e_master;
-        ROS_INFO( "[UART_odom]: I have receive the odom,  therefore I am master." );
-        m_timer_send_odom = m_ros_nh.createTimer( ros::Duration( 1.0 / m_para_sent_timer_frequency ), &Uart_odom::send_service_odom_message, this );
-        m_timer_test_send.stop(); // Turn of test sender.
-      }
-
-      //  ROS_INFO( "[ODOM][%d]:  odom ", m_idx_odom );
-      //  cout <<"=== position === \n" <<msg.pose.pose.position << endl;
-      //  cout  <<"=== orientation === \n" << msg.pose.pose.orientation <<endl;
-    };
-
-    void odom_cone_callback( const nav_msgs::Odometry &msg ) {
-      m_current_odom_cone = msg;
     };
 
     void send_service_eval_stability( const ros::TimerEvent &event )
@@ -249,11 +236,39 @@ public:
       cout << "test_uart exit" << endl;
     };
 
-    explicit Uart_odom( ros::NodeHandle &nh )
-    {
+    void init_as_master(){
+      ROS_INFO( "[UART_odom]: I have receive the odom,  therefore I am master." );
+      m_timer_send_odom = m_ros_nh.createTimer( ros::Duration( 1.0 / m_para_sent_timer_frequency ), &Uart_odom::send_service_odom_message, this );
+      m_timer_test_send.stop(); // Turn of test sender.
+
+      payload_ptr->init_as_master();
+
+    }
+
+    void init_as_slave(){
+      payload_ptr->init_as_slave();
+    }
+
+    explicit Uart_odom( ros::NodeHandle &nh ) {
 
       m_ros_nh = nh;
       load_parameter( m_ros_nh );
+
+      int role = e_role::e_role_unset;
+      nh.getParam("role",role);
+      m_role = (e_role)role;
+
+      switch (m_role) {
+        case e_role::e_master:
+          init_as_master();
+          break;
+        case e_role::e_role_slave:
+          init_as_slave();
+          break;
+        default:
+          ROS_ERROR_STREAM("[UWB] did not assign a role!");
+          exit(-1);
+      }
 
       m_sub_odom = m_ros_nh.subscribe(
               "odom_in",
@@ -262,14 +277,13 @@ public:
               this,
               ros::TransportHints().tcpNoDelay()
       );
-      //m_sub_odom_cone = m_ros_nh.subscribe( "/odom/cone", 1, &Uart_odom::odom_cone_callback, this,  ros::TransportHints().tcpNoDelay() );
+
       // m_timer_test_read = m_ros_nh.createTimer( ros::Duration( 1.0 / m_para_read_timer_frequency ), &Uart_odom::read_serive_eval_stability, this );
 
       m_pub_odom_test = nh.advertise< nav_msgs::Odometry >( "test_odom", 100 );
       m_pub_odom = nh.advertise< nav_msgs::Odometry >( "out_odom_uav", 100 );
       m_pub_odom_cone = nh.advertise< nav_msgs::Odometry >( "out_odom_cone", 100 );
       m_timer_test_read = nh.createTimer( ros::Duration( 1.0 / m_para_read_timer_frequency ), &Uart_odom::read_serive_eval_stability, this );
-
 
       m_serial.setPort( m_para_serial_port );
       m_serial.setBaudrate( m_para_baud_rate ); // 10000/10000 packet, all rec

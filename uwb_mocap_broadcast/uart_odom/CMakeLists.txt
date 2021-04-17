@@ -170,6 +170,7 @@ add_executable( ${PROJECT_NAME}
     ./src/serial_service.cpp
 #    ./src/payload.cpp
 #    ./src/drone_swarm_payload.cpp
+    ./src/payload_rnw.cpp
     ./src/uwb_transceiver_node.cpp
     )
 

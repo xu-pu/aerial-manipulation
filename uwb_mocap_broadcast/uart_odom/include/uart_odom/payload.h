@@ -11,11 +11,29 @@ namespace uwb_comm {
 
     struct payload_base_t {
 
-        ros::NodeHandle & nh;
+        /**
+         * Register ros::Subscriber here
+         */
+        virtual void init_as_master() = 0;
 
-        explicit payload_base_t( ros::NodeHandle & );
+        /**
+         * Register ros::Publisher here
+         */
+        virtual void init_as_slave() = 0;
 
+        /**
+         * Encode and write data frame to the buffer
+         * @param buffer
+         */
+        virtual void encode(char * buffer) = 0;
 
+        /**
+         * Decode data in the buffer and send it out
+         * @param buffer
+         */
+        virtual void decode(char const * buffer) = 0;
+
+        virtual int data_length() = 0;
 
     };
 
