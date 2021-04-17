@@ -1,10 +1,7 @@
-#include "serial_service.h"
 #include <iostream>
-#include <nav_msgs/Odometry.h>
 #include <ros/ros.h>
 #include <std_msgs/String.h>
-#include <stdio.h>
-
+#include "serial_service.h"
 #include "uart_odom/payload.h"
 #include "uart_odom/rnw_payload.h"
 
@@ -54,11 +51,6 @@ public:
     ros::Timer m_timer_send_odom;
 
     ros::NodeHandle m_ros_nh;
-    ros::Subscriber m_sub_odom;
-    ros::Subscriber m_sub_odom_cone;
-    ros::Publisher  m_pub_odom;
-    ros::Publisher  m_pub_odom_cone;
-    nav_msgs::Odometry m_init_odom, m_current_odom, m_current_odom_cone;
     int                m_if_odom_init = 0;
     int                m_idx_odom;
 
@@ -76,17 +68,6 @@ public:
       //cout << "Send frequency = " << ( int ) ( 1.0 / ( m_send_current_time - m_send_last_time ) ) << endl;
       m_send_last_time = m_send_current_time;
     }
-
-    void odom_callback( const nav_msgs::Odometry &msg )
-    {
-      m_idx_odom++;
-      m_current_odom = msg;
-      if ( m_if_odom_init == 0 )
-      {
-        m_init_odom = msg;
-        m_if_odom_init = 1;
-      }
-    };
 
     void send_service_eval_stability( const ros::TimerEvent &event )
     {
@@ -157,60 +138,30 @@ public:
       cout << "=====  load_parameter finish ===== " << endl;
     }
 
-    void read_serive_eval_stability( const ros::TimerEvent &event )
-    {
-      //cout << "Enter read_serive_eval_stability" << endl;
+    void read_serive_eval_stability( const ros::TimerEvent &event ) {
       Serial_packet temp_serial_pack;
-      int           pack_num = m_protocal_to_mcu.receive_packet( temp_serial_pack );
-      if ( pack_num != 0 ) // Receive packet
-      {
+      int pack_num = m_protocal_to_mcu.receive_packet( temp_serial_pack );
+      if ( pack_num != 0 ) { // Receive packet
         m_test_rec_count++;
         m_current_time = ros::Time::now().toSec();
-        if ( m_para_debug_packet_info )
-        {
+        if ( m_para_debug_packet_info ) {
           cout << "Packet  " << m_test_rec_count
                << ", length = " << temp_serial_pack.data_length
                << ", freq = " << (int) (1.0 / ( m_current_time - m_last_time ))
                << endl;
         }
         m_last_time = m_current_time;
-        if ( temp_serial_pack.id == m_para_test_packet_id )
-        {
-          return;
-        }
-        else if ( temp_serial_pack.id == m_para_odom_packet_id )
-        {
-          if ( m_role == e_role_unset )
-          {
-            m_role = e_role_slave;
-            ROS_INFO( "[UART_ODOM]: I read the odom from uart, therefore I am slave" );
-            m_timer_test_send.stop(); // Turn of test sender.
-          }
-
-          //cout << __FUNCTION__ << "  " << __LINE__ << endl;
-
+        if ( temp_serial_pack.id == m_para_odom_packet_id ){
           payload_ptr->decode(temp_serial_pack.data);
-
-          //cout << "Finish publish" << endl;
         }
-        else
-        {
-          return;
-        }
-
-        //ser_pack.display();
-        //ros::Duration( 1).sleep();
       }
     };
 
-    void test_uart()
-    {
+    void test_uart() {
       cout << " ===== test_uart =====" << endl;
       m_timer_test_send = m_ros_nh.createTimer( ros::Duration( 1.0 / m_para_sent_timer_frequency ), &Uart_odom::send_service_eval_stability, this );
-
       m_timer_test_send.start();
       m_timer_test_read.start();
-
       cout << "test_uart exit" << endl;
     };
 
@@ -222,6 +173,8 @@ public:
     }
 
     void init_as_slave(){
+      ROS_INFO( "[UART_ODOM]: I read the odom from uart, therefore I am slave" );
+      m_timer_test_send.stop(); // Turn of test sender.
       payload_ptr->init_as_slave();
     }
 
@@ -258,30 +211,20 @@ public:
       m_protocal_to_mcu.set_protocal_mode( m_para_serial_protocal_mode );
       m_protocal_to_mcu.set_debug_info( m_para_debug_protocal );
 
-      if ( m_serial.isOpen() )
-      {
+      if ( m_serial.isOpen() ) {
         cout << "Open serial success !!" << endl;
         m_protocal_to_mcu.init( &m_serial );
       }
-      else
-      {
+      else {
         cout << "Open serial fail !! " << endl;
       }
     }
 };
 
 int main( int argc, char *argv[] ) {
-  printf( "Hello, this is uart odom \n" );
-  //    printf()
-  cout << "Size of odom \r\n"
-       << sizeof( nav_msgs::Odometry ) << endl;
-
   ros::init( argc, argv, "uart_odom" );
-
   ros::NodeHandle nh = ros::NodeHandle( "~" );
-
   Uart_odom uart_odom( nh );
-
   uart_odom.test_uart();
   ros::MultiThreadedSpinner spinner( 6 ); // Use 4 threads
   spinner.spin();
