@@ -8,8 +8,6 @@
 #include <std_msgs/String.h>
 #include <stdio.h>
 
-#define IF_USING_MINI_ODOM 1
-#define IF_UART_ODOM_DEBUG 0
 using namespace std;
 
 using mini_odom_t = Mini_odom<float,int>;
@@ -72,33 +70,20 @@ public:
     {
 
       //        printf("enter odom_message_send_service");
-      if(IF_USING_MINI_ODOM)
-      {
-        m_serial_send_pack.id = m_para_odom_packet_id;
-        m_serial_send_pack.data_length = sizeof(mini_odom_t) * 2;
-        mini_odom_t m_mini_odom_uav, m_mini_odom_cone;
-        odom_to_miniodom<float, int>(m_current_odom, m_mini_odom_uav );
-        odom_to_miniodom<float, int>( m_current_odom_cone, m_mini_odom_cone );
-        memcpy(m_serial_send_pack.data, (char*)&m_mini_odom_uav, sizeof(mini_odom_t));
-        memcpy(m_serial_send_pack.data + sizeof(mini_odom_t), (char*)&m_mini_odom_cone, sizeof(mini_odom_t));
-        m_send_current_time = ros::Time::now().toSec();
-      }
-      else
-      {
-        m_serial_send_pack.id = m_para_odom_packet_id;
-        int odom_packet_size = sizeof( nav_msgs::Odometry );
-        m_serial_send_pack.data_length = odom_packet_size;
-        memcpy( ( char * ) m_serial_send_pack.data, ( char * ) &m_current_odom, odom_packet_size );
-        m_send_current_time = ros::Time::now().toSec();
-      }
+      m_serial_send_pack.id = m_para_odom_packet_id;
+      m_serial_send_pack.data_length = sizeof(mini_odom_t) * 2;
+      mini_odom_t m_mini_odom_uav, m_mini_odom_cone;
+      odom_to_miniodom<float, int>(m_current_odom, m_mini_odom_uav );
+      odom_to_miniodom<float, int>( m_current_odom_cone, m_mini_odom_cone );
+      memcpy(m_serial_send_pack.data, (char*)&m_mini_odom_uav, sizeof(mini_odom_t));
+      memcpy(m_serial_send_pack.data + sizeof(mini_odom_t), (char*)&m_mini_odom_cone, sizeof(mini_odom_t));
+      m_send_current_time = ros::Time::now().toSec();
+
       m_protocal_to_mcu.send_packet( m_serial_send_pack );
-#if IF_UART_ODOM_DEBUG
-      m_pub_odom_test.publish(m_current_odom);
-#endif
       //cout << (1.0 / (ros::Time::now().toSec() - m_send_current_time) ) <<endl;
       //cout << "Send frequency = " << ( int ) ( 1.0 / ( m_send_current_time - m_send_last_time ) ) << endl;
       m_send_last_time = m_send_current_time;
-      return;
+
     }
 
     void odom_callback( const nav_msgs::Odometry &msg )
@@ -264,15 +249,11 @@ public:
       cout << "test_uart exit" << endl;
     };
 
-    Uart_odom( ros::NodeHandle &nh )
+    explicit Uart_odom( ros::NodeHandle &nh )
     {
 
       m_ros_nh = nh;
       load_parameter( m_ros_nh );
-
-#if IF_HALF_MINI_ODOM
-      cout << "Mini odom size = " << sizeof( mini_odom< Eigen::half, uint16_t > ) << endl;
-#endif
 
       m_sub_odom = m_ros_nh.subscribe(
               "odom_in",
@@ -314,9 +295,10 @@ int main( int argc, char *argv[] ) {
   //    printf()
   cout << "Size of odom \r\n"
        << sizeof( nav_msgs::Odometry ) << endl;
+
   ros::init( argc, argv, "uart_odom" );
+
   ros::NodeHandle nh = ros::NodeHandle( "~" );
-  //ros::NodeHandle nh( "~" );
 
   Uart_odom uart_odom( nh );
 

@@ -3,18 +3,8 @@
 #ifndef MINI_ODOM_H
 #define MINI_ODOM_H
 
-#define IF_HALF_MINI_ODOM 0
-// if using half odom, the packet size can be reduce to 34 .
-
-
 #include <nav_msgs/Odometry.h>
 #include <stddef.h>
-
-#if IF_HALF_MINI_ODOM
-#include <Eigen/Eigen>
-//#include "Half.h"
-#include <Eigen/src/Core/arch/CUDA/Half.h>
-#endif
 
 //--- Odom example
 //header:
