@@ -5,15 +5,26 @@ using namespace uwb_comm;
 rnw_payload_t::rnw_payload_t( ros::NodeHandle & _nh ) : nh(_nh) {}
 
 void rnw_payload_t::init_as_master(){
+  sub_odom_uav = nh.subscribe(
+          "odom_in",
+          1,
+          &rnw_payload_t::on_odom_uav,
+          this,
+          ros::TransportHints().tcpNoDelay()
+  );
+}
 
+void rnw_payload_t::on_odom_uav(const nav_msgs::OdometryConstPtr & msg) {
+  latest_msg = *msg;
 }
 
 void rnw_payload_t::init_as_slave() {
-
+  pub_odom_uav = nh.advertise< nav_msgs::Odometry >( "out_odom_uav", 100 );
+  pub_odom_cone = nh.advertise< nav_msgs::Odometry >( "out_odom_cone", 100 );
 }
 
 int rnw_payload_t::data_length() {
-
+  return sizeof(mini_odom_t) * 2;
 }
 
 void rnw_payload_t::decode(const char *buffer) {
@@ -21,5 +32,9 @@ void rnw_payload_t::decode(const char *buffer) {
 }
 
 void rnw_payload_t::encode(char *buffer) {
-
+  mini_odom_t m_mini_odom_uav, m_mini_odom_cone;
+  odom_to_miniodom<float, int>(latest_msg, m_mini_odom_uav );
+  odom_to_miniodom<float, int>( latest_msg, m_mini_odom_cone );
+  memcpy(buffer, (char*)&m_mini_odom_uav, sizeof(mini_odom_t));
+  memcpy(buffer + sizeof(mini_odom_t), (char*)&m_mini_odom_cone, sizeof(mini_odom_t));
 }

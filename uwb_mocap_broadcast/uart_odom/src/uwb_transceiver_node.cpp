@@ -9,10 +9,9 @@
 #include <stdio.h>
 
 #include "uart_odom/payload.h"
+#include "uart_odom/rnw_payload.h"
 
 using namespace std;
-
-using mini_odom_t = Mini_odom<float,int>;
 
 class Uart_odom
 {
@@ -62,7 +61,6 @@ public:
     ros::Subscriber m_sub_odom_cone;
     ros::Publisher  m_pub_odom;
     ros::Publisher  m_pub_odom_cone;
-    ros::Publisher  m_pub_odom_test;
     nav_msgs::Odometry m_init_odom, m_current_odom, m_current_odom_cone;
     int                m_if_odom_init = 0;
     int                m_idx_odom;
@@ -70,24 +68,16 @@ public:
     std::shared_ptr<uwb_comm::payload_base_t> payload_ptr;
 
 public:
-    void send_service_odom_message( const ros::TimerEvent &event )
-    {
-
+    void send_service_odom_message( const ros::TimerEvent &event ) {
       //        printf("enter odom_message_send_service");
       m_serial_send_pack.id = m_para_odom_packet_id;
-      m_serial_send_pack.data_length = sizeof(mini_odom_t) * 2;
-      mini_odom_t m_mini_odom_uav, m_mini_odom_cone;
-      odom_to_miniodom<float, int>(m_current_odom, m_mini_odom_uav );
-      odom_to_miniodom<float, int>( m_current_odom_cone, m_mini_odom_cone );
-      memcpy(m_serial_send_pack.data, (char*)&m_mini_odom_uav, sizeof(mini_odom_t));
-      memcpy(m_serial_send_pack.data + sizeof(mini_odom_t), (char*)&m_mini_odom_cone, sizeof(mini_odom_t));
+      m_serial_send_pack.data_length = payload_ptr->data_length();
       m_send_current_time = ros::Time::now().toSec();
-
+      payload_ptr->encode(m_serial_send_pack.data);
       m_protocal_to_mcu.send_packet( m_serial_send_pack );
       //cout << (1.0 / (ros::Time::now().toSec() - m_send_current_time) ) <<endl;
       //cout << "Send frequency = " << ( int ) ( 1.0 / ( m_send_current_time - m_send_last_time ) ) << endl;
       m_send_last_time = m_send_current_time;
-
     }
 
     void odom_callback( const nav_msgs::Odometry &msg )
@@ -254,6 +244,8 @@ public:
       m_ros_nh = nh;
       load_parameter( m_ros_nh );
 
+      payload_ptr = std::make_shared<uwb_comm::rnw_payload_t>(nh);
+
       int role = e_role::e_role_unset;
       nh.getParam("role",role);
       m_role = (e_role)role;
@@ -270,19 +262,7 @@ public:
           exit(-1);
       }
 
-      m_sub_odom = m_ros_nh.subscribe(
-              "odom_in",
-              1,
-              &Uart_odom::odom_callback,
-              this,
-              ros::TransportHints().tcpNoDelay()
-      );
-
       // m_timer_test_read = m_ros_nh.createTimer( ros::Duration( 1.0 / m_para_read_timer_frequency ), &Uart_odom::read_serive_eval_stability, this );
-
-      m_pub_odom_test = nh.advertise< nav_msgs::Odometry >( "test_odom", 100 );
-      m_pub_odom = nh.advertise< nav_msgs::Odometry >( "out_odom_uav", 100 );
-      m_pub_odom_cone = nh.advertise< nav_msgs::Odometry >( "out_odom_cone", 100 );
       m_timer_test_read = nh.createTimer( ros::Duration( 1.0 / m_para_read_timer_frequency ), &Uart_odom::read_serive_eval_stability, this );
 
       m_serial.setPort( m_para_serial_port );

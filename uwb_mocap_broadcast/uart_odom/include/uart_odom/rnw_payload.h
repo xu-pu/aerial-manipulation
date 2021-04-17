@@ -6,6 +6,10 @@
 #define UWB_COMM_RNW_PAYLOAD_H
 
 #include "uart_odom/payload.h"
+#include <nav_msgs/Odometry.h>
+#include "mini_odom.h"
+
+using mini_odom_t = Mini_odom<float,int>;
 
 namespace uwb_comm {
 
@@ -13,7 +17,19 @@ namespace uwb_comm {
 
         ros::NodeHandle & nh;
 
+        ros::Subscriber sub_odom_uav;
+
+        ros::Publisher pub_odom_uav;
+
+        ros::Publisher pub_odom_cone;
+
+        nav_msgs::Odometry latest_msg;
+
         explicit rnw_payload_t( ros::NodeHandle & );
+
+        void on_odom_uav( nav_msgs::OdometryConstPtr const & );
+
+    public:
 
         void init_as_master() final;
 
