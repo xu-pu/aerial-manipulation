@@ -9,6 +9,7 @@
 #include <am_traj/ros_msgs.h>
 
 using std::vector;
+using Eigen::Vector2d;
 using Eigen::Vector3d;
 using Eigen::Matrix3d;
 
@@ -25,6 +26,8 @@ struct test_swarm_planner_t {
     ros::Subscriber sub_odom_drone2;
 
     ros::Subscriber sub_trigger_hello_world;
+
+    ros::Subscriber sub_trigger_circle;
 
     bool init_drone1 = false;
 
@@ -60,6 +63,9 @@ struct test_swarm_planner_t {
 
       sub_trigger_hello_world = nh.subscribe<std_msgs::Header>(
               "/gamepad/A", 10, &test_swarm_planner_t::trigger_hello_world, this);
+
+      sub_trigger_circle = nh.subscribe<std_msgs::Header>(
+              "/gamepad/B", 10, &test_swarm_planner_t::trigger_circle, this);
 
     }
 
@@ -108,7 +114,48 @@ struct test_swarm_planner_t {
 
     void trigger_align(){}
 
-    void trigger_circle(){}
+    void trigger_circle( std_msgs::HeaderConstPtr const & msg ) const {
+
+      if ( !initialized() ) {
+        ROS_ERROR_STREAM("[test_swarm_planner_node] did not receive odom");
+        return;
+      }
+
+      Vector3d pos1 = uav_utils::from_point_msg(latest_odom_drone1.pose.pose.position);
+      Vector3d pos2 = uav_utils::from_point_msg(latest_odom_drone2.pose.pose.position);
+
+      double dist = (pos1 - pos2).norm();
+
+      if ( dist < 0.5 ) {
+        ROS_ERROR_STREAM("[test_swarm_planner_node] drones too close");
+        return;
+      }
+
+      Vector2d p1(pos1.x(),pos1.y());
+      Vector2d p2(pos2.x(),pos2.y());
+
+      Vector2d mid = (p1+p2)/2;
+
+      Vector2d v1 = p1-mid;
+      Vector2d v2 = p2-mid;
+
+      int segments = 12;
+      double interval = M_PI*2/segments;
+
+      vector<Vector3d> wpts_drone1;
+      vector<Vector3d> wpts_drone2;
+      for ( int i=0; i<=segments; i++ ) {
+        Eigen::Rotation2Dd rot(interval*i);
+        Vector2d pt1 = mid + (rot * v1);
+        wpts_drone1.emplace_back(pt1.x(), pt1.y(), pos1.z());
+        Vector2d pt2 = mid + (rot * v2);
+        wpts_drone2.emplace_back(pt2.x(), pt2.y(), pos2.z());
+      }
+
+      pub_traj_drone1.publish(wpts2traj(latest_odom_drone1,wpts_drone1));
+      pub_traj_drone2.publish(wpts2traj(latest_odom_drone2,wpts_drone2));
+
+    }
 
     void on_odom_drone1( nav_msgs::OdometryConstPtr const & msg ){
       init_drone1 = true;
