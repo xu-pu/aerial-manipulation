@@ -12,9 +12,27 @@ void drone_swarm_payload_t::on_odom(const nav_msgs::OdometryConstPtr & msg) {
   latest_odom = *msg;
 }
 
-void drone_swarm_payload_t::init_as_slave() {}
+void drone_swarm_payload_t::init_as_slave() {
+  pub_odom = nh.advertise<nav_msgs::Odometry>("odom",100);
+  pub_cmd = nh.advertise<quadrotor_msgs::PositionCommand>("position_cmd",100);
+}
 
-void drone_swarm_payload_t::init_as_master() {}
+void drone_swarm_payload_t::init_as_master() {
+  sub_odom = nh.subscribe<nav_msgs::Odometry>(
+          "odom",
+          1,
+          &drone_swarm_payload_t::on_odom,
+          this,
+          ros::TransportHints().tcpNoDelay()
+  );
+  sub_cmd = nh.subscribe<quadrotor_msgs::PositionCommand>(
+          "position_cmd",
+          1,
+          &drone_swarm_payload_t::on_cmd,
+          this,
+          ros::TransportHints().tcpNoDelay()
+  );
+}
 
 void drone_swarm_payload_t::decode(const char *buffer) {}
 
