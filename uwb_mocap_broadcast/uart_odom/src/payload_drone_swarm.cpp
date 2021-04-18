@@ -81,7 +81,9 @@ quadrotor_msgs::PositionCommand decode_pos_cmd( pos_cmd_data_t<T> const & dat ){
 using pos_cmd_data_f32_t = pos_cmd_data_t<float>;
 using mini_odom_f32_t = Mini_odom<float,int>;
 
-drone_swarm_payload_t::drone_swarm_payload_t(ros::NodeHandle & _nh) : nh(_nh) {}
+drone_swarm_payload_t::drone_swarm_payload_t(ros::NodeHandle & _nh) : nh(_nh) {
+  latest_cmd.header.seq = 0;
+}
 
 void drone_swarm_payload_t::on_cmd(const quadrotor_msgs::PositionCommandConstPtr & msg) {
   latest_cmd = *msg;
@@ -127,7 +129,11 @@ void drone_swarm_payload_t::decode(const char *buffer) {
 
   // process cmd
   auto * cmd_ptr = (pos_cmd_data_f32_t const *)(buffer+sizeof(mini_odom_f32_t));
-  if ( cmd_ptr->seq != latest_cmd.header.seq ) {
+  if ( cmd_ptr->seq == 0 ) {
+    // seq == 0 is ignored, might be uninitialized empty command
+    return;
+  }
+  else if ( cmd_ptr->seq != latest_cmd.header.seq ) {
     latest_cmd = decode_pos_cmd(*cmd_ptr);
     latest_cmd.header.stamp = ros::Time::now();
   }
@@ -136,6 +142,7 @@ void drone_swarm_payload_t::decode(const char *buffer) {
     //ROS_WARN_STREAM("[UWB][slave] no new command");
     return;
   }
+  ROS_INFO_STREAM("[UWB][slave] send out cmd with seq " << latest_cmd.header.seq);
   pub_cmd.publish(latest_cmd);
 
 }
