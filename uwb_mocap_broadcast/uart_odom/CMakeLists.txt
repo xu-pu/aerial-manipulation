@@ -166,7 +166,7 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-add_executable( ${PROJECT_NAME}
+add_executable(uwb_transceiver_node
     ./src/serial_protocal.c
     ./src/serial_service.cpp
     ./src/payload_drone_swarm.cpp
@@ -185,9 +185,7 @@ add_executable( ${PROJECT_NAME}
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(${PROJECT_NAME}
-   ${catkin_LIBRARIES}
- )
+target_link_libraries(uwb_transceiver_node ${catkin_LIBRARIES})
 
 #############
 ## Install ##

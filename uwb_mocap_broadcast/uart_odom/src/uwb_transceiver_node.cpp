@@ -4,6 +4,7 @@
 #include "serial_service.h"
 #include "uart_odom/payload.h"
 #include "uart_odom/rnw_payload.h"
+#include "uart_odom/drone_swarm_payload.h"
 
 using namespace std;
 
@@ -183,7 +184,8 @@ public:
       m_ros_nh = nh;
       load_parameter( m_ros_nh );
 
-      payload_ptr = std::make_shared<uwb_comm::rnw_payload_t>(nh);
+      //payload_ptr = std::make_shared<uwb_comm::rnw_payload_t>(nh);
+      payload_ptr = std::make_shared<uwb_comm::drone_swarm_payload_t>(nh);
 
       int role = e_role::e_role_unset;
       nh.getParam("role",role);
@@ -225,7 +227,7 @@ int main( int argc, char *argv[] ) {
   ros::init( argc, argv, "uart_odom" );
   ros::NodeHandle nh = ros::NodeHandle( "~" );
   Uart_odom uart_odom( nh );
-  uart_odom.test_uart();
+  //uart_odom.test_uart();
   ros::MultiThreadedSpinner spinner( 6 ); // Use 4 threads
   spinner.spin();
   return 0;

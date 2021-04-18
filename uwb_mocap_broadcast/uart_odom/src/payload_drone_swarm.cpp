@@ -26,7 +26,6 @@ struct pos_cmd_data_t {
 
 };
 
-
 template<typename T>
 pos_cmd_data_t<T> encode_pos_cmd( quadrotor_msgs::PositionCommand const & msg ){
 
@@ -95,6 +94,7 @@ void drone_swarm_payload_t::on_odom(const nav_msgs::OdometryConstPtr & msg) {
 void drone_swarm_payload_t::init_as_slave() {
   pub_odom = nh.advertise<nav_msgs::Odometry>("odom",100);
   pub_cmd = nh.advertise<quadrotor_msgs::PositionCommand>("position_cmd",100);
+  ROS_INFO_STREAM("[UWB][Swarm Drone Payload] init as slave, " << data_length() << " bytes per frame");
 }
 
 void drone_swarm_payload_t::init_as_master() {
@@ -112,11 +112,12 @@ void drone_swarm_payload_t::init_as_master() {
           this,
           ros::TransportHints().tcpNoDelay()
   );
+  ROS_INFO_STREAM("[UWB][Swarm Drone Payload] init as master, " << data_length() << " bytes per frame");
 }
 
 void drone_swarm_payload_t::decode(const char *buffer) {
-  mini_odom_f32_t const * odom_ptr = (mini_odom_f32_t const *)buffer;
-  pos_cmd_data_f32_t const * cmd_ptr = (pos_cmd_data_f32_t const *)(buffer+sizeof(mini_odom_f32_t));
+  auto * odom_ptr = (mini_odom_f32_t const *)buffer;
+  auto * cmd_ptr = (pos_cmd_data_f32_t const *)(buffer+sizeof(mini_odom_f32_t));
   miniodom_to_odom<float>(*odom_ptr,latest_odom);
   latest_cmd = decode_pos_cmd(*cmd_ptr);
   latest_odom.header.stamp = ros::Time::now();
