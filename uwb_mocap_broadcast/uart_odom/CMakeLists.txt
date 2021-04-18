@@ -31,6 +31,7 @@ find_package(catkin REQUIRED COMPONENTS
     geometry_msgs
     serial
     tf
+    quadrotor_msgs
     )
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
@@ -168,8 +169,7 @@ include_directories(
 add_executable( ${PROJECT_NAME}
     ./src/serial_protocal.c
     ./src/serial_service.cpp
-#    ./src/payload.cpp
-#    ./src/drone_swarm_payload.cpp
+    ./src/payload_drone_swarm.cpp
     ./src/payload_rnw.cpp
     ./src/uwb_transceiver_node.cpp
     )

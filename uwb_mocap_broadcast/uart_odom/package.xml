@@ -60,7 +60,7 @@
   <build_export_depend>serial</build_export_depend>
   <exec_depend>serial</exec_depend>
 
-
+  <depend>quadrotor_msgs</depend>
   <!-- The export tag contains other, unspecified, tags -->
   <export>
     <!-- Other tools can request additional information be placed here -->
