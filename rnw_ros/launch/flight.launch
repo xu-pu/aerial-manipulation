@@ -1,26 +1,10 @@
 <launch>
 
-	<arg name="uavname" default="fpv" />
+    <arg name="uavname" default="fpv" />
 
     <arg name="imu_topic" default="/djiros/imu"/>
 
     <arg name="topic_odom_uav" default="/odom/uav"/>
-    <arg name="topic_odom_cone" default="/odom/cone"/>
-
-    <arg name="topic_rocking_cmd" value="/rnw/rocking_cmd"/>
-    <arg name="topic_cone_state" value="/rnw/cone_state"/>
-    <arg name="topic_poly_traj" value="/rnw/poly_traj" />
-
-    <arg name="topic_trigger_insert" value="/rnw/trigger/insert" />
-    <arg name="topic_trigger_zigzag" value="/rnw/trigger/zigzag" />
-    <arg name="topic_trigger_topple" value="/rnw/trigger/topple" />
-    <arg name="topic_trigger_rnw" value="/rnw/trigger/rnw" />
-    <arg name="topic_trigger_push_init" value="/rnw/trigger/push_init" />
-    <arg name="topic_trigger_adjust_nutation" value="/rnw/trigger/adjust_nutation" />
-    <arg name="topic_trigger_adjust_grip" value="/rnw/trigger/adjust_grip" />
-    <arg name="topic_trigger_adjust_yaw" value="/rnw/trigger/adjust_yaw" />
-
-    <rosparam command="load" file="$(find rnw_ros)/config/rnw_config.yaml"/>
 
     <!-- Using dynamic_reconfigure will cause timeout -->
     <!-- Increase from 0.1 default to 0.5 to avoid entering atti mode -->
@@ -37,17 +21,15 @@
         <param name="align_with_fmu" type="bool" value="false"/>
     </node>
 
-    <node pkg="uart_odom" type="uart_odom" name="uart_odom_client" output="log" respawn="true">
-        <!--publishers-->
-        <remap from="~out_odom_uav" to="$(arg topic_odom_uav)"/>
-        <remap from="~out_odom_cone" to="$(arg topic_odom_cone)"/>
-        <!--params-->
-        <rosparam command="load" file="$(find uart_odom)/config/uart_odom_config.yaml"/>
-        <param name="work_mode" value="real-time"/>
-        <param name="js_ctrl_mode" value="feedback"/>
-        <param name="serial_port" value="/dev/tty.uwb.slave"/>
+    <node pkg="uart_odom" type="uwb_transceiver_node" name="uwb_slave_drone2" output="screen">
+      <rosparam command="load" file="$(find uart_odom)/config/uart_odom_config.yaml" />
+      <param name="serial_port" value="/dev/tty.uwb.slave"/>
+      <remap from="~odom" to="$(arg topic_odom_uav)"/>
+      <remap from="~position_cmd" to="/position_cmd"/>
+      <param name="role" type="int" value="2"/> <!--slave-->
+      <param name="debug/m_debug_packet_info" type="int" value="0"/>
     </node>
-
+    
     <node pkg="n3ctrl" type="n3ctrl_node" name="n3ctrl" output="screen" required="true">
         <!--subscribers-->
 		<remap from="~joy" to="/djiros/rc" />
@@ -63,6 +45,8 @@
         <param name="work_mode" value="real-time" />
         <param name="js_ctrl_mode" value="feedback" />
         <param name="pub_debug_msgs" type="bool" value="true"/>
-	</node>
+    </node>
 
+    <node name="record" pkg="rosbag" type="record" output="screen" args="-a" />
+    
 </launch>
