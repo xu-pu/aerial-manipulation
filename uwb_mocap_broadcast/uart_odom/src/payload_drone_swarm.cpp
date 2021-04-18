@@ -116,15 +116,27 @@ void drone_swarm_payload_t::init_as_master() {
 }
 
 void drone_swarm_payload_t::decode(const char *buffer) {
+
+  // process odom
   auto * odom_ptr = (mini_odom_f32_t const *)buffer;
-  auto * cmd_ptr = (pos_cmd_data_f32_t const *)(buffer+sizeof(mini_odom_f32_t));
   miniodom_to_odom<float>(*odom_ptr,latest_odom);
-  latest_cmd = decode_pos_cmd(*cmd_ptr);
   latest_odom.header.stamp = ros::Time::now();
-  latest_cmd.header.stamp = ros::Time::now();
   latest_odom.header.frame_id = "world";
   pub_odom.publish(latest_odom);
+
+  // process cmd
+  auto * cmd_ptr = (pos_cmd_data_f32_t const *)(buffer+sizeof(mini_odom_f32_t));
+  if ( cmd_ptr->seq != latest_cmd.header.seq ) {
+    latest_cmd = decode_pos_cmd(*cmd_ptr);
+    latest_cmd.header.stamp = ros::Time::now();
+  }
+  else if ( (ros::Time::now() - latest_cmd.header.stamp).toSec() > 1 ) {
+    // did not receive new cmd for one full second, stop sending the same cmd
+    //ROS_WARN_STREAM("[UWB][slave] no new command");
+    return;
+  }
   pub_cmd.publish(latest_cmd);
+
 }
 
 void drone_swarm_payload_t::encode(char *buffer) {
