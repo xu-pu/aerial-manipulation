@@ -65,7 +65,7 @@ struct Mini_odom
 };
 
 template <typename T, typename T2>
-void odom_to_miniodom(nav_msgs::Odometry & odom ,Mini_odom<T, T2> & mini_odom )
+void odom_to_miniodom(nav_msgs::Odometry const & odom ,Mini_odom<T, T2> & mini_odom )
 {
     mini_odom.seq = odom.header.seq;
     //mini_odom.frame_id = odom.header.frame_id;
@@ -90,7 +90,7 @@ void odom_to_miniodom(nav_msgs::Odometry & odom ,Mini_odom<T, T2> & mini_odom )
 }
 
 template <typename T, typename T2>
-void miniodom_to_odom(Mini_odom<T, T2> & mini_odom,  nav_msgs::Odometry & odom )
+void miniodom_to_odom(Mini_odom<T, T2> const & mini_odom,  nav_msgs::Odometry & odom )
 {
     odom.header.seq = mini_odom.seq;
     odom.header.stamp = ros::Time::now();

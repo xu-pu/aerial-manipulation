@@ -22,13 +22,13 @@ namespace uwb_comm {
         virtual void init_as_slave() = 0;
 
         /**
-         * Encode and write data frame to the buffer
+         * Encode and write data frame to the buffer (as master)
          * @param buffer
          */
         virtual void encode(char * buffer) = 0;
 
         /**
-         * Decode data in the buffer and send it out
+         * Decode data in the buffer and send it out (as slave)
          * @param buffer
          */
         virtual void decode(char const * buffer) = 0;
