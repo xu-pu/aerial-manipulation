@@ -107,4 +107,9 @@
         <param name="name" value="sim_tf" />
     </node>
 
+    <node pkg="rnw_ros" type="odom2tf_node" name="drone1_tf" output="screen">
+        <remap from="~odom" to="/drone1/odom"/>
+        <param name="name" value="odom_drone1" />
+    </node>
+
 </launch>

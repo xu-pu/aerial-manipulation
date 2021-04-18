@@ -38,7 +38,9 @@ void N3CtrlFSM::determine_state(const ros::Time& now_time) {
     bool cmd_id_renewed = cmd_data.trajectory_id > last_command_id;
     bool cmd_is_timeout = (now_time - cmd_data.rcv_stamp).toSec() < param.msg_timeout.cmd;
     //ROS_WARN("%d %d %d",cmd_flag_valid,cmd_id_renewed, cmd_is_timeout); //zxzxzxzx
-    bool cmd_is_valid = cmd_flag_valid & cmd_id_renewed & cmd_is_timeout;
+    //bool cmd_is_valid = cmd_flag_valid & cmd_id_renewed & cmd_is_timeout;
+    // swarm mode, cmd is valid as long as it's in time
+    bool cmd_is_valid = cmd_is_timeout;
 
     if (!cmd_is_valid) {
         dbgss << boost::format("[Command not valid] flag[%d] cmd_id[%d] last_id[%d]") %
