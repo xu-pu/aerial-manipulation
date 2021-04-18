@@ -47,8 +47,7 @@
         <param name="~autorepeat_rate" value="0" />
     </node>
 
-    <node pkg="rnw_ros" type="gamepad_trigger_node" name="gamepad" output="screen">
-    </node>
+    <node pkg="rnw_ros" type="gamepad_trigger_node" name="gamepad" output="screen"/>
 
     <node pkg="rnw_ros" type="test_swarm_planner_node" name="test_swarm_planner_node" output="screen"/>
 

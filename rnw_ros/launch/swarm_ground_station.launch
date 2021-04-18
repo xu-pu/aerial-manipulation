@@ -44,10 +44,6 @@
 
     <node name="rviz_traj" pkg="rviz" type="rviz" output="log" args="-d $(find rnw_ros)/config/swarm.rviz" />
 
-    <!--    <node pkg="rnw_ros" type="pub_euler_angles_node" name="pub_euler_angles_node" required="true" output="screen">-->
-    <!--        <remap from="~odom" to="/drone2/odom"/>-->
-    <!--    </node>-->
-
     <!--    <node pkg="rqt_multiplot" type="rqt_multiplot" name="rqt_multiplot"-->
     <!--          args="&#45;&#45;multiplot-config $(find rnw_ros)/config/rqt_multiplot_vicon_imu.xml &#45;&#45;multiplot-run-all"/>-->
 
@@ -57,9 +53,7 @@
         <param name="~autorepeat_rate" value="0" />
     </node>
 
-    <node pkg="rnw_ros" type="gamepad_trigger_node" name="gamepad_trigger_node" output="screen">
-        <remap from="~A" to="/gamepad/A"/>
-    </node>
+    <node pkg="rnw_ros" type="gamepad_trigger_node" name="gamepad" output="screen"/>
 
     <node pkg="rnw_ros" type="traj2cmd_node" name="traj2cmd_drone1" output="screen" required="true">
         <remap from="~traj" to="/drone1/traj"/>
