@@ -19,6 +19,7 @@ void rnw_payload_t::init_as_master(){
 }
 
 void rnw_payload_t::on_odom_uav(const nav_msgs::OdometryConstPtr & msg) {
+  init = true;
   latest_msg = *msg;
 }
 
@@ -44,10 +45,11 @@ void rnw_payload_t::decode(const char *buffer) {
   pub_odom_cone.publish(odom_cone);
 }
 
-void rnw_payload_t::encode(char *buffer) {
+bool rnw_payload_t::encode(char *buffer) {
   mini_odom_t m_mini_odom_uav, m_mini_odom_cone;
   odom_to_miniodom<float, int>(latest_msg, m_mini_odom_uav );
   odom_to_miniodom<float, int>( latest_msg, m_mini_odom_cone );
   memcpy(buffer, (char*)&m_mini_odom_uav, sizeof(mini_odom_t));
   memcpy(buffer + sizeof(mini_odom_t), (char*)&m_mini_odom_cone, sizeof(mini_odom_t));
+  return init;
 }

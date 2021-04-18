@@ -19,6 +19,8 @@ namespace uwb_comm {
 
         nav_msgs::Odometry latest_msg;
 
+        bool init = false;
+
         explicit rnw_payload_t( ros::NodeHandle & );
 
         void on_odom_uav( nav_msgs::OdometryConstPtr const & );
@@ -29,7 +31,7 @@ namespace uwb_comm {
 
         void init_as_slave() final;
 
-        void encode(char * buffer) final;
+        bool encode(char * buffer) final;
 
         void decode(char const * buffer) final;
 

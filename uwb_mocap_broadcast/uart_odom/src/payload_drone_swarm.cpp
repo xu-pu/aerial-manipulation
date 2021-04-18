@@ -88,6 +88,7 @@ void drone_swarm_payload_t::on_cmd(const quadrotor_msgs::PositionCommandConstPtr
 }
 
 void drone_swarm_payload_t::on_odom(const nav_msgs::OdometryConstPtr & msg) {
+  init = true;
   latest_odom = *msg;
 }
 
@@ -139,12 +140,13 @@ void drone_swarm_payload_t::decode(const char *buffer) {
 
 }
 
-void drone_swarm_payload_t::encode(char *buffer) {
+bool drone_swarm_payload_t::encode(char *buffer) {
   mini_odom_f32_t buffer_odom;
   odom_to_miniodom<float, int>(latest_odom,buffer_odom);
   pos_cmd_data_f32_t buffer_cmd = encode_pos_cmd<float>(latest_cmd);
   memcpy(buffer, (char*)&buffer_odom, sizeof(mini_odom_f32_t));
   memcpy(buffer+sizeof(mini_odom_f32_t), (char*)&buffer_cmd, sizeof(pos_cmd_data_f32_t));
+  return init;
 }
 
 int drone_swarm_payload_t::data_length() {

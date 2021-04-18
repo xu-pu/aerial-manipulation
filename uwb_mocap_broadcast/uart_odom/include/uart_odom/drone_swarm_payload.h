@@ -29,6 +29,8 @@ namespace uwb_comm {
 
         quadrotor_msgs::PositionCommand latest_cmd;
 
+        bool init = false;
+
         explicit drone_swarm_payload_t( ros::NodeHandle & );
 
         void on_odom( nav_msgs::OdometryConstPtr const & );
@@ -41,7 +43,7 @@ namespace uwb_comm {
 
         void init_as_slave() final;
 
-        void encode(char * buffer) final;
+        bool encode(char * buffer) final;
 
         void decode(char const * buffer) final;
 

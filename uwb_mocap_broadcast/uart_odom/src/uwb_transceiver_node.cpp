@@ -63,11 +63,12 @@ public:
       m_serial_send_pack.id = m_para_odom_packet_id;
       m_serial_send_pack.data_length = payload_ptr->data_length();
       m_send_current_time = ros::Time::now().toSec();
-      payload_ptr->encode(m_serial_send_pack.data);
-      m_protocal_to_mcu.send_packet( m_serial_send_pack );
-      //cout << (1.0 / (ros::Time::now().toSec() - m_send_current_time) ) <<endl;
-      //cout << "Send frequency = " << ( int ) ( 1.0 / ( m_send_current_time - m_send_last_time ) ) << endl;
-      m_send_last_time = m_send_current_time;
+      if ( payload_ptr->encode(m_serial_send_pack.data) ) {
+        m_protocal_to_mcu.send_packet( m_serial_send_pack );
+        //cout << (1.0 / (ros::Time::now().toSec() - m_send_current_time) ) <<endl;
+        //cout << "Send frequency = " << ( int ) ( 1.0 / ( m_send_current_time - m_send_last_time ) ) << endl;
+        m_send_last_time = m_send_current_time;
+      }
     }
 
     void send_service_eval_stability( const ros::TimerEvent &event )

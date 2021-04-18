@@ -102,9 +102,9 @@
         <remap from="~position_cmd" to="/position_cmd"/>
     </node>
 
-<!--    <node pkg="rnw_ros" type="odom2tf_node" name="sim_tf" output="screen">-->
-<!--        <remap from="~odom" to="$(arg topic_odom_uav)"/>-->
-<!--        <param name="name" value="sim_tf" />-->
-<!--    </node>-->
+    <node pkg="rnw_ros" type="odom2tf_node" name="sim_tf" output="screen">
+        <remap from="~odom" to="$(arg topic_odom_uav)"/>
+        <param name="name" value="sim_tf" />
+    </node>
 
 </launch>

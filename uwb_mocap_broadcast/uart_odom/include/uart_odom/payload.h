@@ -24,8 +24,9 @@ namespace uwb_comm {
         /**
          * Encode and write data frame to the buffer (as master)
          * @param buffer
+         * @return if true, send the data, if false, don't send anything
          */
-        virtual void encode(char * buffer) = 0;
+        virtual bool encode(char * buffer) = 0;
 
         /**
          * Decode data in the buffer and send it out (as slave)
