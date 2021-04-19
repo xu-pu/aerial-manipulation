@@ -29,6 +29,10 @@ struct test_swarm_planner_t {
 
     ros::Subscriber sub_trigger_circle;
 
+    ros::Subscriber sub_trigger_align;
+
+    ros::Subscriber sub_trigger_zigzag;
+
     bool init_drone1 = false;
 
     bool init_drone2 = false;
@@ -66,6 +70,12 @@ struct test_swarm_planner_t {
 
       sub_trigger_circle = nh.subscribe<std_msgs::Header>(
               "/gamepad/B", 10, &test_swarm_planner_t::trigger_circle, this);
+
+      sub_trigger_align = nh.subscribe<std_msgs::Header>(
+              "/gamepad/Y", 10, &test_swarm_planner_t::trigger_align, this);
+
+      sub_trigger_zigzag = nh.subscribe<std_msgs::Header>(
+              "/gamepad/X", 10, &test_swarm_planner_t::trigger_zigzag, this);
 
     }
 
@@ -112,7 +122,28 @@ struct test_swarm_planner_t {
 
     }
 
-    void trigger_align(){}
+    void trigger_align( std_msgs::HeaderConstPtr const & msg ) const {
+
+      if ( !initialized() ) {
+        ROS_ERROR_STREAM("[test_swarm_planner_node] did not receive odom");
+        return;
+      }
+
+    }
+
+    void trigger_zigzag( std_msgs::HeaderConstPtr const & msg ) const {
+
+      if ( !initialized() ) {
+        ROS_ERROR_STREAM("[test_swarm_planner_node] did not receive odom");
+        return;
+      }
+
+      vector<Vector3d> wpts = gen_waypoint_zigzag(5,0.5,0.5);
+
+      pub_traj_drone1.publish(local_wpts2traj(latest_odom_drone1,wpts));
+      pub_traj_drone2.publish(local_wpts2traj(latest_odom_drone2,wpts));
+
+    }
 
     void trigger_circle( std_msgs::HeaderConstPtr const & msg ) const {
 
