@@ -50,6 +50,10 @@ struct traj_visualizer_t {
     ros::Publisher pub_marker_acc;
     ros::Publisher pub_marker_lift;
 
+    ros::Timer timer;
+    ros::Subscriber sub_traj;
+    ros::Subscriber sub_abort;
+
     explicit traj_visualizer_t( ros::NodeHandle & nh ) {
       pub_marker_traj = nh.advertise<visualization_msgs::Marker>("traj", 1);
       pub_marker_setpoint = nh.advertise<visualization_msgs::Marker>("setpoint", 1);
@@ -61,6 +65,27 @@ struct traj_visualizer_t {
       acc_dt = get_param_default(nh,"acc_dt",0.15);
       length_g = get_param_default<double>(nh,"length_g",1.);
 
+      timer = nh.createTimer( ros::Rate(30), &traj_visualizer_t::on_spin, this );
+
+      sub_traj = nh.subscribe<quadrotor_msgs::PolynomialTrajectory>(
+              "poly_traj",
+              100,
+              &traj_visualizer_t::on_traj,
+              this
+      );
+
+      sub_traj = nh.subscribe<std_msgs::Header>(
+              "/abort",
+              100,
+              &traj_visualizer_t::on_abort,
+              this
+      );
+
+    }
+
+    void on_abort( std_msgs::HeaderConstPtr const & msg ){
+      init = false;
+      clear_markers();
     }
 
     void on_traj(  quadrotor_msgs::PolynomialTrajectoryConstPtr const & msg  ){

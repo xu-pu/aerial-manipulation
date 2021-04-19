@@ -185,6 +185,7 @@ set(RNW_NODES
         fake_drone_node
         traj2cmd_node
         visualize_pos_cmd_node
+        js_pos_cmd_node
 )
 
 FOREACH(NODE ${RNW_NODES})

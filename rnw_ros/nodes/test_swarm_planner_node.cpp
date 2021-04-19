@@ -27,6 +27,8 @@ struct test_swarm_planner_t {
 
     ros::Publisher pub_traj_drone2;
 
+    ros::Publisher pub_abort;
+
     ros::Subscriber sub_odom_drone1;
 
     ros::Subscriber sub_odom_drone2;
@@ -54,6 +56,8 @@ struct test_swarm_planner_t {
       pub_traj_drone1 = nh.advertise<quadrotor_msgs::PolynomialTrajectory>("/drone1/traj",10);
 
       pub_traj_drone2 = nh.advertise<quadrotor_msgs::PolynomialTrajectory>("/drone2/traj",10);
+
+      pub_abort = nh.advertise<std_msgs::Header>("/abort",10);
 
       sub_odom_drone1 = nh.subscribe<nav_msgs::Odometry>(
               "/drone1/odom",
@@ -85,6 +89,12 @@ struct test_swarm_planner_t {
 
     }
 
+    void abort_mission() const {
+      std_msgs::Header msg;
+      msg.stamp = ros::Time::now();
+      pub_abort.publish(msg);
+    }
+
     /**
      * Waypoints in world frame to Polynomial Trajectory
      * @param odom - local frame
@@ -111,6 +121,8 @@ struct test_swarm_planner_t {
 
     void trigger_hello_world( std_msgs::HeaderConstPtr const & msg ) const {
 
+      abort_mission();
+
       if ( !initialized() ) {
         ROS_ERROR_STREAM("[test_swarm_planner_node] did not receive odom");
         return;
@@ -129,6 +141,8 @@ struct test_swarm_planner_t {
     }
 
     void trigger_align( std_msgs::HeaderConstPtr const & msg ) const {
+
+      abort_mission();
 
       if ( !initialized() ) {
         ROS_ERROR_STREAM("[test_swarm_planner_node] did not receive odom");
@@ -154,6 +168,8 @@ struct test_swarm_planner_t {
 
     void trigger_zigzag( std_msgs::HeaderConstPtr const & msg ) const {
 
+      abort_mission();
+
       if ( !initialized() ) {
         ROS_ERROR_STREAM("[test_swarm_planner_node] did not receive odom");
         return;
@@ -167,6 +183,8 @@ struct test_swarm_planner_t {
     }
 
     void trigger_circle( std_msgs::HeaderConstPtr const & msg ) const {
+
+      abort_mission();
 
       if ( !initialized() ) {
         ROS_ERROR_STREAM("[test_swarm_planner_node] did not receive odom");

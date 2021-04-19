@@ -17,6 +17,8 @@ struct traj_server_t {
 
     ros::Subscriber sub_poly_traj;
 
+    ros::Subscriber sub_abort;
+
     poly_traj_t poly_traj;
 
     quadrotor_msgs::PolynomialTrajectory latest_poly_traj;
@@ -54,10 +56,23 @@ struct traj_server_t {
               ros::TransportHints().tcpNoDelay()
       );
 
+      sub_abort = nh.subscribe<std_msgs::Header>(
+              "/abort",
+              100,
+              &traj_server_t::on_abort,
+              this,
+              ros::TransportHints().tcpNoDelay()
+      );
+
     }
 
     void on_cleanup(){
       poly_traj = poly_traj_t();
+    }
+
+    void on_abort( std_msgs::HeaderConstPtr const & msg ){
+      ROS_ERROR_STREAM("[traj2cmd] trajectory aborted!");
+      on_cleanup();
     }
 
     void on_odom( OdometryConstPtr const & odom ){
@@ -67,7 +82,6 @@ struct traj_server_t {
       ros::Time t = ros::Time::now();
 
       if ( poly_traj.available && t < poly_traj.final_time ) {
-
         // position command
         quadrotor_msgs::PositionCommand cmd;
         poly_traj.gen_pos_cmd(cmd,*odom,t,yaw_rate);
