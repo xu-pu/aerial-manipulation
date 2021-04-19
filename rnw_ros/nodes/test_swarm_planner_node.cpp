@@ -13,6 +13,12 @@ using Eigen::Vector2d;
 using Eigen::Vector3d;
 using Eigen::Matrix3d;
 
+Vector3d point_in_frame( nav_msgs::Odometry const & odom, Vector3d const & pt ){
+  Matrix3d R = uav_utils::from_quaternion_msg(odom.pose.pose.orientation).toRotationMatrix();
+  Vector3d T = uav_utils::from_point_msg(odom.pose.pose.position);
+  return R*pt + T;
+}
+
 struct test_swarm_planner_t {
 
     ros::NodeHandle & nh;
@@ -128,6 +134,21 @@ struct test_swarm_planner_t {
         ROS_ERROR_STREAM("[test_swarm_planner_node] did not receive odom");
         return;
       }
+
+      Vector3d pt_srt = uav_utils::from_point_msg(latest_odom_drone1.pose.pose.position);
+      Vector3d pt_end = point_in_frame(latest_odom_drone2,Vector3d(0,1,0));
+
+      if ((pt_srt-pt_end).norm() < 0.05) {
+        ROS_WARN_STREAM("close enough, no need to align");
+        return;
+      }
+
+      vector<Vector3d> wpts;
+      wpts.push_back(pt_srt);
+      wpts.emplace_back((pt_srt+pt_end)/2);
+      wpts.push_back(pt_end);
+
+      pub_traj_drone1.publish(wpts2traj(latest_odom_drone1,wpts));
 
     }
 
