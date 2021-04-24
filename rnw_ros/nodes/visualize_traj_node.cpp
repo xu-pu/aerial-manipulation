@@ -89,17 +89,23 @@ struct traj_visualizer_t {
     }
 
     void on_traj(  quadrotor_msgs::PolynomialTrajectoryConstPtr const & msg  ){
-      latest_msg = *msg;
-      poly_traj = poly_traj_t(latest_msg);
-      latest_time = ros::Time::now();
-
-      clear_acc_markers();
-      clear_lift_markers();
-      pub_marker_acc.publish(gen_marker_acc());
-      pub_marker_lift.publish(gen_marker_lift());
-      pub_marker_traj.publish(gen_marker_traj());
-
-      init = true;
+      if ( msg->action == quadrotor_msgs::PolynomialTrajectory::ACTION_ABORT ) {
+        init = false;
+        clear_markers();
+        ROS_INFO_STREAM("[viz_traj] ACTION_ABORT");
+      }
+      else if ( msg->action == quadrotor_msgs::PolynomialTrajectory::ACTION_ADD ) {
+        latest_msg = *msg;
+        poly_traj = poly_traj_t(latest_msg);
+        latest_time = ros::Time::now();
+        clear_acc_markers();
+        clear_lift_markers();
+        pub_marker_acc.publish(gen_marker_acc());
+        pub_marker_lift.publish(gen_marker_lift());
+        pub_marker_traj.publish(gen_marker_traj());
+        init = true;
+        ROS_INFO_STREAM("[viz_traj] ACTION_ADD");
+      }
     }
 
     void on_spin( const ros::TimerEvent &event ){

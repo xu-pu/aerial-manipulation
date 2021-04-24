@@ -27,8 +27,6 @@ struct swarm_interface_t {
 
     ros::Publisher pub_traj_drone2;
 
-    ros::Publisher pub_abort;
-
     ros::Subscriber sub_odom_drone1;
 
     ros::Subscriber sub_odom_drone2;
@@ -41,13 +39,17 @@ struct swarm_interface_t {
 
     nav_msgs::Odometry latest_odom_drone2;
 
+    static quadrotor_msgs::PolynomialTrajectory abort_traj() {
+      quadrotor_msgs::PolynomialTrajectory msg;
+      msg.action = quadrotor_msgs::PolynomialTrajectory::ACTION_ABORT;
+      return msg;
+    }
+
     explicit swarm_interface_t( ros::NodeHandle & _nh ) : nh(_nh) {
 
       pub_traj_drone1 = nh.advertise<quadrotor_msgs::PolynomialTrajectory>("/drone1/traj",10);
 
       pub_traj_drone2 = nh.advertise<quadrotor_msgs::PolynomialTrajectory>("/drone2/traj",10);
-
-      pub_abort = nh.advertise<std_msgs::Header>("/abort",10);
 
       sub_odom_drone1 = nh.subscribe<nav_msgs::Odometry>(
               "/drone1/odom",
@@ -81,24 +83,18 @@ struct swarm_interface_t {
       latest_odom_drone2 = *msg;
     }
 
-    void abort_mission() const {
-      std_msgs::Header msg;
-      msg.stamp = ros::Time::now();
-      pub_abort.publish(msg);
-    }
-
     void send_traj( quadrotor_msgs::PolynomialTrajectory const & traj1, quadrotor_msgs::PolynomialTrajectory const & traj2 ) const {
       pub_traj_drone1.publish(traj1);
       pub_traj_drone2.publish(traj2);
     }
 
     void send_traj_just_drone1( quadrotor_msgs::PolynomialTrajectory const & msg ) const {
-      abort_mission();
       pub_traj_drone1.publish(msg);
+      pub_traj_drone2.publish(abort_traj());
     }
 
     void send_traj_just_drone2( quadrotor_msgs::PolynomialTrajectory const & msg ) const {
-      abort_mission();
+      pub_traj_drone1.publish(abort_traj());
       pub_traj_drone2.publish(msg);
     }
 

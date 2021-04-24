@@ -105,11 +105,16 @@ struct traj_server_t {
 
     void on_poly_traj( quadrotor_msgs::PolynomialTrajectoryConstPtr const & msg ){
       on_cleanup();
-      poly_traj = poly_traj_t(*msg);
-      latest_poly_traj = *msg;
-      base_yaw = odom2yaw(cur_uav_odom);
-      traj_id = traj_id+1;
-      ROS_INFO_STREAM("[Traj Server] Start new trajectory with id #" << traj_id);
+      if ( msg->action == quadrotor_msgs::PolynomialTrajectory::ACTION_ABORT ) {
+        ROS_INFO_STREAM("[traj2cmd] ACTION_ABORT");
+      }
+      else if ( msg->action == quadrotor_msgs::PolynomialTrajectory::ACTION_ADD ) {
+        poly_traj = poly_traj_t(*msg);
+        latest_poly_traj = *msg;
+        base_yaw = odom2yaw(cur_uav_odom);
+        traj_id = traj_id+1;
+        ROS_INFO_STREAM("[traj2cmd] ACTION_ADD");
+      }
     }
 
 };
