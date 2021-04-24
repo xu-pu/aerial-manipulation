@@ -19,7 +19,7 @@ Vector3d point_in_frame( nav_msgs::Odometry const & odom, Vector3d const & pt ){
   return R*pt + T;
 }
 
-struct test_swarm_planner_t {
+struct swarm_interface_t {
 
     ros::NodeHandle & nh;
 
@@ -33,14 +33,6 @@ struct test_swarm_planner_t {
 
     ros::Subscriber sub_odom_drone2;
 
-    ros::Subscriber sub_trigger_hello_world;
-
-    ros::Subscriber sub_trigger_circle;
-
-    ros::Subscriber sub_trigger_align;
-
-    ros::Subscriber sub_trigger_zigzag;
-
     bool init_drone1 = false;
 
     bool init_drone2 = false;
@@ -49,9 +41,7 @@ struct test_swarm_planner_t {
 
     nav_msgs::Odometry latest_odom_drone2;
 
-    AmTraj traj_generator;
-
-    explicit test_swarm_planner_t( ros::NodeHandle & _nh ) : nh(_nh), traj_generator(1024, 16, 0.4, 0.5, 0.5, 23, 0.02) {
+    explicit swarm_interface_t( ros::NodeHandle & _nh ) : nh(_nh) {
 
       pub_traj_drone1 = nh.advertise<quadrotor_msgs::PolynomialTrajectory>("/drone1/traj",10);
 
@@ -62,7 +52,7 @@ struct test_swarm_planner_t {
       sub_odom_drone1 = nh.subscribe<nav_msgs::Odometry>(
               "/drone1/odom",
               10,
-              &test_swarm_planner_t::on_odom_drone1,
+              &swarm_interface_t::on_odom_drone1,
               this,
               ros::TransportHints().tcpNoDelay()
       );
@@ -70,10 +60,67 @@ struct test_swarm_planner_t {
       sub_odom_drone2 = nh.subscribe<nav_msgs::Odometry>(
               "/drone2/odom",
               10,
-              &test_swarm_planner_t::on_odom_drone2,
+              &swarm_interface_t::on_odom_drone2,
               this,
               ros::TransportHints().tcpNoDelay()
       );
+
+    }
+
+    bool initialized() const {
+      return init_drone1 && init_drone2;
+    }
+
+    void on_odom_drone1( nav_msgs::OdometryConstPtr const & msg ){
+      init_drone1 = true;
+      latest_odom_drone1 = *msg;
+    }
+
+    void on_odom_drone2( nav_msgs::OdometryConstPtr const & msg ){
+      init_drone2 = true;
+      latest_odom_drone2 = *msg;
+    }
+
+    void abort_mission() const {
+      std_msgs::Header msg;
+      msg.stamp = ros::Time::now();
+      pub_abort.publish(msg);
+    }
+
+    void send_traj( quadrotor_msgs::PolynomialTrajectory const & traj1, quadrotor_msgs::PolynomialTrajectory const & traj2 ) const {
+      pub_traj_drone1.publish(traj1);
+      pub_traj_drone2.publish(traj2);
+    }
+
+    void send_traj_just_drone1( quadrotor_msgs::PolynomialTrajectory const & msg ) const {
+      abort_mission();
+      pub_traj_drone1.publish(msg);
+    }
+
+    void send_traj_just_drone2( quadrotor_msgs::PolynomialTrajectory const & msg ) const {
+      abort_mission();
+      pub_traj_drone2.publish(msg);
+    }
+
+};
+
+struct test_swarm_planner_t {
+
+    ros::NodeHandle & nh;
+
+    swarm_interface_t swarm;
+
+    ros::Subscriber sub_trigger_hello_world;
+
+    ros::Subscriber sub_trigger_circle;
+
+    ros::Subscriber sub_trigger_align;
+
+    ros::Subscriber sub_trigger_zigzag;
+
+    AmTraj traj_generator;
+
+    explicit test_swarm_planner_t( ros::NodeHandle & _nh ) : nh(_nh), swarm(_nh), traj_generator(1024, 16, 0.4, 0.5, 0.5, 23, 0.02) {
 
       sub_trigger_hello_world = nh.subscribe<std_msgs::Header>(
               "/gamepad/A", 10, &test_swarm_planner_t::trigger_hello_world, this);
@@ -87,12 +134,6 @@ struct test_swarm_planner_t {
       sub_trigger_zigzag = nh.subscribe<std_msgs::Header>(
               "/gamepad/X", 10, &test_swarm_planner_t::trigger_zigzag, this);
 
-    }
-
-    void abort_mission() const {
-      std_msgs::Header msg;
-      msg.stamp = ros::Time::now();
-      pub_abort.publish(msg);
     }
 
     /**
@@ -121,9 +162,7 @@ struct test_swarm_planner_t {
 
     void trigger_hello_world( std_msgs::HeaderConstPtr const & msg ) const {
 
-      abort_mission();
-
-      if ( !initialized() ) {
+      if ( !swarm.initialized() ) {
         ROS_ERROR_STREAM("[test_swarm_planner_node] did not receive odom");
         return;
       }
@@ -135,22 +174,22 @@ struct test_swarm_planner_t {
       wpts.emplace_back(0.3,0,0.2);
       wpts.emplace_back(0.4,0,0.2);
 
-      pub_traj_drone1.publish(local_wpts2traj(latest_odom_drone1,wpts));
-      pub_traj_drone2.publish(local_wpts2traj(latest_odom_drone2,wpts));
+      swarm.send_traj(
+              local_wpts2traj(swarm.latest_odom_drone1,wpts),
+              local_wpts2traj(swarm.latest_odom_drone2,wpts)
+      );
 
     }
 
     void trigger_align( std_msgs::HeaderConstPtr const & msg ) const {
 
-      abort_mission();
-
-      if ( !initialized() ) {
+      if ( !swarm.initialized() ) {
         ROS_ERROR_STREAM("[test_swarm_planner_node] did not receive odom");
         return;
       }
 
-      Vector3d pt_srt = uav_utils::from_point_msg(latest_odom_drone1.pose.pose.position);
-      Vector3d pt_end = point_in_frame(latest_odom_drone2,Vector3d(0,1,0));
+      Vector3d pt_srt = uav_utils::from_point_msg(swarm.latest_odom_drone1.pose.pose.position);
+      Vector3d pt_end = point_in_frame(swarm.latest_odom_drone2,Vector3d(0,1,0));
 
       if ((pt_srt-pt_end).norm() < 0.05) {
         ROS_WARN_STREAM("close enough, no need to align");
@@ -162,37 +201,35 @@ struct test_swarm_planner_t {
       wpts.emplace_back((pt_srt+pt_end)/2);
       wpts.push_back(pt_end);
 
-      pub_traj_drone1.publish(wpts2traj(latest_odom_drone1,wpts));
+      swarm.send_traj_just_drone1(wpts2traj(swarm.latest_odom_drone1,wpts));
 
     }
 
     void trigger_zigzag( std_msgs::HeaderConstPtr const & msg ) const {
 
-      abort_mission();
-
-      if ( !initialized() ) {
+      if ( !swarm.initialized() ) {
         ROS_ERROR_STREAM("[test_swarm_planner_node] did not receive odom");
         return;
       }
 
       vector<Vector3d> wpts = gen_waypoint_zigzag(5,0.5,0.5);
 
-      pub_traj_drone1.publish(local_wpts2traj(latest_odom_drone1,wpts));
-      pub_traj_drone2.publish(local_wpts2traj(latest_odom_drone2,wpts));
+      swarm.send_traj(
+              local_wpts2traj(swarm.latest_odom_drone1,wpts),
+              local_wpts2traj(swarm.latest_odom_drone2,wpts)
+      );
 
     }
 
     void trigger_circle( std_msgs::HeaderConstPtr const & msg ) const {
 
-      abort_mission();
-
-      if ( !initialized() ) {
+      if ( !swarm.initialized() ) {
         ROS_ERROR_STREAM("[test_swarm_planner_node] did not receive odom");
         return;
       }
 
-      Vector3d pos1 = uav_utils::from_point_msg(latest_odom_drone1.pose.pose.position);
-      Vector3d pos2 = uav_utils::from_point_msg(latest_odom_drone2.pose.pose.position);
+      Vector3d pos1 = uav_utils::from_point_msg(swarm.latest_odom_drone1.pose.pose.position);
+      Vector3d pos2 = uav_utils::from_point_msg(swarm.latest_odom_drone2.pose.pose.position);
 
       double dist = (pos1 - pos2).norm();
 
@@ -222,27 +259,14 @@ struct test_swarm_planner_t {
         wpts_drone2.emplace_back(pt2.x(), pt2.y(), pos2.z());
       }
 
-      pub_traj_drone1.publish(wpts2traj(latest_odom_drone1,wpts_drone1));
-      pub_traj_drone2.publish(wpts2traj(latest_odom_drone2,wpts_drone2));
+      swarm.send_traj(
+              wpts2traj(swarm.latest_odom_drone1,wpts_drone1),
+              wpts2traj(swarm.latest_odom_drone2,wpts_drone2)
+      );
 
-    }
-
-    void on_odom_drone1( nav_msgs::OdometryConstPtr const & msg ){
-      init_drone1 = true;
-      latest_odom_drone1 = *msg;
-    }
-
-    void on_odom_drone2( nav_msgs::OdometryConstPtr const & msg ){
-      init_drone2 = true;
-      latest_odom_drone2 = *msg;
-    }
-
-    bool initialized() const {
-      return init_drone1 && init_drone2;
     }
 
 };
-
 
 int main( int argc, char** argv ) {
 
