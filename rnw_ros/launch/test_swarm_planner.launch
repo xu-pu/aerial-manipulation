@@ -54,6 +54,8 @@
         </node>
     </group>
 
+    <node pkg="rnw_ros" type="joystick_drone_cmd_node" name="joystick_drone_cmd_node" output="screen"/>
+
     <remap from="/gamepad/RB" to="/abort"/>
 
     <node pkg="rnw_ros" type="gamepad_trigger_node" name="gamepad" output="screen"/>
