@@ -116,7 +116,7 @@ struct test_swarm_planner_t {
 
     AmTraj traj_generator;
 
-    explicit test_swarm_planner_t( ros::NodeHandle & _nh ) : nh(_nh), swarm(_nh), traj_generator(1024, 16, 0.4, 0.5, 0.5, 23, 0.02) {
+    explicit test_swarm_planner_t( ros::NodeHandle & _nh ) : nh(_nh), swarm(_nh), traj_generator(1024, 16, 0.4, 1, 0.5, 23, 0.02) {
 
       sub_trigger_hello_world = nh.subscribe<std_msgs::Header>(
               "/gamepad/A", 10, &test_swarm_planner_t::trigger_hello_world, this);
@@ -185,7 +185,7 @@ struct test_swarm_planner_t {
       }
 
       Vector3d pt_srt = uav_utils::from_point_msg(swarm.latest_odom_drone1.pose.pose.position);
-      Vector3d pt_end = point_in_frame(swarm.latest_odom_drone2,Vector3d(0,1,0));
+      Vector3d pt_end = point_in_frame(swarm.latest_odom_drone2,Vector3d(0,1.4,0));
 
       if ((pt_srt-pt_end).norm() < 0.05) {
         ROS_WARN_STREAM("close enough, no need to align");

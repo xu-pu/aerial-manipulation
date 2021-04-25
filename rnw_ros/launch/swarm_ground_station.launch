@@ -53,6 +53,17 @@
         <param name="~autorepeat_rate" value="0" />
     </node>
 
+    <group>
+        <remap from="joy" to="joy_hz"/>
+        <node pkg="joy" type="joy_node" name="joy_cont" output="screen">
+            <param name="~autorepeat_rate" value="30" />
+        </node>
+    </group>
+
+    <node pkg="rnw_ros" type="joystick_drone_cmd_node" name="joystick_drone_cmd_node" output="screen"/>
+
+    <remap from="/gamepad/RB" to="/abort"/>
+
     <node pkg="rnw_ros" type="gamepad_trigger_node" name="gamepad" output="screen"/>
 
     <node pkg="rnw_ros" type="traj2cmd_node" name="traj2cmd_drone1" output="screen" required="true">
@@ -73,6 +84,20 @@
 
     <node pkg="rnw_ros" type="visualize_pos_cmd_node" name="pos_cmd_viz_drone2" output="screen" required="true">
         <remap from="~position_cmd" to="/drone2/position_cmd"/>
+    </node>
+
+    <node pkg="rnw_ros" type="visualize_traj_node" name="traj_viz_drone1" output="screen" required="true">
+        <param name="lift_dt" type="double" value="0.05"/>
+        <param name="length_g" type="double" value="0.5"/>
+        <param name="clear_after_n_sec" type="double" value="0"/>
+        <remap from="~poly_traj" to="/drone1/traj"/>
+    </node>
+
+    <node pkg="rnw_ros" type="visualize_traj_node" name="traj_viz_drone2" output="screen" required="true">
+        <param name="lift_dt" type="double" value="0.05"/>
+        <param name="length_g" type="double" value="0.5"/>
+        <param name="clear_after_n_sec" type="double" value="0"/>
+        <remap from="~poly_traj" to="/drone2/traj"/>
     </node>
 
 </launch>
