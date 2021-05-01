@@ -8,9 +8,9 @@ struct joystick_commander_t {
 
     static constexpr double js_epsi = 0.01;
 
-    static constexpr double scale_vx = 0.1;
+    static constexpr double scale_vx = 0.3;
 
-    static constexpr double scale_vy = 0.1;
+    static constexpr double scale_vy = 0.3;
 
     static constexpr double scale_vz = 0.1;
 
@@ -91,8 +91,8 @@ struct joystick_commander_t {
     }
 
     static Vector3d js2vel( sensor_msgs::Joy const & joy ){
-      double dir_F = joy.axes[4];
-      double dir_L = joy.axes[3];
+      double dir_F = -joy.axes[3];
+      double dir_L = joy.axes[4];
       double dir_U = joy.axes[1];
       return Vector3d( scale_vx * dir_F, scale_vy * dir_L, scale_vz * dir_U );
     }
