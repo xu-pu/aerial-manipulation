@@ -15,7 +15,7 @@ rigid_bodies:
       parent_frame_id: world
     '3':
       pose: mocap/cone
-      pose2d: cone/ground_pose
+      pose2d: mocap_2d/cone
       child_frame_id: cone
       parent_frame_id: world
 

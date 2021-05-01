@@ -109,7 +109,7 @@ int main( int argc, char** argv ) {
   mocap_calibrator_t cali;
 
   ros::Subscriber sub_pose_uav = nh.subscribe<geometry_msgs::PoseStamped>(
-          "/mocap/uav",
+          "uav",
           10,
           &mocap_calibrator_t::on_odom_uav,
           &cali,
@@ -117,7 +117,7 @@ int main( int argc, char** argv ) {
   );
 
   ros::Subscriber sub_pose_cone = nh.subscribe<geometry_msgs::PoseStamped>(
-          "/mocap/cone",
+          "cone",
           10,
           &mocap_calibrator_t::on_odom_cone,
           &cali,
