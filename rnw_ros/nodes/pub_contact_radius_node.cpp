@@ -33,15 +33,15 @@ int main( int argc, char** argv ) {
   rnw_config.load_from_ros(nh);
 
   ros::Subscriber sub_odom = nh.subscribe<rnw_msgs::ConeState>(
-          "/rnw/cone_state",
+          "/cone/state",
           10,
           on_cone_state,
           nullptr,
           ros::TransportHints().tcpNoDelay()
   );
 
-  pub_est_radius = nh.advertise<quadrotor_msgs::Float64Stamped>("/rnw/radius_est",100);
-  pub_true_radius = nh.advertise<quadrotor_msgs::Float64Stamped>("/rnw/radius_true",100);
+  pub_est_radius = nh.advertise<quadrotor_msgs::Float64Stamped>("/cone/radius_est",100);
+  pub_true_radius = nh.advertise<quadrotor_msgs::Float64Stamped>("/cone/radius_true",100);
 
   ros::spin();
 

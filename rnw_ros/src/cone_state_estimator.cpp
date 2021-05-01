@@ -14,11 +14,25 @@ Vector3d cone_state_estimator_t::X_base_body() const {
 }
 
 cone_state_estimator_t::cone_state_estimator_t( ros::NodeHandle & nh ) {
+
   rnw_config.load_from_ros(nh);
-  pub_cone_state = nh.advertise<rnw_msgs::ConeState>("/rnw/cone_state",10);
-  pub_odom_dt = nh.advertise<quadrotor_msgs::Float64Stamped>("dt",10);
+
   cut_euler_velocity = get_param_default(nh,"cut_euler_velocity",false);
+
   max_euler_velocity = get_param_default(nh,"max_euler_velocity",numeric_limits<double>::max());
+
+  pub_cone_state = nh.advertise<rnw_msgs::ConeState>("/cone/state",10);
+
+  pub_odom_dt = nh.advertise<quadrotor_msgs::Float64Stamped>("/cone/dt",10);
+
+  sub_odom = nh.subscribe<nav_msgs::Odometry>(
+          "/cone/odom",
+          10,
+          &cone_state_estimator_t::on_odom,
+          this,
+          ros::TransportHints().tcpNoDelay()
+  );
+
 }
 
 void cone_state_estimator_t::on_odom( nav_msgs::OdometryConstPtr const & msg ){

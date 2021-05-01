@@ -1,7 +1,6 @@
 #include <ros/ros.h>
 
 #include "rnw_ros/rnw_utils.h"
-#include "rnw_ros/cone_state_estimator.h"
 
 struct zero_spin_finder_t {
 
@@ -61,13 +60,24 @@ struct obj_tracer_t {
 
     ros::Publisher pub_spin_zero_odom;
 
-    ros::Publisher pub_spin_dot_zero;
+    ros::Subscriber sub_cone_state;
 
     zero_spin_finder_t finder;
 
     explicit obj_tracer_t( ros::NodeHandle & nh ){
-      pub_spin_zero = nh.advertise<rnw_msgs::ConeState>("/rnw/zero_spin_states",100);
-      pub_spin_zero_odom = nh.advertise<nav_msgs::Odometry>("/rnw/zero_spin_odom",100);
+
+      pub_spin_zero = nh.advertise<rnw_msgs::ConeState>("/cone/zero_spin_states",100);
+
+      pub_spin_zero_odom = nh.advertise<nav_msgs::Odometry>("/cone/zero_spin_odom",100);
+
+      sub_cone_state = nh.subscribe<rnw_msgs::ConeState>(
+              "/cone/state",
+              10,
+              &obj_tracer_t::on_cone_state,
+              this,
+              ros::TransportHints().tcpNoDelay()
+      );
+
     }
 
     void on_cone_state( rnw_msgs::ConeStateConstPtr const & msg ){
@@ -88,14 +98,6 @@ int main( int argc, char** argv ) {
   ros::NodeHandle nh("~");
 
   obj_tracer_t node(nh);
-
-  ros::Subscriber sub_cone_state = nh.subscribe<rnw_msgs::ConeState>(
-          "/rnw/cone_state",
-          10,
-          &obj_tracer_t::on_cone_state,
-          &node,
-          ros::TransportHints().tcpNoDelay()
-  );
 
   ros::spin();
 

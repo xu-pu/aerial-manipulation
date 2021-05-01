@@ -10,10 +10,17 @@
 struct cone_state_estimator_t {
 
     rnw_config_t rnw_config;
+
     Vector3d X_base_body() const;
+
     ros::Publisher pub_cone_state;
+
     ros::Publisher pub_odom_dt;
+
+    ros::Subscriber sub_odom;
+
     nav_msgs::Odometry latest_odom;
+
     bool init = false;
     static constexpr double min_tilt = 5;
     double odom_timeout = 1;

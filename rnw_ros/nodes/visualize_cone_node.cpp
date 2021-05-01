@@ -30,6 +30,12 @@ struct cone_visualizer_t {
 
     rnw_msgs::GripState latest_grip_state;
 
+    ros::Subscriber sub_traj;
+    ros::Subscriber sub_rocking_cmd;
+    ros::Subscriber sub_grip_state;
+
+    ros::Timer timer;
+
     static constexpr int id_base = 0;
     static constexpr int id_shaft = 1;
     static constexpr int id_contact_path = 2;
@@ -69,6 +75,39 @@ struct cone_visualizer_t {
       color_default.a = 1;
 
       init_marker_contact_path();
+
+      constexpr size_t spin_hz = 10;
+
+      timer = nh.createTimer(
+              ros::Duration( 1.0 / spin_hz ),
+              &cone_visualizer_t::on_spin,
+              this
+      );
+
+      sub_traj = nh.subscribe<rnw_msgs::ConeState>(
+              "/cone/state",
+              100,
+              &cone_visualizer_t::on_cone_state,
+              this,
+              ros::TransportHints().tcpNoDelay()
+      );
+
+      sub_rocking_cmd = nh.subscribe<rnw_msgs::RockingCmd>(
+              "/rnw/rocking_cmd",
+              100,
+              &cone_visualizer_t::on_rocking_cmd,
+              this,
+              ros::TransportHints().tcpNoDelay()
+      );
+
+      sub_grip_state = nh.subscribe<rnw_msgs::GripState>(
+              "/rnw/grip_state",
+              100,
+              &cone_visualizer_t::on_grip_state,
+              this,
+              ros::TransportHints().tcpNoDelay()
+      );
+
     }
 
     void init_marker_contact_path(){
@@ -311,34 +350,6 @@ int main( int argc, char** argv ) {
   ros::NodeHandle nh("~");
 
   cone_visualizer_t cone_viz(nh);
-
-  constexpr size_t spin_hz = 10;
-
-  auto timer = nh.createTimer( ros::Duration( 1.0 / spin_hz ), &cone_visualizer_t::on_spin, &cone_viz );
-
-  ros::Subscriber sub_traj = nh.subscribe<rnw_msgs::ConeState>(
-          "/rnw/cone_state",
-          100,
-          &cone_visualizer_t::on_cone_state,
-          &cone_viz,
-          ros::TransportHints().tcpNoDelay()
-  );
-
-  ros::Subscriber sub_rocking_cmd = nh.subscribe<rnw_msgs::RockingCmd>(
-          "/rnw/rocking_cmd",
-          100,
-          &cone_visualizer_t::on_rocking_cmd,
-          &cone_viz,
-          ros::TransportHints().tcpNoDelay()
-  );
-
-  ros::Subscriber sub_grip_state = nh.subscribe<rnw_msgs::GripState>(
-          "/rnw/grip_state",
-          100,
-          &cone_visualizer_t::on_grip_state,
-          &cone_viz,
-          ros::TransportHints().tcpNoDelay()
-  );
 
   ros::spin();
 

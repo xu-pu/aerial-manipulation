@@ -155,7 +155,7 @@ struct mocap_processor_t {
        * Setup Publishers
        */
 
-      pub_odom_cone = nh.advertise<nav_msgs::Odometry>("/odom/cone", 100);
+      pub_odom_cone = nh.advertise<nav_msgs::Odometry>("/cone/odom", 100);
 
       bool publish_uav_odom = get_param_default<bool>(nh, "publish_uav_odom", true);
 

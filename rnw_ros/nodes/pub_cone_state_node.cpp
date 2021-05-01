@@ -11,14 +11,6 @@ int main( int argc, char** argv ) {
 
   cone_state_estimator_t cone_state_estimator(nh);
 
-  ros::Subscriber sub_odom = nh.subscribe<nav_msgs::Odometry>(
-          "/odom/cone",
-          10,
-          &cone_state_estimator_t::on_odom,
-          &cone_state_estimator,
-          ros::TransportHints().tcpNoDelay()
-  );
-
   ros::spin();
 
   ros::shutdown();

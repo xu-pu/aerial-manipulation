@@ -35,7 +35,7 @@
                                         <relative_minimum>-1000</relative_minimum>
                                         <type>0</type>
                                     </scale>
-                                    <topic>/rnw/cone_state</topic>
+                                    <topic>/cone/state</topic>
                                     <type>rnw_msgs/ConeState</type>
                                 </x_axis>
                                 <y_axis>
@@ -48,8 +48,8 @@
                                         <relative_minimum>-1000</relative_minimum>
                                         <type>0</type>
                                     </scale>
-                                    <topic>/rnw/cone_state</topic>
-                                    <type>rnw_ros/ConeState</type>
+                                    <topic>/cone/state</topic>
+                                    <type>rnw_msgs/ConeState</type>
                                 </y_axis>
                             </axes>
                             <color>
@@ -86,7 +86,7 @@
                                         <relative_minimum>-1000</relative_minimum>
                                         <type>0</type>
                                     </scale>
-                                    <topic>/rnw/cone_state</topic>
+                                    <topic>/cone/state</topic>
                                     <type>rnw_msgs/ConeState</type>
                                 </x_axis>
                                 <y_axis>
@@ -99,8 +99,8 @@
                                         <relative_minimum>-1000</relative_minimum>
                                         <type>0</type>
                                     </scale>
-                                    <topic>/rnw/cone_state</topic>
-                                    <type>rnw_ros/ConeState</type>
+                                    <topic>/cone/state</topic>
+                                    <type>rnw_msgs/ConeState</type>
                                 </y_axis>
                             </axes>
                             <color>
@@ -137,7 +137,7 @@
                                         <relative_minimum>-1000</relative_minimum>
                                         <type>0</type>
                                     </scale>
-                                    <topic>/rnw/cone_state</topic>
+                                    <topic>/cone/state</topic>
                                     <type>rnw_msgs/ConeState</type>
                                 </x_axis>
                                 <y_axis>
@@ -150,8 +150,8 @@
                                         <relative_minimum>-1000</relative_minimum>
                                         <type>0</type>
                                     </scale>
-                                    <topic>/rnw/cone_state</topic>
-                                    <type>rnw_ros/ConeState</type>
+                                    <topic>/cone/state</topic>
+                                    <type>rnw_msgs/ConeState</type>
                                 </y_axis>
                             </axes>
                             <color>
@@ -211,7 +211,7 @@
                                         <relative_minimum>-1000</relative_minimum>
                                         <type>0</type>
                                     </scale>
-                                    <topic>/pub_cone_state_node/dt</topic>
+                                    <topic>/cone/dt</topic>
                                     <type>quadrotor_msgs/Float64Stamped</type>
                                 </x_axis>
                                 <y_axis>
@@ -224,7 +224,7 @@
                                         <relative_minimum>-1000</relative_minimum>
                                         <type>0</type>
                                     </scale>
-                                    <topic>/pub_cone_state_node/dt</topic>
+                                    <topic>/cone/dt</topic>
                                     <type>quadrotor_msgs/Float64Stamped</type>
                                 </y_axis>
                             </axes>
@@ -287,7 +287,7 @@
                                         <relative_minimum>-1000</relative_minimum>
                                         <type>0</type>
                                     </scale>
-                                    <topic>/rnw/cone_state</topic>
+                                    <topic>/cone/state</topic>
                                     <type>rnw_msgs/ConeState</type>
                                 </x_axis>
                                 <y_axis>
@@ -300,8 +300,8 @@
                                         <relative_minimum>-1000</relative_minimum>
                                         <type>0</type>
                                     </scale>
-                                    <topic>/rnw/cone_state</topic>
-                                    <type>rnw_ros/ConeState</type>
+                                    <topic>/cone/state</topic>
+                                    <type>rnw_msgs/ConeState</type>
                                 </y_axis>
                             </axes>
                             <color>
@@ -338,7 +338,7 @@
                                         <relative_minimum>-1000</relative_minimum>
                                         <type>0</type>
                                     </scale>
-                                    <topic>/rnw/cone_state</topic>
+                                    <topic>/cone/state</topic>
                                     <type>rnw_msgs/ConeState</type>
                                 </x_axis>
                                 <y_axis>
@@ -351,8 +351,8 @@
                                         <relative_minimum>-1000</relative_minimum>
                                         <type>0</type>
                                     </scale>
-                                    <topic>/rnw/cone_state</topic>
-                                    <type>rnw_ros/ConeState</type>
+                                    <topic>/cone/state</topic>
+                                    <type>rnw_msgs/ConeState</type>
                                 </y_axis>
                             </axes>
                             <color>
@@ -389,7 +389,7 @@
                                         <relative_minimum>-1000</relative_minimum>
                                         <type>0</type>
                                     </scale>
-                                    <topic>/rnw/cone_state</topic>
+                                    <topic>/cone/state</topic>
                                     <type>rnw_msgs/ConeState</type>
                                 </x_axis>
                                 <y_axis>
@@ -402,8 +402,8 @@
                                         <relative_minimum>-1000</relative_minimum>
                                         <type>0</type>
                                     </scale>
-                                    <topic>/rnw/cone_state</topic>
-                                    <type>rnw_ros/ConeState</type>
+                                    <topic>/cone/state</topic>
+                                    <type>rnw_msgs/ConeState</type>
                                 </y_axis>
                             </axes>
                             <color>
@@ -463,20 +463,20 @@
                                         <relative_minimum>-1000</relative_minimum>
                                         <type>0</type>
                                     </scale>
-                                    <topic>/rnw/radius_true</topic>
+                                    <topic>/cone/radius_true</topic>
                                     <type>quadrotor_msgs/Float64Stamped</type>
                                 </x_axis>
                                 <y_axis>
                                     <field>value</field>
                                     <field_type>0</field_type>
                                     <scale>
-                                        <absolute_maximum>1000</absolute_maximum>
+                                        <absolute_maximum>0.5</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
                                         <relative_minimum>-1000</relative_minimum>
-                                        <type>0</type>
+                                        <type>1</type>
                                     </scale>
-                                    <topic>/rnw/radius_true</topic>
+                                    <topic>/cone/radius_true</topic>
                                     <type>quadrotor_msgs/Float64Stamped</type>
                                 </y_axis>
                             </axes>
@@ -514,20 +514,20 @@
                                         <relative_minimum>-1000</relative_minimum>
                                         <type>0</type>
                                     </scale>
-                                    <topic>/rnw/radius_est</topic>
+                                    <topic>/cone/radius_est</topic>
                                     <type>quadrotor_msgs/Float64Stamped</type>
                                 </x_axis>
                                 <y_axis>
                                     <field>value</field>
                                     <field_type>0</field_type>
                                     <scale>
-                                        <absolute_maximum>0.20000000000000001</absolute_maximum>
+                                        <absolute_maximum>0.5</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
                                         <relative_minimum>-1000</relative_minimum>
                                         <type>1</type>
                                     </scale>
-                                    <topic>/rnw/radius_est</topic>
+                                    <topic>/cone/radius_est</topic>
                                     <type>quadrotor_msgs/Float64Stamped</type>
                                 </y_axis>
                             </axes>
