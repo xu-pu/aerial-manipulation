@@ -65,7 +65,7 @@ struct rnw_node_t {
               swarm_planner(nh,cfg)
     {
 
-      timer = nh.createTimer(ros::Rate(30), &rnw_node_t::rnw_planner_loop, this);
+      timer = nh.createTimer(ros::Rate(30), &rnw_node_t::spin, this);
 
       sub_cone_state = nh.subscribe<rnw_msgs::ConeState>(
               "/cone/state",
@@ -106,30 +106,22 @@ struct rnw_node_t {
     }
 
     /**
-     * This loop checks commands (RockingCmd) from rnw_planner
-     * If there is pending RockingCmd, execute
+     * Spin the rnw_planner.
+     * If there is pending command, execute.
      * After execution, rnw_planner.cmd_complete()
-     * @param event
      */
-    void rnw_planner_loop( const ros::TimerEvent &event ){
+    void spin(const ros::TimerEvent &event ){
       rnw_planner.spin();
-      switch(rnw_planner.cmd_fsm){
-        case rnw_planner_v2_t::cmd_fsm_e::executing:
-        {
-          if (ros::Time::now() > cmd_start_time + cmd_duration) {
-            rnw_planner.cmd_complete();
-          }
+      if ( rnw_planner.cmd_fsm == rnw_planner_v2_t::cmd_fsm_e::executing ) {
+        if (ros::Time::now() > cmd_start_time + cmd_duration) {
+          rnw_planner.cmd_complete();
         }
-          break;
-        case rnw_planner_v2_t::cmd_fsm_e::pending:
-        {
-          rnw_command_t cmd = rnw_planner.take_cmd();
-          double time_to_go = swarm_planner.execute_cmd(cmd);
-          cmd_start_time = ros::Time::now();
-          cmd_duration = ros::Duration(time_to_go);
-        }
-          break;
-        default: break;
+      }
+      else if ( rnw_planner.cmd_fsm == rnw_planner_v2_t::cmd_fsm_e::pending ) {
+        rnw_command_t cmd = rnw_planner.take_cmd();
+        double time_to_go = swarm_planner.execute_cmd(cmd);
+        cmd_start_time = ros::Time::now();
+        cmd_duration = ros::Duration(time_to_go);
       }
     }
 
