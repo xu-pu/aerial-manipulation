@@ -147,6 +147,7 @@ add_library(${PROJECT_NAME}
         src/rnw_utils.cpp
         src/cone_state_estimator.cpp
         src/rnw_planner.cpp
+        src/swarm_interface.cpp
 )
 
 ## Add cmake target dependencies of the library
@@ -186,6 +187,7 @@ set(RNW_NODES
         traj2cmd_node
         visualize_pos_cmd_node
         joystick_drone_cmd_node
+        swarm_rnw_controller_node
 )
 
 FOREACH(NODE ${RNW_NODES})

@@ -1,8 +1,5 @@
-#include <ros/ros.h>
-#include <nav_msgs/Odometry.h>
-#include <quadrotor_msgs/PolynomialTrajectory.h>
+#include "rnw_ros/swarm_interface.h"
 #include <Eigen/Dense>
-#include <uav_utils/geometry_utils.h>
 #include <uav_utils/converters.h>
 #include <rnw_ros/traj_uitls.h>
 #include <am_traj/am_traj.hpp>
@@ -18,87 +15,6 @@ Vector3d point_in_frame( nav_msgs::Odometry const & odom, Vector3d const & pt ){
   Vector3d T = uav_utils::from_point_msg(odom.pose.pose.position);
   return R*pt + T;
 }
-
-struct swarm_interface_t {
-
-    ros::NodeHandle & nh;
-
-    ros::Publisher pub_traj_drone1;
-
-    ros::Publisher pub_traj_drone2;
-
-    ros::Subscriber sub_odom_drone1;
-
-    ros::Subscriber sub_odom_drone2;
-
-    bool init_drone1 = false;
-
-    bool init_drone2 = false;
-
-    nav_msgs::Odometry latest_odom_drone1;
-
-    nav_msgs::Odometry latest_odom_drone2;
-
-    static quadrotor_msgs::PolynomialTrajectory abort_traj() {
-      quadrotor_msgs::PolynomialTrajectory msg;
-      msg.action = quadrotor_msgs::PolynomialTrajectory::ACTION_ABORT;
-      return msg;
-    }
-
-    explicit swarm_interface_t( ros::NodeHandle & _nh ) : nh(_nh) {
-
-      pub_traj_drone1 = nh.advertise<quadrotor_msgs::PolynomialTrajectory>("/drone1/traj",10);
-
-      pub_traj_drone2 = nh.advertise<quadrotor_msgs::PolynomialTrajectory>("/drone2/traj",10);
-
-      sub_odom_drone1 = nh.subscribe<nav_msgs::Odometry>(
-              "/drone1/odom",
-              10,
-              &swarm_interface_t::on_odom_drone1,
-              this,
-              ros::TransportHints().tcpNoDelay()
-      );
-
-      sub_odom_drone2 = nh.subscribe<nav_msgs::Odometry>(
-              "/drone2/odom",
-              10,
-              &swarm_interface_t::on_odom_drone2,
-              this,
-              ros::TransportHints().tcpNoDelay()
-      );
-
-    }
-
-    bool initialized() const {
-      return init_drone1 && init_drone2;
-    }
-
-    void on_odom_drone1( nav_msgs::OdometryConstPtr const & msg ){
-      init_drone1 = true;
-      latest_odom_drone1 = *msg;
-    }
-
-    void on_odom_drone2( nav_msgs::OdometryConstPtr const & msg ){
-      init_drone2 = true;
-      latest_odom_drone2 = *msg;
-    }
-
-    void send_traj( quadrotor_msgs::PolynomialTrajectory const & traj1, quadrotor_msgs::PolynomialTrajectory const & traj2 ) const {
-      pub_traj_drone1.publish(traj1);
-      pub_traj_drone2.publish(traj2);
-    }
-
-    void send_traj_just_drone1( quadrotor_msgs::PolynomialTrajectory const & msg ) const {
-      pub_traj_drone1.publish(msg);
-      pub_traj_drone2.publish(abort_traj());
-    }
-
-    void send_traj_just_drone2( quadrotor_msgs::PolynomialTrajectory const & msg ) const {
-      pub_traj_drone1.publish(abort_traj());
-      pub_traj_drone2.publish(msg);
-    }
-
-};
 
 struct test_swarm_planner_t {
 
