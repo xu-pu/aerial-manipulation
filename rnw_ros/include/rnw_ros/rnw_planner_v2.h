@@ -50,10 +50,6 @@ struct rnw_command_t {
 
 struct rnw_planner_v2_t {
 
-    ///////////////////////////////////////
-    /// Public Interface
-    ///////////////////////////////////////
-
     rnw_planner_v2_t( ros::NodeHandle & nh, rnw_config_t const & config );
 
     void on_cone_state( rnw_msgs::ConeStateConstPtr const & msg );
@@ -76,11 +72,6 @@ struct rnw_planner_v2_t {
      */
     rnw_command_t take_cmd();
 
-    /**
-     * All information output from the planner is in the rnw_cmd.
-     * You only need to care about setpoint_uav, which is where the
-     * UAV need to go. Other information are supplementary
-     */
     rnw_command_t rnw_command;
 
     void start_walking();
@@ -89,27 +80,17 @@ struct rnw_planner_v2_t {
 
 private:
 
-    enum cmd_fsm_e {
-        cmd_fsm_idle,
-        cmd_fsm_pending,
-        cmd_fsm_executing
-    } cmd_fsm = cmd_fsm_idle;
-
-    size_t cmd_idx = 0; // same cmd may be published multiple times, use this to keep track
-
-    size_t step_count;
-
-    bool is_walking = false;
-
-    uint8_t walk_idx = 0;
-
-    double desired_yaw;
+    enum class cmd_fsm_e {
+        idle,
+        pending,
+        executing
+    } cmd_fsm = cmd_fsm_e::idle;
 
     enum class cone_fsm_e {
-        idle, qstatic, rocking
-    };
-
-    cone_fsm_e fsm = cone_fsm_e::idle;
+        idle,
+        qstatic,
+        rocking
+    } cone_fsm = cone_fsm_e::idle;
 
     void fsm_update();
 
@@ -124,6 +105,14 @@ private:
     rnw_msgs::ConeState latest_cone_state;
 
     double rot_dir = -1;
+
+    size_t step_count;
+
+    bool is_walking = false;
+
+    uint8_t walk_idx = 0;
+
+    double desired_yaw;
 
     precession_regulator_t precession_regulator;
 

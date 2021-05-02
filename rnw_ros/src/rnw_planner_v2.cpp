@@ -23,14 +23,14 @@ void rnw_planner_v2_t::spin(){
   /////////////////////////////////
   /// Do Planning
 
-  if ( cmd_fsm == cmd_fsm_idle && fsm == cone_fsm_e::qstatic ) {
+  if ( cmd_fsm == cmd_fsm_e::idle && cone_fsm == cone_fsm_e::qstatic ) {
     //ROS_INFO_STREAM("[rnw_planner] plan next cmd");
     plan_next_cmd();
   }
-  else if ( cmd_fsm == cmd_fsm_pending ) {
+  else if ( cmd_fsm == cmd_fsm_e::pending ) {
     //ROS_INFO_STREAM("[rnw_planner] cmd pending, do not plan");
   }
-  else if ( cmd_fsm == cmd_fsm_executing ) {
+  else if ( cmd_fsm == cmd_fsm_e::executing ) {
     //ROS_INFO_STREAM("[rnw_planner] cmd executing, do not plan");
   }
 
@@ -38,16 +38,16 @@ void rnw_planner_v2_t::spin(){
 
 void rnw_planner_v2_t::fsm_update(){
   if ( latest_cone_state.euler_angles.y < rnw_config.rnw.min_nutation_deg * deg2rad ) {
-    fsm_transition(fsm, cone_fsm_e::idle);
+    fsm_transition(cone_fsm, cone_fsm_e::idle);
   }
 //  else if ( !latest_cone_state.is_point_contact ){
 //    fsm_transition(fsm, cone_fsm_e::idle);
 //  }
   else if ( abs(latest_cone_state.euler_angles_velocity.z) < rnw_config.rnw.ang_vel_threshold ) {
-    fsm_transition(fsm, cone_fsm_e::qstatic);
+    fsm_transition(cone_fsm, cone_fsm_e::qstatic);
   }
   else {
-    fsm_transition(fsm, cone_fsm_e::rocking);
+    fsm_transition(cone_fsm, cone_fsm_e::rocking);
   }
 }
 
@@ -62,7 +62,7 @@ void rnw_planner_v2_t::fsm_transition(cone_fsm_e from, cone_fsm_e to ){
   }
 
   if ( to == cone_fsm_e::idle ) {
-    cmd_fsm = cmd_fsm_idle;
+    cmd_fsm = cmd_fsm_e::idle;
     step_count = 0;
   }
 
@@ -71,12 +71,12 @@ void rnw_planner_v2_t::fsm_transition(cone_fsm_e from, cone_fsm_e to ){
     stop_walking();
   }
 
-  fsm = to;
+  cone_fsm = to;
 
 }
 
 void rnw_planner_v2_t::start_walking(){
-  if ( fsm == cone_fsm_e::idle ) {
+  if (cone_fsm == cone_fsm_e::idle ) {
     ROS_ERROR_STREAM("[rnw] Can't start walking when object is idle!");
     is_walking = false;
   }
@@ -145,7 +145,7 @@ void rnw_planner_v2_t::plan_cmd_walk(){
   rnw_command.control_point_setpoint = setpoint_apex;
   rnw_command.cmd_idx++;
   step_count++;
-  cmd_fsm = cmd_fsm_pending;
+  cmd_fsm = cmd_fsm_e::pending;
 
   precession_regulator.step(latest_cone_state);
 
@@ -153,14 +153,14 @@ void rnw_planner_v2_t::plan_cmd_walk(){
 
 rnw_command_t rnw_planner_v2_t::take_cmd(){
   switch ( cmd_fsm ) {
-    case cmd_fsm_e::cmd_fsm_idle:
+    case cmd_fsm_e::idle:
       ROS_ERROR("[rnw] there is no command at the moment");
       break;
-    case cmd_fsm_e::cmd_fsm_pending:
+    case cmd_fsm_e::pending:
       ROS_INFO_STREAM("[rnw] command is taken, now executing, step #" << step_count);
-      cmd_fsm = cmd_fsm_e::cmd_fsm_executing;
+      cmd_fsm = cmd_fsm_e::executing;
       break;
-    case cmd_fsm_e::cmd_fsm_executing:
+    case cmd_fsm_e::executing:
       ROS_ERROR("[rnw] command is already taken!");
       break;
     default:
@@ -170,8 +170,8 @@ rnw_command_t rnw_planner_v2_t::take_cmd(){
 }
 
 void rnw_planner_v2_t::cmd_complete(){
-  if ( cmd_fsm == cmd_fsm_e::cmd_fsm_executing ) {
-    cmd_fsm = cmd_fsm_e::cmd_fsm_idle;
+  if ( cmd_fsm == cmd_fsm_e::executing ) {
+    cmd_fsm = cmd_fsm_e::idle;
   }
 }
 
