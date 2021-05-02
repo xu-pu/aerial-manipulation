@@ -5,6 +5,7 @@
 
 ros::Publisher pub_est_radius;
 ros::Publisher pub_true_radius;
+ros::Publisher pub_cone_yaw;
 
 rnw_config_t rnw_config;
 
@@ -21,6 +22,9 @@ void on_cone_state( rnw_msgs::ConeStateConstPtr const & msg ){
 
   msg2.value = rnw_config.cone.radius;
   pub_true_radius.publish(msg2);
+
+  msg2.value = cone_yaw(*msg);
+  pub_cone_yaw.publish(msg2);
 
 }
 
@@ -42,6 +46,7 @@ int main( int argc, char** argv ) {
 
   pub_est_radius = nh.advertise<quadrotor_msgs::Float64Stamped>("/cone/radius_est",100);
   pub_true_radius = nh.advertise<quadrotor_msgs::Float64Stamped>("/cone/radius_true",100);
+  pub_cone_yaw = nh.advertise<quadrotor_msgs::Float64Stamped>("/cone/yaw",100);
 
   ros::spin();
 
