@@ -11,7 +11,7 @@
 #include "rnw_ros/pose_utils.h"
 #include "rnw_ros/rnw_planner.h"
 
-struct swarm_rnw_controller_t {
+struct rnw_interface_t {
 
     rnw_config_t rnw_config;
 
@@ -35,7 +35,7 @@ struct swarm_rnw_controller_t {
 
     ros::Subscriber sub_trigger_rnw;
 
-    explicit swarm_rnw_controller_t(ros::NodeHandle & nh)
+    explicit rnw_interface_t(ros::NodeHandle & nh)
             : rnw_planner(nh,rnw_config),
               rocking_generator(1024, 16, 0.4, 0.5, 0.5, 23, 0.02)
     {
@@ -44,14 +44,14 @@ struct swarm_rnw_controller_t {
 
       rocking_generator = AmTraj(1024, 16, 0.4, rnw_config.rnw.rocking_max_vel, rnw_config.rnw.rocking_max_acc, 23, 0.02);
 
-      timer = nh.createTimer(ros::Rate(30), &swarm_rnw_controller_t::rnw_planner_loop, this);
+      timer = nh.createTimer(ros::Rate(30), &rnw_interface_t::rnw_planner_loop, this);
 
       pub_poly_traj = nh.advertise<quadrotor_msgs::PolynomialTrajectory>("/rnw/poly_traj",10,false);
 
       sub_uav_odom = nh.subscribe<nav_msgs::Odometry>(
               "/odom/uav",
               10,
-              &swarm_rnw_controller_t::on_uav_odom,
+              &rnw_interface_t::on_uav_odom,
               this,
               ros::TransportHints().tcpNoDelay()
       );
@@ -59,7 +59,7 @@ struct swarm_rnw_controller_t {
       sub_cone_state = nh.subscribe<rnw_msgs::ConeState>(
               "/cone/state",
               10,
-              &swarm_rnw_controller_t::on_cone_state,
+              &rnw_interface_t::on_cone_state,
               this,
               ros::TransportHints().tcpNoDelay()
       );
@@ -67,7 +67,7 @@ struct swarm_rnw_controller_t {
       sub_trigger_rnw = nh.subscribe<std_msgs::Header>(
               "/rnw/trigger/rnw",
               10,
-              &swarm_rnw_controller_t::on_trigger_rnw,
+              &rnw_interface_t::on_trigger_rnw,
               this
       );
 
@@ -167,35 +167,15 @@ int main( int argc, char** argv ) {
 
   ros::NodeHandle nh("~");
 
-  swarm_rnw_controller_t rnw_controller(nh);
-
-  auto timer = nh.createTimer(ros::Rate(30), &swarm_rnw_controller_t::rnw_planner_loop, &rnw_controller);
-
-  ros::Subscriber sub_uav_odom = nh.subscribe<nav_msgs::Odometry>(
-          "/odom/uav",
-          10,
-          &swarm_rnw_controller_t::on_uav_odom,
-          &rnw_controller,
-          ros::TransportHints().tcpNoDelay()
-  );
-
-  ros::Subscriber sub_cone_state = nh.subscribe<rnw_msgs::ConeState>(
-          "/rnw/cone_state",
-          10,
-          &swarm_rnw_controller_t::on_cone_state,
-          &rnw_controller,
-          ros::TransportHints().tcpNoDelay()
-  );
-
-  ros::Subscriber sub_trigger_rnw = nh.subscribe<std_msgs::Header>("/rnw/trigger/rnw", 10, &swarm_rnw_controller_t::on_trigger_rnw, &rnw_controller);
+  rnw_interface_t rnw_interface(nh);
 
   dynamic_reconfigure::Server<rnw_ros::RNWConfig> server;
-  server.setConfigDefault(rnw_controller.rnw_config.rnw.to_config());
-  server.updateConfig(rnw_controller.rnw_config.rnw.to_config());
+  server.setConfigDefault(rnw_interface.rnw_config.rnw.to_config());
+  server.updateConfig(rnw_interface.rnw_config.rnw.to_config());
   server.setCallback([&]( rnw_ros::RNWConfig & config, uint32_t level ){
-    rnw_controller.cfg_callback(config,level);
+    rnw_interface.cfg_callback(config, level);
   });
-  server.updateConfig(rnw_controller.rnw_config.rnw.to_config());
+  server.updateConfig(rnw_interface.rnw_config.rnw.to_config());
 
   ros::spin();
 
