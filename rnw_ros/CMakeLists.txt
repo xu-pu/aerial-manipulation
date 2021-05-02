@@ -189,6 +189,7 @@ set(RNW_NODES
         visualize_pos_cmd_node
         joystick_drone_cmd_node
         swarm_rnw_controller_node
+        check_planning_assistant_node
 )
 
 FOREACH(NODE ${RNW_NODES})
