@@ -53,7 +53,7 @@ struct rnw_command_t {
 
 struct rnw_planner_v2_t {
 
-    rnw_planner_v2_t( ros::NodeHandle & nh, rnw_config_t const & config );
+    explicit rnw_planner_v2_t( rnw_config_t const & config );
 
     void on_cone_state( rnw_msgs::ConeStateConstPtr const & msg );
 
@@ -81,8 +81,6 @@ struct rnw_planner_v2_t {
 
     void stop_walking();
 
-private:
-
     enum class cmd_fsm_e {
         idle,
         pending,
@@ -95,11 +93,11 @@ private:
         rocking
     } cone_fsm = cone_fsm_e::idle;
 
+private:
+
     void fsm_update();
 
     void fsm_transition( cone_fsm_e from, cone_fsm_e to );
-
-    ros::NodeHandle & nh;
 
     rnw_config_t const & rnw_config;
 

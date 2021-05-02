@@ -1,7 +1,7 @@
 #include "rnw_ros/rnw_planner_v2.h"
 
-rnw_planner_v2_t::rnw_planner_v2_t( ros::NodeHandle & h, rnw_config_t const & cfg )
-        : rnw_config(cfg), nh(h), precession_regulator(cfg) { }
+rnw_planner_v2_t::rnw_planner_v2_t( rnw_config_t const & cfg )
+        : rnw_config(cfg), precession_regulator(cfg) { }
 
 void rnw_planner_v2_t::on_cone_state( rnw_msgs::ConeStateConstPtr const & msg ){
   latest_cone_state = *msg;
@@ -92,8 +92,6 @@ void rnw_planner_v2_t::stop_walking(){
   if ( is_walking ) {
     precession_regulator.end();
     is_walking = false;
-    //pub_walking_state = ros::Publisher();
-    //ROS_INFO_STREAM("[rnw] Stop walking");
   }
 }
 
