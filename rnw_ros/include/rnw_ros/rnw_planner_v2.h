@@ -3,6 +3,7 @@
 
 #include "rnw_ros/rnw_utils.h"
 #include <rnw_msgs/ConeState.h>
+#include <rnw_msgs/RnwCmd.h>
 
 /**
  * positive rot increase yaw
@@ -42,9 +43,11 @@ struct precession_regulator_t {
 
 struct rnw_command_t {
 
-    uint32_t cmd_idx;
+    uint32_t cmd_idx = 0;
 
     Vector3d control_point_setpoint;
+
+    rnw_msgs::RnwCmd to_ros_msg() const;
 
 };
 
