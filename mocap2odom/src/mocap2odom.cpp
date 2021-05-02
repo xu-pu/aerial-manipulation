@@ -128,6 +128,10 @@ struct mocap_processor_t {
     ros::Publisher pub_odom_drone1;
     ros::Publisher pub_odom_drone2;
 
+    ros::Subscriber sub_drone_1;
+    ros::Subscriber sub_drone_2;
+    ros::Subscriber sub_cone;
+
     uav_odom_filter_t drone1;
     uav_odom_filter_t drone2;
 
@@ -151,18 +155,41 @@ struct mocap_processor_t {
       ROS_INFO_STREAM("Drone #1 T_MARKER_FLU: " << drone1.T_MARKER_FLU.transpose());
       ROS_INFO_STREAM("Drone #2 T_MARKER_FLU: " << drone2.T_MARKER_FLU.transpose());
 
-      /**
-       * Setup Publishers
-       */
+      bool publish_uav_odom = get_param_default<bool>(nh, "publish_uav_odom", true);
+
+      if ( publish_uav_odom ) {
+
+        pub_odom_drone1 = nh.advertise<nav_msgs::Odometry>("/drone1/odom", 100);
+
+        pub_odom_drone2 = nh.advertise<nav_msgs::Odometry>("/drone2/odom", 100);
+
+        sub_drone_1 = nh.subscribe<geometry_msgs::PoseStamped>(
+                "/mocap/drone1",
+                100,
+                &mocap_processor_t::drone1_pose_callback,
+                this,
+                ros::TransportHints().tcpNoDelay()
+        );
+
+        sub_drone_2 = nh.subscribe<geometry_msgs::PoseStamped>(
+                "/mocap/drone2",
+                100,
+                &mocap_processor_t::drone2_pose_callback,
+                this,
+                ros::TransportHints().tcpNoDelay()
+        );
+
+      }
 
       pub_odom_cone = nh.advertise<nav_msgs::Odometry>("/cone/odom", 100);
 
-      bool publish_uav_odom = get_param_default<bool>(nh, "publish_uav_odom", true);
-
-      if(publish_uav_odom){
-        pub_odom_drone1 = nh.advertise<nav_msgs::Odometry>("/drone1/odom", 100);
-        pub_odom_drone2 = nh.advertise<nav_msgs::Odometry>("/drone2/odom", 100);
-      }
+      sub_cone = nh.subscribe<geometry_msgs::PoseStamped>(
+              "/mocap/cone",
+              100,
+              &mocap_processor_t::pose_cone_callback,
+              this,
+              ros::TransportHints().tcpNoDelay()
+      );
 
     }
 
@@ -212,33 +239,10 @@ struct mocap_processor_t {
 int main( int argc, char **argv ){
 
   ros::init( argc, argv, "mocap2odom" );
+
   ros::NodeHandle n( "~" );
 
   mocap_processor_t mocap_processor(n);
-
-  ros::Subscriber sub_drone_1 = n.subscribe<geometry_msgs::PoseStamped>(
-          "/mocap/drone1",
-          100,
-          &mocap_processor_t::drone1_pose_callback,
-          &mocap_processor,
-          ros::TransportHints().tcpNoDelay()
-  );
-
-  ros::Subscriber sub_drone_2 = n.subscribe<geometry_msgs::PoseStamped>(
-          "/mocap/drone2",
-          100,
-          &mocap_processor_t::drone2_pose_callback,
-          &mocap_processor,
-          ros::TransportHints().tcpNoDelay()
-  );
-
-  ros::Subscriber sub_cone = n.subscribe<geometry_msgs::PoseStamped>(
-          "/mocap/cone",
-          100,
-          &mocap_processor_t::pose_cone_callback,
-          &mocap_processor,
-          ros::TransportHints().tcpNoDelay()
-  );
 
   ros::spin();
 
