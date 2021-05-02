@@ -10,10 +10,33 @@
 #include "rnw_ros/rnw_utils.h"
 #include "rnw_ros/pose_utils.h"
 #include "rnw_ros/rnw_planner.h"
+#include "rnw_ros/swarm_interface.h"
+
+struct swarm_rnw_controller_t {
+
+    rnw_config_t & rnw_config;
+
+    swarm_interface_t swarm_interface;
+
+    swarm_rnw_controller_t( ros::NodeHandle & nh, rnw_config_t & cfg ) : rnw_config(cfg), swarm_interface(nh) {}
+
+    /**
+     * Execute the command, return an estimated time cost
+     * @param cmd
+     * @return estimated duration (sec)
+     */
+    double execute_cmd( rnw_cmd_t * cmd ){
+      return 1;
+    }
+
+};
+
 
 struct rnw_interface_t {
 
-    rnw_config_t rnw_config;
+    swarm_rnw_controller_t swarm_rnw_controller;
+
+    rnw_config_t & rnw_config;
 
     bool uav_odom_init = false;
 
@@ -35,12 +58,12 @@ struct rnw_interface_t {
 
     ros::Subscriber sub_trigger_rnw;
 
-    explicit rnw_interface_t(ros::NodeHandle & nh)
-            : rnw_planner(nh,rnw_config),
+    rnw_interface_t(ros::NodeHandle & nh, rnw_config_t & cfg )
+            : rnw_config(cfg),
+              rnw_planner(nh,rnw_config),
+              swarm_rnw_controller(nh,rnw_config),
               rocking_generator(1024, 16, 0.4, 0.5, 0.5, 23, 0.02)
     {
-
-      rnw_config.load_from_ros(nh);
 
       rocking_generator = AmTraj(1024, 16, 0.4, rnw_config.rnw.rocking_max_vel, rnw_config.rnw.rocking_max_acc, 23, 0.02);
 
@@ -135,27 +158,10 @@ struct rnw_interface_t {
         }
       }
       else if ( rnw_planner.rnw_cmd.fsm == rnw_cmd_t::fsm_pending ) {
-
         rnw_cmd_t * cmd = rnw_planner.take_cmd();
-
-        vector<Vector3d> waypoints = {};
-        waypoints.push_back(pose2T(latest_uav_odom.pose.pose));
-        waypoints.push_back(cmd->setpoint_uav);
-
-        if (check_waypoints(waypoints)) {
-          Vector3d v0 = Vector3d::Zero();
-          Trajectory traj = rocking_generator.genOptimalTrajDTC(waypoints, v0, v0, v0, v0);
-          double yaw_start = uav_yaw_from_odom(latest_uav_odom);
-          double yaw_final = cmd->desired_yaw;
-          pub_poly_traj.publish(to_ros_msg(traj,yaw_start,yaw_final,ros::Time::now()));
-          cmd_start_time = ros::Time::now();
-          cmd_duration = ros::Duration(traj.getTotalDuration());
-        }
-        else {
-          ROS_ERROR_STREAM("[rnw] trajectory is too short! Did not execute!");
-          rnw_planner.cmd_complete();
-        }
-
+        double time_to_go = swarm_rnw_controller.execute_cmd(cmd);
+        cmd_start_time = ros::Time::now();
+        cmd_duration = ros::Duration(time_to_go);
       }
     }
 
@@ -167,15 +173,18 @@ int main( int argc, char** argv ) {
 
   ros::NodeHandle nh("~");
 
-  rnw_interface_t rnw_interface(nh);
+  rnw_config_t rnw_config;
+  rnw_config.load_from_ros(nh);
+
+  rnw_interface_t rnw_interface(nh,rnw_config);
 
   dynamic_reconfigure::Server<rnw_ros::RNWConfig> server;
-  server.setConfigDefault(rnw_interface.rnw_config.rnw.to_config());
-  server.updateConfig(rnw_interface.rnw_config.rnw.to_config());
+  server.setConfigDefault(rnw_config.rnw.to_config());
+  server.updateConfig(rnw_config.rnw.to_config());
   server.setCallback([&]( rnw_ros::RNWConfig & config, uint32_t level ){
     rnw_interface.cfg_callback(config, level);
   });
-  server.updateConfig(rnw_interface.rnw_config.rnw.to_config());
+  server.updateConfig(rnw_config.rnw.to_config());
 
   ros::spin();
 
