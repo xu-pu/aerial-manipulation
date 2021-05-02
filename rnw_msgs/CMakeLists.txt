@@ -60,6 +60,7 @@ add_message_files(
         RockingCmd.msg
         GripState.msg
         WalkingState.msg
+        ControlPointCmd.msg
 )
 
 
