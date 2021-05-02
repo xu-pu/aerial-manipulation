@@ -178,6 +178,11 @@ void rnw_config_t::load_from_ros( ros::NodeHandle & nh ){
   rnw.EKi = get_param_default<double>(nh, "/rnw/EKi", 0);
   rnw.EKd = get_param_default<double>(nh, "/rnw/EKd", 0);
   rnw.tau_ff = get_param_default<double>(nh, "/rnw/tau_ff", 0);
+
+  swarm.cable1 = get_param_default<double>(nh, "/swarm/cable1", 1);
+  swarm.cable2 = get_param_default<double>(nh, "/swarm/cable2", 1);
+  swarm.angle = get_param_default<double>(nh, "/swarm/angle", 90);
+
 }
 
 double dist( Vector3d const & A, Vector3d const & B ){

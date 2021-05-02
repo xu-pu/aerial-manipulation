@@ -8,6 +8,10 @@ flu_T_tcp:
   y: 0
   z: -0.114698
 insert_below_tip: 0.1
+swarm:
+  cable1: 0.8
+  cable2: 0.8
+  angle: 90
 rnw:
   hover_above_tip: 0.03
   insertion_depth: 0.12 # 0.11

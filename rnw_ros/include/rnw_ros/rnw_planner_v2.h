@@ -47,6 +47,8 @@ struct rnw_command_t {
 
     Vector3d control_point_setpoint;
 
+    double heading;
+
     rnw_msgs::RnwCmd to_ros_msg() const;
 
 };

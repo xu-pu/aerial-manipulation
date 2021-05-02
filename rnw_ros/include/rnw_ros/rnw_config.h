@@ -151,6 +151,12 @@ struct rnw_config_t {
 
     } rnw;
 
+    struct {
+        double cable1;
+        double cable2;
+        double angle;
+    } swarm;
+
     void load_from_ros( ros::NodeHandle & nh );
 
 };
