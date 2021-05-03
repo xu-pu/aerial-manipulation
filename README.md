@@ -123,6 +123,16 @@ Inspect them using:
 - `/drone2/traj`
 - `/drone2/position_cmd`
 
+`/cone`
+
+- `/cone/odom`
+- `/cone/state`
+
+`/rnw`
+
+- `/rnw/start`
+- `/rnw/state`
+
 ### Nodes
 
 `swarm_planner_node` takes all `/droneX/odom`, and sets all `/droneX/traj`
@@ -149,4 +159,3 @@ Inspect them using:
 
 `n3ctrl` executes `/position_cmd` while monitoring `/uav/odom` and `/djiros/rc`
 
-s

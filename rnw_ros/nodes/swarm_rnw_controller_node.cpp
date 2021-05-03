@@ -28,13 +28,40 @@ struct swarm_planner_t {
       rocking_generator = AmTraj(1024, 16, 0.4, rnw_config.rnw.rocking_max_vel, rnw_config.rnw.rocking_max_acc, 23, 0.02);
     }
 
+    quadrotor_msgs::PolynomialTrajectory genetate_uav_traj( nav_msgs::Odometry const & from, Vector3d const & to ){
+
+    }
+
     /**
      * Execute the command, return an estimated time cost
      * @param cmd
      * @return estimated duration (sec)
      */
     double execute_cmd( rnw_command_t const & cmd ){
-      return 1;
+
+      if ( !swarm_interface.initialized() ) {
+        ROS_ERROR_STREAM("swarm odom not properly initialized");
+        return 0;
+      }
+
+      double rad = deg2rad * 0.5 * rnw_config.swarm.angle;
+      Vector3d setpoint1 = calc_pt_at_cp_frame(cmd.control_point_setpoint,cmd.heading,rnw_config.swarm.cable1,rad);
+      Vector3d setpoint2 = calc_pt_at_cp_frame(cmd.control_point_setpoint,cmd.heading,rnw_config.swarm.cable2,-rad);
+      nav_msgs::Odometry odom1 = swarm_interface.latest_odom_drone1;
+      nav_msgs::Odometry odom2 = swarm_interface.latest_odom_drone2;
+
+      quadrotor_msgs::PolynomialTrajectory traj1 = genetate_uav_traj(odom1,setpoint1);
+      quadrotor_msgs::PolynomialTrajectory traj2 = genetate_uav_traj(odom1,setpoint2);
+
+      swarm_interface.send_traj(traj1,traj2);
+
+      double dt1 = get_traj_duration(traj1);
+      double dt2 = get_traj_duration(traj2);
+
+      ROS_INFO_STREAM("[rnw_planner] execute cmd #" << cmd.cmd_idx << ", drone1 " << dt1 << "s, drone2 " << dt2 << "s");
+
+      return std::max(dt1,dt2);
+
     }
 
 };

@@ -7,12 +7,21 @@
 
 #include <deque>
 #include <quadrotor_msgs/Float64Stamped.h>
+#include <quadrotor_msgs/PolynomialTrajectory.h>
 #include <rnw_msgs/ConeState.h>
 #include <nav_msgs/Odometry.h>
 #include <rnw_msgs/GripState.h>
 #include <rnw_msgs/RockingCmd.h>
 
 #include "rnw_ros/rnw_config.h"
+
+inline double get_traj_duration( quadrotor_msgs::PolynomialTrajectory const & msg ){
+  double rst = 0;
+  for ( double i : msg.time ) {
+    rst += i;
+  }
+  return rst;
+}
 
 /**
  * Calculate the desired drone position given control point frame and cable length and direction
