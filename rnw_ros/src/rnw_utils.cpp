@@ -337,3 +337,36 @@ double calc_obj_heading( rnw_msgs::ConeState const & s1, rnw_msgs::ConeState con
 double uav_yaw_from_cone_yaw( double cone_yaw ){
   return uav_utils::normalize_angle(cone_yaw-M_PI);
 }
+
+quadrotor_msgs::PolynomialTrajectory gen_setpoint_traj(nav_msgs::Odometry const & odom, Vector3d const & setpoint, double duration ){
+
+  constexpr int order = 5;
+
+  quadrotor_msgs::PolynomialTrajectory msg;
+
+  msg.header.stamp = ros::Time::now();
+  //msg.trajectory_id = traj_id;
+  msg.action = quadrotor_msgs::PolynomialTrajectory::ACTION_ADD;
+  msg.num_order = order;
+  msg.num_segment = 1;
+  msg.start_yaw = uav_yaw_from_odom(odom);
+  msg.final_yaw = uav_yaw_from_odom(odom);
+
+  // fill the segment
+
+  msg.time.push_back(duration);
+  msg.order.push_back(order);
+
+  msg.coef_x.push_back(setpoint.x());
+  msg.coef_y.push_back(setpoint.y());
+  msg.coef_z.push_back(setpoint.z());
+
+  for ( size_t i=0; i<order; i++ ) {
+    msg.coef_x.push_back(0);
+    msg.coef_y.push_back(0);
+    msg.coef_z.push_back(0);
+  }
+
+  return msg;
+
+}

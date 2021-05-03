@@ -15,6 +15,8 @@
 
 #include "rnw_ros/rnw_config.h"
 
+quadrotor_msgs::PolynomialTrajectory gen_setpoint_traj(nav_msgs::Odometry const & odom, Vector3d const & setpoint, double duration );
+
 inline double get_traj_duration( quadrotor_msgs::PolynomialTrajectory const & msg ){
   double rst = 0;
   for ( double i : msg.time ) {

@@ -1,4 +1,5 @@
 #include "rnw_ros/swarm_interface.h"
+#include "rnw_ros/rnw_utils.h"
 #include <Eigen/Dense>
 #include <uav_utils/converters.h>
 #include <rnw_ros/traj_uitls.h>
@@ -9,6 +10,7 @@ using std::vector;
 using Eigen::Vector2d;
 using Eigen::Vector3d;
 using Eigen::Matrix3d;
+
 
 Vector3d point_in_frame( nav_msgs::Odometry const & odom, Vector3d const & pt ){
   Matrix3d R = uav_utils::from_quaternion_msg(odom.pose.pose.orientation).toRotationMatrix();
@@ -23,12 +25,14 @@ struct test_swarm_planner_t {
     swarm_interface_t swarm;
 
     ros::Subscriber sub_trigger_hello_world;
-
     ros::Subscriber sub_trigger_circle;
-
     ros::Subscriber sub_trigger_align;
-
     ros::Subscriber sub_trigger_zigzag;
+
+    ros::Subscriber sub_dpad_up;
+    ros::Subscriber sub_dpad_down;
+    ros::Subscriber sub_dpad_left;
+    ros::Subscriber sub_dpad_right;
 
     AmTraj traj_generator;
 
@@ -45,6 +49,18 @@ struct test_swarm_planner_t {
 
       sub_trigger_zigzag = nh.subscribe<std_msgs::Header>(
               "/gamepad/X", 10, &test_swarm_planner_t::trigger_zigzag, this);
+
+      sub_dpad_up = nh.subscribe<std_msgs::Header>(
+              "/gamepad/DPAD/Up", 10, &test_swarm_planner_t::on_dpad_up, this);
+
+      sub_dpad_down = nh.subscribe<std_msgs::Header>(
+              "/gamepad/DPAD/Down", 10, &test_swarm_planner_t::on_dpad_down, this);
+
+      sub_dpad_left = nh.subscribe<std_msgs::Header>(
+              "/gamepad/DPAD/Left", 10, &test_swarm_planner_t::on_dpad_left, this);
+
+      sub_dpad_right = nh.subscribe<std_msgs::Header>(
+              "/gamepad/DPAD/Right", 10, &test_swarm_planner_t::on_dpad_right, this);
 
     }
 
@@ -176,6 +192,28 @@ struct test_swarm_planner_t {
               wpts2traj(swarm.latest_odom_drone2,wpts_drone2)
       );
 
+    }
+
+    void move_drone1_relative( Vector3d const & pt ){
+      Vector3d setpoint = uav_utils::from_point_msg(swarm.latest_odom_drone1.pose.pose.position) + 0.5 * pt;
+      quadrotor_msgs::PolynomialTrajectory traj = gen_setpoint_traj(swarm.latest_odom_drone1, setpoint, 1);
+      swarm.send_traj_just_drone1(traj);
+    }
+
+    void on_dpad_up( std_msgs::HeaderConstPtr const & msg ){
+      move_drone1_relative({ 1, 0, 0 });
+    }
+
+    void on_dpad_down( std_msgs::HeaderConstPtr const & msg ){
+      move_drone1_relative({ -1, 0, 0 });
+    }
+
+    void on_dpad_left( std_msgs::HeaderConstPtr const & msg ){
+      move_drone1_relative({ 0, 1, 0 });
+    }
+
+    void on_dpad_right( std_msgs::HeaderConstPtr const & msg ){
+      move_drone1_relative({ 0, -1, 0 });
     }
 
 };
