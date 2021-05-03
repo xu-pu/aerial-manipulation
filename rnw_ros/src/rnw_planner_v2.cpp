@@ -141,6 +141,7 @@ void rnw_planner_v2_t::plan_cmd_walk(){
   Vector3d setpoint_apex = G + next_v;
 
   rnw_command.control_point_setpoint = setpoint_apex;
+  rnw_command.heading = precession_regulator.desired_heading_yaw;
   rnw_command.cmd_idx++;
   step_count++;
   cmd_fsm = cmd_fsm_e::pending;

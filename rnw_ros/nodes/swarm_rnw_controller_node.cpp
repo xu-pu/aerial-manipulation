@@ -28,7 +28,27 @@ struct swarm_planner_t {
       rocking_generator = AmTraj(1024, 16, 0.4, rnw_config.rnw.rocking_max_vel, rnw_config.rnw.rocking_max_acc, 23, 0.02);
     }
 
-    quadrotor_msgs::PolynomialTrajectory genetate_uav_traj( nav_msgs::Odometry const & from, Vector3d const & to ){
+    quadrotor_msgs::PolynomialTrajectory genetate_uav_traj( nav_msgs::Odometry const & from, Vector3d const & to ) const {
+
+      constexpr double epsi = 0.05;
+
+      Vector3d pt_start = uav_utils::from_point_msg(from.pose.pose.position);
+
+      double dist = (to-pt_start).norm();
+
+      if ( dist < epsi ) {
+        return gen_setpoint_traj(from,to,0.5);
+      }
+      else {
+        // plan traj
+        vector<Vector3d> wpts;
+        wpts.emplace_back(pt_start);
+        wpts.emplace_back((pt_start+to)/2);
+        wpts.emplace_back(to);
+        Vector3d v0 = Vector3d::Zero();
+        auto traj = rocking_generator.genOptimalTrajDTC(wpts,v0,v0,v0,v0);
+        return to_ros_msg(traj,from,ros::Time::now());
+      }
 
     }
 
@@ -37,7 +57,7 @@ struct swarm_planner_t {
      * @param cmd
      * @return estimated duration (sec)
      */
-    double execute_cmd( rnw_command_t const & cmd ){
+    double execute_cmd( rnw_command_t const & cmd ) const {
 
       if ( !swarm_interface.initialized() ) {
         ROS_ERROR_STREAM("swarm odom not properly initialized");
