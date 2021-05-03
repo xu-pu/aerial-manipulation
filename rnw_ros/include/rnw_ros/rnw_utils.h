@@ -15,6 +15,21 @@
 #include "rnw_ros/rnw_config.h"
 
 /**
+ * Calculate the desired drone position given control point frame and cable length and direction
+ * @param CP - control point
+ * @param heading - heading direction (yaw)
+ * @param cable - cable length
+ * @param rad - cable angle (rotation along x axis)
+ * @return
+ */
+inline Vector3d calc_pt_at_cp_frame( Vector3d const & CP, double heading, double cable, double rad ){
+  // reference frame at the control point
+  Matrix3d R = Eigen::AngleAxisd(heading,Vector3d::UnitZ()).toRotationMatrix();
+  Vector3d pt(0,cable*std::sin(rad),cable*cos(rad));
+  return R*pt+CP;
+}
+
+/**
  * There are some bugs in the traj generator
  * - create mid points to make sure there is at least 3 waypoints
  * - remove waypoint too close together

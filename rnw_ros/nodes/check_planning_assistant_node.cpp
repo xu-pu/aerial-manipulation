@@ -10,13 +10,6 @@ quadrotor_msgs::PositionCommand pt2cmd( Vector3d const & pt ){
   cmd.yaw = 0;
 }
 
-Vector3d calc_desired_drone_pos( Vector3d const & CP, double heading, double cable, double rad ){
-  // reference frame at the control point
-  Matrix3d R = Eigen::AngleAxisd(heading,Vector3d::UnitZ()).toRotationMatrix();
-  Vector3d pt(0,cable*std::sin(rad),cable*cos(rad));
-  return R*pt+CP;
-}
-
 struct assistant_node_t {
 
     rnw_config_t rnw_config;
@@ -37,7 +30,7 @@ struct assistant_node_t {
       latest_cone_state = *msg;
     }
 
-    void on_start( std_msgs::HeaderConstPtr const & msg ){
+    void on_start( std_msgs::HeaderConstPtr const & msg ) const {
 
       if ( (ros::Time::now() - latest_cone_state.header.stamp).toSec() > 1 ) {
         ROS_ERROR_STREAM("cone state timeout!");
@@ -47,8 +40,8 @@ struct assistant_node_t {
       double rad = rnw_config.swarm.angle * deg2rad * 0.5;
       double heading = cone_yaw(latest_cone_state);
       Vector3d CP = uav_utils::from_point_msg(latest_cone_state.tip);
-      Vector3d drone1_pos = calc_desired_drone_pos(CP,heading,rnw_config.swarm.cable1,rad);
-      Vector3d drone2_pos = calc_desired_drone_pos(CP,heading,rnw_config.swarm.cable2,rad);
+      Vector3d drone1_pos = calc_pt_at_cp_frame(CP, heading, rnw_config.swarm.cable1, rad);
+      Vector3d drone2_pos = calc_pt_at_cp_frame(CP, heading, rnw_config.swarm.cable2, rad);
 
       pub_pos_cmd_drone1.publish(pt2cmd(drone1_pos));
       pub_pos_cmd_drone2.publish(pt2cmd(drone2_pos));
