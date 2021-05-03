@@ -71,7 +71,7 @@ struct swarm_planner_t {
       nav_msgs::Odometry odom2 = swarm_interface.latest_odom_drone2;
 
       quadrotor_msgs::PolynomialTrajectory traj1 = genetate_uav_traj(odom1,setpoint1);
-      quadrotor_msgs::PolynomialTrajectory traj2 = genetate_uav_traj(odom1,setpoint2);
+      quadrotor_msgs::PolynomialTrajectory traj2 = genetate_uav_traj(odom2,setpoint2);
 
       swarm_interface.send_traj(traj1,traj2);
 

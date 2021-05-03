@@ -8,6 +8,7 @@ quadrotor_msgs::PositionCommand pt2cmd( Vector3d const & pt ){
   cmd.position = uav_utils::to_point_msg(pt);
   cmd.yaw_dot = 0;
   cmd.yaw = 0;
+  return cmd;
 }
 
 struct assistant_node_t {
@@ -41,7 +42,7 @@ struct assistant_node_t {
       double heading = cone_yaw(latest_cone_state);
       Vector3d CP = uav_utils::from_point_msg(latest_cone_state.tip);
       Vector3d drone1_pos = calc_pt_at_cp_frame(CP, heading, rnw_config.swarm.cable1, rad);
-      Vector3d drone2_pos = calc_pt_at_cp_frame(CP, heading, rnw_config.swarm.cable2, rad);
+      Vector3d drone2_pos = calc_pt_at_cp_frame(CP, heading, rnw_config.swarm.cable2, -rad);
 
       pub_pos_cmd_drone1.publish(pt2cmd(drone1_pos));
       pub_pos_cmd_drone2.publish(pt2cmd(drone2_pos));
@@ -72,7 +73,7 @@ struct assistant_node_t {
       );
 
       sub_start_trigger = nh.subscribe<std_msgs::Header>(
-              "start",
+              "/gamepad/Y",
               100,
               &assistant_node_t::on_start,
               this
