@@ -23,6 +23,14 @@ struct gamepad_handler_t {
 
     ros::Publisher pub_LT;
 
+    ros::Publisher pub_dpad_up;
+
+    ros::Publisher pub_dpad_down;
+
+    ros::Publisher pub_dpad_left;
+
+    ros::Publisher pub_dpad_right;
+
     sensor_msgs::Joy latest_joy;
 
     bool init = false;
@@ -36,6 +44,9 @@ struct gamepad_handler_t {
     static constexpr size_t BUTTON_LT = 6;
     static constexpr size_t BUTTON_RT = 7;
 
+    static constexpr size_t DPAD_UP_DOWN = 7;
+    static constexpr size_t DPAD_LEFT_RIGHT = 6;
+
     explicit gamepad_handler_t( ros::NodeHandle & nh ){
       pub_A = nh.advertise<std_msgs::Header>("A",10,false);
       pub_B = nh.advertise<std_msgs::Header>("B",10,false);
@@ -45,6 +56,10 @@ struct gamepad_handler_t {
       pub_LB = nh.advertise<std_msgs::Header>("LB",10,false);
       pub_RT = nh.advertise<std_msgs::Header>("RT",10,false);
       pub_LT = nh.advertise<std_msgs::Header>("LT",10,false);
+      pub_dpad_up    = nh.advertise<std_msgs::Header>("DPAD/Up",10,false);
+      pub_dpad_down  = nh.advertise<std_msgs::Header>("DPAD/Down",10,false);
+      pub_dpad_left  = nh.advertise<std_msgs::Header>("DPAD/Left",10,false);
+      pub_dpad_right = nh.advertise<std_msgs::Header>("DPAD/Right",10,false);
     }
 
     void on_joystick( sensor_msgs::JoyConstPtr const & msg ){
@@ -97,6 +112,32 @@ struct gamepad_handler_t {
       if ( pre_msg.buttons.at(BUTTON_RT) > cur_msg.buttons.at(BUTTON_RT) ) {
         ROS_INFO_STREAM("Button RT triggered!");
         pub_RT.publish(std_msgs::Header());
+      }
+
+      int pre_dpad_v = static_cast<int>(pre_msg.axes.at(DPAD_UP_DOWN));
+      int cur_dpad_v = static_cast<int>(cur_msg.axes.at(DPAD_UP_DOWN));
+
+      int pre_dpad_h = static_cast<int>(pre_msg.axes.at(DPAD_LEFT_RIGHT));
+      int cur_dpad_h = static_cast<int>(cur_msg.axes.at(DPAD_LEFT_RIGHT));
+
+      if ( pre_dpad_h != cur_dpad_h && cur_dpad_h == 1 ) {
+        ROS_INFO_STREAM("DPAD Left triggered!");
+        pub_dpad_left.publish(std_msgs::Header());
+      }
+
+      if ( pre_dpad_h != cur_dpad_h && cur_dpad_h == -1 ) {
+        ROS_INFO_STREAM("DPAD Right triggered!");
+        pub_dpad_right.publish(std_msgs::Header());
+      }
+
+      if ( pre_dpad_v != cur_dpad_v && cur_dpad_v == 1 ) {
+        ROS_INFO_STREAM("DPAD Up triggered!");
+        pub_dpad_up.publish(std_msgs::Header());
+      }
+
+      if ( pre_dpad_v != cur_dpad_v && cur_dpad_v == -1 ) {
+        ROS_INFO_STREAM("DPAD Down triggered!");
+        pub_dpad_down.publish(std_msgs::Header());
       }
 
     }
