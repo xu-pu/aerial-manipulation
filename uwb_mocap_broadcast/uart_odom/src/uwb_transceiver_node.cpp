@@ -10,78 +10,78 @@ using namespace std;
 
 struct uwb_transceiver_t {
 
-    enum role_e {
-        e_role_unset = 0,
-        e_role_master = 1,
-        e_role_slave = 2,
-    };
+    enum class role_e {
+        unset = 0,
+        master = 1,
+        slave = 2,
+    } m_role = role_e::unset;
 
-    serial::Serial  m_serial;
-    Protocal_to_mcu m_protocal_to_mcu;
-    Serial_packet   m_serial_send_pack;
-
-    int m_test_rec_count = 0;
-
-    role_e m_role = e_role_unset; // The master or slave
+    // configuration (from ros)
 
     string m_para_serial_port;
-    int    m_para_baud_rate;
-    int    m_para_serial_protocal_mode = 1;
-    int    m_para_read_timer_frequency;
-    int    m_para_sent_timer_frequency;
-    int    m_para_odom_packet_id;
-
+    int m_para_baud_rate;
+    int m_para_serial_protocal_mode = 1;
+    int m_para_read_timer_frequency;
+    int m_para_sent_timer_frequency;
+    int m_para_odom_packet_id;
     int m_para_test_packet_id;
     int m_para_test_packet_size;
     int m_para_test_send_total;
-
     int m_para_debug_protocal;
     int m_para_debug_packet_info;
 
-    double     m_last_time;
-    double     m_current_time;
-    double     m_send_last_time;
-    double     m_send_current_time;
+    // state
+
+    serial::Serial  m_serial;
+
+    Protocal_to_mcu m_protocal_to_mcu;
+
+    Serial_packet   m_serial_send_pack;
+
+    int m_receiver_counter = 0;
+
+    double m_last_time;
+    double m_current_time;
+    double m_send_last_time;
+    double m_send_current_time;
 
     ros::Timer m_timer_receive;
     ros::Timer m_timer_send;
 
-    ros::NodeHandle m_ros_nh;
+    ros::NodeHandle nh;
 
     std::shared_ptr<uwb_comm::payload_base_t> payload_ptr;
 
     template < typename TName, typename TVal >
-    void read_essential_param( const ros::NodeHandle &nh, const TName &name, TVal &val )
-    {
+    void read_essential_param( const TName &name, TVal &val ) {
       if ( nh.getParam( name, val ) )
       {
         // pass
       }
       else
       {
-        ROS_ERROR_STREAM( "Read param: " << name << " failed." );
+        ROS_FATAL_STREAM( "[uwb_transceiver] Read param: " << name << " failed." );
         ROS_BREAK();
       }
     };
 
-    void load_parameter( const ros::NodeHandle &nh )
-    {
+    void load_parameter(){
       cout << "=====  load_parameter ===== " << endl;
       ros::Duration( 1.0 ).sleep();
 
-      read_essential_param( nh, "serial_port", m_para_serial_port );
-      read_essential_param( nh, "baud_rate", m_para_baud_rate );
-      read_essential_param( nh, "read_timer_frequency", m_para_read_timer_frequency );
-      read_essential_param( nh, "send_timer_frequency", m_para_sent_timer_frequency );
-      read_essential_param( nh, "serial_protocal_mode", m_para_serial_protocal_mode );
-      read_essential_param( nh, "odom_packet_id", m_para_odom_packet_id );
+      read_essential_param( "serial_port", m_para_serial_port );
+      read_essential_param( "baud_rate", m_para_baud_rate );
+      read_essential_param( "read_timer_frequency", m_para_read_timer_frequency );
+      read_essential_param( "send_timer_frequency", m_para_sent_timer_frequency );
+      read_essential_param( "serial_protocal_mode", m_para_serial_protocal_mode );
+      read_essential_param( "odom_packet_id", m_para_odom_packet_id );
 
-      read_essential_param( nh, "test/send_total", m_para_test_send_total );
-      read_essential_param( nh, "test/send_packet_size", m_para_test_packet_size );
-      read_essential_param( nh, "test/send_packet_size", m_para_test_packet_size );
+      read_essential_param( "test/send_total", m_para_test_send_total );
+      read_essential_param( "test/send_packet_size", m_para_test_packet_size );
+      read_essential_param( "test/send_packet_size", m_para_test_packet_size );
 
-      read_essential_param( nh, "debug/m_debug_packet_info", m_para_debug_packet_info );
-      read_essential_param( nh, "debug/m_debug_protocal_info", m_para_debug_protocal );
+      read_essential_param( "debug/m_debug_packet_info", m_para_debug_packet_info );
+      read_essential_param( "debug/m_debug_protocal_info", m_para_debug_protocal );
 
       cout << "serial_port:    " << m_para_serial_port << endl;
       cout << "baud_rate:      " << m_para_baud_rate << endl;
@@ -96,56 +96,54 @@ struct uwb_transceiver_t {
       cout << "debug/m_debug_packet_info:      " << m_para_debug_packet_info << endl;
       cout << "debug/m_para_debug_protocal:      " << m_para_debug_protocal << endl;
       cout << "=====  load_parameter finish ===== " << endl;
-    }
-
-    void send_data(const ros::TimerEvent &event ) {
-      //        printf("enter odom_message_send_service");
-
-      if ( m_role == e_role_slave ) {
-        if (payload_ptr->slave_encode(m_serial_send_pack.data)){
-          m_serial_send_pack.id = m_para_odom_packet_id;
-          m_serial_send_pack.data_length = payload_ptr->data_length_slave();
-          m_send_current_time = ros::Time::now().toSec();
-          m_protocal_to_mcu.send_packet( m_serial_send_pack );
-          m_send_last_time = m_send_current_time;
-        }
-      }
-      else if (m_role == e_role_master ) {
-        if (payload_ptr->master_encode(m_serial_send_pack.data) ) {
-          m_serial_send_pack.id = m_para_odom_packet_id;
-          m_serial_send_pack.data_length = payload_ptr->data_length_master();
-          m_send_current_time = ros::Time::now().toSec();
-          m_protocal_to_mcu.send_packet( m_serial_send_pack );
-          //cout << (1.0 / (ros::Time::now().toSec() - m_send_current_time) ) <<endl;
-          //cout << "Send frequency = " << ( int ) ( 1.0 / ( m_send_current_time - m_send_last_time ) ) << endl;
-          m_send_last_time = m_send_current_time;
-        }
-      }
 
     }
 
-    void receive_data( const ros::TimerEvent &event ) {
-      Serial_packet temp_serial_pack;
-      int pack_num = m_protocal_to_mcu.receive_packet( temp_serial_pack );
-      if ( pack_num != 0 ) { // Receive packet
-        m_test_rec_count++;
-        m_current_time = ros::Time::now().toSec();
-        if ( m_para_debug_packet_info ) {
-          cout << "Packet  " << m_test_rec_count
-               << ", length = " << temp_serial_pack.data_length
-               << ", freq = " << (int) (1.0 / ( m_current_time - m_last_time ))
-               << endl;
+    void send_data(const ros::TimerEvent &event){
+      if ( m_role == role_e::slave && payload_ptr->slave_encode(m_serial_send_pack.data) ) {
+        m_serial_send_pack.id = m_para_odom_packet_id;
+        m_serial_send_pack.data_length = payload_ptr->data_length_slave();
+        m_send_current_time = ros::Time::now().toSec();
+        m_protocal_to_mcu.send_packet(m_serial_send_pack);
+        m_send_last_time = m_send_current_time;
+      }
+      else if ( m_role == role_e::master && payload_ptr->master_encode(m_serial_send_pack.data) ) {
+        m_serial_send_pack.id = m_para_odom_packet_id;
+        m_serial_send_pack.data_length = payload_ptr->data_length_master();
+        m_send_current_time = ros::Time::now().toSec();
+        m_protocal_to_mcu.send_packet(m_serial_send_pack);
+        m_send_last_time = m_send_current_time;
+      }
+    }
+
+    void receive_data(const ros::TimerEvent &event){
+
+      // try to receive data
+      Serial_packet pack;
+      int pack_num = m_protocal_to_mcu.receive_packet(pack);
+      if ( pack_num == 0 ) return;
+
+      // record the data
+      m_receiver_counter++;
+      m_current_time = ros::Time::now().toSec();
+      if ( m_para_debug_packet_info ) {
+        ROS_INFO_STREAM("Packet  " << m_receiver_counter << ", length = " << pack.data_length << ", freq = " << (int) (1.0 / (m_current_time - m_last_time )));
+      }
+      m_last_time = m_current_time;
+
+      // decode and dispatch the data
+      if (pack.id == m_para_odom_packet_id ){
+        if (m_role == role_e::master ) {
+          payload_ptr->master_decode(pack.data);
         }
-        m_last_time = m_current_time;
-        if ( temp_serial_pack.id == m_para_odom_packet_id ){
-          if (m_role == e_role_master ) {
-            payload_ptr->master_decode(temp_serial_pack.data);
-          }
-          else if ( m_role == e_role_slave ){
-            payload_ptr->slave_decode(temp_serial_pack.data);
-          }
+        else if ( m_role == role_e::slave ){
+          payload_ptr->slave_decode(pack.data);
         }
       }
+      else {
+        ROS_WARN_STREAM("[uwb_transceiver] unexpected packet");
+      }
+
     };
 
     void init_as_master(){
@@ -158,46 +156,53 @@ struct uwb_transceiver_t {
       payload_ptr->init_as_slave();
     }
 
-    explicit uwb_transceiver_t(ros::NodeHandle &nh ) {
+    uwb_transceiver_t():nh("~"){
 
-      m_ros_nh = nh;
-      load_parameter( m_ros_nh );
+      load_parameter();
 
       //payload_ptr = std::make_shared<uwb_comm::rnw_payload_t>(nh);
       payload_ptr = std::make_shared<uwb_comm::drone_swarm_payload_t>(nh);
 
-      int role = role_e::e_role_unset;
+      int role = (int)role_e::unset;
       nh.getParam("role",role);
       m_role = (role_e)role;
 
       switch (m_role) {
-        case role_e::e_role_master:
+        case role_e::master:
           init_as_master();
           break;
-        case role_e::e_role_slave:
+        case role_e::slave:
           init_as_slave();
           break;
         default:
-          ROS_ERROR_STREAM("[UWB] did not assign a role!");
-          exit(-1);
+          ROS_FATAL("[uwb_transceiver] did not assign a role!");
+          ROS_BREAK();
       }
 
       m_timer_receive = nh.createTimer(ros::Rate(m_para_read_timer_frequency), &uwb_transceiver_t::receive_data, this );
-      m_timer_send = m_ros_nh.createTimer(ros::Rate(m_para_sent_timer_frequency), &uwb_transceiver_t::send_data, this );
+      m_timer_send = nh.createTimer(ros::Rate(m_para_sent_timer_frequency), &uwb_transceiver_t::send_data, this );
 
-      m_serial.setPort( m_para_serial_port );
-      m_serial.setBaudrate( m_para_baud_rate ); // 10000/10000 packet, all rec
-      m_serial.open();
+      try {
 
-      m_protocal_to_mcu.set_protocal_mode( m_para_serial_protocal_mode );
-      m_protocal_to_mcu.set_debug_info( m_para_debug_protocal );
+        m_serial.setPort( m_para_serial_port );
+        m_serial.setBaudrate( m_para_baud_rate ); // 10000/10000 packet, all rec
+        m_serial.open();
+
+        m_protocal_to_mcu.set_protocal_mode( m_para_serial_protocal_mode );
+        m_protocal_to_mcu.set_debug_info( m_para_debug_protocal );
+        m_protocal_to_mcu.init( &m_serial );
+
+      } catch (...) {
+        ROS_FATAL("[uwb_transceiver] Open serial fail !!");
+        ROS_BREAK();
+      }
 
       if ( m_serial.isOpen() ) {
-        cout << "Open serial success !!" << endl;
-        m_protocal_to_mcu.init( &m_serial );
+        ROS_INFO_STREAM("[uwb_transceiver] Open serial success !!");
       }
       else {
-        cout << "Open serial fail !! " << endl;
+        ROS_FATAL("[uwb_transceiver] Open serial fail !!");
+        ROS_BREAK();
       }
 
     }
@@ -206,8 +211,7 @@ struct uwb_transceiver_t {
 
 int main( int argc, char *argv[] ) {
   ros::init( argc, argv, "uwb_transceiver_node" );
-  ros::NodeHandle nh = ros::NodeHandle( "~" );
-  uwb_transceiver_t uart_odom(nh );
+  uwb_transceiver_t uwb_transceiver;
   ros::MultiThreadedSpinner spinner( 6 ); // Use 4 threads
   spinner.spin();
   ros::shutdown();
