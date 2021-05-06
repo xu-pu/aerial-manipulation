@@ -8,8 +8,8 @@
 #include <thread>
 
 //#include "serial/serial.h"
-#include "../../serial/include/serial/serial.h"
-#include "serial_protocal.h"
+#include "serial/serial.h"
+#include "uwb_transceiver/serial_protocal.h"
 
 #define SERIAL_SERVICE_VERSION "Serial_service_v0.1"
 #define SERIAL_SERVICE_DESC "The beta version."

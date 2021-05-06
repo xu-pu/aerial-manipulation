@@ -1,6 +1,6 @@
-#include "uart_odom/rnw_payload.h"
+#include "uwb_transceiver/rnw_payload.h"
 
-#include "mini_odom.h"
+#include "uwb_transceiver/mini_odom.h"
 
 using mini_odom_t = Mini_odom<float,int>;
 

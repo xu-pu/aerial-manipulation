@@ -9,7 +9,7 @@
 #include <nav_msgs/Odometry.h>
 #include <quadrotor_msgs/PositionCommand.h>
 
-#include "uart_odom/payload.h"
+#include "uwb_transceiver/payload.h"
 
 namespace uwb_comm {
 

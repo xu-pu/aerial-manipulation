@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>uart_odom</name>
+  <name>uwb_transceiver</name>
   <version>0.0.0</version>
   <description>The uart_odom package</description>
 

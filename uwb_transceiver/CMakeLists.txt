@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(uart_odom)
+project(uwb_transceiver)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -172,7 +172,7 @@ add_executable(uwb_transceiver_node
     ./src/payload_drone_swarm.cpp
     ./src/payload_rnw.cpp
     ./src/uwb_transceiver_node.cpp
-    )
+)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
