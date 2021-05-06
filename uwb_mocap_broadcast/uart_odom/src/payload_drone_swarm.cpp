@@ -156,6 +156,31 @@ bool drone_swarm_payload_t::encode(char *buffer) {
   return init;
 }
 
+struct reverse_dat_t {
+    uint32_t id;
+    uint32_t time;
+};
+
+bool drone_swarm_payload_t::slave_encode(char *buffer) {
+  //ROS_INFO_STREAM("sending message as slave");
+  static uint32_t counter = 0;
+  reverse_dat_t dat;
+  dat.id = counter++;
+  dat.time = counter*2;
+  memcpy(buffer, (char*)&dat, sizeof(reverse_dat_t));
+  return true;
+}
+
+void drone_swarm_payload_t::master_decode(const char *buffer) {
+  auto const * ptr = (reverse_dat_t const *)buffer;
+  reverse_dat_t dat = *ptr;
+  ROS_INFO_STREAM("recieve reverse data "<< dat.id << " " << dat.time);
+}
+
 int drone_swarm_payload_t::data_length() {
   return sizeof(mini_odom_f32_t) + sizeof(pos_cmd_data_f32_t);
+}
+
+int drone_swarm_payload_t::data_length_slave() {
+  return sizeof(reverse_dat_t);
 }

@@ -34,7 +34,13 @@ namespace uwb_comm {
          */
         virtual void decode(char const * buffer) = 0;
 
+        virtual bool slave_encode(char * buffer) = 0;
+
+        virtual void master_decode(char const * buffer) = 0;
+
         virtual int data_length() = 0;
+
+        virtual int data_length_slave() = 0;
 
     };
 

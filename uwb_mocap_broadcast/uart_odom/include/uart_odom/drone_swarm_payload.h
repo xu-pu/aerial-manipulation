@@ -49,6 +49,12 @@ namespace uwb_comm {
 
         int data_length() final;
 
+        int data_length_slave() final;
+
+        bool slave_encode(char * buffer) final;
+
+        void master_decode(char const * buffer) final;
+
     };
 
 }

@@ -60,15 +60,28 @@ public:
 public:
     void send_service_odom_message( const ros::TimerEvent &event ) {
       //        printf("enter odom_message_send_service");
-      m_serial_send_pack.id = m_para_odom_packet_id;
-      m_serial_send_pack.data_length = payload_ptr->data_length();
-      m_send_current_time = ros::Time::now().toSec();
-      if ( payload_ptr->encode(m_serial_send_pack.data) ) {
-        m_protocal_to_mcu.send_packet( m_serial_send_pack );
-        //cout << (1.0 / (ros::Time::now().toSec() - m_send_current_time) ) <<endl;
-        //cout << "Send frequency = " << ( int ) ( 1.0 / ( m_send_current_time - m_send_last_time ) ) << endl;
-        m_send_last_time = m_send_current_time;
+
+      if ( m_role == e_role_slave ) {
+        if (payload_ptr->slave_encode(m_serial_send_pack.data)){
+          m_serial_send_pack.id = m_para_odom_packet_id;
+          m_serial_send_pack.data_length = payload_ptr->data_length_slave();
+          m_send_current_time = ros::Time::now().toSec();
+          m_protocal_to_mcu.send_packet( m_serial_send_pack );
+          m_send_last_time = m_send_current_time;
+        }
       }
+      else if (m_role == e_master ) {
+        if ( payload_ptr->encode(m_serial_send_pack.data) ) {
+          m_serial_send_pack.id = m_para_odom_packet_id;
+          m_serial_send_pack.data_length = payload_ptr->data_length();
+          m_send_current_time = ros::Time::now().toSec();
+          m_protocal_to_mcu.send_packet( m_serial_send_pack );
+          //cout << (1.0 / (ros::Time::now().toSec() - m_send_current_time) ) <<endl;
+          //cout << "Send frequency = " << ( int ) ( 1.0 / ( m_send_current_time - m_send_last_time ) ) << endl;
+          m_send_last_time = m_send_current_time;
+        }
+      }
+
     }
 
     void send_service_eval_stability( const ros::TimerEvent &event )
@@ -154,7 +167,12 @@ public:
         }
         m_last_time = m_current_time;
         if ( temp_serial_pack.id == m_para_odom_packet_id ){
-          payload_ptr->decode(temp_serial_pack.data);
+          if ( m_role == e_master ) {
+            payload_ptr->master_decode(temp_serial_pack.data);
+          }
+          else if ( m_role == e_role_slave ){
+            payload_ptr->decode(temp_serial_pack.data);
+          }
         }
       }
     };
@@ -169,14 +187,13 @@ public:
 
     void init_as_master(){
       ROS_INFO( "[UART_odom]: I have receive the odom,  therefore I am master." );
-      m_timer_send_odom = m_ros_nh.createTimer( ros::Duration( 1.0 / m_para_sent_timer_frequency ), &Uart_odom::send_service_odom_message, this );
-      m_timer_test_send.stop(); // Turn of test sender.
+      //m_timer_test_send.stop(); // Turn of test sender.
       payload_ptr->init_as_master();
     }
 
     void init_as_slave(){
       ROS_INFO( "[UART_ODOM]: I read the odom from uart, therefore I am slave" );
-      m_timer_test_send.stop(); // Turn of test sender.
+      //m_timer_test_send.stop(); // Turn of test sender.
       payload_ptr->init_as_slave();
     }
 
@@ -206,6 +223,7 @@ public:
 
       // m_timer_test_read = m_ros_nh.createTimer( ros::Duration( 1.0 / m_para_read_timer_frequency ), &Uart_odom::read_serive_eval_stability, this );
       m_timer_test_read = nh.createTimer( ros::Duration( 1.0 / m_para_read_timer_frequency ), &Uart_odom::read_serive_eval_stability, this );
+      m_timer_send_odom = m_ros_nh.createTimer( ros::Duration( 1.0 / m_para_sent_timer_frequency ), &Uart_odom::send_service_odom_message, this );
 
       m_serial.setPort( m_para_serial_port );
       m_serial.setBaudrate( m_para_baud_rate ); // 10000/10000 packet, all rec
