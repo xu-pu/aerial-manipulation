@@ -8,23 +8,21 @@
 
 using namespace std;
 
-class Uart_odom
-{
-    enum e_role
-    {
+struct uwb_transceiver_t {
+
+    enum role_e {
         e_role_unset = 0,
-        e_master = 1,
+        e_role_master = 1,
         e_role_slave = 2,
     };
 
-public:
     serial::Serial  m_serial;
     Protocal_to_mcu m_protocal_to_mcu;
     Serial_packet   m_serial_send_pack;
 
     int m_test_rec_count = 0;
 
-    e_role m_role = e_role_unset; // The master or slave
+    role_e m_role = e_role_unset; // The master or slave
 
     string m_para_serial_port;
     int    m_para_baud_rate;
@@ -51,34 +49,6 @@ public:
     ros::NodeHandle m_ros_nh;
 
     std::shared_ptr<uwb_comm::payload_base_t> payload_ptr;
-
-public:
-    void send_data(const ros::TimerEvent &event ) {
-      //        printf("enter odom_message_send_service");
-
-      if ( m_role == e_role_slave ) {
-        if (payload_ptr->slave_encode(m_serial_send_pack.data)){
-          m_serial_send_pack.id = m_para_odom_packet_id;
-          m_serial_send_pack.data_length = payload_ptr->data_length_slave();
-          m_send_current_time = ros::Time::now().toSec();
-          m_protocal_to_mcu.send_packet( m_serial_send_pack );
-          m_send_last_time = m_send_current_time;
-        }
-      }
-      else if (m_role == e_master ) {
-        if (payload_ptr->master_encode(m_serial_send_pack.data) ) {
-          m_serial_send_pack.id = m_para_odom_packet_id;
-          m_serial_send_pack.data_length = payload_ptr->data_length_master();
-          m_send_current_time = ros::Time::now().toSec();
-          m_protocal_to_mcu.send_packet( m_serial_send_pack );
-          //cout << (1.0 / (ros::Time::now().toSec() - m_send_current_time) ) <<endl;
-          //cout << "Send frequency = " << ( int ) ( 1.0 / ( m_send_current_time - m_send_last_time ) ) << endl;
-          m_send_last_time = m_send_current_time;
-        }
-      }
-
-    }
-
 
     template < typename TName, typename TVal >
     void read_essential_param( const ros::NodeHandle &nh, const TName &name, TVal &val )
@@ -128,6 +98,32 @@ public:
       cout << "=====  load_parameter finish ===== " << endl;
     }
 
+    void send_data(const ros::TimerEvent &event ) {
+      //        printf("enter odom_message_send_service");
+
+      if ( m_role == e_role_slave ) {
+        if (payload_ptr->slave_encode(m_serial_send_pack.data)){
+          m_serial_send_pack.id = m_para_odom_packet_id;
+          m_serial_send_pack.data_length = payload_ptr->data_length_slave();
+          m_send_current_time = ros::Time::now().toSec();
+          m_protocal_to_mcu.send_packet( m_serial_send_pack );
+          m_send_last_time = m_send_current_time;
+        }
+      }
+      else if (m_role == e_role_master ) {
+        if (payload_ptr->master_encode(m_serial_send_pack.data) ) {
+          m_serial_send_pack.id = m_para_odom_packet_id;
+          m_serial_send_pack.data_length = payload_ptr->data_length_master();
+          m_send_current_time = ros::Time::now().toSec();
+          m_protocal_to_mcu.send_packet( m_serial_send_pack );
+          //cout << (1.0 / (ros::Time::now().toSec() - m_send_current_time) ) <<endl;
+          //cout << "Send frequency = " << ( int ) ( 1.0 / ( m_send_current_time - m_send_last_time ) ) << endl;
+          m_send_last_time = m_send_current_time;
+        }
+      }
+
+    }
+
     void receive_data( const ros::TimerEvent &event ) {
       Serial_packet temp_serial_pack;
       int pack_num = m_protocal_to_mcu.receive_packet( temp_serial_pack );
@@ -142,7 +138,7 @@ public:
         }
         m_last_time = m_current_time;
         if ( temp_serial_pack.id == m_para_odom_packet_id ){
-          if ( m_role == e_master ) {
+          if (m_role == e_role_master ) {
             payload_ptr->master_decode(temp_serial_pack.data);
           }
           else if ( m_role == e_role_slave ){
@@ -153,18 +149,16 @@ public:
     };
 
     void init_as_master(){
-      ROS_INFO( "[UART_odom]: I have receive the odom,  therefore I am master." );
-      //m_timer_test_send.stop(); // Turn of test sender.
+      ROS_INFO( "[uwb_transceiver]: init as master node" );
       payload_ptr->init_as_master();
     }
 
     void init_as_slave(){
-      ROS_INFO( "[UART_ODOM]: I read the odom from uart, therefore I am slave" );
-      //m_timer_test_send.stop(); // Turn of test sender.
+      ROS_INFO( "[uwb_transceiver]: init as slave node" );
       payload_ptr->init_as_slave();
     }
 
-    explicit Uart_odom( ros::NodeHandle &nh ) {
+    explicit uwb_transceiver_t(ros::NodeHandle &nh ) {
 
       m_ros_nh = nh;
       load_parameter( m_ros_nh );
@@ -172,15 +166,15 @@ public:
       //payload_ptr = std::make_shared<uwb_comm::rnw_payload_t>(nh);
       payload_ptr = std::make_shared<uwb_comm::drone_swarm_payload_t>(nh);
 
-      int role = e_role::e_role_unset;
+      int role = role_e::e_role_unset;
       nh.getParam("role",role);
-      m_role = (e_role)role;
+      m_role = (role_e)role;
 
       switch (m_role) {
-        case e_role::e_master:
+        case role_e::e_role_master:
           init_as_master();
           break;
-        case e_role::e_role_slave:
+        case role_e::e_role_slave:
           init_as_slave();
           break;
         default:
@@ -188,8 +182,8 @@ public:
           exit(-1);
       }
 
-      m_timer_receive = nh.createTimer(ros::Duration(1.0 / m_para_read_timer_frequency ), &Uart_odom::receive_data, this );
-      m_timer_send = m_ros_nh.createTimer(ros::Duration(1.0 / m_para_sent_timer_frequency ), &Uart_odom::send_data, this );
+      m_timer_receive = nh.createTimer(ros::Rate(m_para_read_timer_frequency), &uwb_transceiver_t::receive_data, this );
+      m_timer_send = m_ros_nh.createTimer(ros::Rate(m_para_sent_timer_frequency), &uwb_transceiver_t::send_data, this );
 
       m_serial.setPort( m_para_serial_port );
       m_serial.setBaudrate( m_para_baud_rate ); // 10000/10000 packet, all rec
@@ -205,15 +199,17 @@ public:
       else {
         cout << "Open serial fail !! " << endl;
       }
+
     }
+
 };
 
 int main( int argc, char *argv[] ) {
-  ros::init( argc, argv, "uart_odom" );
+  ros::init( argc, argv, "uwb_transceiver_node" );
   ros::NodeHandle nh = ros::NodeHandle( "~" );
-  Uart_odom uart_odom( nh );
-  //uart_odom.test_uart();
+  uwb_transceiver_t uart_odom(nh );
   ros::MultiThreadedSpinner spinner( 6 ); // Use 4 threads
   spinner.spin();
+  ros::shutdown();
   return 0;
 }
