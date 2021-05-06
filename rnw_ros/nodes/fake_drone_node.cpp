@@ -4,6 +4,7 @@
 #include <ros/ros.h>
 #include <quadrotor_msgs/PositionCommand.h>
 #include <nav_msgs/Odometry.h>
+#include <n3ctrl/N3CtrlState.h>
 
 #include "rnw_ros/ros_utils.h"
 
@@ -33,6 +34,8 @@ struct fake_drone_t {
 
     ros::Publisher pub_odom;
 
+    ros::Publisher pub_n3ctrl;
+
     quadrotor_msgs::PositionCommand latest_position_cmd;
 
     nav_msgs::Odometry latest_odom;
@@ -51,6 +54,8 @@ struct fake_drone_t {
 
       pub_odom = nh.advertise<nav_msgs::Odometry>("odom",10);
 
+      pub_n3ctrl = nh.advertise<n3ctrl::N3CtrlState>("n3ctrl",10);
+
       timer = nh.createTimer(ros::Rate(90),&fake_drone_t::on_timer,this);
 
       sub_pos_cmd = nh.subscribe<quadrotor_msgs::PositionCommand>(
@@ -68,10 +73,29 @@ struct fake_drone_t {
     }
 
     void on_timer( ros::TimerEvent const & event ){
+
+      // execute position command
+
       if ( latest_position_cmd.header.stamp > latest_odom.header.stamp ) {
         latest_odom = cmd2odom(latest_position_cmd);
       }
+
+      // publish odom
+
       pub_odom.publish(latest_odom);
+
+      // publish n3ctrl_state
+
+      constexpr double ctrl_timeout = 0.5;
+
+      n3ctrl::N3CtrlState n3ctrl;
+      n3ctrl.header.stamp = ros::Time::now();
+      n3ctrl.header.frame_id = "world";
+      n3ctrl.last_traj_id = 0;
+      n3ctrl.state = (ros::Time::now() - latest_position_cmd.header.stamp).toSec() > ctrl_timeout ?
+              n3ctrl::N3CtrlState::STATE_CMD_HOVER : n3ctrl::N3CtrlState::STATE_CMD_CTRL;
+      pub_n3ctrl.publish(n3ctrl);
+
     }
 
 };

@@ -50,6 +50,7 @@
         <remap from="~poly_traj" to="/drone1/traj"/>
         <remap from="~odom" to="/drone1/odom"/>
         <remap from="~position_cmd" to="/drone1/position_cmd"/>
+        <remap from="~n3ctrl" to="/drone1/state"/>
     </node>
 
     <node pkg="n3ctrl" type="n1_sim_helper.py" name="n1_sim_helper" output="screen" required="true">
