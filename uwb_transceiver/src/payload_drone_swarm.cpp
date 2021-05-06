@@ -3,6 +3,11 @@
 
 using namespace uwb_comm;
 
+struct n3ctrl_state_t {
+    uint8_t state;
+    uint32_t last_traj_id;
+};
+
 template<typename T>
 struct pos_cmd_data_t {
 
@@ -121,6 +126,7 @@ void drone_swarm_payload_t::init_as_slave() {
 }
 
 void drone_swarm_payload_t::init_as_master() {
+
   sub_odom = nh.subscribe<nav_msgs::Odometry>(
           "odom",
           1,
@@ -128,6 +134,7 @@ void drone_swarm_payload_t::init_as_master() {
           this,
           ros::TransportHints().tcpNoDelay()
   );
+
   sub_cmd = nh.subscribe<quadrotor_msgs::PositionCommand>(
           "position_cmd",
           1,
@@ -135,7 +142,9 @@ void drone_swarm_payload_t::init_as_master() {
           this,
           ros::TransportHints().tcpNoDelay()
   );
-  ROS_INFO_STREAM("[UWB][Swarm Drone Payload] init as master, " << data_length_master() << " bytes per frame");
+
+  pub_n3ctrl = nh.advertise<n3ctrl::N3CtrlState>("n3ctrl",100);
+
 }
 
 void drone_swarm_payload_t::slave_decode(const char *buffer) {
@@ -176,25 +185,22 @@ bool drone_swarm_payload_t::master_encode(char *buffer) {
   return odom_on_time();
 }
 
-struct reverse_dat_t {
-    uint32_t id;
-    uint32_t time;
-};
-
 bool drone_swarm_payload_t::slave_encode(char *buffer) {
-  //ROS_INFO_STREAM("sending message as slave");
-  static uint32_t counter = 0;
-  reverse_dat_t dat;
-  dat.id = counter++;
-  dat.time = counter*2;
-  memcpy(buffer, (char*)&dat, sizeof(reverse_dat_t));
-  return true;
+  n3ctrl_state_t dat {};
+  dat.state = latest_n3ctrl.state;
+  dat.last_traj_id = latest_n3ctrl.last_traj_id;
+  memcpy(buffer, (char*)&dat, sizeof(n3ctrl_state_t));
+  return n3ctrl_on_time();
 }
 
 void drone_swarm_payload_t::master_decode(const char *buffer) {
-  auto const * ptr = (reverse_dat_t const *)buffer;
-  reverse_dat_t dat = *ptr;
-  ROS_INFO_STREAM("recieve reverse data "<< dat.id << " " << dat.time);
+  auto const * ptr = (n3ctrl_state_t const *)buffer;
+  n3ctrl_state_t dat = *ptr;
+  latest_n3ctrl.header.stamp = ros::Time::now();
+  latest_n3ctrl.header.frame_id = "world";
+  latest_n3ctrl.state = dat.state;
+  latest_n3ctrl.last_traj_id = dat.last_traj_id;
+  pub_n3ctrl.publish(latest_n3ctrl);
 }
 
 int drone_swarm_payload_t::data_length_master() {
@@ -202,5 +208,5 @@ int drone_swarm_payload_t::data_length_master() {
 }
 
 int drone_swarm_payload_t::data_length_slave() {
-  return sizeof(reverse_dat_t);
+  return sizeof(n3ctrl_state_t);
 }
