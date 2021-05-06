@@ -20,9 +20,7 @@ class Uart_odom
 public:
     serial::Serial  m_serial;
     Protocal_to_mcu m_protocal_to_mcu;
-    Serial_packet   m_serial_pack;
     Serial_packet   m_serial_send_pack;
-    Serial_packet   m_serial_read_pack;
 
     int m_test_rec_count = 0;
 
@@ -46,19 +44,16 @@ public:
     double     m_current_time;
     double     m_send_last_time;
     double     m_send_current_time;
-    ros::Timer m_timer_test_send;
-    ros::Timer m_timer_test_read;
 
-    ros::Timer m_timer_send_odom;
+    ros::Timer m_timer_receive;
+    ros::Timer m_timer_send;
 
     ros::NodeHandle m_ros_nh;
-    int                m_if_odom_init = 0;
-    int                m_idx_odom;
 
     std::shared_ptr<uwb_comm::payload_base_t> payload_ptr;
 
 public:
-    void send_service_odom_message( const ros::TimerEvent &event ) {
+    void send_data(const ros::TimerEvent &event ) {
       //        printf("enter odom_message_send_service");
 
       if ( m_role == e_role_slave ) {
@@ -84,26 +79,6 @@ public:
 
     }
 
-    void send_service_eval_stability( const ros::TimerEvent &event )
-    {
-
-      char str[ 2048 ] = "Hello~\r\n";
-      for ( int i = 10; i < m_para_test_packet_size; i++ )
-      {
-        str[ i ] = i & 0xff;
-      }
-      //cout << "Enter eval_stability_send_service" << endl;
-      m_serial_pack.id = m_para_test_packet_id;
-      m_serial_pack.data_length = m_para_test_packet_size;
-      memcpy( m_serial_pack.data, str, m_para_test_packet_size );
-      m_para_test_send_total--;
-      if ( m_para_test_send_total >= 0 )
-      {
-        m_protocal_to_mcu.send_packet( m_serial_pack );
-        //protocal_to_mcu.display( 100 );
-        //ser_pack.display();
-      }
-    };
 
     template < typename TName, typename TVal >
     void read_essential_param( const ros::NodeHandle &nh, const TName &name, TVal &val )
@@ -153,7 +128,7 @@ public:
       cout << "=====  load_parameter finish ===== " << endl;
     }
 
-    void read_serive_eval_stability( const ros::TimerEvent &event ) {
+    void receive_data( const ros::TimerEvent &event ) {
       Serial_packet temp_serial_pack;
       int pack_num = m_protocal_to_mcu.receive_packet( temp_serial_pack );
       if ( pack_num != 0 ) { // Receive packet
@@ -175,14 +150,6 @@ public:
           }
         }
       }
-    };
-
-    void test_uart() {
-      cout << " ===== test_uart =====" << endl;
-      m_timer_test_send = m_ros_nh.createTimer( ros::Duration( 1.0 / m_para_sent_timer_frequency ), &Uart_odom::send_service_eval_stability, this );
-      m_timer_test_send.start();
-      m_timer_test_read.start();
-      cout << "test_uart exit" << endl;
     };
 
     void init_as_master(){
@@ -221,9 +188,8 @@ public:
           exit(-1);
       }
 
-      // m_timer_test_read = m_ros_nh.createTimer( ros::Duration( 1.0 / m_para_read_timer_frequency ), &Uart_odom::read_serive_eval_stability, this );
-      m_timer_test_read = nh.createTimer( ros::Duration( 1.0 / m_para_read_timer_frequency ), &Uart_odom::read_serive_eval_stability, this );
-      m_timer_send_odom = m_ros_nh.createTimer( ros::Duration( 1.0 / m_para_sent_timer_frequency ), &Uart_odom::send_service_odom_message, this );
+      m_timer_receive = nh.createTimer(ros::Duration(1.0 / m_para_read_timer_frequency ), &Uart_odom::receive_data, this );
+      m_timer_send = m_ros_nh.createTimer(ros::Duration(1.0 / m_para_sent_timer_frequency ), &Uart_odom::send_data, this );
 
       m_serial.setPort( m_para_serial_port );
       m_serial.setBaudrate( m_para_baud_rate ); // 10000/10000 packet, all rec

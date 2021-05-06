@@ -71,7 +71,7 @@ class Uart_odom
     int                m_idx_odom;
 
   public:
-    void send_service_odom_message( const ros::TimerEvent &event )
+    void send_data(const ros::TimerEvent &event )
     {
 
         //        printf("enter odom_message_send_service");
@@ -201,7 +201,7 @@ class Uart_odom
         cout << "=====  load_parameter finish ===== " << endl;
     }
 
-    void read_serive_eval_stability( const ros::TimerEvent &event )
+    void receive_data(const ros::TimerEvent &event )
     {
         //cout << "Enter read_serive_eval_stability" << endl;
         Serial_packet temp_serial_pack;
