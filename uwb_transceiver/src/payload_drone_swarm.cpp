@@ -84,19 +84,40 @@ drone_swarm_payload_t::drone_swarm_payload_t(ros::NodeHandle & _nh) : nh(_nh) {
   latest_cmd.header.seq = 0;
 }
 
+bool drone_swarm_payload_t::odom_on_time() const {
+  return ( ros::Time::now() - latest_odom.header.stamp ).toSec() < msg_timeout_sec;
+}
+
+bool drone_swarm_payload_t::n3ctrl_on_time() const {
+  return ( ros::Time::now() - latest_n3ctrl.header.stamp ).toSec() < msg_timeout_sec;
+}
+
 void drone_swarm_payload_t::on_cmd(const quadrotor_msgs::PositionCommandConstPtr & msg) {
   latest_cmd = *msg;
 }
 
 void drone_swarm_payload_t::on_odom(const nav_msgs::OdometryConstPtr & msg) {
-  init = true;
   latest_odom = *msg;
 }
 
+void drone_swarm_payload_t::on_n3ctrl(const n3ctrl::N3CtrlStateConstPtr & msg) {
+  latest_n3ctrl = *msg;
+}
+
 void drone_swarm_payload_t::init_as_slave() {
+
   pub_odom = nh.advertise<nav_msgs::Odometry>("odom",100);
+
   pub_cmd = nh.advertise<quadrotor_msgs::PositionCommand>("position_cmd",100);
-  ROS_INFO_STREAM("[UWB][Swarm Drone Payload] init as slave, " << data_length_master() << " bytes per frame");
+
+  sub_n3ctrl = nh.subscribe<n3ctrl::N3CtrlState>(
+          "n3ctrl",
+          100,
+          &drone_swarm_payload_t::on_n3ctrl,
+          this,
+          ros::TransportHints().tcpNoDelay()
+  );
+
 }
 
 void drone_swarm_payload_t::init_as_master() {
@@ -136,7 +157,7 @@ void drone_swarm_payload_t::slave_decode(const char *buffer) {
     latest_cmd = decode_pos_cmd(*cmd_ptr);
     latest_cmd.header.stamp = ros::Time::now();
   }
-  else if ( (ros::Time::now() - latest_cmd.header.stamp).toSec() > 1 ) {
+  else if ( (ros::Time::now() - latest_cmd.header.stamp).toSec() > msg_timeout_sec ) {
     // did not receive new cmd for one full second, stop sending the same cmd
     //ROS_WARN_STREAM("[UWB][slave] no new command");
     return;
@@ -152,7 +173,7 @@ bool drone_swarm_payload_t::master_encode(char *buffer) {
   pos_cmd_data_f32_t buffer_cmd = encode_pos_cmd<float>(latest_cmd);
   memcpy(buffer, (char*)&buffer_odom, sizeof(mini_odom_f32_t));
   memcpy(buffer+sizeof(mini_odom_f32_t), (char*)&buffer_cmd, sizeof(pos_cmd_data_f32_t));
-  return init;
+  return odom_on_time();
 }
 
 struct reverse_dat_t {

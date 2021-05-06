@@ -8,6 +8,7 @@
 #include <ros/ros.h>
 #include <nav_msgs/Odometry.h>
 #include <quadrotor_msgs/PositionCommand.h>
+#include <n3ctrl/N3CtrlState.h>
 
 #include "uwb_transceiver/payload.h"
 
@@ -15,11 +16,33 @@ namespace uwb_comm {
 
     struct drone_swarm_payload_t: public payload_base_t {
 
+        void init_as_master() final;
+
+        void init_as_slave() final;
+
+        bool master_encode(char * buffer) final;
+
+        void master_decode(char const * buffer) final;
+
+        bool slave_encode(char * buffer) final;
+
+        void slave_decode(char const * buffer) final;
+
+        int data_length_master() final;
+
+        int data_length_slave() final;
+
+    public:
+
         ros::NodeHandle & nh;
 
         ros::Subscriber sub_odom;
 
         ros::Subscriber sub_cmd;
+
+        ros::Subscriber sub_n3ctrl;
+
+        ros::Publisher pub_n3ctrl;
 
         ros::Publisher pub_odom;
 
@@ -29,7 +52,9 @@ namespace uwb_comm {
 
         quadrotor_msgs::PositionCommand latest_cmd;
 
-        bool init = false;
+        n3ctrl::N3CtrlState latest_n3ctrl;
+
+        double msg_timeout_sec = 1;
 
         explicit drone_swarm_payload_t( ros::NodeHandle & );
 
@@ -37,23 +62,11 @@ namespace uwb_comm {
 
         void on_cmd( quadrotor_msgs::PositionCommandConstPtr const & );
 
-    public:
+        void on_n3ctrl( n3ctrl::N3CtrlStateConstPtr const & );
 
-        void init_as_master() final;
+        bool odom_on_time() const;
 
-        void init_as_slave() final;
-
-        bool master_encode(char * buffer) final;
-
-        void slave_decode(char const * buffer) final;
-
-        int data_length_master() final;
-
-        int data_length_slave() final;
-
-        bool slave_encode(char * buffer) final;
-
-        void master_decode(char const * buffer) final;
+        bool n3ctrl_on_time() const;
 
     };
 

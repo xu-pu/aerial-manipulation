@@ -32,6 +32,7 @@ find_package(catkin REQUIRED COMPONENTS
     serial
     tf
     quadrotor_msgs
+    n3ctrl
 )
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
