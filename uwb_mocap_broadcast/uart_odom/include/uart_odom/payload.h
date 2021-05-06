@@ -26,19 +26,19 @@ namespace uwb_comm {
          * @param buffer
          * @return if true, send the data, if false, don't send anything
          */
-        virtual bool encode(char * buffer) = 0;
+        virtual bool master_encode(char * buffer) = 0;
 
         /**
          * Decode data in the buffer and send it out (as slave)
          * @param buffer
          */
-        virtual void decode(char const * buffer) = 0;
+        virtual void slave_decode(char const * buffer) = 0;
 
         virtual bool slave_encode(char * buffer) = 0;
 
         virtual void master_decode(char const * buffer) = 0;
 
-        virtual int data_length() = 0;
+        virtual int data_length_master() = 0;
 
         virtual int data_length_slave() = 0;
 

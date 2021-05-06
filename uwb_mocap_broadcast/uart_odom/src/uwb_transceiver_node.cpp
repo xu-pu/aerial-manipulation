@@ -71,9 +71,9 @@ public:
         }
       }
       else if (m_role == e_master ) {
-        if ( payload_ptr->encode(m_serial_send_pack.data) ) {
+        if (payload_ptr->master_encode(m_serial_send_pack.data) ) {
           m_serial_send_pack.id = m_para_odom_packet_id;
-          m_serial_send_pack.data_length = payload_ptr->data_length();
+          m_serial_send_pack.data_length = payload_ptr->data_length_master();
           m_send_current_time = ros::Time::now().toSec();
           m_protocal_to_mcu.send_packet( m_serial_send_pack );
           //cout << (1.0 / (ros::Time::now().toSec() - m_send_current_time) ) <<endl;
@@ -171,7 +171,7 @@ public:
             payload_ptr->master_decode(temp_serial_pack.data);
           }
           else if ( m_role == e_role_slave ){
-            payload_ptr->decode(temp_serial_pack.data);
+            payload_ptr->slave_decode(temp_serial_pack.data);
           }
         }
       }

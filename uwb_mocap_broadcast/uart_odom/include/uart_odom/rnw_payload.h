@@ -31,11 +31,11 @@ namespace uwb_comm {
 
         void init_as_slave() final;
 
-        bool encode(char * buffer) final;
+        bool master_encode(char * buffer) final;
 
-        void decode(char const * buffer) final;
+        void slave_decode(char const * buffer) final;
 
-        int data_length() final;
+        int data_length_master() final;
 
     };
 

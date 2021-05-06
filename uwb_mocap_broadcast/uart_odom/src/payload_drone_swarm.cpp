@@ -97,7 +97,7 @@ void drone_swarm_payload_t::on_odom(const nav_msgs::OdometryConstPtr & msg) {
 void drone_swarm_payload_t::init_as_slave() {
   pub_odom = nh.advertise<nav_msgs::Odometry>("odom",100);
   pub_cmd = nh.advertise<quadrotor_msgs::PositionCommand>("position_cmd",100);
-  ROS_INFO_STREAM("[UWB][Swarm Drone Payload] init as slave, " << data_length() << " bytes per frame");
+  ROS_INFO_STREAM("[UWB][Swarm Drone Payload] init as slave, " << data_length_master() << " bytes per frame");
 }
 
 void drone_swarm_payload_t::init_as_master() {
@@ -115,10 +115,10 @@ void drone_swarm_payload_t::init_as_master() {
           this,
           ros::TransportHints().tcpNoDelay()
   );
-  ROS_INFO_STREAM("[UWB][Swarm Drone Payload] init as master, " << data_length() << " bytes per frame");
+  ROS_INFO_STREAM("[UWB][Swarm Drone Payload] init as master, " << data_length_master() << " bytes per frame");
 }
 
-void drone_swarm_payload_t::decode(const char *buffer) {
+void drone_swarm_payload_t::slave_decode(const char *buffer) {
 
   // process odom
   auto * odom_ptr = (mini_odom_f32_t const *)buffer;
@@ -147,7 +147,7 @@ void drone_swarm_payload_t::decode(const char *buffer) {
 
 }
 
-bool drone_swarm_payload_t::encode(char *buffer) {
+bool drone_swarm_payload_t::master_encode(char *buffer) {
   mini_odom_f32_t buffer_odom;
   odom_to_miniodom<float, int>(latest_odom,buffer_odom);
   pos_cmd_data_f32_t buffer_cmd = encode_pos_cmd<float>(latest_cmd);
@@ -177,7 +177,7 @@ void drone_swarm_payload_t::master_decode(const char *buffer) {
   ROS_INFO_STREAM("recieve reverse data "<< dat.id << " " << dat.time);
 }
 
-int drone_swarm_payload_t::data_length() {
+int drone_swarm_payload_t::data_length_master() {
   return sizeof(mini_odom_f32_t) + sizeof(pos_cmd_data_f32_t);
 }
 

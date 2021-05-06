@@ -28,11 +28,11 @@ void rnw_payload_t::init_as_slave() {
   pub_odom_cone = nh.advertise< nav_msgs::Odometry >( "out_odom_cone", 100 );
 }
 
-int rnw_payload_t::data_length() {
+int rnw_payload_t::data_length_master() {
   return sizeof(mini_odom_t) * 2;
 }
 
-void rnw_payload_t::decode(const char *buffer) {
+void rnw_payload_t::slave_decode(const char *buffer) {
   mini_odom_t m_read_mini_odom_uav, m_read_mini_odom_cone;
   memcpy(&m_read_mini_odom_uav, buffer, sizeof(mini_odom_t));
   memcpy(&m_read_mini_odom_cone, buffer+sizeof(mini_odom_t), sizeof(mini_odom_t));
@@ -45,7 +45,7 @@ void rnw_payload_t::decode(const char *buffer) {
   pub_odom_cone.publish(odom_cone);
 }
 
-bool rnw_payload_t::encode(char *buffer) {
+bool rnw_payload_t::master_encode(char *buffer) {
   mini_odom_t m_mini_odom_uav, m_mini_odom_cone;
   odom_to_miniodom<float, int>(latest_msg, m_mini_odom_uav );
   odom_to_miniodom<float, int>( latest_msg, m_mini_odom_cone );
