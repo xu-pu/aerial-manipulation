@@ -116,12 +116,14 @@ Inspect them using:
 - `/drone1/odom`
 - `/drone1/traj`
 - `/drone1/position_cmd`
+- `/drone1/state`
 
 `/drone2`
 
 - `/drone2/odom`
 - `/drone2/traj`
 - `/drone2/position_cmd`
+- `/drone2/state`
 
 `/cone`
 

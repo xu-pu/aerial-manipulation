@@ -171,7 +171,7 @@ void drone_swarm_payload_t::slave_decode(const char *buffer) {
     //ROS_WARN_STREAM("[UWB][slave] no new command");
     return;
   }
-  ROS_INFO_STREAM("[UWB][slave] send out cmd with seq " << latest_cmd.header.seq);
+  //ROS_INFO_STREAM("[UWB][slave] send out cmd with seq " << latest_cmd.header.seq);
   pub_cmd.publish(latest_cmd);
 
 }
