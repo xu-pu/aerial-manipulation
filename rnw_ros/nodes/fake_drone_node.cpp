@@ -82,6 +82,7 @@ struct fake_drone_t {
 
       // publish odom
 
+      latest_odom.header.stamp = ros::Time::now();
       pub_odom.publish(latest_odom);
 
       // publish n3ctrl_state

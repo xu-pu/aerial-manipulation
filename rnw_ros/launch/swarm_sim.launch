@@ -6,7 +6,7 @@
 
     <remap from="/uwb_vicon_odom" to="$(arg topic_odom_uav)"/>
 
-    <node pkg="djiros" type="djiros_node" name="djiros" output="screen" launch-prefix="" required="true">
+    <node pkg="djiros" type="djiros_node" name="djiros" output="log" launch-prefix="" required="true">
         <param name="log_level" type="string" value="info"/>
         <param name="serial_name" type="string" value="/dev/tty.dji.n3"/>
         <param name="baud_rate" type="int" value="921600"/>
@@ -17,7 +17,7 @@
         <param name="align_with_fmu" type="bool" value="false"/>
     </node>
 
-    <node pkg="n3ctrl" type="n3ctrl_node" name="n3ctrl" output="screen" required="true">
+    <node pkg="n3ctrl" type="n3ctrl_node" name="n3ctrl" output="log" required="true">
         <!--subscribers-->
 		<remap from="~joy" to="/djiros/rc" />
         <remap from="~odom" to="$(arg topic_odom_uav)" />
@@ -64,7 +64,7 @@
 
     <!--  generate control cmd for the drones  -->
 
-    <node pkg="rnw_ros" type="test_swarm_planner_node" name="test_swarm_planner_node"/>
+    <node pkg="rnw_ros" type="test_swarm_planner_node" name="test_swarm_planner_node" output="screen"/>
 
     <node pkg="rnw_ros" type="traj2cmd_node" name="traj2cmd_drone1" output="screen" required="true">
         <remap from="~traj" to="/drone1/traj"/>

@@ -90,7 +90,7 @@ struct test_swarm_planner_t {
 
     void trigger_hello_world( std_msgs::HeaderConstPtr const & msg ) const {
 
-      if ( !swarm.initialized() ) {
+      if ( !swarm.ready() ) {
         ROS_ERROR_STREAM("[test_swarm_planner_node] did not receive odom");
         return;
       }
@@ -111,7 +111,7 @@ struct test_swarm_planner_t {
 
     void trigger_align( std_msgs::HeaderConstPtr const & msg ) const {
 
-      if ( !swarm.initialized() ) {
+      if ( !swarm.ready() ) {
         ROS_ERROR_STREAM("[test_swarm_planner_node] did not receive odom");
         return;
       }
@@ -135,7 +135,7 @@ struct test_swarm_planner_t {
 
     void trigger_zigzag( std_msgs::HeaderConstPtr const & msg ) const {
 
-      if ( !swarm.initialized() ) {
+      if ( !swarm.ready() ) {
         ROS_ERROR_STREAM("[test_swarm_planner_node] did not receive odom");
         return;
       }
@@ -151,7 +151,7 @@ struct test_swarm_planner_t {
 
     void trigger_circle( std_msgs::HeaderConstPtr const & msg ) const {
 
-      if ( !swarm.initialized() ) {
+      if ( !swarm.ready() ) {
         ROS_ERROR_STREAM("[test_swarm_planner_node] did not receive odom");
         return;
       }

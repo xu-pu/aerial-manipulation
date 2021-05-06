@@ -59,7 +59,7 @@ struct swarm_planner_t {
      */
     double execute_cmd( rnw_command_t const & cmd ) const {
 
-      if ( !swarm_interface.initialized() ) {
+      if ( !swarm_interface.ready() ) {
         ROS_ERROR_STREAM("swarm odom not properly initialized");
         return 0;
       }
