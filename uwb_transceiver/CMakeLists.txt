@@ -32,7 +32,7 @@ find_package(catkin REQUIRED COMPONENTS
     serial
     tf
     quadrotor_msgs
-    )
+)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 find_package(Eigen REQUIRED) # try to find manually installed eigen (Usually in /usr/local with provided FindEigen3.cmake)
@@ -133,8 +133,6 @@ catkin_package(
     INCLUDE_DIRS include
 #    rosserial_msgs
 #    std_msgs
-#    CATKIN_DEPENDS
-#  LIBRARIES uart_odom
 #   CATKIN_DEPENDS other_catkin_pkg
 #   DEPENDS system_lib
 )
@@ -155,7 +153,6 @@ include_directories(
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/src/uart_odom.cpp
 #)
 
 ## Add cmake target dependencies of the library
@@ -221,16 +218,3 @@ target_link_libraries(uwb_transceiver_node ${catkin_LIBRARIES})
 #   # myfile2
 #   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 # )
-
-#############
-## Testing ##
-#############
-
-## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_uart_odom.cpp)
-# if(TARGET ${PROJECT_NAME}-test)
-#   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
-# endif()
-
-## Add folders to be run by python nosetests
-# catkin_add_nosetests(test)

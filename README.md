@@ -139,7 +139,7 @@ Inspect them using:
 
 `traj_server_node` takes `/drone1/traj` and sets `/drone1/position_cmd`
 
-`uart_odom` takes `/drone1/odom` and `/done1/position_cmd` and send it to the drone
+`uwb_transceiver` takes `/drone1/odom` and `/done1/position_cmd` and send it to the drone
 
 
 
@@ -155,7 +155,7 @@ Inspect them using:
 
 ### Nodes
 
-`uart_odom` sets `/odom/uav` and `/position_cmd`
+`uwb_transceiver` sets `/odom/uav` and `/position_cmd`
 
 `n3ctrl` executes `/position_cmd` while monitoring `/uav/odom` and `/djiros/rc`
 

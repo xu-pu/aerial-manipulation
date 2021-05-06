@@ -16,16 +16,16 @@
         <rosparam file="$(find mocap2odom)/config/calib.yaml" command="load" />
     </node>
 
-    <node pkg="uart_odom" type="uwb_transceiver_node" name="uwb_master_drone1" output="screen">
-        <rosparam command="load" file="$(find uart_odom)/config/uart_odom_config.yaml" />
+    <node pkg="uwb_transceiver" type="uwb_transceiver_node" name="uwb_master_drone1" output="screen">
+        <rosparam command="load" file="$(find uwb_transceiver)/config/config.yaml" />
         <param name="serial_port" value="/dev/tty.uwb.master1"/>
         <remap from="~odom" to="/drone1/odom"/>
         <remap from="~position_cmd" to="/drone1/position_cmd"/>
         <param name="role" type="int" value="1"/> <!--master-->
     </node>
 
-    <node pkg="uart_odom" type="uwb_transceiver_node" name="uwb_master_drone2" output="screen">
-        <rosparam command="load" file="$(find uart_odom)/config/uart_odom_config.yaml" />
+    <node pkg="uwb_transceiver" type="uwb_transceiver_node" name="uwb_master_drone2" output="screen">
+        <rosparam command="load" file="$(find uwb_transceiver)/config/config.yaml" />
         <param name="serial_port" value="/dev/tty.uwb.master2"/>
         <remap from="~odom" to="/drone2/odom"/>
         <remap from="~position_cmd" to="/drone2/position_cmd"/>

@@ -2,24 +2,24 @@
 <package format="2">
   <name>uwb_transceiver</name>
   <version>0.0.0</version>
-  <description>The uart_odom package</description>
+  <description>The uwb_transceiver package, modified from uart_odom package from zivlin</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag -->
   <!-- Example:  -->
   <!-- <maintainer email="jane.doe@example.com">Jane Doe</maintainer> -->
-  <maintainer email="zivlin@todo.todo">zivlin</maintainer>
+  <maintainer email="ptx.pluto@gmail.com">Paul Xu</maintainer>
 
 
   <!-- One license tag required, multiple allowed, one license per tag -->
   <!-- Commonly used license strings: -->
   <!--   BSD, MIT, Boost Software License, GPLv2, GPLv3, LGPLv2.1, LGPLv3 -->
-  <license>TODO</license>
+  <license>MIT</license>
 
 
   <!-- Url tags are optional, but multiple are allowed, one per tag -->
   <!-- Optional attribute type can be: website, bugtracker, or repository -->
   <!-- Example: -->
-  <!-- <url type="website">http://wiki.ros.org/uart_odom</url> -->
+  <!-- <url type="website">http://wiki.ros.org/uwb_transceiver</url> -->
 
 
   <!-- Author tags are optional, multiple are allowed, one per tag -->
