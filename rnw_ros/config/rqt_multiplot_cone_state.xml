@@ -253,8 +253,8 @@
                         <curve_0>
                             <axes>
                                 <x_axis>
-                                    <field></field>
-                                    <field_type>1</field_type>
+                                    <field>header/stamp</field>
+                                    <field_type>0</field_type>
                                     <scale>
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
@@ -262,7 +262,7 @@
                                         <relative_minimum>-1000</relative_minimum>
                                         <type>0</type>
                                     </scale>
-                                    <topic>/cone/dt</topic>
+                                    <topic>/cone/control_point_height</topic>
                                     <type>quadrotor_msgs/Float64Stamped</type>
                                 </x_axis>
                                 <y_axis>
@@ -275,7 +275,7 @@
                                         <relative_minimum>-1000</relative_minimum>
                                         <type>0</type>
                                     </scale>
-                                    <topic>/cone/dt</topic>
+                                    <topic>/cone/control_point_height</topic>
                                     <type>quadrotor_msgs/Float64Stamped</type>
                                 </y_axis>
                             </axes>
@@ -286,7 +286,7 @@
                             <data>
                                 <circular_buffer_capacity>1000</circular_buffer_capacity>
                                 <time_frame_length>10</time_frame_length>
-                                <type>3</type>
+                                <type>0</type>
                             </data>
                             <style>
                                 <lines_interpolate>false</lines_interpolate>
@@ -299,14 +299,14 @@
                                 <type>0</type>
                             </style>
                             <subscriber_queue_size>100</subscriber_queue_size>
-                            <title>dt</title>
+                            <title>Untitled Curve</title>
                         </curve_0>
                     </curves>
                     <legend>
                         <visible>true</visible>
                     </legend>
                     <plot_rate>30</plot_rate>
-                    <title>dt</title>
+                    <title>control point height</title>
                 </column_1>
             </row_0>
             <row_1>
