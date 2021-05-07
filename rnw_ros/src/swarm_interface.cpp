@@ -8,9 +8,19 @@ quadrotor_msgs::PolynomialTrajectory swarm_interface_t::abort_traj() {
 
 swarm_interface_t::swarm_interface_t( ros::NodeHandle & _nh ) : nh(_nh) {
 
+  pub_abort = nh.advertise<std_msgs::Header>("/abort",10);
+
   pub_traj_drone1 = nh.advertise<quadrotor_msgs::PolynomialTrajectory>("/drone1/traj",10);
 
   pub_traj_drone2 = nh.advertise<quadrotor_msgs::PolynomialTrajectory>("/drone2/traj",10);
+
+  sub_abort_trigger = nh.subscribe<std_msgs::Header>(
+          "/gamepad/RB",
+          100,
+          &swarm_interface_t::on_abort,
+          this,
+          ros::TransportHints().tcpNoDelay()
+  );
 
   sub_odom_drone1 = nh.subscribe<nav_msgs::Odometry>(
           "/drone1/odom",
@@ -109,10 +119,10 @@ void swarm_interface_t::on_integrity_check(const ros::TimerEvent &e) {
 
   bool swarm_ready = ready();
   if ( swarm_ready_latch && !swarm_ready ) {
-    ROS_ERROR_STREAM("[swarm] exit ready state!");
+    on_exit_ready();
   }
   else if ( !swarm_ready_latch && swarm_ready ) {
-    ROS_INFO_STREAM("[swarm] bacame ready");
+    on_became_ready();
   }
 
   swarm_ready_latch = swarm_ready;
@@ -127,4 +137,21 @@ bool swarm_interface_t::drone1_connected() const {
 bool swarm_interface_t::drone2_connected() const {
   return (ros::Time::now() - latest_odom_drone2.header.stamp).toSec() < odom_timeout_sec &&
          (ros::Time::now() - latest_n3ctrl_drone2.header.stamp).toSec() < n3ctrl_timeout_sec;
+}
+
+void swarm_interface_t::on_became_ready() const {
+  ROS_INFO_STREAM("[swarm] bacame ready");
+}
+
+void swarm_interface_t::on_exit_ready() const {
+  on_abort(nullptr);
+  ROS_ERROR_STREAM("[swarm] exit ready state! abort!");
+}
+
+void swarm_interface_t::on_abort(const std_msgs::HeaderConstPtr &msg) const {
+  std_msgs::Header m;
+  m.stamp = ros::Time::now();
+  pub_abort.publish(m);
+  pub_abort.publish(m);
+  pub_abort.publish(m);
 }

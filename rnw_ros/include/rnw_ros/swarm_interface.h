@@ -14,6 +14,8 @@ struct swarm_interface_t {
 
     ros::NodeHandle & nh;
 
+    ros::Publisher pub_abort;
+
     ros::Publisher pub_traj_drone1;
 
     ros::Publisher pub_traj_drone2;
@@ -25,6 +27,8 @@ struct swarm_interface_t {
     ros::Subscriber sub_n3ctrl_drone1;
 
     ros::Subscriber sub_n3ctrl_drone2;
+
+    ros::Subscriber sub_abort_trigger;
 
     nav_msgs::Odometry latest_odom_drone1;
 
@@ -45,6 +49,12 @@ struct swarm_interface_t {
     void on_n3ctrl_drone1( n3ctrl::N3CtrlStateConstPtr const & msg );
 
     void on_n3ctrl_drone2( n3ctrl::N3CtrlStateConstPtr const & msg );
+
+    void on_became_ready() const;
+
+    void on_exit_ready() const;
+
+    void on_abort( std_msgs::HeaderConstPtr const & msg ) const;
 
     void send_traj( quadrotor_msgs::PolynomialTrajectory const & traj1, quadrotor_msgs::PolynomialTrajectory const & traj2 ) const;
 
