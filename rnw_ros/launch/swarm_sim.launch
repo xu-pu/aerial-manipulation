@@ -38,11 +38,7 @@
         <param name="~autorepeat_rate" value="0" />
     </node>
 
-    <node pkg="rnw_ros" type="gamepad_trigger_node" name="gamepad_trigger_node" output="screen">
-        <remap from="~A" to="/gamepad/A"/>
-    </node>
-
-    <node name="rviz_traj" pkg="rviz" type="rviz" output="log" args="-d $(find rnw_ros)/config/swarm_sim.rviz" />
+    <node pkg="rnw_ros" type="gamepad_trigger_node" name="gamepad" output="screen"/>
 
     <!-- odom for the drones, simulated and fake ones   -->
 
@@ -102,6 +98,8 @@
 
     <!--  visualization  -->
 
+    <node name="rviz_traj" pkg="rviz" type="rviz" output="log" args="-d $(find rnw_ros)/config/swarm.rviz" />
+
     <node pkg="rnw_ros" type="visualize_pos_cmd_node" name="sim_cmd" output="screen" required="true">
         <remap from="~position_cmd" to="/position_cmd"/>
     </node>
@@ -114,6 +112,20 @@
     <node pkg="rnw_ros" type="odom2tf_node" name="drone1_tf" output="screen">
         <remap from="~odom" to="/drone1/odom"/>
         <param name="name" value="odom_drone1" />
+    </node>
+
+    <node pkg="rnw_ros" type="visualize_traj_node" name="traj_viz_drone1" output="screen" required="true">
+        <param name="lift_dt" type="double" value="0.05"/>
+        <param name="length_g" type="double" value="0.5"/>
+        <param name="clear_after_n_sec" type="double" value="0"/>
+        <remap from="~poly_traj" to="/drone1/traj"/>
+    </node>
+
+    <node pkg="rnw_ros" type="visualize_traj_node" name="traj_viz_drone2" output="screen" required="true">
+        <param name="lift_dt" type="double" value="0.05"/>
+        <param name="length_g" type="double" value="0.5"/>
+        <param name="clear_after_n_sec" type="double" value="0"/>
+        <remap from="~poly_traj" to="/drone2/traj"/>
     </node>
 
 </launch>

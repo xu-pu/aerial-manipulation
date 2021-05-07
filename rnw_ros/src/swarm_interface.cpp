@@ -14,7 +14,7 @@ swarm_interface_t::swarm_interface_t( ros::NodeHandle & _nh ) : nh(_nh) {
 
   sub_odom_drone1 = nh.subscribe<nav_msgs::Odometry>(
           "/drone1/odom",
-          10,
+          1,
           &swarm_interface_t::on_odom_drone1,
           this,
           ros::TransportHints().tcpNoDelay()
@@ -22,7 +22,7 @@ swarm_interface_t::swarm_interface_t( ros::NodeHandle & _nh ) : nh(_nh) {
 
   sub_odom_drone2 = nh.subscribe<nav_msgs::Odometry>(
           "/drone2/odom",
-          10,
+          1,
           &swarm_interface_t::on_odom_drone2,
           this,
           ros::TransportHints().tcpNoDelay()
@@ -30,7 +30,7 @@ swarm_interface_t::swarm_interface_t( ros::NodeHandle & _nh ) : nh(_nh) {
 
   sub_n3ctrl_drone1 = nh.subscribe<n3ctrl::N3CtrlState>(
           "/drone1/state",
-          10,
+          1,
           &swarm_interface_t::on_n3ctrl_drone1,
           this,
           ros::TransportHints().tcpNoDelay()
@@ -38,7 +38,7 @@ swarm_interface_t::swarm_interface_t( ros::NodeHandle & _nh ) : nh(_nh) {
 
   sub_n3ctrl_drone2 = nh.subscribe<n3ctrl::N3CtrlState>(
           "/drone2/state",
-          10,
+          1,
           &swarm_interface_t::on_n3ctrl_drone2,
           this,
           ros::TransportHints().tcpNoDelay()
