@@ -162,31 +162,27 @@ add_library(${PROJECT_NAME}
 # add_executable(${PROJECT_NAME}_node src/rnw_ros_node.cpp)
 
 set(RNW_NODES
-        pub_grip_state_node
-        pub_frames_node
         pub_euler_angles_node
         pub_mock_cone_node
-        pub_mock_uav_node
         pub_cone_state_node
-        pub_contact_radius_node
+        pub_cone_debug_info_node
+        pub_obj_trace_node
+        pub_energy_node
         visualize_traj_node
         visualize_cone_node
+        visualize_pos_cmd_node
         rnw_traj_server_node
         rnw_controller_node
         rnw_planning_node
-        test_traj_node
         vicon_imu_cali_node
         gamepad_trigger_node
         dbg_atti_loop_node
         mocap_calib_node
-        pub_obj_trace_node
         gen_paper_data_node
-        pub_energy_node
         odom2tf_node
         test_swarm_planner_node
         fake_drone_node
         traj2cmd_node
-        visualize_pos_cmd_node
         joystick_drone_cmd_node
         swarm_rnw_controller_node
         check_planning_assistant_node

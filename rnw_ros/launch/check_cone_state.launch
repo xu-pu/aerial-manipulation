@@ -19,7 +19,7 @@
         <param name="max_euler_velocity" value="10"/>
     </node>
 
-    <node pkg="rnw_ros" type="pub_contact_radius_node" name="pub_contact_radius_node" output="screen" required="true"/>
+    <node pkg="rnw_ros" type="pub_cone_debug_info_node" name="pub_cone_debug_info_node" output="screen" required="true"/>
 
     <node pkg="rnw_ros" type="visualize_cone_node" name="visualize_cone_node" output="screen" required="true">
         <param name="cone_color_r" type="double" value="0"/>
