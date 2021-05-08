@@ -161,3 +161,10 @@ Inspect them using:
 
 `n3ctrl` executes `/position_cmd` while monitoring `/uav/odom` and `/djiros/rc`
 
+
+
+
+
+## Configuration
+
+In motion capture volumn, the max height drones can safely fly is $1.9$-$2.0$ meters.
