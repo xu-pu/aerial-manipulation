@@ -120,5 +120,7 @@
         <remap from="~position_cmd" to="/drone2/position_cmd"/>
     </node>
 
+    <node name="record" pkg="rosbag" type="record" output="screen" args="-a -x '(.*)visual(.*)|/(.*)viz(.*)'" />
+
 
 </launch>
