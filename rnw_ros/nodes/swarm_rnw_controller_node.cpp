@@ -219,6 +219,7 @@ struct rnw_node_t {
       double nut_comp = M_PI_2 - deg2rad * rnw_config.rnw.desired_nutation;
       Vector3d tip = dir_2d * std::cos(nut_comp) * len;
       tip.z() = std::sin(nut_comp) * len;
+      tip = tip + cur_contact;
 
       double ang = 0.5 * rnw_config.swarm.angle * deg2rad;
 
