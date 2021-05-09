@@ -110,7 +110,7 @@ struct rnw_node_t {
 
     ros::Subscriber sub_trigger_abort;
 
-    ros::Subscriber sub_trigger_init;
+    ros::Subscriber sub_trigger_swing_up;
 
     ros::Subscriber sub_trigger_land;
 
@@ -135,9 +135,23 @@ struct rnw_node_t {
       );
 
       sub_trigger_start = nh.subscribe<std_msgs::Header>(
-              "/rnw/start",
+              "/gamepad/X",
               10,
               &rnw_node_t::on_start,
+              this
+      );
+
+      sub_trigger_swing_up = nh.subscribe<std_msgs::Header>(
+              "/gamepad/Y",
+              10,
+              &rnw_node_t::on_swing_up,
+              this
+      );
+
+      sub_trigger_land = nh.subscribe<std_msgs::Header>(
+              "/gamepad/A",
+              10,
+              &rnw_node_t::on_land,
               this
       );
 
@@ -183,9 +197,9 @@ struct rnw_node_t {
 
     }
 
-    void on_init( std_msgs::HeaderConstPtr const & msg ){
+    void on_swing_up(std_msgs::HeaderConstPtr const & msg ){
 
-      ROS_WARN_STREAM("[rnw_planner] init triggered!");
+      ROS_WARN_STREAM("[rnw_planner] swing up triggered!");
       rnw_planner.stop_walking();
 
       double heading = cone_yaw(rnw_planner.latest_cone_state);
