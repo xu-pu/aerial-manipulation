@@ -66,6 +66,11 @@
 
     <!--  RnW  -->
 
+    <node pkg="rnw_ros" type="pub_cone_state_node" name="pub_cone_state_node" required="true" output="screen">
+        <param name="cut_euler_velocity" type="bool" value="true"/>
+        <param name="max_euler_velocity" value="10"/>
+    </node>
+
     <node pkg="rnw_ros" type="swarm_rnw_controller_node" name="swarm_rnw_controller_node" required="true" output="screen"/>
 
     <!--  Visualization  -->
@@ -102,7 +107,13 @@
         <param name="name" value="odom_drone2" />
     </node>
 
-    <node name="rviz_traj" pkg="rviz" type="rviz" output="log" args="-d $(find rnw_ros)/config/swarm.rviz" />
+    <node pkg="rnw_ros" type="visualize_cone_node" name="visualize_cone_node" output="screen" required="true">
+        <param name="cone_color_r" type="double" value="0"/>
+        <param name="cone_color_g" type="double" value="1"/>
+        <param name="cone_color_b" type="double" value="0"/>
+    </node>
+
+    <node name="rviz_traj" pkg="rviz" type="rviz" output="log" required="false" args="-d $(find rnw_ros)/config/swarm.rviz" />
 
     <node name="record" pkg="rosbag" type="record" output="screen" args="-a -x '(.*)visual(.*)|/(.*)viz(.*)'" />
 

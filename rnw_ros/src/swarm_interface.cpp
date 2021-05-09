@@ -65,18 +65,21 @@ void swarm_interface_t::on_odom_drone2( nav_msgs::OdometryConstPtr const & msg )
 }
 
 void swarm_interface_t::send_traj( quadrotor_msgs::PolynomialTrajectory const & traj1, quadrotor_msgs::PolynomialTrajectory const & traj2 ) const {
-  pub_traj_drone1.publish(traj1);
-  pub_traj_drone2.publish(traj2);
+  if ( ready() ) {
+    pub_traj_drone1.publish(traj1);
+    pub_traj_drone2.publish(traj2);
+  }
+  else {
+    ROS_WARN_STREAM("[swarm] swarm is not ready, can not send trajectories");
+  }
 }
 
 void swarm_interface_t::send_traj_just_drone1( quadrotor_msgs::PolynomialTrajectory const & msg ) const {
-  pub_traj_drone1.publish(msg);
-  pub_traj_drone2.publish(abort_traj());
+  send_traj(msg,abort_traj());
 }
 
 void swarm_interface_t::send_traj_just_drone2( quadrotor_msgs::PolynomialTrajectory const & msg ) const {
-  pub_traj_drone1.publish(abort_traj());
-  pub_traj_drone2.publish(msg);
+  send_traj(abort_traj(),msg);
 }
 
 void swarm_interface_t::on_n3ctrl_drone1(const n3ctrl::N3CtrlStateConstPtr &msg) {
