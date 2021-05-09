@@ -72,7 +72,7 @@
     </node>
 
     <node pkg="rnw_ros" type="swarm_rnw_controller_node" name="swarm_rnw_controller_node" required="true" output="screen">
-        <param name="check_swarm_ready" type="bool" value="false"/>
+<!--        <param name="check_swarm_ready" type="bool" value="false"/>-->
     </node>
 
     <!--  Visualization  -->
