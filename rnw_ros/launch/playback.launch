@@ -1,30 +1,26 @@
 <launch>
 
-    <arg name="imu_topic" default="/djiros/imu"/>
-    <arg name="vicon_topic" value="/uwb_vicon_odom"/>
-    <arg name="joy_ctrl_topic" value="/djiros/ctrl"/>
-
     <param name="/use_sim_time" type="bool" value="true"/>
 
-    <rosparam command="load" file="$(find rnw_ros)/config/rnw_config.yaml"/>
+<!--    <rosparam command="load" file="$(find rnw_ros)/config/rnw_config.yaml"/>-->
 
-    <node pkg="rnw_ros" type="visualize_traj_node" name="traj_visualization" output="screen" required="true">
-        <param name="lift_dt" type="double" value="0.05"/>
-        <param name="length_g" type="double" value="0.5"/>
-        <param name="clear_after_n_sec" type="double" value="0"/>
-    </node>
+<!--    <node pkg="rnw_ros" type="visualize_traj_node" name="traj_visualization" output="screen" required="true">-->
+<!--        <param name="lift_dt" type="double" value="0.05"/>-->
+<!--        <param name="length_g" type="double" value="0.5"/>-->
+<!--        <param name="clear_after_n_sec" type="double" value="0"/>-->
+<!--    </node>-->
 
-    <node pkg="rnw_ros" type="visualize_cone_node" name="visualize_cone_node" output="screen" required="true">
-        <param name="cone_color_r" type="double" value="0"/>
-        <param name="cone_color_g" type="double" value="1"/>
-        <param name="cone_color_b" type="double" value="0"/>
-    </node>
+<!--    <node pkg="rnw_ros" type="visualize_cone_node" name="visualize_cone_node" output="screen" required="true">-->
+<!--        <param name="cone_color_r" type="double" value="0"/>-->
+<!--        <param name="cone_color_g" type="double" value="1"/>-->
+<!--        <param name="cone_color_b" type="double" value="0"/>-->
+<!--    </node>-->
 
 <!--    <node pkg="rnw_ros" type="pub_obj_trace_node" name="pub_obj_trace_node" output="screen" required="true"/>-->
 
 <!--    <node pkg="rnw_ros" type="gen_paper_data_node" name="gen_paper_data_node" output="screen" required="true"/>-->
 
-    <node name="rviz_traj" pkg="rviz" type="rviz" output="log" required="true" args="-d $(find rnw_ros)/config/traj.rviz" />
+    <node name="rviz_traj" pkg="rviz" type="rviz" output="log" required="true" args="-d $(find rnw_ros)/config/swarm.rviz" />
 
 <!--    <node pkg="rnw_ros" type="pub_cone_state_node" name="pub_cone_state_node" required="true" output="log">-->
 <!--        <param name="cut_euler_velocity" type="bool" value="true"/>-->
@@ -32,18 +28,20 @@
 <!--    </node>-->
 
     <node name="rosbag_play" pkg="rosbag" type="play" respawn="false"
-          args="--clock -r 5 /home/sheep/Dropbox/rosbags/2020-11-23-21-57-58.bag"/>
+          args="--clock /home/sheep/Dropbox/mphil_bags/2021-05-08-23-45-02.bag"/>
 
-    <node name="rosbag_reocrd" pkg="rosbag" type="record" respawn="false" args="/rnw/cone_energy_diff"/>
-    <node pkg="rnw_ros" type="pub_energy_node" name="pub_energy_node" output="screen" required="true"/>
+<!--    <node name="rosbag_reocrd" pkg="rosbag" type="record" respawn="false" args="/rnw/cone_energy_diff"/>-->
+<!--    <node pkg="rnw_ros" type="pub_energy_node" name="pub_energy_node" output="screen" required="true"/>-->
 
     <!--    <node pkg="rnw_ros" type="dbg_atti_loop_node" name="dbg_atti_loop_node" output="screen">-->
 <!--        <remap from="~imu" to="$(arg imu_topic)"/>-->
 <!--        <remap from="~joy_ctrl" to="$(arg joy_ctrl_topic)"/>-->
 <!--    </node>-->
 
+    <node pkg="rnw_ros" type="pub_swarm_rnw_debug_info_node" name="pub_swarm_rnw_debug_info_node"/>
+
         <node pkg="rqt_multiplot" type="rqt_multiplot" name="rqt_multiplot"
-              args="--multiplot-config $(find rnw_ros)/config/rqt_multiplot_energy.xml --multiplot-run-all"/>
+              args="--multiplot-config $(find rnw_ros)/config/rqt_multiplot_swarm_rnw_debug.xml --multiplot-run-all"/>
 
 <!--    <node pkg="rqt_multiplot" type="rqt_multiplot" name="rqt_multiplot"-->
 <!--          args="&#45;&#45;multiplot-config $(find rnw_ros)/config/rqt_multiplot_cone_state.xml &#45;&#45;multiplot-run-all"/>-->
