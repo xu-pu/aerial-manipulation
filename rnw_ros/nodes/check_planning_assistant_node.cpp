@@ -39,10 +39,10 @@ struct assistant_node_t {
       }
 
       double rad = rnw_config.swarm.angle * deg2rad * 0.5;
-      double heading = cone_yaw(latest_cone_state);
+      double heading = latest_cone_state.euler_angles.x + M_PI_2;
       Vector3d CP = uav_utils::from_point_msg(latest_cone_state.tip);
-      Vector3d drone1_pos = calc_pt_at_cp_frame(CP, heading, rnw_config.swarm.cable1, rad);
-      Vector3d drone2_pos = calc_pt_at_cp_frame(CP, heading, rnw_config.swarm.cable2, -rad);
+      Vector3d drone1_pos = calc_pt_at_cp_frame(CP, heading, rnw_config.swarm.cable1, -rad);
+      Vector3d drone2_pos = calc_pt_at_cp_frame(CP, heading, rnw_config.swarm.cable2, rad);
 
       pub_pos_cmd_drone1.publish(pt2cmd(drone1_pos));
       pub_pos_cmd_drone2.publish(pt2cmd(drone2_pos));
