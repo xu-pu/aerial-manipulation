@@ -95,7 +95,7 @@ struct rnw_planner_v2_t {
         rocking
     } cone_fsm = cone_fsm_e::idle;
 
-private:
+public:
 
     void fsm_update();
 

@@ -168,3 +168,11 @@ Inspect them using:
 ## Configuration
 
 In motion capture volumn, the max height drones can safely fly is $1.9$-$2.0$ meters.
+
+placement
+
+cone tip points out
+
+left: drone1
+
+right: drone2

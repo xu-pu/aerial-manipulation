@@ -84,6 +84,14 @@ struct swarm_planner_t {
 
     }
 
+    void go_to_setpoint( Vector3d const & sp1, Vector3d const & sp2 ) const {
+      nav_msgs::Odometry odom1 = swarm_interface.latest_odom_drone1;
+      nav_msgs::Odometry odom2 = swarm_interface.latest_odom_drone2;
+      quadrotor_msgs::PolynomialTrajectory traj1 = genetate_uav_traj(odom1,sp1);
+      quadrotor_msgs::PolynomialTrajectory traj2 = genetate_uav_traj(odom2,sp2);
+      swarm_interface.send_traj(traj1,traj2);
+    }
+
 };
 
 struct rnw_node_t {
@@ -101,6 +109,10 @@ struct rnw_node_t {
     ros::Subscriber sub_trigger_start;
 
     ros::Subscriber sub_trigger_abort;
+
+    ros::Subscriber sub_trigger_init;
+
+    ros::Subscriber sub_trigger_land;
 
     ros::Time cmd_start_time;
 
@@ -150,6 +162,29 @@ struct rnw_node_t {
     void on_abort( std_msgs::HeaderConstPtr const & msg ){
       ROS_WARN_STREAM("[rnw_planner] abort triggered!");
       rnw_planner.stop_walking();
+    }
+
+    void on_land( std_msgs::HeaderConstPtr const & msg ){
+      ROS_WARN_STREAM("[rnw_planner] land triggered!");
+      rnw_planner.stop_walking();
+
+      double heading = cone_yaw(rnw_planner.latest_cone_state);
+
+      Vector3d cur_tip = uav_utils::from_point_msg(rnw_planner.latest_cone_state.tip);
+      Vector3d cur_contact = uav_utils::from_point_msg(rnw_planner.latest_cone_state.contact_point);
+
+      Vector3d v = cur_tip - cur_contact;
+      Vector3d rest_tip = cur_contact + v.norm() * Vector3d(v.x(),v.y(),0).normalized();
+
+      Vector3d tgt1 = calc_pt_at_cp_frame(rest_tip,heading,rnw_config.swarm.cable1*0.9,M_PI_2);
+      Vector3d tgt2 = calc_pt_at_cp_frame(rest_tip,heading,rnw_config.swarm.cable2*0.9,-M_PI_2);
+
+      swarm_planner.go_to_setpoint(tgt1,tgt2);
+
+    }
+
+    void on_init( std_msgs::HeaderConstPtr const & msg ){
+
     }
 
     /**
