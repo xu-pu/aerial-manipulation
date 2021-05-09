@@ -1,7 +1,11 @@
 #include "rnw_ros/rnw_planner_v2.h"
 
 rnw_planner_v2_t::rnw_planner_v2_t( rnw_config_t const & cfg )
-        : rnw_config(cfg), precession_regulator(cfg) { }
+        : rnw_config(cfg), precession_regulator(cfg)
+{
+  ros::NodeHandle nh("~");
+  pub_rnw_state = nh.advertise<rnw_msgs::RnwState>("/rnw/state",100);
+}
 
 void rnw_planner_v2_t::on_cone_state( rnw_msgs::ConeStateConstPtr const & msg ){
   latest_cone_state = *msg;
@@ -33,6 +37,8 @@ void rnw_planner_v2_t::spin(){
   else if ( cmd_fsm == cmd_fsm_e::executing ) {
     //ROS_INFO_STREAM("[rnw_planner] cmd executing, do not plan");
   }
+
+  pub_rnw_state.publish(to_rnw_state());
 
 }
 
@@ -92,7 +98,18 @@ void rnw_planner_v2_t::stop_walking(){
   if ( is_walking ) {
     precession_regulator.end();
     is_walking = false;
+    step_count = 0;
   }
+}
+
+rnw_msgs::RnwState rnw_planner_v2_t::to_rnw_state() const {
+  rnw_msgs::RnwState msg;
+  msg.header.stamp = ros::Time::now();
+  msg.header.frame_id = "world";
+  msg.is_walking = is_walking;
+  msg.step_count = step_count;
+  msg.setpoint = uav_utils::to_point_msg(rnw_command.control_point_setpoint);
+  return msg;
 }
 
 void rnw_planner_v2_t::plan_next_cmd(){

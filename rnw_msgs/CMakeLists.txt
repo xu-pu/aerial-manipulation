@@ -61,6 +61,7 @@ add_message_files(
         GripState.msg
         WalkingState.msg
         RnwCmd.msg
+        RnwState.msg
 )
 
 

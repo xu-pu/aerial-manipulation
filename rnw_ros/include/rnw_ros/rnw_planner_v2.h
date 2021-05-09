@@ -4,6 +4,7 @@
 #include "rnw_ros/rnw_utils.h"
 #include <rnw_msgs/ConeState.h>
 #include <rnw_msgs/RnwCmd.h>
+#include <rnw_msgs/RnwState.h>
 
 /**
  * positive rot increase yaw
@@ -59,6 +60,8 @@ struct rnw_planner_v2_t {
 
     void on_cone_state( rnw_msgs::ConeStateConstPtr const & msg );
 
+    rnw_msgs::RnwState to_rnw_state() const;
+
     /**
      * Main loop of the planner, run at 30Hz
      */
@@ -102,6 +105,8 @@ public:
     void fsm_transition( cone_fsm_e from, cone_fsm_e to );
 
     rnw_config_t const & rnw_config;
+
+    ros::Publisher pub_rnw_state;
 
     bool cone_state_init = false;
 
