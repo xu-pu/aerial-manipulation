@@ -185,6 +185,28 @@ struct rnw_node_t {
 
     void on_init( std_msgs::HeaderConstPtr const & msg ){
 
+      ROS_WARN_STREAM("[rnw_planner] init triggered!");
+      rnw_planner.stop_walking();
+
+      double heading = cone_yaw(rnw_planner.latest_cone_state);
+
+      Vector3d cur_tip = uav_utils::from_point_msg(rnw_planner.latest_cone_state.tip);
+      Vector3d cur_contact = uav_utils::from_point_msg(rnw_planner.latest_cone_state.contact_point);
+
+      Vector3d v = cur_tip - cur_contact;
+      double len = v.norm();
+      Vector3d dir_2d = Vector3d(v.x(),v.y(),0).normalized();
+      double nut_comp = M_PI_2 - deg2rad * rnw_config.rnw.desired_nutation;
+      Vector3d tip = dir_2d * std::cos(nut_comp) * len;
+      tip.z() = std::sin(nut_comp) * len;
+
+      double ang = 0.5 * rnw_config.swarm.angle * deg2rad;
+
+      Vector3d tgt1 = calc_pt_at_cp_frame(tip,heading,rnw_config.swarm.cable1,ang);
+      Vector3d tgt2 = calc_pt_at_cp_frame(tip,heading,rnw_config.swarm.cable2,-ang);
+
+      swarm_planner.go_to_setpoint(tgt1,tgt2);
+
     }
 
     /**
