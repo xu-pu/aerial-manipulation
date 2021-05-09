@@ -65,8 +65,8 @@ struct swarm_planner_t {
       }
 
       double rad = deg2rad * 0.5 * rnw_config.swarm.angle;
-      Vector3d setpoint1 = calc_pt_at_cp_frame(cmd.control_point_setpoint,cmd.heading,rnw_config.swarm.cable1,rad);
-      Vector3d setpoint2 = calc_pt_at_cp_frame(cmd.control_point_setpoint,cmd.heading,rnw_config.swarm.cable2,-rad);
+      Vector3d setpoint1 = calc_pt_at_cp_frame(cmd.control_point_setpoint,cmd.heading,rnw_config.swarm.cable1,-rad);
+      Vector3d setpoint2 = calc_pt_at_cp_frame(cmd.control_point_setpoint,cmd.heading,rnw_config.swarm.cable2,rad);
       nav_msgs::Odometry odom1 = swarm_interface.latest_odom_drone1;
       nav_msgs::Odometry odom2 = swarm_interface.latest_odom_drone2;
 
