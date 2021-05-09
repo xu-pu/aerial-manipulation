@@ -60,7 +60,7 @@ struct swarm_planner_t {
     double execute_cmd( rnw_command_t const & cmd ) const {
 
       if ( !swarm_interface.ready() ) {
-        ROS_ERROR_STREAM("swarm odom not properly initialized");
+        ROS_ERROR_STREAM("[rnw_planner] swarm not ready, can not execute commands!");
         return 0;
       }
 
@@ -170,7 +170,13 @@ struct rnw_node_t {
 
     void on_start( std_msgs::HeaderConstPtr const & msg ){
       ROS_WARN_STREAM("[rnw_planner] start triggered!");
-      rnw_planner.start_walking();
+      if ( swarm_planner.swarm_interface.ready() ) {
+        rnw_planner.start_walking();
+      }
+      else {
+        ROS_WARN_STREAM("[rnw_planner] swarm not ready, can not start rnw!");
+      }
+
     }
 
     void on_abort( std_msgs::HeaderConstPtr const & msg ){

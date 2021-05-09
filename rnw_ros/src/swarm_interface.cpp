@@ -14,14 +14,6 @@ swarm_interface_t::swarm_interface_t( ros::NodeHandle & _nh ) : nh(_nh) {
 
   pub_traj_drone2 = nh.advertise<quadrotor_msgs::PolynomialTrajectory>("/drone2/traj",10);
 
-  sub_abort_trigger = nh.subscribe<std_msgs::Header>(
-          "/gamepad/RB",
-          100,
-          &swarm_interface_t::on_abort,
-          this,
-          ros::TransportHints().tcpNoDelay()
-  );
-
   sub_odom_drone1 = nh.subscribe<nav_msgs::Odometry>(
           "/drone1/odom",
           1,
@@ -144,14 +136,12 @@ void swarm_interface_t::on_became_ready() const {
 }
 
 void swarm_interface_t::on_exit_ready() const {
-  on_abort(nullptr);
   ROS_ERROR_STREAM("[swarm] exit ready state! abort!");
+  send_abort();
 }
 
-void swarm_interface_t::on_abort(const std_msgs::HeaderConstPtr &msg) const {
+void swarm_interface_t::send_abort() const {
   std_msgs::Header m;
   m.stamp = ros::Time::now();
-  pub_abort.publish(m);
-  pub_abort.publish(m);
   pub_abort.publish(m);
 }

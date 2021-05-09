@@ -35,9 +35,9 @@ struct gamepad_handler_t {
 
     bool init = false;
 
-    static constexpr size_t BUTTON_X = 0;
-    static constexpr size_t BUTTON_A = 1;
-    static constexpr size_t BUTTON_B = 2;
+    static constexpr size_t BUTTON_X = 2;
+    static constexpr size_t BUTTON_A = 0;
+    static constexpr size_t BUTTON_B = 1;
     static constexpr size_t BUTTON_Y = 3;
     static constexpr size_t BUTTON_LB = 4;
     static constexpr size_t BUTTON_RB = 5;

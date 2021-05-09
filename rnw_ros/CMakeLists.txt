@@ -171,14 +171,10 @@ set(RNW_NODES
         visualize_traj_node
         visualize_cone_node
         visualize_pos_cmd_node
-        rnw_traj_server_node
-        rnw_controller_node
-        rnw_planning_node
         vicon_imu_cali_node
         gamepad_trigger_node
         dbg_atti_loop_node
         mocap_calib_node
-        gen_paper_data_node
         odom2tf_node
         test_swarm_planner_node
         fake_drone_node

@@ -12,6 +12,7 @@
         <param name="init_z" type="double" value="-0.5"/>
         <remap from="~odom" to="/drone1/odom"/>
         <remap from="~position_cmd" to="/drone1/position_cmd"/>
+        <remap from="~n3ctrl" to="/drone1/state"/>
     </node>
 
     <node pkg="rnw_ros" type="fake_drone_node" name="fake_drone2" output="screen" required="true">
@@ -19,6 +20,7 @@
         <param name="init_z" type="double" value="0.1"/>
         <remap from="~odom" to="/drone2/odom"/>
         <remap from="~position_cmd" to="/drone2/position_cmd"/>
+        <remap from="~n3ctrl" to="/drone2/state"/>
     </node>
 
     <node pkg="rnw_ros" type="traj2cmd_node" name="traj2cmd_drone1" output="screen" required="true">
@@ -46,11 +48,11 @@
         </node>
     </group>
 
-    <node pkg="rnw_ros" type="joystick_drone_cmd_node" name="joystick_drone_cmd_node" output="screen"/>
+<!--    <node pkg="rnw_ros" type="joystick_drone_cmd_node" name="joystick_drone_cmd_node" output="screen"/>-->
 
-    <node pkg="rnw_ros" type="gamepad_trigger_node" name="gamepad" output="screen"/>
-
-    <remap from="/gamepad/RB" to="/abort"/>
+    <node pkg="rnw_ros" type="gamepad_trigger_node" name="gamepad" output="screen">
+        <remap from="~RB" to="/abort"/>
+    </node>
 
     <!--  Setup Cone  -->
 
