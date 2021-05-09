@@ -41,6 +41,7 @@
         <remap from="~position_cmd" to="/drone1/position_cmd"/>
         <remap from="~n3ctrl" to="/drone1/state"/>
         <param name="role" type="int" value="1"/> <!--master-->
+        <param name="debug/m_debug_packet_info" type="int" value="0"/>
     </node>
 
     <node pkg="uwb_transceiver" type="uwb_transceiver_node" name="uwb_master_drone2" output="screen">
@@ -50,6 +51,7 @@
         <remap from="~position_cmd" to="/drone2/position_cmd"/>
         <remap from="~n3ctrl" to="/drone2/state"/>
         <param name="role" type="int" value="1"/> <!--master-->
+        <param name="debug/m_debug_packet_info" type="int" value="0"/>
     </node>
 
     <node pkg="rnw_ros" type="traj2cmd_node" name="traj2cmd_drone1" output="screen" required="true">
