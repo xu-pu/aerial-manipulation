@@ -26,6 +26,7 @@
       <param name="serial_port" value="/dev/tty.uwb.slave"/>
       <remap from="~odom" to="$(arg topic_odom_uav)"/>
       <remap from="~position_cmd" to="/position_cmd"/>
+      <remap from="~n3ctrl" to="/n3ctrl/n3ctrl_state"/>
       <param name="role" type="int" value="2"/> <!--slave-->
       <param name="debug/m_debug_packet_info" type="int" value="0"/>
     </node>
