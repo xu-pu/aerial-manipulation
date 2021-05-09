@@ -1,4 +1,5 @@
 #include "rnw_ros/swarm_interface.h"
+#include "rnw_ros/ros_utils.h"
 
 quadrotor_msgs::PolynomialTrajectory swarm_interface_t::abort_traj() {
   quadrotor_msgs::PolynomialTrajectory msg;
@@ -7,6 +8,8 @@ quadrotor_msgs::PolynomialTrajectory swarm_interface_t::abort_traj() {
 }
 
 swarm_interface_t::swarm_interface_t( ros::NodeHandle & _nh ) : nh(_nh) {
+
+  check_swarm_ready = get_param_default<bool>(nh,"check_swarm_ready",true);
 
   pub_abort = nh.advertise<std_msgs::Header>("/abort",10);
 
@@ -51,9 +54,14 @@ swarm_interface_t::swarm_interface_t( ros::NodeHandle & _nh ) : nh(_nh) {
 }
 
 bool swarm_interface_t::ready() const {
-  return drone1_connected() && drone2_connected() &&
-          latest_n3ctrl_drone1.state >= n3ctrl::N3CtrlState::STATE_CMD_HOVER &&
-          latest_n3ctrl_drone2.state >= n3ctrl::N3CtrlState::STATE_CMD_HOVER;
+  if ( check_swarm_ready ) {
+    return drone1_connected() && drone2_connected() &&
+           latest_n3ctrl_drone1.state >= n3ctrl::N3CtrlState::STATE_CMD_HOVER &&
+           latest_n3ctrl_drone2.state >= n3ctrl::N3CtrlState::STATE_CMD_HOVER;
+  }
+  else {
+    return true;
+  }
 }
 
 void swarm_interface_t::on_odom_drone1( nav_msgs::OdometryConstPtr const & msg ){
@@ -65,6 +73,7 @@ void swarm_interface_t::on_odom_drone2( nav_msgs::OdometryConstPtr const & msg )
 }
 
 void swarm_interface_t::send_traj( quadrotor_msgs::PolynomialTrajectory const & traj1, quadrotor_msgs::PolynomialTrajectory const & traj2 ) const {
+  if (!check_swarm_ready) { ROS_WARN_STREAM("[swarm] did not check swarm readiness, debug only, don't actually fly!"); }
   if ( ready() ) {
     pub_traj_drone1.publish(traj1);
     pub_traj_drone2.publish(traj2);

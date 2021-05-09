@@ -78,6 +78,8 @@ private:
 
     bool swarm_ready_latch = false;
 
+    bool check_swarm_ready = true;
+
     static constexpr double odom_timeout_sec = 0.5;
 
     static constexpr double n3ctrl_timeout_sec = 1;
