@@ -9,14 +9,14 @@ flu_T_tcp:
   z: -0.114698
 insert_below_tip: 0.1
 swarm:
-  cable1: 0.8
-  cable2: 0.8
+  cable1: 0.77
+  cable2: 0.74
   angle: 90
 rnw:
   hover_above_tip: 0.03
   insertion_depth: 0.12 # 0.11
   topple_init: 0.05
-  desired_nutation: 30
+  desired_nutation: 65
   desired_grip_depth: 0.05
   tau: 20
   max_vel: 0.5
