@@ -163,26 +163,24 @@ add_library(${PROJECT_NAME}
 
 set(RNW_NODES
         pub_euler_angles_node
-        pub_mock_cone_node
         pub_cone_state_node
         pub_cone_debug_info_node
         pub_obj_trace_node
         pub_energy_node
+        pub_swarm_rnw_debug_info_node
         visualize_traj_node
         visualize_cone_node
         visualize_pos_cmd_node
-        vicon_imu_cali_node
         gamepad_trigger_node
+        joystick_drone_cmd_node
         dbg_atti_loop_node
         mocap_calib_node
         odom2tf_node
+        traj2cmd_node
         test_swarm_planner_node
         fake_drone_node
-        traj2cmd_node
-        joystick_drone_cmd_node
         swarm_rnw_controller_node
         check_planning_assistant_node
-        pub_swarm_rnw_debug_info_node
 )
 
 FOREACH(NODE ${RNW_NODES})
