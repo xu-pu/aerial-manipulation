@@ -33,25 +33,25 @@
     <!--    <node pkg="rqt_multiplot" type="rqt_multiplot" name="rqt_multiplot"-->
     <!--          args="&#45;&#45;multiplot-config $(find rnw_ros)/config/rqt_multiplot_vicon_imu.xml &#45;&#45;multiplot-run-all"/>-->
 
-    <node pkg="rnw_ros" type="visualize_traj_node" name="traj_viz_drone1" output="screen" required="true">
-        <param name="lift_dt" type="double" value="0.05"/>
-        <param name="length_g" type="double" value="0.5"/>
-        <param name="clear_after_n_sec" type="double" value="0"/>
-        <remap from="~poly_traj" to="/drone1/traj"/>
-    </node>
+<!--    <node pkg="rnw_ros" type="visualize_traj_node" name="traj_viz_drone1" output="screen" required="true">-->
+<!--        <param name="lift_dt" type="double" value="0.05"/>-->
+<!--        <param name="length_g" type="double" value="0.5"/>-->
+<!--        <param name="clear_after_n_sec" type="double" value="0"/>-->
+<!--        <remap from="~poly_traj" to="/drone1/traj"/>-->
+<!--    </node>-->
 
-    <node pkg="rnw_ros" type="visualize_traj_node" name="traj_viz_drone2" output="screen" required="true">
-        <param name="lift_dt" type="double" value="0.05"/>
-        <param name="length_g" type="double" value="0.5"/>
-        <param name="clear_after_n_sec" type="double" value="0"/>
-        <remap from="~poly_traj" to="/drone2/traj"/>
-    </node>
+<!--    <node pkg="rnw_ros" type="visualize_traj_node" name="traj_viz_drone2" output="screen" required="true">-->
+<!--        <param name="lift_dt" type="double" value="0.05"/>-->
+<!--        <param name="length_g" type="double" value="0.5"/>-->
+<!--        <param name="clear_after_n_sec" type="double" value="0"/>-->
+<!--        <remap from="~poly_traj" to="/drone2/traj"/>-->
+<!--    </node>-->
 
-    <node pkg="rnw_ros" type="visualize_cone_node" name="visualize_cone_node" output="screen" required="true">
-        <param name="cone_color_r" type="double" value="0"/>
-        <param name="cone_color_g" type="double" value="1"/>
-        <param name="cone_color_b" type="double" value="0"/>
-    </node>
+<!--    <node pkg="rnw_ros" type="visualize_cone_node" name="visualize_cone_node" output="screen" required="true">-->
+<!--        <param name="cone_color_r" type="double" value="0"/>-->
+<!--        <param name="cone_color_g" type="double" value="1"/>-->
+<!--        <param name="cone_color_b" type="double" value="0"/>-->
+<!--    </node>-->
 
     <node name="record" pkg="rosbag" type="record" output="screen" args="-a" />
 

@@ -33,6 +33,7 @@ struct cone_visualizer_t {
     static constexpr int id_contact_normal = 3;
     static constexpr int id_rocking_cmd = 4;
     static constexpr int id_grip = 5;
+    static constexpr int id_moai = 6;
 
     string ns = "cone_state_visualization";
 
@@ -128,6 +129,7 @@ struct cone_visualizer_t {
       marker_arr.markers.push_back(gen_contact_path());
       marker_arr.markers.push_back(gen_marker_contact_normal());
       marker_arr.markers.push_back(gen_marker_rnw_cmd());
+      //marker_arr.markers.push_back(gen_marker_moai());
       return marker_arr;
     }
 
@@ -190,6 +192,33 @@ struct cone_visualizer_t {
       } else {
         marker.action = visualization_msgs::Marker::DELETE;
       }
+
+      return marker;
+
+    }
+
+    visualization_msgs::Marker gen_marker_moai() const {
+
+      visualization_msgs::Marker marker;
+
+      marker.id = id_moai;
+
+      marker.type = visualization_msgs::Marker::MESH_RESOURCE;
+      marker.mesh_resource = "package://rnw_ros/meshes/moai.dae";
+      marker.mesh_use_embedded_materials = true;
+
+      //marker.type = visualization_msgs::Marker::CYLINDER;
+      marker.header.stamp = ros::Time::now();
+      marker.header.frame_id = "world";
+      marker.action = visualization_msgs::Marker::ADD;
+      marker.ns = "moai";
+      //marker.color = color;
+
+      marker.pose.orientation = latest_cone_state.odom.pose.pose.orientation;
+      marker.pose.position = latest_cone_state.disc_center;
+      marker.scale.x = 1;
+      marker.scale.y = 1;
+      marker.scale.z = 1;
 
       return marker;
 
