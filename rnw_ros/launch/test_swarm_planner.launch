@@ -54,11 +54,11 @@
         </node>
     </group>
 
-    <node pkg="rnw_ros" type="joystick_drone_cmd_node" name="joystick_drone_cmd_node" output="screen"/>
+    <node pkg="rnw_ros" type="gamepad_drone_cmd_node" name="gamepad_drone_cmd_node" output="screen"/>
 
-    <remap from="/gamepad/RB" to="/abort"/>
-
-    <node pkg="rnw_ros" type="gamepad_trigger_node" name="gamepad" output="screen"/>
+    <node pkg="rnw_ros" type="gamepad_trigger_node" name="gamepad" output="screen">
+        <remap from="~RB" to="/abort"/>
+    </node>
 
     <node pkg="rnw_ros" type="test_swarm_planner_node" name="test_swarm_planner_node" output="screen"/>
 

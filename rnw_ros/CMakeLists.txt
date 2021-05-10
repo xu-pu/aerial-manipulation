@@ -172,7 +172,7 @@ set(RNW_NODES
         visualize_cone_node
         visualize_pos_cmd_node
         gamepad_trigger_node
-        joystick_drone_cmd_node
+        gamepad_drone_cmd_node
         dbg_atti_loop_node
         mocap_calib_node
         odom2tf_node

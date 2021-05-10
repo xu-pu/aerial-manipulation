@@ -17,7 +17,7 @@
         </node>
     </group>
 
-<!--    <node pkg="rnw_ros" type="joystick_drone_cmd_node" name="joystick_drone_cmd_node" output="screen"/>-->
+<!--    <node pkg="rnw_ros" type="gamepad_drone_cmd_node" name="gamepad_drone_cmd_node" output="screen"/>-->
 
     <node pkg="rnw_ros" type="gamepad_trigger_node" name="gamepad" output="screen">
         <remap from="~RB" to="/abort"/>

@@ -193,7 +193,7 @@ struct joystick_commander_t {
 
 int main( int argc, char** argv ) {
 
-  ros::init(argc,argv,"joystick_drone_cmd_node");
+  ros::init(argc,argv,"gamepad_drone_cmd_node");
 
   ros::NodeHandle nh("~");
 
