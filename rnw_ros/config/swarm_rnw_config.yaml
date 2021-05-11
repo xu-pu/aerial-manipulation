@@ -10,7 +10,7 @@ flu_T_tcp:
 insert_below_tip: 0.1
 swarm:
   cable1: 0.77
-  cable2: 0.74
+  cable2: 0.75
   angle: 90
 rnw:
   hover_above_tip: 0.03
