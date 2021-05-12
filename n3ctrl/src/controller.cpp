@@ -169,8 +169,7 @@ void Controller::update(const Desired_State_t& des,const Odom_Data_t& odom,const
 		m.vector.y = ypr_real(1);
 		m.vector.z = ypr_real(0);
 		ctrl_dbg_att_real_pub.publish(m);
-	
-		output_visualization(u);
+
 	}
 
 };
@@ -260,25 +259,6 @@ void Controller::publish_so3_ctrl(const SO3_Controller_Output_t& u_so3, const ro
 
 	// ctrl_so3_pub.publish(msg);
 }
-
-void Controller::output_visualization(const Controller_Output_t& u)
-{
-	double fn = u.thrust;
-	double tan_r = std::tan(u.roll);
-	double tan_p = std::tan(u.pitch);
-	double fz = std::sqrt(fn*fn/(tan_r*tan_r+tan_p*tan_p+1));
-	double fx = fz * tan_p;
-	double fy = -fz * tan_r;
-
-	sensor_msgs::Imu msg;
-	msg.header.stamp = ros::Time::now();
-	msg.header.frame_id = std::string("intermediate");
-	msg.linear_acceleration.x = fx;
-	msg.linear_acceleration.y = fy;
-	msg.linear_acceleration.z = fz;
-
-	ctrl_vis_pub.publish(msg);
-};
 
 Eigen::Vector3d Controller::calc_desired_force( const Desired_State_t& des,const Odom_Data_t& odom ){
 

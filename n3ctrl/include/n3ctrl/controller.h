@@ -77,7 +77,6 @@ public:
 	void config();
 	void update(const Desired_State_t& des, const Odom_Data_t& odom, const Imu_Data_t& imu, Controller_Output_t& u, SO3_Controller_Output_t& u_so3);
 	
-	void output_visualization(const Controller_Output_t& u);
 	void publish_ctrl(const Controller_Output_t& u, const ros::Time& stamp, const ros::Time& extra_stamp);
 	void publish_so3_ctrl(const SO3_Controller_Output_t& u_so3, const ros::Time& stamp);
 
