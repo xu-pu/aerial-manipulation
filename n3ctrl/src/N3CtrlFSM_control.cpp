@@ -69,7 +69,6 @@ void N3CtrlFSM::process_control(const ros::Time& now_time)
 		process_idling_control(u, u_so3, idling_lasting_time);
 	}
 
-	controller.publish_so3_ctrl(u_so3, now_time);
 	align_with_imu(u);
 	controller.publish_ctrl(u, now_time, odom_data.msg.header.stamp);
 

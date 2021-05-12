@@ -206,60 +206,6 @@ void Controller::publish_ctrl(const Controller_Output_t& u, const ros::Time& sta
     ctrl_pub.publish(msg);
 }
 
-void Controller::publish_so3_ctrl(const SO3_Controller_Output_t& u_so3, const ros::Time& stamp)
-{
-	//Eigen::Vector3d T_w = u_so3.Fdes;
-	Eigen::Quaterniond q(u_so3.Rdes);
-
-	geometry_msgs::QuaternionStamped att_msg;
-
-	att_msg.header.stamp = stamp;
-	att_msg.header.frame_id = std::string("world");
-	att_msg.quaternion.x = q.x();
-	att_msg.quaternion.y = q.y();
-	att_msg.quaternion.z = q.z();
-	att_msg.quaternion.w = q.w();
-
-	ctrl_so3_attitude_pub.publish(att_msg);
-
-	geometry_msgs::WrenchStamped thr_msg;
-
-	thr_msg.header.stamp = stamp;
-	thr_msg.header.frame_id = std::string("body");
-	thr_msg.wrench.force.z = u_so3.net_force / param.full_thrust;
-
-	ctrl_so3_thrust_pub.publish(thr_msg);
-
-	// quadrotor_msgs::SO3Command msg;
-	// msg.header.stamp = stamp;
-	// msg.header.frame_id = std::string("body");
-
-	// msg.force.x = T_w(0);
-	// msg.force.y = T_w(1);
-	// msg.force.z = T_w(2);
-
-	// msg.orientation.x = q.x();
-	// msg.orientation.y = q.y();
-	// msg.orientation.z = q.z();
-	// msg.orientation.w = q.w();
-
-	// msg.kR[0] = Kr(0,0);
-	// msg.kR[1] = Kr(1,1);
-	// msg.kR[2] = Kr(2,2);
-
-	// msg.kOm[0] = Kw(0,0);
-	// msg.kOm[1] = Kw(1,1);
-	// msg.kOm[2] = Kw(2,2);
-
-	// msg.aux.kf_correction = 0.0;
-	// msg.aux.angle_corrections[0] = 0.0;
-	// msg.aux.angle_corrections[1] = 0.0;
-	// msg.aux.enable_motors = true;
-	// msg.aux.use_external_yaw = false;
-
-	// ctrl_so3_pub.publish(msg);
-}
-
 Eigen::Vector3d Controller::calc_desired_force( const Desired_State_t& des,const Odom_Data_t& odom ){
 
   ROS_ASSERT_MSG(is_configured, "Gains for controller might not be initialized!");

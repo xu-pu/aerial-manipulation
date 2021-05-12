@@ -150,17 +150,6 @@ int main(int argc, char* argv[]) {
 
     fsm.controller.ctrl_pub = nh.advertise<sensor_msgs::Joy>("ctrl", 10);
 
-    // fsm.controller.ctrl_so3_pub	=
-    // 	nh.advertise<quadrotor_msgs::SO3Command>("ctrl_so3", 10);
-
-    fsm.controller.ctrl_so3_attitude_pub =
-        nh.advertise<geometry_msgs::QuaternionStamped>("ctrl_so3/attitude", 10);
-
-    fsm.controller.ctrl_so3_thrust_pub =
-        nh.advertise<geometry_msgs::WrenchStamped>("ctrl_so3/thrust", 10);
-
-    fsm.controller.ctrl_vis_pub = nh.advertise<sensor_msgs::Imu>("ctrl_vis", 10);
-
     fsm.controller.ctrl_val_dbg_pub = nh.advertise<n3ctrl::ControllerDebug>("ctrl_dbg/value", 10);
 
     fsm.controller.ctrl_dbg_att_des_pub =

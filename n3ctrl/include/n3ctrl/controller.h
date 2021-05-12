@@ -51,10 +51,6 @@ public:
 	Parameter_t& param;
 
 	ros::Publisher ctrl_pub;
-	// ros::Publisher ctrl_so3_pub;
-	ros::Publisher ctrl_so3_attitude_pub;
-	ros::Publisher ctrl_so3_thrust_pub;
-	ros::Publisher ctrl_vis_pub;
 	ros::Publisher ctrl_val_dbg_pub;
 	ros::Publisher ctrl_dbg_att_des_pub;
 	ros::Publisher ctrl_dbg_att_real_pub;
@@ -78,7 +74,6 @@ public:
 	void update(const Desired_State_t& des, const Odom_Data_t& odom, const Imu_Data_t& imu, Controller_Output_t& u, SO3_Controller_Output_t& u_so3);
 	
 	void publish_ctrl(const Controller_Output_t& u, const ros::Time& stamp, const ros::Time& extra_stamp);
-	void publish_so3_ctrl(const SO3_Controller_Output_t& u_so3, const ros::Time& stamp);
 
 private:
 	bool is_configured;
