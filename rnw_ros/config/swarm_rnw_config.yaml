@@ -9,16 +9,16 @@ flu_T_tcp:
   z: -0.114698
 insert_below_tip: 0.1
 swarm:
-  cable1: 0.77
-  cable2: 0.75
+  cable1: 0.78
+  cable2: 0.74
   angle: 90
 rnw:
   hover_above_tip: 0.03
   insertion_depth: 0.12 # 0.11
   topple_init: 0.05
-  desired_nutation: 55
+  desired_nutation: 45
   desired_grip_depth: 0.05
-  tau: 30
+  tau: 50
   max_vel: 0.5
   max_acc: 0.3
   rocking_max_vel: 2
@@ -51,14 +51,15 @@ zigzag:
 cone:
   radius: 0.35
   base_center:
-    x: -0.104074
-    y: 0.0243508
-    z: -0.185596
+    x: -0.0933493
+    y: 0.017352
+    z: -0.174666
   tip:
-    x: 0.263207
-    y: 0.0242551
-    z: 1.24713
-#    z: 1.30513
+    x: 0.286082
+    y: 0.00122838
+#    z: 1.31123
+#    z: 1.31123-0.058
+    z: 1.25323
   CoM_x: 0.08
   CoM_z: 0.05
   mass: 0.5
