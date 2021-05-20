@@ -181,6 +181,7 @@ set(RNW_NODES
         fake_drone_node
         swarm_rnw_controller_node
         check_planning_assistant_node
+        individual_flight_test_node
 )
 
 FOREACH(NODE ${RNW_NODES})
