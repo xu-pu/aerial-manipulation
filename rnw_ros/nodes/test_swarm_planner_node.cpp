@@ -18,7 +18,7 @@ Vector3d point_in_frame( nav_msgs::Odometry const & odom, Vector3d const & pt ){
   return R*pt + T;
 }
 
-struct test_swarm_planner_t {
+struct individual_drone_test_t {
 
     ros::NodeHandle & nh;
 
@@ -36,31 +36,31 @@ struct test_swarm_planner_t {
 
     AmTraj traj_generator;
 
-    explicit test_swarm_planner_t( ros::NodeHandle & _nh ) : nh(_nh), swarm(_nh), traj_generator(1024, 16, 0.4, 1, 0.5, 23, 0.02) {
+    explicit individual_drone_test_t(ros::NodeHandle & _nh ) : nh(_nh), swarm(_nh), traj_generator(1024, 16, 0.4, 1, 0.5, 23, 0.02) {
 
       sub_trigger_hello_world = nh.subscribe<std_msgs::Header>(
-              "/gamepad/A", 10, &test_swarm_planner_t::trigger_hello_world, this);
+              "/gamepad/A", 10, &individual_drone_test_t::trigger_hello_world, this);
 
       sub_trigger_circle = nh.subscribe<std_msgs::Header>(
-              "/gamepad/B", 10, &test_swarm_planner_t::trigger_circle, this);
+              "/gamepad/B", 10, &individual_drone_test_t::trigger_circle, this);
 
       sub_trigger_align = nh.subscribe<std_msgs::Header>(
-              "/gamepad/Y", 10, &test_swarm_planner_t::trigger_align, this);
+              "/gamepad/Y", 10, &individual_drone_test_t::trigger_align, this);
 
       sub_trigger_zigzag = nh.subscribe<std_msgs::Header>(
-              "/gamepad/X", 10, &test_swarm_planner_t::trigger_zigzag, this);
+              "/gamepad/X", 10, &individual_drone_test_t::trigger_zigzag, this);
 
       sub_dpad_up = nh.subscribe<std_msgs::Header>(
-              "/gamepad/DPAD/Up", 10, &test_swarm_planner_t::on_dpad_up, this);
+              "/gamepad/DPAD/Up", 10, &individual_drone_test_t::on_dpad_up, this);
 
       sub_dpad_down = nh.subscribe<std_msgs::Header>(
-              "/gamepad/DPAD/Down", 10, &test_swarm_planner_t::on_dpad_down, this);
+              "/gamepad/DPAD/Down", 10, &individual_drone_test_t::on_dpad_down, this);
 
       sub_dpad_left = nh.subscribe<std_msgs::Header>(
-              "/gamepad/DPAD/Left", 10, &test_swarm_planner_t::on_dpad_left, this);
+              "/gamepad/DPAD/Left", 10, &individual_drone_test_t::on_dpad_left, this);
 
       sub_dpad_right = nh.subscribe<std_msgs::Header>(
-              "/gamepad/DPAD/Right", 10, &test_swarm_planner_t::on_dpad_right, this);
+              "/gamepad/DPAD/Right", 10, &individual_drone_test_t::on_dpad_right, this);
 
     }
 
@@ -224,7 +224,7 @@ int main( int argc, char** argv ) {
 
   ros::NodeHandle nh("~");
 
-  test_swarm_planner_t planner(nh);
+  individual_drone_test_t planner(nh);
 
   ros::spin();
 

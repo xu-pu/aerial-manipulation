@@ -17,8 +17,6 @@
         </node>
     </group>
 
-<!--    <node pkg="rnw_ros" type="gamepad_drone_cmd_node" name="gamepad_drone_cmd_node" output="screen"/>-->
-
     <node pkg="rnw_ros" type="gamepad_trigger_node" name="gamepad" output="screen">
         <remap from="~RB" to="/abort"/>
     </node>
@@ -73,7 +71,7 @@
         <param name="max_euler_velocity" value="10"/>
     </node>
 
-    <node pkg="rnw_ros" type="swarm_rnw_controller_node" name="swarm_rnw_controller_node" required="true" output="screen">
+    <node pkg="rnw_ros" type="swarm_rnw_controller_node" name="individual_flight_test_node" required="true" output="screen">
 <!--        <param name="check_swarm_ready" type="bool" value="false"/>-->
     </node>
 

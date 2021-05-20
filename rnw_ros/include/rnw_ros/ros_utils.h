@@ -23,6 +23,10 @@ using namespace std;
 constexpr double deg2rad = M_PI/180.;
 constexpr double rad2deg = 180./M_PI;
 
+template<typename T>
+bool message_in_time( T msg, double sec ){
+  return ( ros::Time::now() - msg.header.stamp ).toSec() < sec;
+}
 
 template<typename Derived>
 double msg_time_diff( Derived const & from, Derived const & to ){
@@ -38,6 +42,18 @@ T get_param_default( ros::NodeHandle & nh, string const & key, T const & default
   }
   return val;
 }
+
+
+template<typename T>
+T get_ros_param_required( ros::NodeHandle & nh, string const & key ){
+  T val;
+  if ( !nh.getParam(key,val) ) {
+    ROS_FATAL_STREAM("Parameter \'" << key << "\' is required but not found, can not continue!");
+    ROS_BREAK();
+  }
+  return val;
+}
+
 
 template<typename T>
 double sec_since_msg( T const & msg ){
