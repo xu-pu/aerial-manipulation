@@ -56,6 +56,10 @@ struct drone_interface_t {
 
     void go_to_point_in_intermediate_frame( Vector3d const & point );
 
+    void follow_waypoints( vector<Vector3d> const & waypoints );
+
+    void follow_waypoints_in_intermediate_frame( vector<Vector3d> const & waypoints );
+
 private:
 
     void setup_trajectory_generator();

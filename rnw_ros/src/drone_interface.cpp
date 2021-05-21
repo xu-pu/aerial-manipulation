@@ -150,7 +150,7 @@ quadrotor_msgs::PolynomialTrajectory drone_interface_t::gen_traj_from_waypoint( 
     }
   }
 
-  // always end with the last point in the original waypoints_in
+  // always end with the last point in the original waypoints
   waypoints_out.back() = waypoints_in.back();
 
   if (waypoints_out.size() < 3 ) {
@@ -160,5 +160,23 @@ quadrotor_msgs::PolynomialTrajectory drone_interface_t::gen_traj_from_waypoint( 
   Vector3d v0 = Vector3d::Zero();
   auto traj = traj_generator.genOptimalTrajDTC(waypoints_out, v0, v0, v0, v0);
   return to_ros_msg(traj,latest_odom,ros::Time::now());
+
+}
+
+void drone_interface_t::follow_waypoints(const vector<Vector3d> &waypoints) {
+
+  if (!ready()) return;
+
+  execute_trajectory(gen_traj_from_waypoint(waypoints));
+
+}
+
+void drone_interface_t::follow_waypoints_in_intermediate_frame(const vector<Vector3d> & points) {
+
+  if (!ready()) return;
+
+  vector<Vector3d> waypoints = points_in_intermediate_frame(points,latest_odom);
+
+  execute_trajectory(gen_traj_from_waypoint(waypoints));
 
 }
