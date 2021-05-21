@@ -256,11 +256,13 @@ struct lpf_1st_butterworth_t {
 
     bool init = false;
 
-    double last_value;
+    double last_value = 0;
 
     double T = 1;
 
     inline lpf_1st_butterworth_t() = default;
+
+    inline explicit lpf_1st_butterworth_t( double param ) : T(param) { }
 
     inline double filter( double measurement ){
       if ( !init ) {
