@@ -79,3 +79,21 @@ void drone_interface_t::send_traj( quadrotor_msgs::PolynomialTrajectory const & 
     pub_traj.publish(traj);
   }
 }
+
+void drone_interface_t::setup_trajectory_generator() {
+  traj_generator = AmTraj(1024, 16, 0.4, max_vel, max_acc, 23, 0.02);
+}
+
+void drone_interface_t::set_max_vel(double val) {
+  set_max_vel_acc(val,max_acc);
+}
+
+void drone_interface_t::set_max_acc(double val) {
+  set_max_vel_acc(max_vel,val);
+}
+
+void drone_interface_t::set_max_vel_acc(double mvel, double macc) {
+  max_vel = mvel;
+  max_acc = macc;
+  setup_trajectory_generator();
+}
