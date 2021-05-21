@@ -262,8 +262,6 @@ struct lpf_1st_butterworth_t {
 
     inline lpf_1st_butterworth_t() = default;
 
-    inline explicit lpf_1st_butterworth_t( double _T ) : T(_T) { }
-
     inline double filter( double measurement ){
       if ( !init ) {
         init = true;

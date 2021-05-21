@@ -33,6 +33,8 @@ cone_state_estimator_t::cone_state_estimator_t( ros::NodeHandle & nh ) {
           ros::TransportHints().tcpNoDelay()
   );
 
+  lpf_ang_vel_z.T = get_param_default(nh,"lpf_ang_vel_z",1);
+
 }
 
 void cone_state_estimator_t::on_odom( nav_msgs::OdometryConstPtr const & msg ){
@@ -114,18 +116,9 @@ void cone_state_estimator_t::update_euler_velocity(nav_msgs::OdometryConstPtr co
   //ROS_INFO_STREAM("after: " << euler_diff.transpose());
 
   Vector3d euler_vel = euler_diff/dt;
-
-  if ( cut_euler_velocity ) {
-    euler_vel(0) = min(euler_vel(0),max_euler_velocity);
-    euler_vel(1) = min(euler_vel(1),max_euler_velocity);
-    euler_vel(2) = min(euler_vel(2),max_euler_velocity);
-    euler_vel(0) = max(euler_vel(0),-max_euler_velocity);
-    euler_vel(1) = max(euler_vel(1),-max_euler_velocity);
-    euler_vel(2) = max(euler_vel(2),-max_euler_velocity);
-  }
-
-  euler_vel.z() = ang_vel_z_filter.update(euler_vel.z());
-  //euler_vel = ang_vel_filter.smooth(euler_vel);
+  euler_vel.x() = lpf_ang_vel_x.filter(euler_vel.x());
+  euler_vel.y() = lpf_ang_vel_y.filter(euler_vel.y());
+  euler_vel.z() = lpf_ang_vel_z.filter(euler_vel.z());
 
   latest_euler_angles = euler_cur;
   latest_euler_velocity = euler_vel;

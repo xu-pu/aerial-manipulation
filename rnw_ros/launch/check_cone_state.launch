@@ -32,6 +32,6 @@
     <node pkg="rqt_multiplot" type="rqt_multiplot" name="rqt_multiplot" output="log" required="true"
           args="--multiplot-config $(find rnw_ros)/config/rqt_multiplot_cone_state.xml --multiplot-run-all"/>
 
-    <node name="rviz" pkg="rviz" type="rviz" output="log" required="true" args="-d $(find rnw_ros)/config/swarm.rviz"/>
+    <node name="rviz" pkg="rviz" type="rviz" output="log" required="false" args="-d $(find rnw_ros)/config/swarm.rviz"/>
 
 </launch>

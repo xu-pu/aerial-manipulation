@@ -108,6 +108,7 @@ find_package(Ceres REQUIRED)
 generate_dynamic_reconfigure_options(
         cfg/MocapCalib.cfg
         cfg/RNW.cfg
+        cfg/TuningConeState.cfg
 )
 ###################################
 ## catkin specific configuration ##

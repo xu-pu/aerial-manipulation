@@ -38,8 +38,9 @@ struct cone_state_estimator_t {
     bool contact_valid = false;
     Vector3d contact_point;
 
-    // filters
-    average_filter_t<double,5> ang_vel_z_filter;
+    lpf_1st_butterworth_t lpf_ang_vel_x;
+    lpf_1st_butterworth_t lpf_ang_vel_y;
+    lpf_1st_butterworth_t lpf_ang_vel_z;
 
     explicit cone_state_estimator_t( ros::NodeHandle & nh );
 
