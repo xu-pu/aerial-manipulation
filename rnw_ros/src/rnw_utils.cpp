@@ -384,3 +384,16 @@ Vector3d point_in_intermediate_frame( Vector3d const & point, nav_msgs::Odometry
   Vector3d T = uav_utils::from_point_msg(frame.pose.pose.position);
   return R * point + T;
 }
+
+vector<Vector3d> points_in_intermediate_frame( vector<Vector3d> const & points, nav_msgs::Odometry const & frame ){
+
+  Matrix3d R = intermediate_rotation(frame);
+  Vector3d T = uav_utils::from_point_msg(frame.pose.pose.position);
+
+  vector<Vector3d> rst;
+  for ( Vector3d const & iter : points ) {
+    rst.emplace_back(R*iter+T);
+  }
+  return rst;
+
+}

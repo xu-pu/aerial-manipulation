@@ -19,6 +19,8 @@ Matrix3d intermediate_rotation( nav_msgs::Odometry const & );
 
 Vector3d point_in_intermediate_frame( Vector3d const & point, nav_msgs::Odometry const & frame );
 
+vector<Vector3d> points_in_intermediate_frame( vector<Vector3d> const & points, nav_msgs::Odometry const & frame );
+
 quadrotor_msgs::PolynomialTrajectory gen_setpoint_traj(nav_msgs::Odometry const & odom, Vector3d const & setpoint, double duration );
 
 inline double get_traj_duration( quadrotor_msgs::PolynomialTrajectory const & msg ){
