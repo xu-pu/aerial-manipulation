@@ -137,3 +137,28 @@ void drone_interface_t::go_to_point_in_intermediate_frame( const Vector3d & poin
   execute_trajectory(gen_traj_go_to_point(target));
 
 }
+
+quadrotor_msgs::PolynomialTrajectory drone_interface_t::gen_traj_from_waypoint( const vector<Vector3d> & waypoints_in ) {
+
+  vector<Vector3d> waypoints_out;
+  // make sure always start with the drone's current position
+  waypoints_out.emplace_back(uav_utils::from_point_msg(latest_odom.pose.pose.position));
+
+  for ( Vector3d const & iter : waypoints_in ) {
+    if ((waypoints_out.back() - iter).norm() > epsi_distance ) {
+      waypoints_out.emplace_back(iter);
+    }
+  }
+
+  // always end with the last point in the original waypoints_in
+  waypoints_out.back() = waypoints_in.back();
+
+  if (waypoints_out.size() < 3 ) {
+    return gen_traj_go_to_point(waypoints_out.back());
+  }
+
+  Vector3d v0 = Vector3d::Zero();
+  auto traj = traj_generator.genOptimalTrajDTC(waypoints_out, v0, v0, v0, v0);
+  return to_ros_msg(traj,latest_odom,ros::Time::now());
+
+}

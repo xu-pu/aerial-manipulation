@@ -50,6 +50,8 @@ struct drone_interface_t {
 
     quadrotor_msgs::PolynomialTrajectory gen_traj_go_to_point( Vector3d const & tgt );
 
+    quadrotor_msgs::PolynomialTrajectory gen_traj_from_waypoint( vector<Vector3d> const & waypoints_in );
+
     void go_to_point( Vector3d const & target );
 
     void go_to_point_in_intermediate_frame( Vector3d const & point );
