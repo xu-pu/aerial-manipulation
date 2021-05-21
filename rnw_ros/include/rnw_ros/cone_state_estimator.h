@@ -24,8 +24,6 @@ struct cone_state_estimator_t {
     bool init = false;
     static constexpr double min_tilt = 5;
     double odom_timeout = 1;
-    bool cut_euler_velocity = false;
-    double max_euler_velocity = numeric_limits<double>::max();
 
     // latest states
     Vector3d latest_euler_angles;
