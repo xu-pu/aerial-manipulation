@@ -150,6 +150,7 @@ add_library(${PROJECT_NAME}
         src/swarm_interface.cpp
         src/rnw_planner_v2.cpp
         src/drone_interface.cpp
+        src/cone_interface.cpp
 )
 
 ## Add cmake target dependencies of the library
