@@ -69,7 +69,7 @@ struct individual_drone_test_t {
 
       vector<Vector3d> wpts = gen_waypoint_zigzag(5,0.5,0.5);
 
-      drone.send_traj(local_wpts2traj(drone.latest_odom,wpts));
+      drone.execute_trajectory(local_wpts2traj(drone.latest_odom, wpts));
 
     }
 

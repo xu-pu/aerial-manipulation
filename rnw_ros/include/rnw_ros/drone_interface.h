@@ -16,6 +16,8 @@ struct drone_interface_t {
 
     static constexpr double message_timeout = 1;
 
+    static constexpr double epsi_distance = 0.05;
+
     bool initialized = false;
 
     string name;
@@ -38,13 +40,19 @@ struct drone_interface_t {
 
     bool ready( bool print_reason = false ) const;
 
-    void send_traj( quadrotor_msgs::PolynomialTrajectory const & traj ) const;
+    void execute_trajectory(quadrotor_msgs::PolynomialTrajectory const & traj ) const;
 
     void set_max_vel( double val );
 
     void set_max_acc( double val );
 
     void set_max_vel_acc( double mvel, double macc );
+
+    quadrotor_msgs::PolynomialTrajectory gen_traj_go_to_point( Vector3d const & tgt );
+
+    void go_to_point( Vector3d const & tgt );
+
+    //void go_to_point_in_intermediate_frame( Vector3d const & tgt );
 
 private:
 

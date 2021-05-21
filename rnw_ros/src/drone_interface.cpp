@@ -1,4 +1,5 @@
 #include "rnw_ros/drone_interface.h"
+#include "rnw_ros/rnw_utils.h"
 
 drone_interface_t::drone_interface_t() = default;
 
@@ -74,7 +75,7 @@ bool drone_interface_t::ready( bool print_reason ) const {
 
 }
 
-void drone_interface_t::send_traj( quadrotor_msgs::PolynomialTrajectory const & traj ) const {
+void drone_interface_t::execute_trajectory(quadrotor_msgs::PolynomialTrajectory const & traj ) const {
   if ( ready(true) ) {
     pub_traj.publish(traj);
   }
@@ -96,4 +97,33 @@ void drone_interface_t::set_max_vel_acc(double mvel, double macc) {
   max_vel = mvel;
   max_acc = macc;
   setup_trajectory_generator();
+}
+
+quadrotor_msgs::PolynomialTrajectory drone_interface_t::gen_traj_go_to_point( Vector3d const & to ){
+
+  Vector3d from = uav_utils::from_point_msg(latest_odom.pose.pose.position);
+
+  double dist = (to-from).norm();
+
+  if ( dist < epsi_distance ) {
+    return gen_setpoint_traj(latest_odom,to,0.5);
+  }
+  else {
+    vector<Vector3d> waypoints;
+    waypoints.emplace_back(from);
+    waypoints.emplace_back((from+to)/2);
+    waypoints.emplace_back(to);
+    Vector3d v0 = Vector3d::Zero();
+    auto traj = traj_generator.genOptimalTrajDTC(waypoints, v0, v0, v0, v0);
+    return to_ros_msg(traj,latest_odom,ros::Time::now());
+  }
+
+}
+
+void drone_interface_t::go_to_point(const Vector3d &tgt) {
+
+  if ( !ready(true) ) { return; }
+
+  execute_trajectory(gen_traj_go_to_point(tgt));
+
 }
