@@ -38,7 +38,7 @@ struct drone_interface_t {
 
     void on_n3ctrl( n3ctrl::N3CtrlStateConstPtr const & msg );
 
-    bool ready( bool print_reason = false ) const;
+    bool ready( bool print_reason = true ) const;
 
     void execute_trajectory(quadrotor_msgs::PolynomialTrajectory const & traj ) const;
 
@@ -50,9 +50,9 @@ struct drone_interface_t {
 
     quadrotor_msgs::PolynomialTrajectory gen_traj_go_to_point( Vector3d const & tgt );
 
-    void go_to_point( Vector3d const & tgt );
+    void go_to_point( Vector3d const & target );
 
-    //void go_to_point_in_intermediate_frame( Vector3d const & tgt );
+    void go_to_point_in_intermediate_frame( Vector3d const & point );
 
 private:
 

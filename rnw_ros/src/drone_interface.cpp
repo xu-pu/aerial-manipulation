@@ -120,10 +120,20 @@ quadrotor_msgs::PolynomialTrajectory drone_interface_t::gen_traj_go_to_point( Ve
 
 }
 
-void drone_interface_t::go_to_point(const Vector3d &tgt) {
+void drone_interface_t::go_to_point( const Vector3d & target) {
 
-  if ( !ready(true) ) { return; }
+  if (!ready()) return;
 
-  execute_trajectory(gen_traj_go_to_point(tgt));
+  execute_trajectory(gen_traj_go_to_point(target));
+
+}
+
+void drone_interface_t::go_to_point_in_intermediate_frame( const Vector3d & point ) {
+
+  if (!ready()) return;
+
+  Vector3d target = point_in_intermediate_frame(point,latest_odom);
+
+  execute_trajectory(gen_traj_go_to_point(target));
 
 }

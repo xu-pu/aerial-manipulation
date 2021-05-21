@@ -3,6 +3,7 @@
 //
 #include "rnw_ros/rnw_utils.h"
 #include "rnw_ros/pose_utils.h"
+#include <uav_utils/geometry_utils.h>
 
 Vector3d cone_rot2euler( Matrix3d const & R ){
 
@@ -369,4 +370,17 @@ quadrotor_msgs::PolynomialTrajectory gen_setpoint_traj(nav_msgs::Odometry const 
 
   return msg;
 
+}
+
+Matrix3d intermediate_rotation( nav_msgs::Odometry const & odom ){
+  double yaw_curr = uav_utils::get_yaw_from_quaternion(
+          uav_utils::from_quaternion_msg(odom.pose.pose.orientation)
+  );
+  return uav_utils::rotz(yaw_curr);
+}
+
+Vector3d point_in_intermediate_frame( Vector3d const & point, nav_msgs::Odometry const & frame ){
+  Matrix3d R = intermediate_rotation(frame);
+  Vector3d T = uav_utils::from_point_msg(frame.pose.pose.position);
+  return R * point + T;
 }
