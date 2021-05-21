@@ -249,4 +249,34 @@ struct average_filter_t {
 
 };
 
+/**
+ * Butterworth First-Order Low Pass Filter
+ */
+struct lpf_1st_butterworth_t {
+
+    bool init = false;
+
+    double last_value;
+
+    double T = 1;
+
+    inline lpf_1st_butterworth_t() = default;
+
+    inline explicit lpf_1st_butterworth_t( double _T ) : T(_T) { }
+
+    inline double filter( double measurement ){
+      if ( !init ) {
+        init = true;
+        last_value = measurement;
+        return last_value;
+      }
+      else {
+        last_value += (measurement-last_value)/(1+(1/(2.*M_PI*T)));
+        return last_value;
+      }
+    }
+
+};
+
+
 #endif //SRC_RNW_UTILS_H
