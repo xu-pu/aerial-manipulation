@@ -117,7 +117,7 @@ void rnw_planner_t::spin(){
     return;
   }
 
-  rnw_cmd.grip_state = grip_state_t(latest_cone_state,latest_uav_odom,rnw_config.flu_T_tcp);
+  rnw_cmd.grip_state = caging_state_t(latest_cone_state, latest_uav_odom, rnw_config.flu_T_tcp);
   pub_grip_state.publish(rnw_cmd.grip_state.to_msg());
 
   if ( rnw_cmd.grip_state.grip_valid ) {

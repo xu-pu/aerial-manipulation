@@ -152,6 +152,7 @@ add_library(${PROJECT_NAME}
         src/rnw_planner_v2.cpp
         src/drone_interface.cpp
         src/cone_interface.cpp
+        src/caging_state.cpp
 )
 
 ## Add cmake target dependencies of the library

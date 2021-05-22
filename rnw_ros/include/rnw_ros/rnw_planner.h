@@ -5,10 +5,12 @@
 #ifndef SRC_RNW_PLANNER_H
 #define SRC_RNW_PLANNER_H
 
-#include "rnw_ros/rnw_utils.h"
 #include <rnw_msgs/ConeState.h>
 #include <rnw_msgs/RockingCmd.h>
 #include <rnw_msgs/WalkingState.h>
+
+#include "rnw_ros/rnw_utils.h"
+#include "rnw_ros/caging_state.h"
 
 struct rnw_cmd_t {
 
@@ -46,7 +48,7 @@ struct rnw_cmd_t {
     /// Grip Monitoring
     //////////////////////////////////////
 
-    grip_state_t grip_state;
+    caging_state_t grip_state;
 
     double setpoint_nutation;
 
