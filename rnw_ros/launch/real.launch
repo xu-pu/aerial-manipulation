@@ -1,0 +1,22 @@
+<launch>
+
+    <rosparam command="load" file="$(find rnw_ros)/config/rnw_config.yaml"/>
+
+    <node pkg="joy" type="joy_node" name="joy_node" output="screen">
+        <param name="~autorepeat_rate" value="0" />
+    </node>
+
+    <node pkg="rnw_ros" type="gamepad_trigger_node" name="gamepad_trigger_node" output="screen">
+        <remap from="~A" to="$(arg topic_trigger_rnw)"/>
+        <remap from="~X" to="$(arg topic_trigger_zigzag)"/>
+        <remap from="~B" to="$(arg topic_trigger_push_init)"/>
+        <remap from="~LT" to="$(arg topic_trigger_adjust_yaw)"/>
+        <remap from="~RT" to="$(arg topic_trigger_adjust_yaw)"/>
+    </node>
+
+    <node pkg="rnw_ros" type="rnw_controller_node" name="rnw_controller_node" output="screen" respawn="true"/>
+
+<!--    <node pkg="rqt_multiplot" type="rqt_multiplot" name="rqt_multiplot"-->
+<!--          args="&#45;&#45;multiplot-config $(find rnw_ros)/config/rqt_multiplot_ctrl_err.xml &#45;&#45;multiplot-run-all"/>-->
+
+</launch>
