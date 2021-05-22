@@ -57,7 +57,7 @@ vector<Vector3d> gen_wpts_push_topple(
 
   vector<Vector3d> waypoints_C;
 
-  Vector3d apex_init = point_at_grip_depth(cone_state, rnw_config.rnw.desired_grip_depth);
+  Vector3d apex_init = point_at_grip_depth(cone_state, rnw_config.caging.desired_grip_depth);
   Vector3d fulcrum = apex_init; fulcrum.z() = rnw_config.ground_z;
   Vector3d axis = uav_utils::from_quaternion_msg(cone_state.odom.pose.pose.orientation)
           .normalized()
@@ -162,7 +162,6 @@ void rnw_config_t::load_from_ros( ros::NodeHandle & nh ){
   rnw.rocking_max_vel  = get_param_default<double>(nh, "/rnw/rocking_max_vel", 0.5);
   rnw.rocking_max_acc  = get_param_default<double>(nh, "/rnw/rocking_max_acc", 0.5);
   rnw.hover_above_tip  = get_param_default<double>(nh,"/rnw/hover_above_tip",0.03);
-  rnw.desired_grip_depth = get_param_default<double>(nh, "/rnw/desired_grip_depth", 0.08);
   rnw.adjust_nutation_threshold  = get_param_default<double>(nh,"/rnw/adjust_nutation_threshold",5.);
   rnw.adjust_grip_depth_threshold = get_param_default<double>(nh, "/rnw/adjust_grip_depth_threshold", 0.05);
   rnw.ang_vel_threshold = get_param_default<double>(nh, "/rnw/ang_vel_threshold", 0);
@@ -183,6 +182,8 @@ void rnw_config_t::load_from_ros( ros::NodeHandle & nh ){
   swarm.cable1 = get_param_default<double>(nh, "/swarm/cable1", 1);
   swarm.cable2 = get_param_default<double>(nh, "/swarm/cable2", 1);
   swarm.angle = get_param_default<double>(nh, "/swarm/angle", 90);
+
+  caging.desired_grip_depth = get_param_default<double>(nh, "/caging/desired_grip_depth", 0.06);
 
 }
 

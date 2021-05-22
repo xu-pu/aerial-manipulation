@@ -75,8 +75,6 @@ struct rnw_config_t {
 
         double desired_nutation;
 
-        double desired_grip_depth;
-
         double tau;
 
         double max_vel;
@@ -140,7 +138,6 @@ struct rnw_config_t {
           config.topple_init = topple_init;
           config.tau = tau;
           config.desired_nutation = desired_nutation;
-          config.desired_grip_depth = desired_grip_depth;
           config.max_vel = max_vel;
           config.max_acc = max_acc;
           config.rocking_max_vel = rocking_max_vel;
@@ -156,6 +153,10 @@ struct rnw_config_t {
         double cable2;
         double angle;
     } swarm;
+
+    struct {
+        double desired_grip_depth;
+    } caging;
 
     void load_from_ros( ros::NodeHandle & nh );
 

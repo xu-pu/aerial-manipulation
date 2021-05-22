@@ -272,7 +272,6 @@ int main( int argc, char** argv ) {
       rnw_config.rnw.insertion_depth = config.insertion_depth;
       rnw_config.rnw.topple_init = config.topple_init;
       rnw_config.rnw.desired_nutation = config.desired_nutation;
-      rnw_config.rnw.desired_grip_depth = config.desired_grip_depth;
       rnw_config.rnw.tau = config.tau;
       rnw_config.rnw.max_vel = config.max_vel;
       rnw_config.rnw.max_acc = config.max_acc;

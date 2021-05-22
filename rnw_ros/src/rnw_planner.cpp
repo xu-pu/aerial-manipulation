@@ -121,7 +121,7 @@ void rnw_planner_t::spin(){
   pub_grip_state.publish(rnw_cmd.grip_state.to_msg());
 
   if ( rnw_cmd.grip_state.grip_valid ) {
-    rnw_cmd.err_grip_depth = rnw_cmd.grip_state.grip_depth - rnw_config.rnw.desired_grip_depth;
+    rnw_cmd.err_grip_depth = rnw_cmd.grip_state.grip_depth - rnw_config.caging.desired_grip_depth;
     rnw_cmd.err_nutation_deg = latest_cone_state.euler_angles.y * rad2deg - rnw_config.rnw.desired_nutation;
   }
   else {
@@ -182,9 +182,9 @@ void rnw_planner_t::trigger_adjust_nutation(){
 
 void rnw_planner_t::plan_cmd_adjust_grip(){
   request_adjust_grip = false;
-  rnw_cmd.setpoint_apex = point_at_grip_depth(latest_cone_state,rnw_config.rnw.desired_grip_depth);
+  rnw_cmd.setpoint_apex = point_at_grip_depth(latest_cone_state,rnw_config.caging.desired_grip_depth);
   rnw_cmd.setpoint_uav = tcp2uav(rnw_cmd.setpoint_apex,latest_uav_odom,rnw_config.flu_T_tcp);
-  rnw_cmd.setpoint_grip_depth = rnw_config.rnw.desired_grip_depth;
+  rnw_cmd.setpoint_grip_depth = rnw_config.caging.desired_grip_depth;
   rnw_cmd.setpoint_nutation = rnw_config.rnw.desired_nutation;
   rnw_cmd.tau_deg = 0;
   rnw_cmd.cmd_type = rnw_cmd_t::cmd_adjust_grip;
@@ -215,7 +215,7 @@ void rnw_planner_t::plan_cmd_adjust_nutation(){
 
   rnw_cmd.setpoint_apex = rotate_point_along_axis(C,O,K,theta);
   rnw_cmd.setpoint_uav = tcp2uav(rnw_cmd.setpoint_apex,latest_uav_odom,rnw_config.flu_T_tcp);
-  rnw_cmd.setpoint_grip_depth = rnw_config.rnw.desired_grip_depth;
+  rnw_cmd.setpoint_grip_depth = rnw_config.caging.desired_grip_depth;
   rnw_cmd.setpoint_nutation = rnw_config.rnw.desired_nutation;
   rnw_cmd.tau_deg = 0;
   rnw_cmd.cmd_type = rnw_cmd_t::cmd_adjust_nutation;
@@ -236,7 +236,7 @@ void rnw_planner_t::plan_cmd_walk(){
   Vector3d e1 = (Dg-G).normalized();
   Vector3d e2 = Vector3d::UnitZ();
   Vector3d K = e1.cross(e2);
-  Vector3d C = point_at_grip_depth(latest_cone_state,rnw_config.rnw.desired_grip_depth);
+  Vector3d C = point_at_grip_depth(latest_cone_state,rnw_config.caging.desired_grip_depth);
 
   // make sure they are radiant
   double cur_nutation = latest_cone_state.euler_angles.y;
@@ -271,7 +271,7 @@ void rnw_planner_t::plan_cmd_walk(){
 
   rnw_cmd.setpoint_uav = setpoint_uav;
   rnw_cmd.setpoint_apex = setpoint_apex;
-  rnw_cmd.setpoint_grip_depth = rnw_config.rnw.desired_grip_depth;
+  rnw_cmd.setpoint_grip_depth = rnw_config.caging.desired_grip_depth;
   rnw_cmd.setpoint_nutation = rnw_config.rnw.desired_nutation;
   rnw_cmd.tau_deg = rnw_config.rnw.tau;
   rnw_cmd.cmd_type = rnw_cmd_t::cmd_rocking;
@@ -302,7 +302,7 @@ void rnw_planner_t::plan_cmd_walk_corridor(){
 
   rnw_cmd.setpoint_uav = setpoint_uav;
   rnw_cmd.setpoint_apex = setpoint_apex;
-  rnw_cmd.setpoint_grip_depth = rnw_config.rnw.desired_grip_depth;
+  rnw_cmd.setpoint_grip_depth = rnw_config.caging.desired_grip_depth;
   rnw_cmd.setpoint_nutation = rnw_config.rnw.desired_nutation;
   rnw_cmd.tau_deg = rnw_config.rnw.tau;
   rnw_cmd.cmd_type = rnw_cmd_t::cmd_rocking;
@@ -326,7 +326,7 @@ void rnw_planner_t::plan_cmd_walk_no_feedforward(){
   Vector3d e1 = (Dg-G).normalized();
   Vector3d e2 = Vector3d::UnitZ();
   Vector3d K = e1.cross(e2);
-  Vector3d C = point_at_grip_depth(latest_cone_state,rnw_config.rnw.desired_grip_depth);
+  Vector3d C = point_at_grip_depth(latest_cone_state,rnw_config.caging.desired_grip_depth);
 
   // make sure they are radiant
   double cur_nutation = latest_cone_state.euler_angles.y;
@@ -361,7 +361,7 @@ void rnw_planner_t::plan_cmd_walk_no_feedforward(){
 
   rnw_cmd.setpoint_uav = setpoint_uav;
   rnw_cmd.setpoint_apex = setpoint_apex;
-  rnw_cmd.setpoint_grip_depth = rnw_config.rnw.desired_grip_depth;
+  rnw_cmd.setpoint_grip_depth = rnw_config.caging.desired_grip_depth;
   rnw_cmd.setpoint_nutation = rnw_config.rnw.desired_nutation;
   rnw_cmd.tau_deg = rnw_config.rnw.tau;
   rnw_cmd.cmd_type = rnw_cmd_t::cmd_rocking;
@@ -502,7 +502,7 @@ void energy_feedback_t::step( rnw_msgs::ConeState const & cone_state ){
 corridor_controller_t::corridor_controller_t( rnw_config_t const & cfg ): config(cfg) {}
 
 void corridor_controller_t::init( rnw_msgs::ConeState const & cone_state ){
-  Vector3d C = point_at_grip_depth(cone_state,config.rnw.desired_grip_depth);
+  Vector3d C = point_at_grip_depth(cone_state,config.caging.desired_grip_depth);
   corridor_origin = C;
   corridor_dir = cone_yaw(cone_state);
   corridor_width = config.rnw.tau_ff/2;
@@ -533,7 +533,7 @@ Vector3d corridor_controller_t::calc_next_c( rnw_msgs::ConeState const & cone_st
   Vector3d e1 = (Dg-G).normalized();
   Vector3d e2 = Vector3d::UnitZ();
   Vector3d K = e1.cross(e2);
-  Vector3d C = point_at_grip_depth(cone_state,config.rnw.desired_grip_depth);
+  Vector3d C = point_at_grip_depth(cone_state,config.caging.desired_grip_depth);
 
   if ( !_init ) {
     ROS_ERROR_STREAM("[rnw] did not init corridor!");
