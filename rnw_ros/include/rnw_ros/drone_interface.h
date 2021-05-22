@@ -50,9 +50,13 @@ struct drone_interface_t {
 
     void set_max_vel_acc( double mvel, double macc );
 
-    quadrotor_msgs::PolynomialTrajectory gen_traj_go_to_point( Vector3d const & tgt );
+    quadrotor_msgs::PolynomialTrajectory gen_traj_go_to_point( Vector3d const & tgt ) const;
 
-    quadrotor_msgs::PolynomialTrajectory gen_traj_from_waypoint( vector<Vector3d> const & waypoints_in );
+    quadrotor_msgs::PolynomialTrajectory gen_traj_go_to_point( Vector3d const & tgt, double yaw ) const;
+
+    quadrotor_msgs::PolynomialTrajectory gen_traj_from_waypoint( vector<Vector3d> const & waypoints_in ) const;
+
+    quadrotor_msgs::PolynomialTrajectory gen_traj_from_waypoint( vector<Vector3d> const & waypoints_in, double final_yaw ) const;
 
     void go_to_point( Vector3d const & target );
 
@@ -60,7 +64,11 @@ struct drone_interface_t {
 
     void follow_waypoints( vector<Vector3d> const & waypoints );
 
+    void follow_waypoints( vector<Vector3d> const & waypoints, double yaw );
+
     void follow_waypoints_in_intermediate_frame( vector<Vector3d> const & waypoints );
+
+    AmTraj traj_generator = AmTraj(1024, 16, 0.4, 0.5, 0.5, 23, 0.02);
 
 private:
 
@@ -69,8 +77,6 @@ private:
     double max_vel = 1;
 
     double max_acc = 1;
-
-    AmTraj traj_generator = AmTraj(1024, 16, 0.4, 0.5, 0.5, 23, 0.02);
 
     ros::Subscriber sub_odom;
 

@@ -293,6 +293,10 @@ double uav_yaw_from_cone_yaw( double cone_yaw ){
 }
 
 quadrotor_msgs::PolynomialTrajectory gen_setpoint_traj(nav_msgs::Odometry const & odom, Vector3d const & setpoint, double duration ){
+  return gen_setpoint_traj(odom,setpoint,uav_yaw_from_odom(odom),duration);
+}
+
+quadrotor_msgs::PolynomialTrajectory gen_setpoint_traj(nav_msgs::Odometry const & odom, Vector3d const & setpoint, double yaw, double duration ){
 
   constexpr int order = 5;
 
@@ -304,7 +308,7 @@ quadrotor_msgs::PolynomialTrajectory gen_setpoint_traj(nav_msgs::Odometry const 
   msg.num_order = order;
   msg.num_segment = 1;
   msg.start_yaw = uav_yaw_from_odom(odom);
-  msg.final_yaw = uav_yaw_from_odom(odom);
+  msg.final_yaw = yaw;
 
   // fill the segment
 

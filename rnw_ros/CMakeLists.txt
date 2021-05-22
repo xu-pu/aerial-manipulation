@@ -187,6 +187,7 @@ set(RNW_NODES
         check_planning_assistant_node
         individual_flight_test_node
         pub_caging_state_node
+        rnw_caging_node
 )
 
 FOREACH(NODE ${RNW_NODES})
