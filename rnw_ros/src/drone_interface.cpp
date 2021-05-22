@@ -124,7 +124,7 @@ quadrotor_msgs::PolynomialTrajectory drone_interface_t::gen_traj_go_to_point( Ve
 
 }
 
-void drone_interface_t::go_to_point( const Vector3d & target) {
+void drone_interface_t::go_to_point( const Vector3d & target) const {
 
   if (!ready()) return;
 
@@ -132,7 +132,7 @@ void drone_interface_t::go_to_point( const Vector3d & target) {
 
 }
 
-void drone_interface_t::go_to_point_in_intermediate_frame( const Vector3d & point ) {
+void drone_interface_t::go_to_point_in_intermediate_frame( const Vector3d & point ) const {
 
   if (!ready()) return;
 
@@ -171,7 +171,7 @@ quadrotor_msgs::PolynomialTrajectory drone_interface_t::gen_traj_from_waypoint( 
 
 }
 
-void drone_interface_t::follow_waypoints(const vector<Vector3d> &waypoints) {
+void drone_interface_t::follow_waypoints(const vector<Vector3d> &waypoints) const {
 
   if (!ready()) return;
 
@@ -179,7 +179,7 @@ void drone_interface_t::follow_waypoints(const vector<Vector3d> &waypoints) {
 
 }
 
-void drone_interface_t::follow_waypoints( vector<Vector3d> const & waypoints, double yaw ){
+void drone_interface_t::follow_waypoints( vector<Vector3d> const & waypoints, double yaw ) const {
 
   if (!ready()) return;
 
@@ -187,7 +187,7 @@ void drone_interface_t::follow_waypoints( vector<Vector3d> const & waypoints, do
 
 }
 
-void drone_interface_t::follow_waypoints_in_intermediate_frame(const vector<Vector3d> & points) {
+void drone_interface_t::follow_waypoints_in_intermediate_frame(const vector<Vector3d> & points) const {
 
   if (!ready()) return;
 

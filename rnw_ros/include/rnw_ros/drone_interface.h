@@ -62,15 +62,15 @@ public: // these methods will take ACTION
 
     void execute_trajectory(quadrotor_msgs::PolynomialTrajectory const & traj ) const;
 
-    void go_to_point( Vector3d const & target );
+    void go_to_point( Vector3d const & target ) const;
 
-    void go_to_point_in_intermediate_frame( Vector3d const & point );
+    void go_to_point_in_intermediate_frame( Vector3d const & point ) const;
 
-    void follow_waypoints( vector<Vector3d> const & waypoints );
+    void follow_waypoints( vector<Vector3d> const & waypoints ) const;
 
-    void follow_waypoints( vector<Vector3d> const & waypoints, double yaw );
+    void follow_waypoints( vector<Vector3d> const & waypoints, double yaw ) const;
 
-    void follow_waypoints_in_intermediate_frame( vector<Vector3d> const & waypoints );
+    void follow_waypoints_in_intermediate_frame( vector<Vector3d> const & waypoints ) const;
 
 private:
 
