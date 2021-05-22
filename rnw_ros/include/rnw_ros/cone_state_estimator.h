@@ -36,9 +36,9 @@ struct cone_state_estimator_t {
     bool contact_valid = false;
     Vector3d contact_point;
 
-    lpf_1st_butterworth_t lpf_ang_vel_x = lpf_1st_butterworth_t(0.1);
-    lpf_1st_butterworth_t lpf_ang_vel_y = lpf_1st_butterworth_t(0.1);
-    lpf_1st_butterworth_t lpf_ang_vel_z = lpf_1st_butterworth_t(0.1);
+    lpf_1st_butterworth_t lpf_ang_vel_x;
+    lpf_1st_butterworth_t lpf_ang_vel_y;
+    lpf_1st_butterworth_t lpf_ang_vel_z;
 
     explicit cone_state_estimator_t( ros::NodeHandle & nh );
 

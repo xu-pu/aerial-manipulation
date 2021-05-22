@@ -17,10 +17,6 @@ cone_state_estimator_t::cone_state_estimator_t( ros::NodeHandle & nh ) {
 
   rnw_config.load_from_ros(nh);
 
-  cut_euler_velocity = get_param_default(nh,"cut_euler_velocity",false);
-
-  max_euler_velocity = get_param_default(nh,"max_euler_velocity",numeric_limits<double>::max());
-
   pub_cone_state = nh.advertise<rnw_msgs::ConeState>("/cone/state",10);
 
   pub_odom_dt = nh.advertise<quadrotor_msgs::Float64Stamped>("/cone/dt",10);
@@ -33,7 +29,9 @@ cone_state_estimator_t::cone_state_estimator_t( ros::NodeHandle & nh ) {
           ros::TransportHints().tcpNoDelay()
   );
 
-  lpf_ang_vel_z.T = get_param_default(nh,"lpf_ang_vel_z",1);
+  lpf_ang_vel_x.T = get_param_default<double>(nh,"lpf_ang_vel_x",0.1);
+  lpf_ang_vel_y.T = get_param_default<double>(nh,"lpf_ang_vel_y",0.1);
+  lpf_ang_vel_z.T = get_param_default<double>(nh,"lpf_ang_vel_z",0.1);
 
 }
 
