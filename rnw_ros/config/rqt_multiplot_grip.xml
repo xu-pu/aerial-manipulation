@@ -35,7 +35,7 @@
                                         <relative_minimum>-1000</relative_minimum>
                                         <type>0</type>
                                     </scale>
-                                    <topic>/rnw/grip_state</topic>
+                                    <topic>/rnw/caging</topic>
                                     <type>rnw_msgs/GripState</type>
                                 </x_axis>
                                 <y_axis>
@@ -48,7 +48,7 @@
                                         <relative_minimum>-1000</relative_minimum>
                                         <type>1</type>
                                     </scale>
-                                    <topic>/rnw/grip_state</topic>
+                                    <topic>/rnw/caging</topic>
                                     <type>rnw_msgs/GripState</type>
                                 </y_axis>
                             </axes>
@@ -111,7 +111,7 @@
                                         <relative_minimum>-1000</relative_minimum>
                                         <type>0</type>
                                     </scale>
-                                    <topic>/rnw/grip_state</topic>
+                                    <topic>/rnw/caging</topic>
                                     <type>rnw_msgs/GripState</type>
                                 </x_axis>
                                 <y_axis>
@@ -124,7 +124,7 @@
                                         <relative_minimum>-1000</relative_minimum>
                                         <type>1</type>
                                     </scale>
-                                    <topic>/rnw/grip_state</topic>
+                                    <topic>/rnw/caging</topic>
                                     <type>rnw_msgs/GripState</type>
                                 </y_axis>
                             </axes>

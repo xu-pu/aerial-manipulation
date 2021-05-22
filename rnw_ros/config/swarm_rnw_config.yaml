@@ -17,7 +17,7 @@ rnw:
   insertion_depth: 0.12 # 0.11
   topple_init: 0.05
   desired_nutation: 45
-  desired_grip_depth: 0.05
+  desired_grip_depth: 0.06
   tau: 50
   max_vel: 0.5
   max_acc: 0.3
@@ -57,9 +57,9 @@ cone:
   tip:
     x: 0.286082
     y: 0.00122838
-#    z: 1.31123
+    z: 1.31123
 #    z: 1.31123-0.058
-    z: 1.25323
+#    z: 1.25323
   CoM_x: 0.08
   CoM_z: 0.05
   mass: 0.5

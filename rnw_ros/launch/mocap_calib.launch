@@ -6,6 +6,7 @@
 
     <node pkg="rnw_ros" type="mocap_calib_node" name="mocap_calib_node" output="screen">
         <remap from="~cone" to="/mocap/cone" />
+        <remap from="~uav" to="/mocap/drone1" />
     </node>
 
     <node pkg="rqt_reconfigure" type="rqt_reconfigure" name="rqt_reconfigure"/>
