@@ -42,13 +42,13 @@ struct drone_interface_t {
 
     bool odom_in_time() const;
 
-    void execute_trajectory(quadrotor_msgs::PolynomialTrajectory const & traj ) const;
-
     void set_max_vel( double val );
 
     void set_max_acc( double val );
 
     void set_max_vel_acc( double mvel, double macc );
+
+public: // these method only perform planning
 
     quadrotor_msgs::PolynomialTrajectory gen_traj_go_to_point( Vector3d const & tgt ) const;
 
@@ -57,6 +57,10 @@ struct drone_interface_t {
     quadrotor_msgs::PolynomialTrajectory gen_traj_from_waypoint( vector<Vector3d> const & waypoints_in ) const;
 
     quadrotor_msgs::PolynomialTrajectory gen_traj_from_waypoint( vector<Vector3d> const & waypoints_in, double final_yaw ) const;
+
+public: // these methods will take ACTION
+
+    void execute_trajectory(quadrotor_msgs::PolynomialTrajectory const & traj ) const;
 
     void go_to_point( Vector3d const & target );
 
@@ -68,11 +72,11 @@ struct drone_interface_t {
 
     void follow_waypoints_in_intermediate_frame( vector<Vector3d> const & waypoints );
 
-    AmTraj traj_generator = AmTraj(1024, 16, 0.4, 0.5, 0.5, 23, 0.02);
-
 private:
 
     void setup_trajectory_generator();
+
+    AmTraj traj_generator = AmTraj(1024, 16, 0.4, 0.5, 0.5, 23, 0.02);
 
     double max_vel = 1;
 
