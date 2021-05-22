@@ -20,6 +20,8 @@ struct cone_interface_t {
 
     void on_cone_state( rnw_msgs::ConeStateConstPtr const & msg );
 
+    bool odom_in_time() const;
+
 };
 
 #endif //RNW_ROS_CONE_INTERFACE_H

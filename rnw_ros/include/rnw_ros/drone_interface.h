@@ -40,6 +40,8 @@ struct drone_interface_t {
 
     bool ready( bool print_reason = true ) const;
 
+    bool odom_in_time() const;
+
     void execute_trajectory(quadrotor_msgs::PolynomialTrajectory const & traj ) const;
 
     void set_max_vel( double val );

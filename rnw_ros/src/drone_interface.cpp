@@ -180,3 +180,7 @@ void drone_interface_t::follow_waypoints_in_intermediate_frame(const vector<Vect
   execute_trajectory(gen_traj_from_waypoint(waypoints));
 
 }
+
+bool drone_interface_t::odom_in_time() const {
+  return message_in_time(latest_odom,message_timeout);
+}
