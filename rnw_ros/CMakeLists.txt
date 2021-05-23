@@ -189,6 +189,7 @@ set(RNW_NODES
         pub_caging_state_node
         rnw_caging_node
         rnw_cable_node
+        dbg_rnw_cable_node
 )
 
 FOREACH(NODE ${RNW_NODES})
