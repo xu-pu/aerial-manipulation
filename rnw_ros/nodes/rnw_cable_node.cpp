@@ -92,11 +92,32 @@ struct cable_rnw_node_t {
 
       ROS_WARN_STREAM("[cable rnw] land triggered!");
 
+      Vector3d cur_tip = uav_utils::from_point_msg(rnw_planner.latest_cone_state.tip);
+      Vector3d cur_contact = uav_utils::from_point_msg(rnw_planner.latest_cone_state.contact_point);
+
+      Vector3d v = cur_tip - cur_contact;
+      Vector3d rest_tip = cur_contact + v.norm() * Vector3d(v.x(),v.y(),0).normalized();
+
+      drone.go_to_point(rest_tip);
+
     }
 
     void on_start( std_msgs::HeaderConstPtr const & msg ){
 
       ROS_WARN_STREAM("[cable rnw] start rnw triggered!");
+
+      Vector3d cur_tip = uav_utils::from_point_msg(rnw_planner.latest_cone_state.tip);
+      Vector3d cur_contact = uav_utils::from_point_msg(rnw_planner.latest_cone_state.contact_point);
+
+      Vector3d v = cur_tip - cur_contact;
+      double len = v.norm();
+      Vector3d dir_2d = Vector3d(v.x(),v.y(),0).normalized();
+      double nut_comp = M_PI_2 - deg2rad * rnw_config.rnw.desired_nutation;
+      Vector3d tip = dir_2d * std::cos(nut_comp) * len;
+      tip.z() = std::sin(nut_comp) * len;
+      tip = tip + cur_contact;
+
+      drone.go_to_point(tip);
 
     }
 
