@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<launch>
+
+    <param name="/use_sim_time" type="bool" value="false"/>
+
+    <rosparam command="load" file="$(find rnw_ros)/config/swarm_rnw_config.yaml"/>
+
+    <!--  Setup Fake Drones  -->
+
+    <node pkg="rnw_ros" type="fake_drone_node" name="fake_drone2" output="screen" required="true">
+        <param name="init_y" type="double" value="1"/>
+        <param name="init_z" type="double" value="0.1"/>
+        <remap from="~odom" to="/drone2/odom"/>
+        <remap from="~position_cmd" to="/drone2/position_cmd"/>
+        <remap from="~n3ctrl" to="/drone2/state"/>
+    </node>
+
+    <node pkg="rnw_ros" type="traj2cmd_node" name="traj2cmd_drone2" output="screen" required="true">
+        <remap from="~traj" to="/drone2/traj"/>
+        <remap from="~odom" to="/drone2/odom"/>
+        <remap from="~position_cmd" to="/drone2/position_cmd"/>
+    </node>
+
+    <!--  Setup Joystick  -->
+
+    <node pkg="joy" type="joy_node" name="joy_node" output="screen">
+        <param name="~autorepeat_rate" value="0" />
+    </node>
+
+    <group>
+        <remap from="joy" to="joy_hz"/>
+        <node pkg="joy" type="joy_node" name="joy_cont" output="screen">
+            <param name="~autorepeat_rate" value="30" />
+        </node>
+    </group>
+
+<!--    <node pkg="rnw_ros" type="gamepad_drone_cmd_node" name="gamepad_drone_cmd_node" output="screen"/>-->
+
+    <node pkg="rnw_ros" type="gamepad_trigger_node" name="gamepad" output="screen">
+        <remap from="~RB" to="/abort"/>
+    </node>
+
+    <!--  Setup Cone  -->
+
+    <node pkg="mocap_optitrack" type="mocap_node" name="mocap_node" respawn="false" launch-prefix="" required="true" output="log">
+        <rosparam file="$(find mocap_optitrack)/config/mocap.yaml" command="load" />
+    </node>
+
+    <node pkg="mocap2odom" type="mocap2odom" name="mocap2odom" output="screen" >
+        <param name="publish_uav_odom" type="bool" value="false"/>
+        <rosparam file="$(find mocap2odom)/config/calib.yaml" command="load" />
+    </node>
+
+    <node pkg="rnw_ros" type="pub_cone_state_node" name="pub_cone_state_node" required="true" output="log">
+        <param name="cut_euler_velocity" type="bool" value="true"/>
+        <param name="max_euler_velocity" value="10"/>
+    </node>
+
+    <!--  RnW  -->
+
+    <node pkg="rnw_ros" type="rnw_cable_node" name="rnw_cable_node" required="true" output="screen"/>
+
+    <!--  Visualization  -->
+
+    <node name="rviz" pkg="rviz" type="rviz" output="log" required="true" args="-d $(find rnw_ros)/config/swarm.rviz"/>
+
+    <node pkg="rnw_ros" type="visualize_cone_node" name="visualize_cone_node" output="screen" required="true">
+        <param name="cone_color_r" type="double" value="0"/>
+        <param name="cone_color_g" type="double" value="1"/>
+        <param name="cone_color_b" type="double" value="0"/>
+    </node>
+
+    <node pkg="rnw_ros" type="odom2tf_node" name="drone2_tf" output="screen">
+        <remap from="~odom" to="/drone2/odom"/>
+        <param name="name" value="odom_drone2" />
+    </node>
+
+    <node pkg="rnw_ros" type="visualize_traj_node" name="traj_viz_drone2" output="screen" required="true">
+        <param name="lift_dt" type="double" value="0.05"/>
+        <param name="length_g" type="double" value="0.5"/>
+        <param name="clear_after_n_sec" type="double" value="0"/>
+        <remap from="~poly_traj" to="/drone2/traj"/>
+    </node>
+
+    <node pkg="rnw_ros" type="visualize_pos_cmd_node" name="pos_cmd_viz_drone2" output="screen" required="true">
+        <remap from="~position_cmd" to="/drone2/position_cmd"/>
+    </node>
+
+<!--    <node name="record" pkg="rosbag" type="record" output="screen" args="-a -x '(.*)visual(.*)|/(.*)viz(.*)'" />-->
+
+</launch>
