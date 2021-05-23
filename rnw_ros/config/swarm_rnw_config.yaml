@@ -19,9 +19,9 @@ rnw:
   insertion_depth: 0.12 # 0.11
   topple_init: 0.05
   # tip over at 30 deg, 20 good angle
-  desired_nutation: 20
+  desired_nutation: 30
   desired_grip_depth: 0.06
-  tau: 50
+  tau: 30
   max_vel: 0.5
   max_acc: 0.3
   rocking_max_vel: 2
