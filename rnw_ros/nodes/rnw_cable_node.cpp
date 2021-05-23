@@ -37,11 +37,21 @@ struct cable_rnw_node_t {
 
     cone_interface_t cone;
 
-    cable_rnw_node_t( ros::NodeHandle & nh, rnw_config_t & cfg ) : rnw_config(cfg), rnw_planner(cfg), drone("drone1") {
+    ros::Subscriber sub_cone_state;
+
+    cable_rnw_node_t( ros::NodeHandle & nh, rnw_config_t & cfg ) : rnw_config(cfg), rnw_planner(cfg), drone("drone2") {
 
       drone.set_max_vel_acc(rnw_config.rnw.rocking_max_vel,rnw_config.rnw.max_acc);
 
       timer = nh.createTimer(ros::Rate(30), &cable_rnw_node_t::spin, this);
+
+      sub_cone_state = nh.subscribe<rnw_msgs::ConeState>(
+              "/cone/state",
+              1,
+              &cable_rnw_node_t::on_cone_state,
+              this,
+              ros::TransportHints().tcpNoDelay()
+      );
 
       sub_trigger_swing_up = nh.subscribe<std_msgs::Header>(
               "/gamepad/Y",
@@ -73,6 +83,10 @@ struct cable_rnw_node_t {
 
     }
 
+    void on_cone_state( rnw_msgs::ConeStateConstPtr const & msg ){
+      rnw_planner.on_cone_state(msg);
+    }
+
     void on_abort( std_msgs::HeaderConstPtr const & msg ){
       ROS_WARN_STREAM("[cable rnw] abort triggered!");
       rnw_planner.stop_walking();
@@ -82,9 +96,18 @@ struct cable_rnw_node_t {
 
       ROS_WARN_STREAM("[cable rnw] swing up triggered!");
 
-      auto waypoints = gen_wpts_push_topple(drone.latest_odom,cone.latest_cone_state,rnw_config);
+      Vector3d cur_tip = uav_utils::from_point_msg(rnw_planner.latest_cone_state.tip);
+      Vector3d cur_contact = uav_utils::from_point_msg(rnw_planner.latest_cone_state.contact_point);
 
-      drone.follow_waypoints(waypoints,uav_yaw_from_cone_state(cone.latest_cone_state));
+      Vector3d v = cur_tip - cur_contact;
+      double len = v.norm();
+      Vector3d dir_2d = Vector3d(v.x(),v.y(),0).normalized();
+      double nut_comp = M_PI_2 - deg2rad * rnw_config.rnw.desired_nutation;
+      Vector3d tip = dir_2d * std::cos(nut_comp) * len;
+      tip.z() = std::sin(nut_comp) * len;
+      tip = tip + cur_contact;
+
+      drone.go_to_point(tip);
 
     }
 
@@ -106,18 +129,12 @@ struct cable_rnw_node_t {
 
       ROS_WARN_STREAM("[cable rnw] start rnw triggered!");
 
-      Vector3d cur_tip = uav_utils::from_point_msg(rnw_planner.latest_cone_state.tip);
-      Vector3d cur_contact = uav_utils::from_point_msg(rnw_planner.latest_cone_state.contact_point);
-
-      Vector3d v = cur_tip - cur_contact;
-      double len = v.norm();
-      Vector3d dir_2d = Vector3d(v.x(),v.y(),0).normalized();
-      double nut_comp = M_PI_2 - deg2rad * rnw_config.rnw.desired_nutation;
-      Vector3d tip = dir_2d * std::cos(nut_comp) * len;
-      tip.z() = std::sin(nut_comp) * len;
-      tip = tip + cur_contact;
-
-      drone.go_to_point(tip);
+      if (drone.ready()) {
+        rnw_planner.start_walking();
+      }
+      else {
+        ROS_WARN_STREAM("[cable rnw] drone not ready to rnw yet!");
+      }
 
     }
 
