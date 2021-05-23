@@ -46,7 +46,21 @@ struct cable_rnw_node_t {
       sub_trigger_swing_up = nh.subscribe<std_msgs::Header>(
               "/gamepad/Y",
               10,
-              &cable_rnw_node_t::on_topple,
+              &cable_rnw_node_t::on_swing_up,
+              this
+      );
+
+      sub_trigger_land = nh.subscribe<std_msgs::Header>(
+              "/gamepad/A",
+              10,
+              &cable_rnw_node_t::on_land,
+              this
+      );
+
+      sub_trigger_start = nh.subscribe<std_msgs::Header>(
+              "/gamepad/X",
+              10,
+              &cable_rnw_node_t::on_start,
               this
       );
 
@@ -60,17 +74,29 @@ struct cable_rnw_node_t {
     }
 
     void on_abort( std_msgs::HeaderConstPtr const & msg ){
-      ROS_WARN_STREAM("[rnw_planner] abort triggered!");
+      ROS_WARN_STREAM("[cable rnw] abort triggered!");
       rnw_planner.stop_walking();
     }
 
-    void on_topple( std_msgs::HeaderConstPtr const & msg ){
+    void on_swing_up( std_msgs::HeaderConstPtr const & msg ){
 
-      ROS_WARN_STREAM("[caging rnw] topple triggered triggered!");
+      ROS_WARN_STREAM("[cable rnw] swing up triggered!");
 
       auto waypoints = gen_wpts_push_topple(drone.latest_odom,cone.latest_cone_state,rnw_config);
 
       drone.follow_waypoints(waypoints,uav_yaw_from_cone_state(cone.latest_cone_state));
+
+    }
+
+    void on_land( std_msgs::HeaderConstPtr const & msg ){
+
+      ROS_WARN_STREAM("[cable rnw] land triggered!");
+
+    }
+
+    void on_start( std_msgs::HeaderConstPtr const & msg ){
+
+      ROS_WARN_STREAM("[cable rnw] start rnw triggered!");
 
     }
 
