@@ -98,12 +98,13 @@ struct cable_rnw_node_t {
 
       constexpr int segments = 10;
 
+      // from M_PI_2 to nutation
       vector<Vector3d> waypoints;
       for ( int i=0; i<=segments; i++ ) {
         waypoints.emplace_back(point_at_nutation(
                 cone.latest_cone_state,
                 uav_utils::from_point_msg(cone.latest_cone_state.tip),
-                rnw_config.rnw.desired_nutation * deg2rad * i / segments
+                M_PI_2 - (M_PI_2 - rnw_config.rnw.desired_nutation * deg2rad) * i / segments
         ));
       }
 
