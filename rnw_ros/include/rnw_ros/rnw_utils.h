@@ -162,6 +162,14 @@ Vector3d tcp2uav( Vector3d const & tcp, nav_msgs::Odometry const & uav_odom, Vec
  */
 Vector3d point_at_grip_depth( rnw_msgs::ConeState const & cone_state, double grip_depth );
 
+/**
+ * @param cone_state
+ * @param point - world frame
+ * @param nutation_rad
+ * @return
+ */
+Vector3d point_at_nutation( rnw_msgs::ConeState const & cone_state, Vector3d const & point, double nutation_rad );
+
 template<typename T, size_t window_size>
 struct median_filter_t {
 

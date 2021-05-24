@@ -354,3 +354,15 @@ vector<Vector3d> points_in_intermediate_frame( vector<Vector3d> const & points, 
   return rst;
 
 }
+
+Vector3d point_at_nutation( rnw_msgs::ConeState const & cone_state, Vector3d const & point, double nutation_rad ){
+  Vector3d cur_contact = uav_utils::from_point_msg(cone_state.contact_point);
+  Vector3d v = point - cur_contact;
+  double len = v.norm();
+  Vector3d dir_2d = Vector3d(v.x(),v.y(),0).normalized();
+  double nut_comp = M_PI_2 - nutation_rad;
+  Vector3d tgt = dir_2d * std::cos(nut_comp) * len;
+  tgt.z() = std::sin(nut_comp) * len;
+  tgt = tgt + cur_contact;
+  return tgt;
+}
