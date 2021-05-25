@@ -1,4 +1,6 @@
-mass        : 1.27
+mass        : 1.259
+# drone2 1.259
+# drone1 1.27
 gra         : 9.81
 hov_percent : 0.24
 full_thrust : 51.744
@@ -7,7 +9,7 @@ js_ctrl_lock_velo: 0.3
 use_yaw_rate_ctrl: false
 pub_debug_msgs: false
 
-enable_dynamic_reconfigure: true
+enable_dynamic_reconfigure: false
 
 # tianbo(0), mellinger(1)
 ctrl_strategy: 0
