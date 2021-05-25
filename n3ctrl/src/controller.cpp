@@ -57,9 +57,11 @@ void Controller::config_gain(const Parameter_t::Gain& gain)
 void Controller::update(const Desired_State_t& des,const Odom_Data_t& odom,const Imu_Data_t& imu,Controller_Output_t& u,SO3_Controller_Output_t& u_so3){
 
   double yaw_curr = get_yaw_from_quaternion(odom.q);
-  Matrix3d wRc = rotz(yaw_curr); // intermediate frame
+  Matrix3d wRc = rotz(yaw_curr); // intermediate frame or control frame, where control gains are defined
 
-  Vector3d cmd_acc = calc_cmd_acceleration(des,odom);
+  Vector3d cmd_vel = position_loop(des,odom);
+
+  Vector3d cmd_acc = velocity_loop(cmd_vel,des,odom);
 
   Vector3d cmd_trust = Vector3d(0, 0, param.mass * param.gra) + param.mass * cmd_acc;
 
@@ -90,6 +92,19 @@ void Controller::update(const Desired_State_t& des,const Odom_Data_t& odom,const
     u.yaw_mode = Controller_Output_t::CTRL_YAW;
     u.yaw = des.yaw;
   }
+
+  ////////////////// debug info //////////////////////
+
+  dbg_msg.ref_p = to_vector3_msg(des.p);
+  dbg_msg.ref_v = to_vector3_msg(des.v);
+  dbg_msg.ref_a = to_vector3_msg(des.a);
+
+  dbg_msg.plant_p = to_vector3_msg(odom.p);
+  dbg_msg.plant_v = to_vector3_msg(odom.v);
+  dbg_msg.plant_a = to_vector3_msg(odom.q*imu.a);
+
+  dbg_msg.cmd_v = to_vector3_msg(cmd_vel);
+  dbg_msg.cmd_a = to_vector3_msg(cmd_acc);
 
 };
 
@@ -123,10 +138,26 @@ void Controller::publish_ctrl(const Controller_Output_t& u, const ros::Time& sta
     msg.buttons.push_back(extra_stamp.nsec%msg.buttons[0]);
 	
     ctrl_pub.publish(msg);
+
+    if ( param.pub_debug_msgs ) {
+      dbg_msg.header.stamp = ros::Time::now();
+      dbg_msg.header.frame_id = "world";
+      pub_dbg_info.publish(dbg_msg);
+    }
+
 }
 
-Eigen::Vector3d Controller::calc_cmd_acceleration( const Desired_State_t& des,const Odom_Data_t& odom ){
+Eigen::Vector3d Controller::position_loop( const Desired_State_t& des,const Odom_Data_t& odom ){
+  double yaw_curr = get_yaw_from_quaternion(odom.q);
+  Matrix3d wRc = rotz(yaw_curr);
+  Matrix3d cRw = wRc.transpose();
+  Vector3d e_p = des.p - odom.p;
+  return des.v + wRc * Kp * cRw * e_p;
+}
 
+Eigen::Vector3d Controller::velocity_loop( Eigen::Vector3d const & cmd_vel, const Desired_State_t& des,const Odom_Data_t& odom ){
+
+  // integral term in velocity only work when hovering
   if (des.v(0) != 0.0 || des.v(1) != 0.0 || des.v(2) != 0.0) {
     // ROS_INFO("Reset integration");
     int_e_v.setZero();
@@ -136,10 +167,7 @@ Eigen::Vector3d Controller::calc_cmd_acceleration( const Desired_State_t& des,co
   Matrix3d wRc = rotz(yaw_curr);
   Matrix3d cRw = wRc.transpose();
 
-  Vector3d e_p = des.p - odom.p;
-  Eigen::Vector3d u_p = wRc * Kp * cRw * e_p;
-
-  Vector3d e_v = des.v + u_p - odom.v;
+  Vector3d e_v = cmd_vel - odom.v;
 
   const std::vector<double> integration_enable_limits = {0.1, 0.1, 0.1};
   for (size_t k = 0; k < 3; ++k) {

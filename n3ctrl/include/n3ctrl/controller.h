@@ -6,7 +6,7 @@
 #include <uav_utils/geometry_utils.h>
 #include <geometry_msgs/QuaternionStamped.h>
 #include <geometry_msgs/WrenchStamped.h>
-
+#include <n3ctrl/ControllerDebug.h>
 #include "input.h"
 
 struct Desired_State_t
@@ -53,6 +53,8 @@ public:
 	ros::Publisher ctrl_pub;
 	ros::Publisher pub_dbg_info;
 
+	n3ctrl::ControllerDebug dbg_msg;
+
 	Eigen::Matrix3d Kp;
 	Eigen::Matrix3d Kv;
 	Eigen::Matrix3d Kvi;
@@ -75,11 +77,29 @@ private:
 	// XU PU
 public:
 
-  Eigen::Vector3d calc_cmd_acceleration( const Desired_State_t& des,const Odom_Data_t& odom );
+    /**
+     * Limit attitude angles and magnitude of the trust vector
+     * @param cmd - thrust vector
+     * @return regulated trust vector
+     */
+    Eigen::Vector3d regulate_cmd_thrust(Eigen::Vector3d const & cmd );
 
-  Eigen::Vector3d regulate_cmd_thrust(Eigen::Vector3d const & cmd );
+    /**
+     * @param cmd_vel
+     * @param des
+     * @param odom
+     * @return command acceleration - input to acceleration loop
+     */
+    Eigen::Vector3d velocity_loop( Eigen::Vector3d const & cmd_vel, const Desired_State_t& des,const Odom_Data_t& odom );
 
-  Eigen::Vector3d acceleration_loop( Eigen::Vector3d const & F_des, const Imu_Data_t& imu, const Odom_Data_t& odom );
+    /**
+     * @param des
+     * @param odom
+     * @return command velocity - input to velocity loop
+     */
+    Eigen::Vector3d position_loop( const Desired_State_t& des,const Odom_Data_t& odom );
+
+    Eigen::Vector3d acceleration_loop( Eigen::Vector3d const & F_des, const Imu_Data_t& imu, const Odom_Data_t& odom );
 
 };
 
