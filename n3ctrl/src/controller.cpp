@@ -208,7 +208,7 @@ Eigen::Vector3d Controller::acceleration_loop( Eigen::Vector3d const & F_des, co
     geometry_msgs::Vector3Stamped msg;
     msg.header.stamp = ros::Time::now();
     msg.vector = uav_utils::to_vector3_msg(e_a);
-    ctrl_dbg_e_a_pub.publish(msg);
+    //ctrl_dbg_e_a_pub.publish(msg);
   }
   Vector3d u = F_des + ( imu.q * ( Kap * e_a ) ) * param.mass; // world frame
   return u;

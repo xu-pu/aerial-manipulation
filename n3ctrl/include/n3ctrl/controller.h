@@ -51,13 +51,7 @@ public:
 	Parameter_t& param;
 
 	ros::Publisher ctrl_pub;
-	ros::Publisher ctrl_val_dbg_pub;
-	ros::Publisher ctrl_dbg_att_des_pub;
-	ros::Publisher ctrl_dbg_att_real_pub;
-	ros::Publisher ctrl_dbg_e_a_pub;
-	ros::Publisher ctrl_dbg_e_p_pub;
-	ros::Publisher ctrl_dbg_e_p_i_pub;
-  ros::Publisher ctrl_dbg_e_v_pub;
+	ros::Publisher pub_dbg_info;
 
 	Eigen::Matrix3d Kp;
 	Eigen::Matrix3d Kv;
