@@ -57,72 +57,19 @@ void Controller::config_gain(const Parameter_t::Gain& gain)
 void Controller::update(const Desired_State_t& des,const Odom_Data_t& odom,const Imu_Data_t& imu,Controller_Output_t& u,SO3_Controller_Output_t& u_so3){
 
   double yaw_curr = get_yaw_from_quaternion(odom.q);
-  Matrix3d wRc = rotz(yaw_curr);
+  Matrix3d wRc = rotz(yaw_curr); // intermediate frame
 
-  Vector3d F_des;
+  Vector3d cmd_acc = calc_cmd_acceleration(des,odom);
 
-  switch ( ctrl_strategy_e(param.ctrl_strategy) ) {
-    case ctrl_strategy_e::tianbo:
-      F_des = calc_desired_force(des,odom);
-      break;
-    default:
-      F_des = calc_desired_force(des,odom);
-      ROS_ERROR_STREAM("[n3ctrl] Invalid control strategy!");
-      break;
-  }
+  Vector3d cmd_trust = Vector3d(0, 0, param.mass * param.gra) + param.mass * cmd_acc;
 
-  F_des = regulate_desired_force(F_des);
-
-	Vector3d z_b_des = F_des / F_des.norm();
-	
-	/////////////////////////////////////////////////
-	// Z-X-Y Rotation Sequence                
-	// Vector3d x_c_des = Vector3d(std::cos(yaw_des), sin(yaw_des), 0.0);
-	// Vector3d y_b_des = z_b_des.cross(x_c_des) / z_b_des.cross(x_c_des).norm();
-	// Vector3d x_b_des = y_b_des.cross(z_b_des);
-	/////////////////////////////////////////////////
-
-	/////////////////////////////////////////////////
-	// Z-Y-X Rotation Sequence                
-	Vector3d y_c_des = Vector3d(-std::sin(des.yaw), std::cos(des.yaw), 0.0);
-	Vector3d x_b_des = y_c_des.cross(z_b_des) / y_c_des.cross(z_b_des).norm();
-	Vector3d y_b_des = z_b_des.cross(x_b_des);
-	///////////////////////////////////////////////// 
-
-	Matrix3d R_des1; // it's wRb
-	R_des1 << x_b_des, y_b_des, z_b_des;
-	
-	Matrix3d R_des2; // it's wRb
-	R_des2 << -x_b_des, -y_b_des, z_b_des;
-	
-	Vector3d e1 = R_to_ypr(R_des1.transpose() * odom.q.toRotationMatrix());
-	Vector3d e2 = R_to_ypr(R_des2.transpose() * odom.q.toRotationMatrix());
-
-	Matrix3d R_des; // it's wRb
-
-	if (e1.norm() < e2.norm())
-	{
-		R_des = R_des1;
-	}
-	else
-	{
-		R_des = R_des2;
-	}
+  Vector3d F_des = regulate_cmd_thrust(cmd_trust);
 
 	// calculate yaw command
 	double e_yaw = des.yaw - yaw_curr;
   while(e_yaw > M_PI) e_yaw -= (2 * M_PI);
   while(e_yaw < -M_PI) e_yaw += (2 * M_PI);
   double u_yaw = Kyaw * e_yaw;
-
-  // {	// so3 control
-	// 	u_so3.Rdes = R_des;
-	// 	u_so3.Fdes = F_des;
-
-	// 	Matrix3d wRb_odom = odom.q.toRotationMatrix();
-	// 	Vector3d z_b_curr = wRb_odom.col(2);
-	// 	u_so3.net_force = F_des.dot(z_b_curr);
-	// }
 
 	{	// n3 api control in forward-left-up frame
 		Vector3d F_c = wRc.transpose() * F_des;
@@ -145,28 +92,6 @@ void Controller::update(const Desired_State_t& des,const Odom_Data_t& odom,const
 			u.yaw = des.yaw;
 		}
 		
-		// cout << "----------" << endl;
-		// cout << z_b_curr.transpose() << endl;
-		// cout << F_c.transpose() << endl;
-		// cout << u1 << endl;
-	}
-
-	if(param.pub_debug_msgs)
-	{
-		Vector3d ypr_des = R_to_ypr(R_des);
-		Vector3d ypr_real = R_to_ypr(odom.q.toRotationMatrix());
-		geometry_msgs::Vector3Stamped m;
-		m.header = odom.msg.header;
-		m.vector.x = ypr_des(2);
-		m.vector.y = ypr_des(1);
-		m.vector.z = ypr_des(0);
-		ctrl_dbg_att_des_pub.publish(m);
-		m.header = odom.msg.header;
-		m.vector.x = ypr_real(2);
-		m.vector.y = ypr_real(1);
-		m.vector.z = ypr_real(0);
-		ctrl_dbg_att_real_pub.publish(m);
-
 	}
 
 };
@@ -274,7 +199,46 @@ Eigen::Vector3d Controller::calc_desired_force( const Desired_State_t& des,const
 
 }
 
-Eigen::Vector3d Controller::regulate_desired_force( Eigen::Vector3d const & cmd ){
+Eigen::Vector3d Controller::calc_cmd_acceleration( const Desired_State_t& des,const Odom_Data_t& odom ){
+
+  if (des.v(0) != 0.0 || des.v(1) != 0.0 || des.v(2) != 0.0) {
+    // ROS_INFO("Reset integration");
+    int_e_v.setZero();
+  }
+
+  double yaw_curr = get_yaw_from_quaternion(odom.q);
+  Matrix3d wRc = rotz(yaw_curr);
+  Matrix3d cRw = wRc.transpose();
+
+  Vector3d e_p = des.p - odom.p;
+  Eigen::Vector3d u_p = wRc * Kp * cRw * e_p;
+
+  Vector3d e_v = des.v + u_p - odom.v;
+
+  const std::vector<double> integration_enable_limits = {0.1, 0.1, 0.1};
+  for (size_t k = 0; k < 3; ++k) {
+    if (std::fabs(e_v(k)) < 0.2) {
+      int_e_v(k) += e_v(k) * 1.0 / 50.0;
+    }
+  }
+
+  Eigen::Vector3d u_v_p = wRc * Kv * cRw * e_v;
+  const std::vector<double> integration_output_limits = {0.4, 0.4, 0.4};
+  Eigen::Vector3d u_v_i = wRc * Kvi * cRw * int_e_v;
+  for (size_t k = 0; k < 3; ++k) {
+    if (std::fabs(u_v_i(k)) > integration_output_limits[k]) {
+      uav_utils::limit_range(u_v_i(k), integration_output_limits[k]);
+      ROS_WARN("Integration saturate for axis %zu, value=%.3f", k, u_v_i(k));
+    }
+  }
+
+  Eigen::Vector3d u_v = u_v_p + u_v_i;
+
+  return u_v + Ka * des.a;
+
+}
+
+Eigen::Vector3d Controller::regulate_cmd_thrust(Eigen::Vector3d const & cmd ){
 
   Vector3d F_des = cmd;
 
