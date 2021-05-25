@@ -65,9 +65,6 @@ void Controller::update(const Desired_State_t& des,const Odom_Data_t& odom,const
     case ctrl_strategy_e::tianbo:
       F_des = calc_desired_force(des,odom);
       break;
-    case ctrl_strategy_e::mellinger:
-      F_des = calc_desired_force_mellinger(des,odom);
-      break;
     default:
       F_des = calc_desired_force(des,odom);
       ROS_ERROR_STREAM("[n3ctrl] Invalid control strategy!");
@@ -304,68 +301,6 @@ Eigen::Vector3d Controller::regulate_desired_force( Eigen::Vector3d const & cmd 
 
   if ( !constraint_info.empty() ) {
     ROS_WARN_STREAM(constraint_info);
-  }
-
-  return F_des;
-
-}
-
-Eigen::Vector3d Controller::calc_desired_force_mellinger( const Desired_State_t& des,const Odom_Data_t& odom ){
-
-  ROS_ASSERT_MSG(is_configured, "Gains for controller might not be initialized!");
-
-  if (des.v(0) != 0.0 || des.v(1) != 0.0 || des.v(2) != 0.0) {
-    // ROS_INFO("Reset integration");
-    int_e_v.setZero();
-  }
-
-  double yaw_curr = get_yaw_from_quaternion(odom.q);
-  Matrix3d wRc = rotz(yaw_curr);
-  Matrix3d cRw = wRc.transpose();
-
-  // P term in PID
-
-  Vector3d e_p = des.p - odom.p;
-  Eigen::Vector3d u_p = wRc * Kp * cRw * e_p; // apply gain in intermediate frame
-
-  // D term in PID
-
-  Vector3d e_v = des.v - odom.v;
-  Eigen::Vector3d u_v_p = wRc * Kv * cRw * e_v; // apply gain in intermediate frame
-
-  // I term in PID
-
-  const std::vector<double> integration_enable_limits = {0.1, 0.1, 0.1};
-  for (size_t k = 0; k < 3; ++k) {
-    if (std::fabs(e_p(k)) < integration_enable_limits.at(k)) {
-      int_e_v(k) += e_p(k) * 1.0 / 50.0;
-    }
-  }
-
-  const std::vector<double> integration_output_limits = {0.4, 0.4, 0.4};
-  Eigen::Vector3d u_v_i = wRc * Kvi * cRw * int_e_v;
-  for (size_t k = 0; k < 3; ++k) {
-    if (std::fabs(u_v_i(k)) > integration_output_limits[k]) {
-      uav_utils::limit_range(u_v_i(k), integration_output_limits[k]);
-      ROS_WARN("Integration saturate for axis %zu, value=%.3f", k, u_v_i(k));
-    }
-  }
-
-  // PID sum
-
-  Eigen::Vector3d u_v = u_p + u_v_p + u_v_i;
-
-  Vector3d F_des = u_v * param.mass + Vector3d(0, 0, param.mass * param.gra) + Ka * param.mass * des.a;
-
-  if(param.pub_debug_msgs){
-    geometry_msgs::Vector3Stamped msg;
-    msg.header.stamp = ros::Time::now();
-    msg.vector = uav_utils::to_vector3_msg(cRw*e_p);
-    ctrl_dbg_e_p_pub.publish(msg);
-    msg.vector = uav_utils::to_vector3_msg(cRw*e_v);
-    ctrl_dbg_e_v_pub.publish(msg);
-    msg.vector = uav_utils::to_vector3_msg(cRw*int_e_v);
-    ctrl_dbg_e_p_i_pub.publish(msg);
   }
 
   return F_des;
