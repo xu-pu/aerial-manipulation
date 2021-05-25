@@ -90,8 +90,8 @@ void N3CtrlFSM::process_control(const ros::Time& now_time)
 
 			hov_thr_kf.process(u.thrust);
 			hov_thr_kf.publish_thr();
-#else			
-      if ( param.hover.use_hov_percent_kf ) {
+#else
+      if ( param.hover.use_hov_percent_kf && controller.flight_status != Controller::flight_status_e::STOPED ) {
         hov_thr_kf.simple_update(imu_data.q, u.thrust, imu_data.a);
         // This line may not take effect according to param.hov.use_hov_percent_kf
         param.config_full_thrust(hov_thr_kf.get_hov_thr());

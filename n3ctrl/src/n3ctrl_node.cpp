@@ -148,7 +148,14 @@ int main(int argc, char* argv[]) {
                                        ros::VoidConstPtr(),
                                        ros::TransportHints().tcpNoDelay());
 
-    fsm.controller.ctrl_pub = nh.advertise<sensor_msgs::Joy>("ctrl", 10);
+    ros::Subscriber sub_flight_status =
+            nh.subscribe<std_msgs::UInt8>("/djiros/flight_status",
+                                           1000,
+                                           &Controller::on_flight_status,
+                                           &controller,
+                                           ros::TransportHints().tcpNoDelay());
+
+  fsm.controller.ctrl_pub = nh.advertise<sensor_msgs::Joy>("ctrl", 10);
 
     fsm.controller.pub_dbg_info = nh.advertise<n3ctrl::ControllerDebug>("debug", 10);
 

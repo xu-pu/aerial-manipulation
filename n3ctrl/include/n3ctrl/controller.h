@@ -7,6 +7,7 @@
 #include <geometry_msgs/QuaternionStamped.h>
 #include <geometry_msgs/WrenchStamped.h>
 #include <n3ctrl/ControllerDebug.h>
+#include <std_msgs/UInt8.h>
 #include "input.h"
 
 struct error_integral_t {
@@ -113,12 +114,20 @@ public:
 
 	error_integral_t vel_err_integral;
 
-	Controller(Parameter_t&);
+    enum class flight_status_e {
+        STOPED      = 0,
+        ON_GROUND   = 1,
+        IN_AIR      = 2
+    } flight_status = flight_status_e::STOPED;
+
+    Controller(Parameter_t&);
 	void config_gain(const Parameter_t::Gain& gain);
 	void config();
 	void update(const Desired_State_t& des, const Odom_Data_t& odom, const Imu_Data_t& imu, Controller_Output_t& u, SO3_Controller_Output_t& u_so3);
 	
 	void publish_ctrl(const Controller_Output_t& u, const ros::Time& stamp, const ros::Time& extra_stamp);
+
+	void on_flight_status( std_msgs::UInt8ConstPtr const & msg );
 
 private:
 	bool is_configured;

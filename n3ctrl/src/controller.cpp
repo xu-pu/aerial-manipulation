@@ -63,6 +63,17 @@ void Controller::config_gain(const Parameter_t::Gain& gain)
 
 void Controller::update(const Desired_State_t& des,const Odom_Data_t& odom,const Imu_Data_t& imu,Controller_Output_t& u,SO3_Controller_Output_t& u_so3){
 
+  // do not run the actual controller when the quadrotor is not armed
+  if ( flight_status == flight_status_e::STOPED ) {
+    u.roll  = 0;
+    u.pitch = 0;
+    u.thrust = 0;
+    u.mode = Controller_Output_t::VERT_THRU;
+    u.yaw_mode = Controller_Output_t::CTRL_YAW_RATE;
+    u.yaw = 0;
+    return;
+  }
+
   double yaw_curr = get_yaw_from_quaternion(odom.q);
   Matrix3d wRc = rotz(yaw_curr); // intermediate frame or control frame, where control gains are defined
 
@@ -236,4 +247,8 @@ Eigen::Vector3d Controller::acceleration_loop( Eigen::Vector3d const & F_des, co
   }
   Vector3d u = F_des + ( imu.q * ( Kap * e_a ) ) * param.mass; // world frame
   return u;
+}
+
+void Controller::on_flight_status( std_msgs::UInt8ConstPtr const & msg ){
+  flight_status = (flight_status_e)msg->data;
 }
