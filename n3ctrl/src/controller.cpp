@@ -106,6 +106,8 @@ void Controller::update(const Desired_State_t& des,const Odom_Data_t& odom,const
   dbg_msg.cmd_v = to_vector3_msg(cmd_vel);
   dbg_msg.cmd_a = to_vector3_msg(cmd_acc);
 
+  dbg_msg.full_thrust = param.full_thrust;
+
 };
 
 void Controller::publish_ctrl(const Controller_Output_t& u, const ros::Time& stamp, const ros::Time& extra_stamp)

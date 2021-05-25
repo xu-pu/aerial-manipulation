@@ -1,5 +1,7 @@
 Header header
 
+float64 full_thrust
+
 geometry_msgs/Vector3 ref_p
 geometry_msgs/Vector3 ref_v
 geometry_msgs/Vector3 ref_a
