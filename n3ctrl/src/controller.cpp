@@ -65,34 +65,31 @@ void Controller::update(const Desired_State_t& des,const Odom_Data_t& odom,const
 
   Vector3d F_des = regulate_cmd_thrust(cmd_trust);
 
-	// calculate yaw command
-	double e_yaw = des.yaw - yaw_curr;
-  while(e_yaw > M_PI) e_yaw -= (2 * M_PI);
-  while(e_yaw < -M_PI) e_yaw += (2 * M_PI);
-  double u_yaw = Kyaw * e_yaw;
-
 	{	// n3 api control in forward-left-up frame
-		Vector3d F_c = wRc.transpose() * F_des;
+		Vector3d F_c = wRc.transpose() * F_des; // des_f in intermediate frame
 		Matrix3d wRb_odom = odom.q.toRotationMatrix();
 		Vector3d z_b_curr = wRb_odom.col(2);
 		double u1 = F_des.dot(z_b_curr);
-		double fx = F_c(0);
-		double fy = F_c(1);
-		double fz = F_c(2);
-		u.roll  = std::atan2(-fy, fz);
-		u.pitch = std::atan2( fx, fz);
+		u.roll  = std::atan2(-F_c.y(), F_c.z());
+		u.pitch = std::atan2( F_c.x(), F_c.z());
 		u.thrust = u1 / param.full_thrust;
 		u.mode = Controller_Output_t::VERT_THRU;
-		if(param.use_yaw_rate_ctrl){
-			u.yaw_mode = Controller_Output_t::CTRL_YAW_RATE;
-			u.yaw = u_yaw;
-		}
-		else{
-			u.yaw_mode = Controller_Output_t::CTRL_YAW;
-			u.yaw = des.yaw;
-		}
-		
 	}
+
+	////////////////// yaw control //////////////////////
+  if(param.use_yaw_rate_ctrl){
+    // calculate yaw command
+    double e_yaw = des.yaw - yaw_curr;
+    while(e_yaw > M_PI) e_yaw -= (2 * M_PI);
+    while(e_yaw < -M_PI) e_yaw += (2 * M_PI);
+    double u_yaw = Kyaw * e_yaw;
+    u.yaw_mode = Controller_Output_t::CTRL_YAW_RATE;
+    u.yaw = u_yaw;
+  }
+  else{
+    u.yaw_mode = Controller_Output_t::CTRL_YAW;
+    u.yaw = des.yaw;
+  }
 
 };
 
