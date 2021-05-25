@@ -171,7 +171,7 @@ Eigen::Vector3d Controller::velocity_loop( Eigen::Vector3d const & cmd_vel, cons
   // integral term in velocity only work when hovering
   if (des.v(0) != 0.0 || des.v(1) != 0.0 || des.v(2) != 0.0) {
     // ROS_INFO("Reset integration");
-    vel_err_integral.reset();
+    //vel_err_integral.reset();
   }
 
   double yaw_curr = get_yaw_from_quaternion(odom.q);
