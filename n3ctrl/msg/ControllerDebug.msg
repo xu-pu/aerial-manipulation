@@ -1,13 +1,25 @@
 Header header
-geometry_msgs/Vector3 des_p
-geometry_msgs/Vector3 u_p_p
-geometry_msgs/Vector3 u_p_i
-geometry_msgs/Vector3 u_p
-geometry_msgs/Vector3 des_v
-geometry_msgs/Vector3 u_v_p
-geometry_msgs/Vector3 u_v_i
-geometry_msgs/Vector3 u_v
-geometry_msgs/Vector3 k_p_p
-geometry_msgs/Vector3 k_p_i
-geometry_msgs/Vector3 k_v_p
-geometry_msgs/Vector3 k_v_i
+
+geometry_msgs/Vector3 ref_p
+geometry_msgs/Vector3 ref_v
+geometry_msgs/Vector3 ref_a
+
+geometry_msgs/Vector3 plant_p
+geometry_msgs/Vector3 plant_v
+geometry_msgs/Vector3 plant_a
+
+# from inner control loops
+
+geometry_msgs/Vector3 cmd_v
+geometry_msgs/Vector3 cmd_a
+
+# integral terms
+
+geometry_msgs/Vector3 int_v
+geometry_msgs/Vector3 int_a
+
+# err = ref - plant, for easy debug
+
+float64 err_p
+float64 err_v
+float64 err_a

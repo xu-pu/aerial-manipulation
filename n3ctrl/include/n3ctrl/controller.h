@@ -81,8 +81,6 @@ private:
 	// XU PU
 public:
 
-  Eigen::Vector3d calc_desired_force( const Desired_State_t& des,const Odom_Data_t& odom );
-
   Eigen::Vector3d calc_cmd_acceleration( const Desired_State_t& des,const Odom_Data_t& odom );
 
   Eigen::Vector3d regulate_cmd_thrust(Eigen::Vector3d const & cmd );
