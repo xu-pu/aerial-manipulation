@@ -1,6 +1,6 @@
 <launch>
 
-	<arg name="uavname" default="hil" />
+	<arg name="uavname" default="fpv" />
     <arg name="imu_topic" default="/djiros/imu"/>
     <arg name="topic_odom_uav" default="/odom/uav"/>
 
@@ -61,5 +61,8 @@
         <remap from="~odom" to="$(arg topic_odom_uav)"/>
         <param name="name" value="sim_tf" />
     </node>
+
+    <node pkg="rqt_multiplot" type="rqt_multiplot" name="rqt_multiplot" output="log" required="true"
+          args="--multiplot-config $(find rnw_ros)/config/rqt_multiplot_n3ctrl.xml --multiplot-run-all"/>
 
 </launch>
