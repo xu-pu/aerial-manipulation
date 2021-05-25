@@ -9,6 +9,55 @@
 #include <n3ctrl/ControllerDebug.h>
 #include "input.h"
 
+struct error_integral_t {
+
+    inline error_integral_t(){
+      reset();
+    }
+
+    inline void reset(){
+      error_integral.setZero();
+    }
+
+    inline error_integral_t & update( Eigen::Vector3d const & err ){
+      for ( int i = 0; i < 3; i++ ) {
+        if (std::fabs(err(i)) < activation_limits(i)) {
+          error_integral(i) += err(i) * integration_ratio;
+        }
+      }
+      return *this;
+    }
+
+    /**
+     * @param gain - control gains, note that gains are defined in the intermediate frame
+     * @param gain_frame - gRe - transformation from error frame to gain frame
+     * @return integral term with limits
+     */
+    inline Eigen::Vector3d output( Eigen::Matrix3d const & gain, Eigen::Matrix3d const & gain_frame ) const {
+      Eigen::Matrix3d const & gRe = gain_frame; // error frame to gain frame
+      Eigen::Vector3d rst = gRe.transpose() * gain * gRe * error_integral;
+      for ( int i=0; i<3; i++ ) {
+        if (std::fabs(rst(i)) > output_limits[i]) {
+          uav_utils::limit_range(rst(i), output_limits(i));
+          ROS_WARN("Integration term of [%s] saturate for axis %u, value=%.3f", name.c_str(), i, rst(i));
+        }
+      }
+      return rst;
+    }
+
+    std::string name;
+
+    double integration_ratio = 0;
+
+    Eigen::Vector3d error_integral;
+
+    Eigen::Vector3d activation_limits;
+
+    Eigen::Vector3d output_limits;
+
+};
+
+
 struct Desired_State_t
 {
 	Eigen::Vector3d p;
@@ -62,7 +111,7 @@ public:
 	Eigen::Matrix3d Kap;
 	double Kyaw;
 
-	Eigen::Vector3d int_e_v;
+	error_integral_t vel_err_integral;
 
 	Controller(Parameter_t&);
 	void config_gain(const Parameter_t::Gain& gain);

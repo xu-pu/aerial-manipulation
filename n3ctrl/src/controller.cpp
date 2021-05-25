@@ -17,7 +17,14 @@ Controller::Controller(Parameter_t& param_):
 	param(param_)
 {
 	is_configured = false;
-	int_e_v.setZero();
+
+	////// initialize vel_err_integral
+  vel_err_integral.reset();
+  vel_err_integral.name = "vel_err_integral";
+  vel_err_integral.integration_ratio = 1./50.;
+  vel_err_integral.activation_limits = {0.2, 0.2, 0.2};
+  vel_err_integral.output_limits = {0.4, 0.4, 0.4};
+
 }
 
 void Controller::config()
@@ -162,7 +169,7 @@ Eigen::Vector3d Controller::velocity_loop( Eigen::Vector3d const & cmd_vel, cons
   // integral term in velocity only work when hovering
   if (des.v(0) != 0.0 || des.v(1) != 0.0 || des.v(2) != 0.0) {
     // ROS_INFO("Reset integration");
-    int_e_v.setZero();
+    vel_err_integral.reset();
   }
 
   double yaw_curr = get_yaw_from_quaternion(odom.q);
@@ -171,23 +178,8 @@ Eigen::Vector3d Controller::velocity_loop( Eigen::Vector3d const & cmd_vel, cons
 
   Vector3d e_v = cmd_vel - odom.v;
 
-  const std::vector<double> integration_enable_limits = {0.1, 0.1, 0.1};
-  for (size_t k = 0; k < 3; ++k) {
-    if (std::fabs(e_v(k)) < 0.2) {
-      int_e_v(k) += e_v(k) * 1.0 / 50.0;
-    }
-  }
-
+  Eigen::Vector3d u_v_i = vel_err_integral.update(e_v).output(Kvi,cRw);
   Eigen::Vector3d u_v_p = wRc * Kv * cRw * e_v;
-  const std::vector<double> integration_output_limits = {0.4, 0.4, 0.4};
-  Eigen::Vector3d u_v_i = wRc * Kvi * cRw * int_e_v;
-  for (size_t k = 0; k < 3; ++k) {
-    if (std::fabs(u_v_i(k)) > integration_output_limits[k]) {
-      uav_utils::limit_range(u_v_i(k), integration_output_limits[k]);
-      ROS_WARN("Integration saturate for axis %zu, value=%.3f", k, u_v_i(k));
-    }
-  }
-
   Eigen::Vector3d u_v = u_v_p + u_v_i;
 
   return u_v + Ka * des.a;
