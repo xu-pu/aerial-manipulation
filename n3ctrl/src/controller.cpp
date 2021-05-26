@@ -83,13 +83,13 @@ void Controller::update(const Desired_State_t& des,const Odom_Data_t& odom,const
 
   Vector3d cmd_trust = Vector3d(0, 0, param.mass * param.gra) + param.mass * cmd_acc;
 
-  Vector3d F_des = regulate_cmd_thrust(cmd_trust);
+  Vector3d thrust_vector = regulate_cmd_thrust(cmd_trust);
 
 	{	// n3 api control in forward-left-up frame
-		Vector3d F_c = wRc.transpose() * F_des; // des_f in intermediate frame
+		Vector3d F_c = wRc.transpose() * thrust_vector; // des_f in intermediate frame
 		Matrix3d wRb_odom = odom.q.toRotationMatrix();
 		Vector3d z_b_curr = wRb_odom.col(2);
-		double u1 = F_des.dot(z_b_curr);
+		double u1 = thrust_vector.dot(z_b_curr);
 		u.roll  = std::atan2(-F_c.y(), F_c.z());
 		u.pitch = std::atan2( F_c.x(), F_c.z());
 		u.thrust = u1 / param.full_thrust;
