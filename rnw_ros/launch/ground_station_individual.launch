@@ -71,8 +71,8 @@
         <param name="max_euler_velocity" value="10"/>
     </node>
 
-    <node pkg="rnw_ros" type="swarm_rnw_controller_node" name="individual_flight_test_node" required="true" output="screen">
-<!--        <param name="check_swarm_ready" type="bool" value="false"/>-->
+    <node pkg="rnw_ros" type="individual_flight_test_node" name="individual_flight_test_node" required="true" output="screen">
+        <param name="drone_name" type="string" value="drone2"/>
     </node>
 
     <!--  Visualization  -->
@@ -117,6 +117,6 @@
 
     <node name="rviz_traj" pkg="rviz" type="rviz" output="log" required="false" args="-d $(find rnw_ros)/config/swarm.rviz" />
 
-    <node name="record" pkg="rosbag" type="record" output="screen" args="-a -x '(.*)visual(.*)|/(.*)viz(.*)'" />
+<!--    <node name="record" pkg="rosbag" type="record" output="screen" args="-a -x '(.*)visual(.*)|/(.*)viz(.*)'" />-->
 
 </launch>
