@@ -20,9 +20,9 @@ disturbance:
   x_limit: 20
   y_limit: 20
   z_limit: 20
-  err_limit_x: 2
-  err_limit_y: 2
-  err_limit_z: 2
+  err_limit_x: 1
+  err_limit_y: 1
+  err_limit_z: 1
   integration_ratio: 0.02
 
 disarm:
@@ -46,9 +46,9 @@ gain:
         Kv0: 3.0
         Kv1: 2.5
         Kv2: 5.5
-        Kvi0: 1
-        Kvi1: 1
-        Kvi2: 1
+        Kvi0: 2.0
+        Kvi1: 2.0
+        Kvi2: 2.0
         Ka0: 1.0
         Ka1: 1.0
         Ka2: 1.0
