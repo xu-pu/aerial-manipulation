@@ -2,12 +2,12 @@ mass        : 1.259
 # drone2 1.259
 # drone1 1.27
 gra         : 9.81
-hov_percent : 0.24
+hov_percent : 0.20
 full_thrust : 51.744
 ctrl_rate   : 100.0
 js_ctrl_lock_velo: 0.3
 use_yaw_rate_ctrl: false
-pub_debug_msgs: false
+pub_debug_msgs: true
 
 enable_dynamic_reconfigure: false
 
@@ -23,15 +23,15 @@ disturbance:
   err_limit_x: 2
   err_limit_y: 2
   err_limit_z: 2
-  integration_ratio: 0.05
+  integration_ratio: 0.02
 
 hover:
     set_hov_percent_to_zero: false
     use_hov_percent_kf: true
     vert_velo_limit_for_update: 0.2
     vert_height_limit_for_update: 0.2
-    percent_lower_limit: 0.05
-    percent_higher_limit: 0.6
+    percent_lower_limit: 0.15
+    percent_higher_limit: 0.4
 
 gain:
     hover:

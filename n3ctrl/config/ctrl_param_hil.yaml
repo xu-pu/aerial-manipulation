@@ -5,7 +5,7 @@ full_thrust : 100 # this one is not used
 ctrl_rate   : 100.0
 js_ctrl_lock_velo: 0.3
 use_yaw_rate_ctrl: false
-pub_debug_msgs: false
+pub_debug_msgs: true
 
 enable_dynamic_reconfigure: true
 
