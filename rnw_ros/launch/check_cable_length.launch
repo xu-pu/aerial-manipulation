@@ -1,0 +1,28 @@
+<launch>
+
+    <param name="/use_sim_time" type="bool" value="false"/>
+
+    <rosparam command="load" file="$(find rnw_ros)/config/swarm_rnw_config.yaml"/>
+
+    <node pkg="mocap_optitrack" type="mocap_node" name="mocap_node" respawn="false" launch-prefix="" required="true" output="log">
+        <rosparam file="$(find mocap_optitrack)/config/mocap.yaml" command="load" />
+    </node>
+
+    <node pkg="mocap2odom" type="mocap2odom" name="mocap2odom" output="screen" >
+        <param name="publish_uav_odom" type="bool" value="true"/>
+        <rosparam file="$(find mocap2odom)/config/calib.yaml" command="load" />
+    </node>
+
+    <node pkg="rnw_ros" type="pub_cone_state_node" name="pub_cone_state_node" required="true" output="screen">
+        <param name="cut_euler_velocity" type="bool" value="true"/>
+        <param name="max_euler_velocity" value="10"/>
+    </node>
+
+    <node pkg="rnw_ros" type="pub_swarm_rnw_debug_info_node" name="pub_swarm_rnw_debug_info_node"/>
+
+    <node pkg="rqt_multiplot" type="rqt_multiplot" name="rqt_multiplot"
+          args="--multiplot-config $(find rnw_ros)/config/rqt_multiplot_cable_length.xml --multiplot-run-all"/>
+
+    <node name="rviz_traj" pkg="rviz" type="rviz" output="log" args="-d $(find rnw_ros)/config/swarm.rviz" />
+
+</launch>

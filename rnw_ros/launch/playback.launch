@@ -18,10 +18,6 @@
 <!--        <param name="cone_color_b" type="double" value="0"/>-->
 <!--    </node>-->
 
-<!--    <node pkg="rnw_ros" type="pub_obj_trace_node" name="pub_obj_trace_node" output="screen" required="true"/>-->
-
-<!--    <node pkg="rnw_ros" type="gen_paper_data_node" name="gen_paper_data_node" output="screen" required="true"/>-->
-
     <node name="rviz_traj" pkg="rviz" type="rviz" output="screen" required="true" args="-d $(find rnw_ros)/config/swarm.rviz" />
 
 <!--    <node pkg="rnw_ros" type="pub_cone_state_node" name="pub_cone_state_node" required="true" output="log">-->
@@ -39,11 +35,6 @@
 <!--        <remap from="~imu" to="$(arg imu_topic)"/>-->
 <!--        <remap from="~joy_ctrl" to="$(arg joy_ctrl_topic)"/>-->
 <!--    </node>-->
-
-    <node pkg="rnw_ros" type="pub_swarm_rnw_debug_info_node" name="pub_swarm_rnw_debug_info_node"/>
-
-        <node pkg="rqt_multiplot" type="rqt_multiplot" name="rqt_multiplot"
-              args="--multiplot-config $(find rnw_ros)/config/rqt_multiplot_swarm_rnw_debug.xml --multiplot-run-all"/>
 
 <!--    <node pkg="rqt_multiplot" type="rqt_multiplot" name="rqt_multiplot"-->
 <!--          args="&#45;&#45;multiplot-config $(find rnw_ros)/config/rqt_multiplot_cone_state.xml &#45;&#45;multiplot-run-all"/>-->
