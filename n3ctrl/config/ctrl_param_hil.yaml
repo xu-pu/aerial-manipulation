@@ -17,8 +17,8 @@ hover:
     use_hov_percent_kf: true
     vert_velo_limit_for_update: 0.2
     vert_height_limit_for_update: 0.2
-    percent_lower_limit: 0.05
-    percent_higher_limit: 0.6
+    percent_lower_limit: 0.35
+    percent_higher_limit: 0.45
 
 gain:
     hover:
@@ -29,9 +29,9 @@ gain:
         Kv0: 3.0
         Kv1: 2.5
         Kv2: 5.5
-        Kvi0: 0.1
-        Kvi1: 0.1
-        Kvi2: 0.1
+        Kvi0: 1
+        Kvi1: 1
+        Kvi2: 1
         Ka0: 1.0
         Ka1: 1.0
         Ka2: 1.0

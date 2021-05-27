@@ -22,8 +22,8 @@ Controller::Controller(Parameter_t& param_):
   vel_err_integral.reset();
   vel_err_integral.name = "vel_err_integral";
   vel_err_integral.integration_ratio = 1./50.;
-  vel_err_integral.activation_limits = {0.2, 0.2, 0.2};
-  vel_err_integral.output_limits = {0.4, 0.4, 0.4};
+  vel_err_integral.error_limits = {0.2, 0.2, 0.2};
+  vel_err_integral.output_limits = {5, 5, 5};
 
 }
 

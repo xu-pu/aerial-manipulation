@@ -53,6 +53,24 @@ limit_range(T& value, const T2& limit)
   limit_range(value, -limit, limit);
 }
 
+template<typename T>
+T clamp( T const & val, T const & min, T const & max ){
+  if ( val < min ) {
+    return min;
+  }
+  else if ( val > max ) {
+    return max;
+  }
+  else {
+    return val;
+  }
+}
+
+template<typename T>
+T clamp( T const & val, T const & limit ){
+  return clamp<T>(val,-std::abs(limit),std::abs(limit));
+}
+
 typedef std::stringstream DebugSS_t;
 } // end of namespace uav_utils
 
