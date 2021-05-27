@@ -13,6 +13,7 @@ using Eigen::Vector2d;
 using Eigen::Vector3d;
 using Eigen::Matrix3d;
 
+double amp = 0.5;
 
 Vector3d point_in_frame( nav_msgs::Odometry const & odom, Vector3d const & pt ){
   Matrix3d R = uav_utils::from_quaternion_msg(odom.pose.pose.orientation).toRotationMatrix();
@@ -104,15 +105,14 @@ struct individual_drone_test_t {
         return;
       }
 
-      double amplitude = 0.5;
-      int times = 3;
+      int times = 5;
 
       vector<Vector3d> waypoints;
       waypoints.emplace_back(Vector3d::Zero());
 
       for ( int i=0; i<times; i++ ) {
-        waypoints.emplace_back(0,amplitude,0);
-        waypoints.emplace_back(0,-amplitude,0);
+        waypoints.emplace_back(0,amp,0);
+        waypoints.emplace_back(0,-amp,0);
       }
 
       drone.follow_waypoints_in_intermediate_frame(waypoints);
@@ -135,6 +135,7 @@ int main( int argc, char** argv ) {
   server->setCallback([&](rnw_ros::VelAccConfig & config, uint32_t level){
       ROS_WARN_STREAM("dynamic reconfigure vel acc limits!");
       node.drone.set_max_vel_acc(config.max_vel,config.max_acc);
+      amp = config.amp;
   });
 
   ros::spin();
