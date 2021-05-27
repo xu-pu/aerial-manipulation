@@ -53,6 +53,7 @@ gain:
         Ka1: 1.0
         Ka2: 1.0
         Kyaw: 20.0
+        # track not used
     track:
         Kp0: 2.3
         Kp1: 2.3

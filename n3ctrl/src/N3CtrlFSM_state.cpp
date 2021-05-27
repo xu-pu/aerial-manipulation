@@ -209,7 +209,7 @@ void N3CtrlFSM::go_to_state(State_t ds)  // dest state
             set_hov_with_odom();
             break;
         case CMD_CTRL:
-            controller.config_gain(param.track_gain);
+            controller.config_gain(param.hover_gain);
             ROS_INFO("[N3CTRL] ---- Enter CMD_CTRL mode.");
             break;
         case CMD_NO_CTRL:
