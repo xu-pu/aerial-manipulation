@@ -20,6 +20,9 @@ struct error_integral_t {
 
     inline void reset(){
       error_integral.setZero();
+      disturbance.setZero();
+      integration_ratio = 1./50.;
+      error_limits = {0.2, 0.2, 0.2};
     }
 
     inline error_integral_t & update( Eigen::Vector3d const & err ){
@@ -33,21 +36,28 @@ struct error_integral_t {
     /**
      * @param gain - control gains, note that gains are defined in the intermediate frame
      * @param gain_frame - gRe - transformation from error frame to gain frame
-     * @return integral term with limits
+     * @return disturbance compensation, unit is acceleration
      */
-    inline Eigen::Vector3d output( Eigen::Matrix3d const & gain, Eigen::Matrix3d const & gain_frame ) const {
+    inline Eigen::Vector3d output( Eigen::Matrix3d const & gain, Eigen::Matrix3d const & gain_frame ) {
+
       Eigen::Matrix3d const & gRe = gain_frame; // error frame to gain frame
+
       Eigen::Vector3d rst = gRe.transpose() * gain * gRe * error_integral;
+
+      Eigen::Vector3d limit_acc = param.disturbance.limit / param.mass;
+
       for ( int i=0; i<3; i++ ) {
-        if (std::fabs(rst(i)) > output_limits[i]) {
-          uav_utils::limit_range(rst(i), output_limits(i));
-          ROS_WARN("Integration term of [%s] saturate for axis %u, value=%.3f", name.c_str(), i, rst(i));
+        if (std::fabs(rst(i)) > limit_acc(i)) {
+          uav_utils::limit_range(rst(i), limit_acc(i));
+          ROS_WARN("Disturbance saturate for axis %u, value=%.3f", i, rst(i));
         }
       }
-      return rst;
-    }
 
-    std::string name;
+      disturbance = - param.mass * rst ;
+
+      return rst;
+
+    }
 
     double integration_ratio = 0;
 
@@ -55,7 +65,7 @@ struct error_integral_t {
 
     Eigen::Vector3d error_limits;
 
-    Eigen::Vector3d output_limits;
+    Eigen::Vector3d disturbance;
 
 };
 
