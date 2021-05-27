@@ -83,4 +83,7 @@
         <remap from="~poly_traj" to="/$(arg drone_name)/traj"/>
     </node>
 
+    <node pkg="rqt_multiplot" type="rqt_multiplot" name="rqt_multiplot" output="log" required="true"
+          args="--multiplot-config $(find rnw_ros)/config/rqt_multiplot_n3ctrl.xml --multiplot-run-all"/>
+
 </launch>
