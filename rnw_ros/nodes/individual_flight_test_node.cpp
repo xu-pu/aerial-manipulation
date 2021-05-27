@@ -28,6 +28,8 @@ struct individual_drone_test_t {
 
     ros::Subscriber sub_trigger_disarm;
 
+    ros::Subscriber sub_trigger_rock;
+
     AmTraj traj_generator;
 
     explicit individual_drone_test_t(ros::NodeHandle & _nh ) : nh(_nh), traj_generator(1024, 16, 0.4, 1, 0.5, 23, 0.02) {
@@ -39,6 +41,9 @@ struct individual_drone_test_t {
 
       sub_trigger_disarm = nh.subscribe<std_msgs::Header>(
               "/gamepad/A", 10, &individual_drone_test_t::trigger_disarm, this);
+
+      sub_trigger_rock = nh.subscribe<std_msgs::Header>(
+              "/gamepad/B", 10, &individual_drone_test_t::trigger_rock, this);
 
 //      sub_trigger_disarm = nh.subscribe<std_msgs::Header>(
 //              "/gamepad/A", 10, &individual_drone_test_t::trigger_disarm, this);
@@ -87,7 +92,28 @@ struct individual_drone_test_t {
         return;
       }
 
-      drone.go_to_point({ drone.latest_odom.pose.pose.position.x, drone.latest_odom.pose.pose.position.y, -0.1 });
+      drone.go_to_point({ drone.latest_odom.pose.pose.position.x, drone.latest_odom.pose.pose.position.y, -1 });
+
+    }
+
+    void trigger_rock( std_msgs::HeaderConstPtr const & msg ) const {
+
+      if ( !drone.ready(true) ) {
+        return;
+      }
+
+      double amplitude = 0.5;
+      int times = 3;
+
+      vector<Vector3d> waypoints;
+      waypoints.emplace_back(Vector3d::Zero());
+
+      for ( int i=0; i<times; i++ ) {
+        waypoints.emplace_back(0,amplitude,0);
+        waypoints.emplace_back(0,-amplitude,0);
+      }
+
+      drone.follow_waypoints_in_intermediate_frame(waypoints);
 
     }
 
