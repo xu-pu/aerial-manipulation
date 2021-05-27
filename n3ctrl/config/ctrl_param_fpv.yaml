@@ -14,6 +14,17 @@ enable_dynamic_reconfigure: false
 # tianbo(0), mellinger(1)
 ctrl_strategy: 0
 
+# disturbances are measured and controlled through the integral term in velocity loop
+# x/y/z_limit's unit is Newton(N)
+disturbance:
+  x_limit: 20
+  y_limit: 20
+  z_limit: 20
+  err_limit_x: 2
+  err_limit_y: 2
+  err_limit_z: 2
+  integration_ratio: 0.05
+
 hover:
     set_hov_percent_to_zero: false
     use_hov_percent_kf: true
@@ -31,9 +42,9 @@ gain:
         Kv0: 3.0
         Kv1: 2.5
         Kv2: 5.5
-        Kvi0: 0.1
-        Kvi1: 0.1
-        Kvi2: 0.1
+        Kvi0: 1
+        Kvi1: 1
+        Kvi2: 1
         Ka0: 1.0
         Ka1: 1.0
         Ka2: 1.0
