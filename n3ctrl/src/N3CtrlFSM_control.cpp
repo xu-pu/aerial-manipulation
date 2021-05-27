@@ -93,15 +93,14 @@ void N3CtrlFSM::process_control(const ros::Time& now_time)
 #else
       if ( param.hover.use_hov_percent_kf && controller.flight_status != Controller::flight_status_e::STOPED ) {
         hov_thr_kf.simple_update(imu_data.q, u.thrust, imu_data.a);
-        // This line may not take effect according to param.hov.use_hov_percent_kf
-        param.config_full_thrust(hov_thr_kf.get_hov_thr());
-        quadrotor_msgs::Float64Stamped msg;
-        msg.header.stamp = now_time;
-        msg.value = hov_thr_kf.get_hov_thr();
-        pub_hov_thr.publish(msg);
-        msg.value = param.full_thrust;
-        pub_full_thrust.publish(msg);
       }
+      param.config_full_thrust(hov_thr_kf.get_hov_thr());
+      quadrotor_msgs::Float64Stamped msg;
+      msg.header.stamp = now_time;
+      msg.value = hov_thr_kf.get_hov_thr();
+      pub_hov_thr.publish(msg);
+      msg.value = param.full_thrust;
+      pub_full_thrust.publish(msg);
 #endif
 		}
 		

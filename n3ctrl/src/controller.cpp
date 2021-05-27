@@ -126,8 +126,6 @@ void Controller::update(const Desired_State_t& des,const Odom_Data_t& odom,const
 
   dbg_msg.int_v = to_vector3_msg(vel_err_integral.error_integral);
 
-  dbg_msg.full_thrust = param.full_thrust;
-
 };
 
 void Controller::publish_ctrl(const Controller_Output_t& u, const ros::Time& stamp, const ros::Time& extra_stamp)
@@ -164,6 +162,7 @@ void Controller::publish_ctrl(const Controller_Output_t& u, const ros::Time& sta
     if ( param.pub_debug_msgs ) {
       dbg_msg.header.stamp = ros::Time::now();
       dbg_msg.header.frame_id = "world";
+      dbg_msg.full_thrust = param.full_thrust;
       pub_dbg_info.publish(dbg_msg);
     }
 
