@@ -70,6 +70,11 @@ public:
       double integration_ratio = 0;
 	} disturbance;
 
+	struct {
+	    bool enable;
+	    double max_height;
+	} disarm;
+
 	Gain hover_gain, track_gain;
 	Idling idling;
 	RC rc;

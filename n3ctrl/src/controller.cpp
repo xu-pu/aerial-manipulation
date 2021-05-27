@@ -57,7 +57,7 @@ void Controller::config_gain(const Parameter_t::Gain& gain)
 void Controller::update(const Desired_State_t& des,const Odom_Data_t& odom,const Imu_Data_t& imu,Controller_Output_t& u,SO3_Controller_Output_t& u_so3){
 
   // do not run the actual controller when the quadrotor is not armed
-  if ( flight_status == flight_status_e::STOPED ) {
+  if ( flight_status == flight_status_e::STOPED || disarm(des,odom) ) {
     u.roll  = 0;
     u.pitch = 0;
     u.thrust = 0;
@@ -250,4 +250,16 @@ Eigen::Vector3d Controller::acceleration_loop( Eigen::Vector3d const & F_des, co
 
 void Controller::on_flight_status( std_msgs::UInt8ConstPtr const & msg ){
   flight_status = (flight_status_e)msg->data;
+}
+
+bool Controller::can_disarm(const Odom_Data_t &odom) const {
+  return odom.p.z() <= param.disarm.max_height;
+}
+
+bool Controller::want_to_disarm(const Desired_State_t &des) const {
+  return des.p.z() < 0;
+}
+
+bool Controller::disarm( const Desired_State_t &des, const Odom_Data_t &odom ) const {
+  return param.disarm.enable && can_disarm(odom) && want_to_disarm(des);
 }

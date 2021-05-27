@@ -97,6 +97,9 @@ void Parameter_t::config_from_ros_handle(const ros::NodeHandle& nh)
   read_essential_param(nh, "disturbance/err_limit_z", disturbance.error_limit.z());
   read_essential_param(nh, "disturbance/integration_ratio", disturbance.integration_ratio);
 
+  read_essential_param(nh, "disarm/max_height", disarm.max_height);
+  read_essential_param(nh, "disarm/enable", disarm.enable);
+
 };
 
 void Parameter_t::init()

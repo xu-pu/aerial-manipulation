@@ -135,6 +135,12 @@ public:
 
 	void on_flight_status( std_msgs::UInt8ConstPtr const & msg );
 
+	bool can_disarm( const Odom_Data_t& odom ) const;
+
+	bool want_to_disarm(const Desired_State_t& des ) const;
+
+	bool disarm( const Desired_State_t &des, const Odom_Data_t &odom ) const;
+
 private:
 	bool is_configured;
 
