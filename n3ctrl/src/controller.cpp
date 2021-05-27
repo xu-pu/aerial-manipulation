@@ -160,7 +160,11 @@ void Controller::publish_ctrl(const Controller_Output_t& u, const ros::Time& sta
       pub_dbg_info.publish(dbg_msg);
     }
 
-    pub_disturbance.publish(to_vector3_msg(vel_err_integral.disturbance));
+  geometry_msgs::Vector3Stamped msg_disturbance;
+  msg_disturbance.header.stamp = ros::Time::now();
+  msg_disturbance.header.frame_id = "world";
+  msg_disturbance.vector = to_vector3_msg(vel_err_integral.disturbance);
+  pub_disturbance.publish(msg_disturbance);
 
 }
 

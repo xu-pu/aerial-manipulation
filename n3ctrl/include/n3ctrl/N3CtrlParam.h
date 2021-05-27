@@ -66,6 +66,8 @@ public:
 
 	struct {
       Eigen::Vector3d limit;
+      Eigen::Vector3d error_limit;
+      double integration_ratio = 0;
 	} disturbance;
 
 	Gain hover_gain, track_gain;

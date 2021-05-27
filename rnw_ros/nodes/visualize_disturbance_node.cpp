@@ -38,7 +38,7 @@ struct disturbance_viz_t {
 
     explicit disturbance_viz_t( ros::NodeHandle & _nh ): nh(_nh){
 
-      pub_markers = nh.advertise<visualization_msgs::Marker>("disturbance",10);
+      pub_markers = nh.advertise<visualization_msgs::Marker>("marker",10);
 
       sub_odom = nh.subscribe<nav_msgs::Odometry>(
               "odom",

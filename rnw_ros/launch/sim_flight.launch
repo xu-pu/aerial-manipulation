@@ -62,6 +62,11 @@
         <param name="name" value="sim_tf" />
     </node>
 
+    <node pkg="rnw_ros" type="visualize_disturbance_node" name="visualize_disturbance_node" required="false">
+        <remap from="~odom" to="$(arg topic_odom_uav)"/>
+        <remap from="~disturbance" to="/n3ctrl/disturbance"/>
+    </node>
+
     <node pkg="rqt_multiplot" type="rqt_multiplot" name="rqt_multiplot" output="log" required="true"
           args="--multiplot-config $(find rnw_ros)/config/rqt_multiplot_n3ctrl.xml --multiplot-run-all"/>
 

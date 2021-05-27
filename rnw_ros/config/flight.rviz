@@ -219,6 +219,14 @@ Visualization Manager:
       Topic: /desire_pose
       Unreliable: false
       Value: true
+    - Class: rviz/Marker
+      Enabled: true
+      Marker Topic: /visualize_disturbance_node/marker
+      Name: Marker
+      Namespaces:
+        viz_disturbance: true
+      Queue Size: 100
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48

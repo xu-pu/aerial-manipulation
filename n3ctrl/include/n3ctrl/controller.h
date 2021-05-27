@@ -21,14 +21,12 @@ struct error_integral_t {
     inline void reset(){
       error_integral.setZero();
       disturbance.setZero();
-      integration_ratio = 1./50.;
-      error_limits = {0.2, 0.2, 0.2};
     }
 
     inline error_integral_t & update( Eigen::Vector3d const & err ){
       using uav_utils::clamp;
       for ( int i = 0; i < 3; i++ ) {
-        error_integral(i) += clamp(err(i),error_limits(i)) * integration_ratio;
+        error_integral(i) += clamp(err(i),param.disturbance.error_limit(i)) * param.disturbance.integration_ratio;
       }
       return *this;
     }
@@ -59,11 +57,7 @@ struct error_integral_t {
 
     }
 
-    double integration_ratio = 0;
-
     Eigen::Vector3d error_integral;
-
-    Eigen::Vector3d error_limits;
 
     Eigen::Vector3d disturbance;
 

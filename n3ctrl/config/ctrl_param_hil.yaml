@@ -18,6 +18,10 @@ disturbance:
   x_limit: 20
   y_limit: 20
   z_limit: 20
+  err_limit_x: 2
+  err_limit_y: 2
+  err_limit_z: 2
+  integration_ratio: 0.1
 
 hover:
     set_hov_percent_to_zero: false
