@@ -156,6 +156,7 @@ void Controller::publish_ctrl(const Controller_Output_t& u, const ros::Time& sta
       dbg_msg.header.stamp = ros::Time::now();
       dbg_msg.header.frame_id = "world";
       dbg_msg.full_thrust = param.full_thrust;
+      dbg_msg.disturbance = to_vector3_msg(vel_err_integral.disturbance);
       pub_dbg_info.publish(dbg_msg);
     }
 

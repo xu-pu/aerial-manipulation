@@ -15,13 +15,7 @@ geometry_msgs/Vector3 plant_a
 geometry_msgs/Vector3 cmd_v
 geometry_msgs/Vector3 cmd_a
 
-# integral terms
+# disturbance
 
 geometry_msgs/Vector3 int_v
-geometry_msgs/Vector3 int_a
-
-# err = ref - plant, for easy debug
-
-float64 err_p
-float64 err_v
-float64 err_a
+geometry_msgs/Vector3 disturbance
