@@ -175,6 +175,7 @@ set(RNW_NODES
         visualize_traj_node
         visualize_cone_node
         visualize_pos_cmd_node
+        visualize_disturbance_node
         gamepad_trigger_node
         gamepad_drone_cmd_node
         dbg_atti_loop_node
