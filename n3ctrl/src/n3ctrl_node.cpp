@@ -155,9 +155,11 @@ int main(int argc, char* argv[]) {
                                            &controller,
                                            ros::TransportHints().tcpNoDelay());
 
-  fsm.controller.ctrl_pub = nh.advertise<sensor_msgs::Joy>("ctrl", 10);
+    fsm.controller.ctrl_pub = nh.advertise<sensor_msgs::Joy>("ctrl", 10);
 
     fsm.controller.pub_dbg_info = nh.advertise<n3ctrl::ControllerDebug>("debug", 10);
+
+    fsm.controller.pub_disturbance = nh.advertise<geometry_msgs::Vector3Stamped>("disturbance", 10);
 
     fsm.pub_hov_thr = nh.advertise<quadrotor_msgs::Float64Stamped>("hov_thr", 10);
 

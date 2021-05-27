@@ -160,6 +160,8 @@ void Controller::publish_ctrl(const Controller_Output_t& u, const ros::Time& sta
       pub_dbg_info.publish(dbg_msg);
     }
 
+    pub_disturbance.publish(to_vector3_msg(vel_err_integral.disturbance));
+
 }
 
 Eigen::Vector3d Controller::position_loop( const Desired_State_t& des,const Odom_Data_t& odom ){

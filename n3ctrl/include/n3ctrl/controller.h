@@ -113,6 +113,7 @@ public:
 
 	ros::Publisher ctrl_pub;
 	ros::Publisher pub_dbg_info;
+	ros::Publisher pub_disturbance;
 
 	n3ctrl::ControllerDebug dbg_msg;
 
