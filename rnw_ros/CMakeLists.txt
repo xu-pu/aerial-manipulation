@@ -109,6 +109,7 @@ generate_dynamic_reconfigure_options(
         cfg/MocapCalib.cfg
         cfg/RNW.cfg
         cfg/TuningConeState.cfg
+        cfg/VelAcc.cfg
 )
 ###################################
 ## catkin specific configuration ##

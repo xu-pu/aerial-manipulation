@@ -97,6 +97,7 @@ void drone_interface_t::set_max_vel_acc(double mvel, double macc) {
   max_vel = mvel;
   max_acc = macc;
   setup_trajectory_generator();
+  ROS_WARN("[%s] reconfigure max_vel=%f, max_acc=%f",name.c_str(),mvel,macc);
 }
 
 quadrotor_msgs::PolynomialTrajectory drone_interface_t::gen_traj_go_to_point( Vector3d const & to ) const {

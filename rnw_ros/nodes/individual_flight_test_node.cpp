@@ -5,6 +5,8 @@
 #include <rnw_ros/traj_uitls.h>
 #include <am_traj/am_traj.hpp>
 #include <am_traj/ros_msgs.h>
+#include <dynamic_reconfigure/server.h>
+#include <rnw_ros/VelAccConfig.h>
 
 using std::vector;
 using Eigen::Vector2d;
@@ -126,6 +128,14 @@ int main( int argc, char** argv ) {
   ros::NodeHandle nh("~");
 
   individual_drone_test_t node(nh);
+
+  using dyn_cfg_server_t = dynamic_reconfigure::Server<rnw_ros::VelAccConfig>;
+  std::shared_ptr<dyn_cfg_server_t> server;
+  server = std::make_shared<dyn_cfg_server_t>();
+  server->setCallback([&](rnw_ros::VelAccConfig & config, uint32_t level){
+      ROS_WARN_STREAM("dynamic reconfigure vel acc limits!");
+      node.drone.set_max_vel_acc(config.max_vel,config.max_acc);
+  });
 
   ros::spin();
 
