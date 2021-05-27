@@ -12,7 +12,9 @@
 
 struct error_integral_t {
 
-    inline error_integral_t(){
+    Parameter_t const & param;
+
+    inline explicit error_integral_t( Parameter_t const & p ) : param(p) {
       reset();
     }
 

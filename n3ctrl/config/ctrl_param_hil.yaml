@@ -12,6 +12,13 @@ enable_dynamic_reconfigure: true
 # tianbo(0), mellinger(1)
 ctrl_strategy: 0
 
+# disturbances are measured and controlled through the integral term in velocity loop
+# x/y/z_limit's unit is Newton(N)
+disturbance:
+  x_limit: 20
+  y_limit: 20
+  z_limit: 20
+
 hover:
     set_hov_percent_to_zero: false
     use_hov_percent_kf: true

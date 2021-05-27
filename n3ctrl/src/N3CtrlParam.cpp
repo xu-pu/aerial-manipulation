@@ -89,6 +89,10 @@ void Parameter_t::config_from_ros_handle(const ros::NodeHandle& nh)
   read_essential_param(nh, "enable_dynamic_reconfigure", enable_dynamic_reconfigure);
   read_essential_param(nh, "ctrl_strategy", ctrl_strategy);
 
+  read_essential_param(nh, "x_limit", disturbance.limit.x());
+  read_essential_param(nh, "y_limit", disturbance.limit.y());
+  read_essential_param(nh, "z_limit", disturbance.limit.z());
+
 };
 
 void Parameter_t::init()

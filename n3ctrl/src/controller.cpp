@@ -14,7 +14,7 @@ using std::endl;
 using namespace uav_utils;
 
 Controller::Controller(Parameter_t& param_):
-	param(param_)
+	param(param_), vel_err_integral(param_)
 {
 	is_configured = false;
 

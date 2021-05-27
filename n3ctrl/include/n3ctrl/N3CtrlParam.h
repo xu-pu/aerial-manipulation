@@ -2,7 +2,7 @@
 #define __N3CTRLPARAM_H
 
 #include <ros/ros.h>
-
+#include <Eigen/Dense>
 #include <n3ctrl/GainsConfig.h>
 
 enum class ctrl_strategy_e {
@@ -63,6 +63,10 @@ public:
 		double rc;
 		double cmd;
 	};
+
+	struct {
+      Eigen::Vector3d limit;
+	} disturbance;
 
 	Gain hover_gain, track_gain;
 	Idling idling;
