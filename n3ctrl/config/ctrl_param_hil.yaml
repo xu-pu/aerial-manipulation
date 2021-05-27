@@ -23,6 +23,10 @@ disturbance:
   err_limit_z: 2
   integration_ratio: 0.5
 
+disarm:
+  enable: true
+  max_height: 0.2
+
 hover:
     set_hov_percent_to_zero: false
     use_hov_percent_kf: true

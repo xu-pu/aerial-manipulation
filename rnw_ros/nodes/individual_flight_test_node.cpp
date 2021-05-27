@@ -26,6 +26,8 @@ struct individual_drone_test_t {
 
     ros::Subscriber sub_trigger_zigzag;
 
+    ros::Subscriber sub_trigger_disarm;
+
     AmTraj traj_generator;
 
     explicit individual_drone_test_t(ros::NodeHandle & _nh ) : nh(_nh), traj_generator(1024, 16, 0.4, 1, 0.5, 23, 0.02) {
@@ -34,6 +36,12 @@ struct individual_drone_test_t {
 
       sub_trigger_zigzag = nh.subscribe<std_msgs::Header>(
               "/gamepad/X", 10, &individual_drone_test_t::trigger_zigzag, this);
+
+      sub_trigger_disarm = nh.subscribe<std_msgs::Header>(
+              "/gamepad/A", 10, &individual_drone_test_t::trigger_disarm, this);
+
+//      sub_trigger_disarm = nh.subscribe<std_msgs::Header>(
+//              "/gamepad/A", 10, &individual_drone_test_t::trigger_disarm, this);
 
     }
 
@@ -70,6 +78,16 @@ struct individual_drone_test_t {
       vector<Vector3d> wpts = gen_waypoint_zigzag(5,0.5,0.5);
 
       drone.execute_trajectory(local_wpts2traj(drone.latest_odom, wpts));
+
+    }
+
+    void trigger_disarm( std_msgs::HeaderConstPtr const & msg ) const {
+
+      if ( !drone.ready(true) ) {
+        return;
+      }
+
+      drone.go_to_point({ drone.latest_odom.pose.pose.position.x, drone.latest_odom.pose.pose.position.y, -0.1 });
 
     }
 
