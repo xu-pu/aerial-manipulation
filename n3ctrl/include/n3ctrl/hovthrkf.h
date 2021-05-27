@@ -18,6 +18,7 @@ public:
 	double get_hov_thr();
 	void set_hov_thr(double hov);
 	void simple_update(Eigen::Quaterniond q, double u, Eigen::Vector3d acc);
+	void update_with_disturbance(Eigen::Quaterniond q, double u, Eigen::Vector3d acc, Eigen::Vector3d const & disturbance);
 private:
 	Eigen::VectorXd x;
 	Eigen::MatrixXd P;

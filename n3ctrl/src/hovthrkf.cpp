@@ -85,3 +85,21 @@ void HovThrKF::simple_update(Eigen::Quaterniond q, double u, Eigen::Vector3d acc
         ROS_WARN("[n3ctrl.hover] Reach percent_higher_limit %f", x(0));
     }
 }
+
+void HovThrKF::update_with_disturbance(Eigen::Quaterniond q, double u, Eigen::Vector3d acc, Eigen::Vector3d const & disturbance ) {
+  Matrix3d bRw = q.toRotationMatrix().transpose();
+  Vector3d acc_body = acc - bRw * Vector3d(0, 0, param.gra);
+  Vector3d acc_des = Vector3d(0, 0, u * param.full_thrust / param.mass)
+                     + bRw * Vector3d(0, 0, -param.gra)
+                     + disturbance/param.mass;
+  double compensate = (acc_des(2) - acc_body(2)) * 0.001;
+  x(0) = x(0) + compensate;
+
+  uav_utils::limit_range(x(0), param.hover.percent_lower_limit, param.hover.percent_higher_limit);
+  if (x(0) == param.hover.percent_lower_limit) {
+    ROS_WARN("[n3ctrl.hover] Reach percent_lower_limit %f", x(0));
+  }
+  if (x(0) == param.hover.percent_higher_limit) {
+    ROS_WARN("[n3ctrl.hover] Reach percent_higher_limit %f", x(0));
+  }
+}
