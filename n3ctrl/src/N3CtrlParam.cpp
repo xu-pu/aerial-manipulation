@@ -100,6 +100,9 @@ void Parameter_t::config_from_ros_handle(const ros::NodeHandle& nh)
   read_essential_param(nh, "disarm/max_height", disarm.max_height);
   read_essential_param(nh, "disarm/enable", disarm.enable);
 
+  read_essential_param(nh, "lpf/acc", lpf.acc);
+  read_essential_param(nh, "lpf/thrust", lpf.thrust);
+
 };
 
 void Parameter_t::init()

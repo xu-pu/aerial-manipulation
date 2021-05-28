@@ -37,6 +37,10 @@ hover:
     percent_lower_limit: 0.15
     percent_higher_limit: 0.4
 
+lpf:
+  acc: 0.1
+  thrust: 0.1
+
 gain:
     hover:
         # Controller gain in minimun snap
