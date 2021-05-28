@@ -9,7 +9,7 @@ Panels:
         - /Odometry1/Shape1
         - /Odometry2/Shape1
       Splitter Ratio: 0.421474367
-    Tree Height: 359
+    Tree Height: 750
   - Class: rviz/Selection
     Name: Selection
   - Class: rviz/Tool Properties
@@ -39,13 +39,9 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: false
-        cone:
+        body:
           Value: true
-        drone1:
-          Value: true
-        drone2:
-          Value: true
-        odom_drone1:
+        intermediate:
           Value: true
         odom_drone2:
           Value: true
@@ -58,13 +54,9 @@ Visualization Manager:
       Show Names: true
       Tree:
         world:
-          cone:
+          body:
             {}
-          drone1:
-            {}
-          drone2:
-            {}
-          odom_drone1:
+          intermediate:
             {}
           odom_drone2:
             {}
@@ -169,7 +161,7 @@ Visualization Manager:
       Marker Topic: /traj_viz_drone2/traj
       Name: Marker
       Namespaces:
-        {}
+        visualize_traj_node: true
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -209,9 +201,23 @@ Visualization Manager:
       Marker Topic: /visualize_cone_node/markers/cone
       Name: MarkerArray
       Namespaces:
-        cone_state_visualization: true
-        moai: true
+        {}
       Queue Size: 100
+      Value: true
+    - Alpha: 1
+      Axes Length: 1
+      Axes Radius: 0.100000001
+      Class: rviz/Pose
+      Color: 255; 25; 0
+      Enabled: true
+      Head Length: 0.300000012
+      Head Radius: 0.100000001
+      Name: Pose
+      Shaft Length: 1
+      Shaft Radius: 0.0500000007
+      Shape: Arrow
+      Topic: /desire_pose
+      Unreliable: false
       Value: true
   Enabled: true
   Global Options:
@@ -238,25 +244,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/ThirdPersonFollower
-      Distance: 5.84437275
+      Distance: 7.86129475
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 1.59602261
-        Y: -1.23149395
+        X: 0.185889482
+        Y: -1.15395069
         Z: 1.67565122e-06
       Focal Shape Fixed Size: false
       Focal Shape Size: 0.0500000007
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 0.00979725365
+      Pitch: 0.669796824
       Target Frame: world
       Value: ThirdPersonFollower (rviz)
-      Yaw: 3.72682357
+      Yaw: 2.92182541
     Saved: ~
 Window Geometry:
   Displays:
