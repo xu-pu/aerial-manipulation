@@ -178,23 +178,20 @@ Eigen::Vector3d Controller::position_loop( const Desired_State_t& des,const Odom
 
 Eigen::Vector3d Controller::velocity_loop( Eigen::Vector3d const & cmd_vel, const Desired_State_t& des,const Odom_Data_t& odom ){
 
-  // integral term in velocity only work when hovering
-  if (des.v(0) != 0.0 || des.v(1) != 0.0 || des.v(2) != 0.0) {
-    // ROS_INFO("Reset integration");
-    //vel_err_integral.reset();
-  }
-
   double yaw_curr = get_yaw_from_quaternion(odom.q);
   Matrix3d wRc = rotz(yaw_curr);
   Matrix3d cRw = wRc.transpose();
 
   Vector3d e_v = cmd_vel - odom.v;
+  //Vector3d e_a = des.a - ;
+  Vector3d e_a = Vector3d::Zero();
 
-  Eigen::Vector3d u_v_i = vel_err_integral.update(e_v).output(Kvi,cRw);
+  Eigen::Vector3d u_v_i = vel_err_integral.update(e_v).output(Kvi,cRw); // can be turn off by setting zero gains
   Eigen::Vector3d u_v_p = wRc * Kv * cRw * e_v;
-  Eigen::Vector3d u_v = u_v_p + u_v_i;
+  Eigen::Vector3d u_v_d = wRc * Ka * cRw * e_a;
+  Eigen::Vector3d u_v = u_v_p + u_v_i + u_v_d; // PID
 
-  return u_v + Ka * des.a;
+  return u_v + des.a;
 
 }
 

@@ -10,6 +10,30 @@
 #include <std_msgs/UInt8.h>
 #include "input.h"
 
+struct vector3d_lpf_t {
+
+    Eigen::Vector3d value;
+
+    double T = 1;
+
+    bool initialized = false;
+
+    inline Eigen::Vector3d filter( Eigen::Vector3d const & value_new ){
+      if ( !initialized ) {
+        initialized = true;
+        value = value_new;
+      }
+      else {
+        for ( int i=0; i<3; i++ ) {
+          value(i) += (value_new(i)-value(i))/(1+(1/(2.*M_PI*T)));
+        }
+      }
+      return value;
+    }
+
+};
+
+
 struct error_integral_t {
 
     Parameter_t const & param;
@@ -119,6 +143,9 @@ public:
 	double Kyaw;
 
 	error_integral_t vel_err_integral;
+
+	vector3d_lpf_t lpf_acc; // acceleration in world frame
+	vector3d_lpf_t lpf_thrust; // specific thrust in world frame
 
     enum class flight_status_e {
         STOPED      = 0,
