@@ -23,7 +23,11 @@ void Parameter_t::config_from_ros_handle(const ros::NodeHandle& nh)
 	read_essential_param(nh, "gain/hover/Ka1", hover_gain.Ka1);
 	read_essential_param(nh, "gain/hover/Ka2", hover_gain.Ka2);
 
-	read_essential_param(nh, "gain/hover/Kyaw", hover_gain.Kyaw);
+  read_essential_param(nh, "gain/hover/Kap0", hover_gain.Kap0);
+  read_essential_param(nh, "gain/hover/Kap1", hover_gain.Kap1);
+  read_essential_param(nh, "gain/hover/Kap2", hover_gain.Kap2);
+
+  read_essential_param(nh, "gain/hover/Kyaw", hover_gain.Kyaw);
 	
 
 	read_essential_param(nh, "gain/track/Kp0", track_gain.Kp0);
