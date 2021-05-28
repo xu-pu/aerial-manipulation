@@ -5,11 +5,6 @@
 #include <Eigen/Dense>
 #include <n3ctrl/GainsConfig.h>
 
-enum class ctrl_strategy_e {
-    tianbo = 0,
-    mellinger = 1
-};
-
 class Parameter_t
 {
 public:
@@ -127,8 +122,6 @@ public:
     // XU Pu
 
     bool enable_dynamic_reconfigure;
-
-    int ctrl_strategy;
 
     /**
      * @return default values for dynamic_reconfigure

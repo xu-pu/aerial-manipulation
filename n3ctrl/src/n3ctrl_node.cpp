@@ -44,11 +44,6 @@ void gain_cfg_callback(n3ctrl::GainsConfig & config, uint32_t level ){
     ROS_WARN_STREAM("[n3ctrl][dyn_reconf] hover percent: " << config.hover_percent << ", full thrust: " << pFSM->param.full_thrust );
   }
 
-  if ( pFSM->param.ctrl_strategy != config.ctrl_strategy ) {
-    pFSM->param.ctrl_strategy = config.ctrl_strategy;
-    ROS_WARN_STREAM("[n3ctrl][dyn_reconf] control strategy updated to " << config.ctrl_strategy);
-  }
-
 }
 
 void mySigintHandler(int sig) {

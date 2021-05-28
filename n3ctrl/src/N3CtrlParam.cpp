@@ -87,7 +87,6 @@ void Parameter_t::config_from_ros_handle(const ros::NodeHandle& nh)
 
 	// XU PU
   read_essential_param(nh, "enable_dynamic_reconfigure", enable_dynamic_reconfigure);
-  read_essential_param(nh, "ctrl_strategy", ctrl_strategy);
 
   read_essential_param(nh, "disturbance/x_limit", disturbance.limit.x());
   read_essential_param(nh, "disturbance/y_limit", disturbance.limit.y());
@@ -143,8 +142,6 @@ n3ctrl::GainsConfig Parameter_t::get_defaults() const {
   rst.Kyaw = hover_gain.Kyaw;
 
   rst.hover_percent = hov_percent;
-
-  rst.ctrl_strategy = ctrl_strategy;
 
   return rst;
 
