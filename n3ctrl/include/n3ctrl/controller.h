@@ -204,8 +204,6 @@ public:
     /**
      * Incremental Nonlinear Dynamic Inversion (INDI) Acceleration Controller
      * @param cmd_acc
-     * @param imu
-     * @param odom
      * @return specific thrust vector (F/m)
      */
     Eigen::Vector3d acceleration_loop( Eigen::Vector3d const & cmd_acc );
