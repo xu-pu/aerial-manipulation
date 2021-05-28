@@ -65,7 +65,18 @@ void Controller::update(const Desired_State_t& des,const Odom_Data_t& odom,const
   lpf_acc.filter( odom.q * imu.a + vg );
 
   // do not run the actual controller when the quadrotor is not armed
-  if ( flight_status == flight_status_e::STOPED || disarm(des,odom) ) {
+  if ( flight_status == flight_status_e::STOPED ) {
+    ROS_WARN_STREAM("[n3ctrl] not armed!");
+    u.roll  = 0;
+    u.pitch = 0;
+    u.thrust = 0;
+    u.mode = Controller_Output_t::VERT_THRU;
+    u.yaw_mode = Controller_Output_t::CTRL_YAW_RATE;
+    u.yaw = 0;
+    return;
+  }
+  else if (disarm(des,odom)) {
+    ROS_WARN_STREAM("[n3ctrl] disarm!");
     u.roll  = 0;
     u.pitch = 0;
     u.thrust = 0;
@@ -255,7 +266,7 @@ bool Controller::can_disarm(const Odom_Data_t &odom) const {
 }
 
 bool Controller::want_to_disarm(const Desired_State_t &des) const {
-  return des.p.z() < 0;
+  return des.p.z() < -0.1;
 }
 
 bool Controller::disarm( const Desired_State_t &des, const Odom_Data_t &odom ) const {
