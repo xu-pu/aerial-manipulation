@@ -141,8 +141,6 @@ n3ctrl::GainsConfig Parameter_t::get_defaults() const {
 
   rst.Kyaw = hover_gain.Kyaw;
 
-  rst.hover_percent = hov_percent;
-
   return rst;
 
 }
