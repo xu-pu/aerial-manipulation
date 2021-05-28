@@ -18,6 +18,8 @@ Controller::Controller(Parameter_t& param_):
 {
 	is_configured = false;
   vel_err_integral.reset();
+  lpf_acc.T = param.lpf.acc;
+  lpf_thrust.T = param.lpf.thrust;
 }
 
 void Controller::config()
