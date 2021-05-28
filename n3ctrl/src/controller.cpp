@@ -58,6 +58,9 @@ void Controller::config_gain(const Parameter_t::Gain& gain)
 
 void Controller::update(const Desired_State_t& des,const Odom_Data_t& odom,const Imu_Data_t& imu,Controller_Output_t& u,SO3_Controller_Output_t& u_so3){
 
+  // lpf acc
+  lpf_acc.filter( odom.q * imu.a );
+
   // do not run the actual controller when the quadrotor is not armed
   if ( flight_status == flight_status_e::STOPED || disarm(des,odom) ) {
     u.roll  = 0;
@@ -185,10 +188,9 @@ Eigen::Vector3d Controller::velocity_loop( Eigen::Vector3d const & cmd_vel, cons
   Matrix3d cRw = wRc.transpose();
 
   Vector3d e_v = cmd_vel - odom.v;
-  //Vector3d e_a = des.a - ;
-  Vector3d e_a = Vector3d::Zero();
+  Vector3d e_a = des.a - lpf_acc.value;
 
-  Eigen::Vector3d u_v_i = vel_err_integral.update(e_v).output(Kvi,cRw); // can be turn off by setting zero gains
+  Eigen::Vector3d u_v_i = vel_err_integral.update(e_v).output(Kvi,cRw);
   Eigen::Vector3d u_v_p = wRc * Kv * cRw * e_v;
   Eigen::Vector3d u_v_d = wRc * Ka * cRw * e_a;
   Eigen::Vector3d u_v = u_v_p + u_v_i + u_v_d; // PID

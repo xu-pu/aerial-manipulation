@@ -144,6 +144,7 @@ public:
 
 	error_integral_t vel_err_integral;
 
+	// low-pass-filters
 	vector3d_lpf_t lpf_acc; // acceleration in world frame
 	vector3d_lpf_t lpf_thrust; // specific thrust in world frame
 
@@ -184,6 +185,7 @@ public:
     Eigen::Vector3d regulate_cmd_thrust(Eigen::Vector3d const & cmd );
 
     /**
+     * PID Velocity Controller
      * @param cmd_vel
      * @param des
      * @param odom
@@ -192,6 +194,7 @@ public:
     Eigen::Vector3d velocity_loop( Eigen::Vector3d const & cmd_vel, const Desired_State_t& des,const Odom_Data_t& odom );
 
     /**
+     * P Position Controller
      * @param des
      * @param odom
      * @return command velocity - input to velocity loop
