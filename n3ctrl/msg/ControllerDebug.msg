@@ -19,3 +19,8 @@ geometry_msgs/Vector3 cmd_a
 
 geometry_msgs/Vector3 int_v
 geometry_msgs/Vector3 disturbance
+
+# lpf
+
+geometry_msgs/Vector3 lpf_acc
+geometry_msgs/Vector3 lpf_thrust

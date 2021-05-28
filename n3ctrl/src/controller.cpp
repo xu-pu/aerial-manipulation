@@ -161,14 +161,16 @@ void Controller::publish_ctrl(const Controller_Output_t& u, const ros::Time& sta
       dbg_msg.header.stamp = ros::Time::now();
       dbg_msg.header.frame_id = "world";
       dbg_msg.full_thrust = param.full_thrust;
-      dbg_msg.disturbance = to_vector3_msg(vel_err_integral.disturbance);
+      dbg_msg.disturbance = to_vector3_msg(external_force_estimate());
+      dbg_msg.lpf_acc = to_vector3_msg(lpf_acc.value);
+      dbg_msg.lpf_thrust = to_vector3_msg(lpf_thrust.value);
       pub_dbg_info.publish(dbg_msg);
     }
 
   geometry_msgs::Vector3Stamped msg_disturbance;
   msg_disturbance.header.stamp = ros::Time::now();
   msg_disturbance.header.frame_id = "world";
-  msg_disturbance.vector = to_vector3_msg(vel_err_integral.disturbance);
+  msg_disturbance.vector = to_vector3_msg(external_force_estimate());
   pub_disturbance.publish(msg_disturbance);
 
 }
