@@ -58,8 +58,10 @@ void Controller::config_gain(const Parameter_t::Gain& gain)
 
 void Controller::update(const Desired_State_t& des,const Odom_Data_t& odom,const Imu_Data_t& imu,Controller_Output_t& u,SO3_Controller_Output_t& u_so3){
 
+  Eigen::Vector3d vg = - Vector3d::UnitZ() * param.gra;
+
   // lpf acc
-  lpf_acc.filter( odom.q * imu.a );
+  lpf_acc.filter( odom.q * imu.a + vg );
 
   // do not run the actual controller when the quadrotor is not armed
   if ( flight_status == flight_status_e::STOPED || disarm(des,odom) ) {
@@ -79,7 +81,7 @@ void Controller::update(const Desired_State_t& des,const Odom_Data_t& odom,const
 
   Vector3d cmd_acc = velocity_loop(cmd_vel,des,odom);
 
-  Vector3d specific_thrust = Vector3d(0, 0, param.gra) + cmd_acc;
+  Vector3d specific_thrust = cmd_acc - vg;
   // or use INDI
   //Vector3d specific_thrust = acceleration_loop(cmd_acc);
 
