@@ -263,3 +263,7 @@ bool Controller::want_to_disarm(const Desired_State_t &des) const {
 bool Controller::disarm( const Desired_State_t &des, const Odom_Data_t &odom ) const {
   return param.disarm.enable && can_disarm(odom) && want_to_disarm(des);
 }
+
+Eigen::Vector3d Controller::external_force_estimate(){
+  return Eigen::Vector3d::Zero();
+}

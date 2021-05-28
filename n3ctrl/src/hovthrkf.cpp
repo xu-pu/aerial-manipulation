@@ -86,12 +86,12 @@ void HovThrKF::simple_update(Eigen::Quaterniond q, double u, Eigen::Vector3d acc
     }
 }
 
-void HovThrKF::update_with_disturbance(Eigen::Quaterniond q, double u, Eigen::Vector3d acc, Eigen::Vector3d const & disturbance ) {
+void HovThrKF::update(Eigen::Quaterniond q, double u, Eigen::Vector3d acc, Eigen::Vector3d const & external_force ) {
   Matrix3d bRw = q.toRotationMatrix().transpose();
   Vector3d acc_body = acc - bRw * Vector3d(0, 0, param.gra);
   Vector3d acc_des = Vector3d(0, 0, u * param.full_thrust / param.mass)
                      + bRw * Vector3d(0, 0, -param.gra)
-                     + disturbance/param.mass;
+                     + external_force / param.mass;
   double compensate = (acc_des(2) - acc_body(2)) * 0.001;
   x(0) = x(0) + compensate;
 

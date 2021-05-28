@@ -141,6 +141,8 @@ public:
 
 	bool disarm( const Desired_State_t &des, const Odom_Data_t &odom ) const;
 
+	Eigen::Vector3d external_force_estimate();
+
 private:
 	bool is_configured;
 
