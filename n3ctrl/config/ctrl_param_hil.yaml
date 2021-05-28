@@ -21,7 +21,7 @@ disturbance:
   err_limit_x: 2
   err_limit_y: 2
   err_limit_z: 2
-  integration_ratio: 0.5
+  integration_ratio: 0.02
 
 disarm:
   enable: true
@@ -48,12 +48,12 @@ gain:
         Kv0: 3.0
         Kv1: 2.5
         Kv2: 5.5
-        Kvi0: 1
-        Kvi1: 1
-        Kvi2: 1
-        Ka0: 1.0
-        Ka1: 1.0
-        Ka2: 1.0
+        Kvi0: 1.0
+        Kvi1: 1.0
+        Kvi2: 1.0
+        Ka0: 0.0
+        Ka1: 0.0
+        Ka2: 0.0
         Kyaw: 20.0
         Kap0: 0
         Kap1: 0

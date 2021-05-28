@@ -16,16 +16,17 @@ using namespace uav_utils;
 Controller::Controller(Parameter_t& param_):
 	param(param_), vel_err_integral(param_)
 {
+  // param is not loaded here
 	is_configured = false;
   vel_err_integral.reset();
-  lpf_acc.T = param.lpf.acc;
-  lpf_thrust.T = param.lpf.thrust;
 }
 
 void Controller::config()
 {
 	config_gain(param.hover_gain);
 	is_configured = true;
+  lpf_acc.T = param.lpf.acc;
+  lpf_thrust.T = param.lpf.thrust;
 }
 
 void Controller::config_gain(const Parameter_t::Gain& gain)

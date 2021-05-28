@@ -16,7 +16,7 @@
         <param name="align_with_fmu" type="bool" value="false"/>
     </node>
 
-    <node pkg="n3ctrl" type="n3ctrl_node" name="n3ctrl" output="log" required="true">
+    <node pkg="n3ctrl" type="n3ctrl_node" name="n3ctrl" output="screen" required="true">
         <!--subscribers-->
 		<remap from="~joy" to="/djiros/rc" />
         <remap from="~odom" to="/$(arg drone_name)/odom" />
