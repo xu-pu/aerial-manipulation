@@ -33,7 +33,6 @@ struct vector3d_lpf_t {
 
 };
 
-
 struct error_integral_t {
 
     Parameter_t const & param;
@@ -86,7 +85,6 @@ struct error_integral_t {
     Eigen::Vector3d disturbance;
 
 };
-
 
 struct Desired_State_t
 {
@@ -171,6 +169,8 @@ public:
 
 	Eigen::Vector3d external_force_estimate();
 
+	Eigen::Vector3d f_ext_indi();
+
 private:
 	bool is_configured;
 
@@ -182,7 +182,7 @@ public:
      * @param cmd - thrust vector
      * @return regulated trust vector
      */
-    Eigen::Vector3d regulate_cmd_thrust(Eigen::Vector3d const & cmd );
+    Eigen::Vector3d regulate_trust_vector(Eigen::Vector3d const & cmd );
 
     /**
      * PID Velocity Controller
@@ -201,7 +201,14 @@ public:
      */
     Eigen::Vector3d position_loop( const Desired_State_t& des,const Odom_Data_t& odom );
 
-    Eigen::Vector3d acceleration_loop( Eigen::Vector3d const & F_des, const Imu_Data_t& imu, const Odom_Data_t& odom );
+    /**
+     * Incremental Nonlinear Dynamic Inversion (INDI) Acceleration Controller
+     * @param cmd_acc
+     * @param imu
+     * @param odom
+     * @return specific thrust vector (F/m)
+     */
+    Eigen::Vector3d acceleration_loop( Eigen::Vector3d const & cmd_acc );
 
 };
 

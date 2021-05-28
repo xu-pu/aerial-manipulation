@@ -79,9 +79,15 @@ void Controller::update(const Desired_State_t& des,const Odom_Data_t& odom,const
 
   Vector3d cmd_acc = velocity_loop(cmd_vel,des,odom);
 
-  Vector3d cmd_trust = Vector3d(0, 0, param.mass * param.gra) + param.mass * cmd_acc;
+  Vector3d specific_thrust = Vector3d(0, 0, param.gra) + cmd_acc;
+  // or use INDI
+  //Vector3d specific_thrust = acceleration_loop(cmd_acc);
 
-  Vector3d thrust_vector = regulate_cmd_thrust(cmd_trust);
+  Vector3d thrust_vector = regulate_trust_vector(specific_thrust * param.mass);
+
+  // update thrust lpf here
+  dbg_msg.lpf_thrust = to_vector3_msg(lpf_thrust.value);
+  lpf_thrust.filter(thrust_vector/param.mass);
 
 	{	// n3 api control in forward-left-up frame
 		Vector3d F_c = wRc.transpose() * thrust_vector; // des_f in intermediate frame
@@ -163,7 +169,6 @@ void Controller::publish_ctrl(const Controller_Output_t& u, const ros::Time& sta
       dbg_msg.full_thrust = param.full_thrust;
       dbg_msg.disturbance = to_vector3_msg(external_force_estimate());
       dbg_msg.lpf_acc = to_vector3_msg(lpf_acc.value);
-      dbg_msg.lpf_thrust = to_vector3_msg(lpf_thrust.value);
       pub_dbg_info.publish(dbg_msg);
     }
 
@@ -201,7 +206,7 @@ Eigen::Vector3d Controller::velocity_loop( Eigen::Vector3d const & cmd_vel, cons
 
 }
 
-Eigen::Vector3d Controller::regulate_cmd_thrust(Eigen::Vector3d const & cmd ){
+Eigen::Vector3d Controller::regulate_trust_vector(Eigen::Vector3d const & cmd ){
 
   Vector3d F_des = cmd;
 
@@ -234,21 +239,8 @@ Eigen::Vector3d Controller::regulate_cmd_thrust(Eigen::Vector3d const & cmd ){
 
 }
 
-Eigen::Vector3d Controller::acceleration_loop( Eigen::Vector3d const & F_des, const Imu_Data_t& imu, const Odom_Data_t& odom ){
-  // PI Controller for Acceleration
-  // apply gains in the body frame
-  Quaterniond Rbw = imu.q.inverse();
-  Vector3d a_des = Rbw * F_des / param.mass; // body frame
-  Vector3d a_est = imu.a; // body frame
-  Vector3d e_a = a_des - a_est; // body frame
-  if(param.pub_debug_msgs) {
-    geometry_msgs::Vector3Stamped msg;
-    msg.header.stamp = ros::Time::now();
-    msg.vector = uav_utils::to_vector3_msg(e_a);
-    //ctrl_dbg_e_a_pub.publish(msg);
-  }
-  Vector3d u = F_des + ( imu.q * ( Kap * e_a ) ) * param.mass; // world frame
-  return u;
+Eigen::Vector3d Controller::acceleration_loop( Eigen::Vector3d const & cmd_acc ){
+  return lpf_thrust.value + cmd_acc - lpf_acc.value;
 }
 
 void Controller::on_flight_status( std_msgs::UInt8ConstPtr const & msg ){
@@ -269,4 +261,8 @@ bool Controller::disarm( const Desired_State_t &des, const Odom_Data_t &odom ) c
 
 Eigen::Vector3d Controller::external_force_estimate(){
   return Eigen::Vector3d::Zero();
+}
+
+Eigen::Vector3d Controller::f_ext_indi() {
+  return param.mass * ( lpf_acc.value - lpf_thrust.value - Vector3d::UnitZ() * param.gra );
 }
