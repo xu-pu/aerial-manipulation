@@ -39,17 +39,17 @@ lpf:
 gain:
     hover:
         # Controller gain in minimun snap
-        Kp0: 2.3
-        Kp1: 2.3
+        Kp0: 4.35
+        Kp1: 4.35
         Kp2: 2.5
-        Kv0: 3.0
-        Kv1: 2.5
+        Kv0: 4.15
+        Kv1: 4.15
         Kv2: 5.5
         Kvi0: 1.0
         Kvi1: 1.0
         Kvi2: 1.0
-        Ka0: 0.0
-        Ka1: 0.0
+        Ka0: 0.65
+        Ka1: 0.65
         Ka2: 0.0
         Kyaw: 20.0
         Kap0: 0
