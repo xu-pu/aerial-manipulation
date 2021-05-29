@@ -32,9 +32,7 @@ hover:
     percent_lower_limit: 0.35
     percent_higher_limit: 0.45
 
-lpf:
-  acc: 10
-  thrust: 10
+indi_lpf: 0.001
 
 gain:
     hover:

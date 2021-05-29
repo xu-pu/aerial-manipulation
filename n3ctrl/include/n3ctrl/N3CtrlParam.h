@@ -70,10 +70,7 @@ public:
 	    double max_height;
 	} disarm;
 
-	struct {
-	    double acc;
-	    double thrust;
-	} lpf;
+	double indi_lpf;
 
 	Gain hover_gain, track_gain;
 	Idling idling;

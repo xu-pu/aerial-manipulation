@@ -25,8 +25,8 @@ void Controller::config()
 {
 	config_gain(param.hover_gain);
 	is_configured = true;
-  lpf_acc.T = param.lpf.acc;
-  lpf_thrust.T = param.lpf.thrust;
+  lpf_acc.T = param.indi_lpf;
+  lpf_thrust.T = param.indi_lpf;
   if ( !lpf_thrust.initialized ) {
     lpf_thrust.filter(Vector3d::UnitZ()*param.gra);
   }
