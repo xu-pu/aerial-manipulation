@@ -20,7 +20,7 @@ disturbance:
   err_limit_x: 1
   err_limit_y: 1
   err_limit_z: 1
-  integration_ratio: 0.02
+  integration_ratio: 0
 
 disarm:
   enable: true
@@ -28,15 +28,13 @@ disarm:
 
 hover:
     set_hov_percent_to_zero: false
-    use_hov_percent_kf: true
+    use_hov_percent_kf: false
     vert_velo_limit_for_update: 0.2
     vert_height_limit_for_update: 0.2
     percent_lower_limit: 0.15
     percent_higher_limit: 0.4
 
-lpf:
-  acc: 0.1
-  thrust: 0.1
+indi_lpf: 0.001
 
 gain:
     hover:
@@ -47,14 +45,17 @@ gain:
         Kv0: 3.0
         Kv1: 2.5
         Kv2: 5.5
-        Kvi0: 2.0
-        Kvi1: 2.0
-        Kvi2: 2.0
-        Ka0: 1.0
-        Ka1: 1.0
-        Ka2: 1.0
+        Kvi0: 0.0
+        Kvi1: 0.0
+        Kvi2: 0.0
+        Ka0: 0.0
+        Ka1: 0.0
+        Ka2: 0.0
         Kyaw: 20.0
-        # track not used
+        Kap0: 1.0
+        Kap1: 1.0
+        Kap2: 1.0
+      # track not used
     track:
         Kp0: 2.3
         Kp1: 2.3
