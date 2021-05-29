@@ -115,16 +115,15 @@ add_executable(n3ctrl_node
   src/input.cpp
 )
 
+add_executable(sim_imu_acc_node src/sim_imu_acc_node.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
 add_dependencies(n3ctrl_node ${PROJECT_NAME}_generate_messages_cpp ${PROJECT_NAME}_gencfg)
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(n3ctrl_node
-  ${catkin_LIBRARIES}
-)
-
+target_link_libraries(n3ctrl_node ${catkin_LIBRARIES})
+target_link_libraries(sim_imu_acc_node ${catkin_LIBRARIES})
 
 #############
 ## Install ##

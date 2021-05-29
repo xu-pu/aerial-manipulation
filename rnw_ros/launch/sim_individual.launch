@@ -20,7 +20,7 @@
         <!--subscribers-->
 		<remap from="~joy" to="/djiros/rc" />
         <remap from="~odom" to="/$(arg drone_name)/odom" />
-		<remap from="~imu" to="/djiros/imu" />
+		<remap from="~imu" to="/djiros/imu_sim" />
 		<remap from="~cmd" to="/$(arg drone_name)/position_cmd" />
         <!--publishers-->
 		<remap from="~desire_pose" to="/desire_pose" />
@@ -49,6 +49,19 @@
         <remap from="~imu" to="/djiros/imu" />
         <!--publishers-->
         <remap from="~odom" to="/$(arg drone_name)/odom" />
+    </node>
+
+    <!--  fix the bug where simulated imu does not have correct acc  -->
+
+    <node pkg="n3ctrl" type="sim_imu_acc_node" name="sim_imu_acc_node" output="screen" required="true">
+        <remap from="~imu_in" to="/djiros/imu" />
+        <remap from="~odom" to="/$(arg drone_name)/odom" />
+        <remap from="~imu_out" to="/djiros/imu_sim" />
+    </node>
+
+    <node pkg="rnw_ros" type="odom2tf_node" name="FLU_tf" output="screen">
+        <remap from="~odom" to="/$(arg drone_name)/odom"/>
+        <param name="name" value="FLU" />
     </node>
 
     <!--  generate control cmd for the drones  -->
