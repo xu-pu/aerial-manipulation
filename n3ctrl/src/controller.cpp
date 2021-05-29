@@ -27,6 +27,9 @@ void Controller::config()
 	is_configured = true;
   lpf_acc.T = param.lpf.acc;
   lpf_thrust.T = param.lpf.thrust;
+  if ( !lpf_thrust.initialized ) {
+    lpf_thrust.filter(Vector3d::UnitZ()*param.gra);
+  }
 }
 
 void Controller::config_gain(const Parameter_t::Gain& gain)
@@ -254,7 +257,7 @@ Eigen::Vector3d Controller::regulate_trust_vector(Eigen::Vector3d const & cmd ){
 }
 
 Eigen::Vector3d Controller::acceleration_loop( Eigen::Vector3d const & cmd_acc ){
-  return lpf_thrust.value + cmd_acc - lpf_acc.value;
+  return lpf_thrust.value + Kap * ( cmd_acc - lpf_acc.value );
 }
 
 void Controller::on_flight_status( std_msgs::UInt8ConstPtr const & msg ){

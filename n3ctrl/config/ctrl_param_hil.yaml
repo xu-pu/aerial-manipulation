@@ -1,6 +1,6 @@
-mass        : 3.905312463
+mass        : 1
 gra         : 9.81
-hov_percent : 0.38310821533203125
+hov_percent : 0.392
 full_thrust : 100 # this one is not used
 ctrl_rate   : 100.0
 js_ctrl_lock_velo: 0.3
@@ -18,7 +18,7 @@ disturbance:
   err_limit_x: 2
   err_limit_y: 2
   err_limit_z: 2
-  integration_ratio: 0.02
+  integration_ratio: 0
 
 disarm:
   enable: true
@@ -26,7 +26,7 @@ disarm:
 
 hover:
     set_hov_percent_to_zero: false
-    use_hov_percent_kf: true
+    use_hov_percent_kf: false
     vert_velo_limit_for_update: 0.2
     vert_height_limit_for_update: 0.2
     percent_lower_limit: 0.35
@@ -52,9 +52,9 @@ gain:
         Ka1: 0.65
         Ka2: 0.0
         Kyaw: 20.0
-        Kap0: 0
-        Kap1: 0
-        Kap2: 0
+        Kap0: 0.1
+        Kap1: 0.1
+        Kap2: 0.1
     track:
         Kp0: 2.3
         Kp1: 2.3
@@ -69,9 +69,9 @@ gain:
         Ka1: 1.0
         Ka2: 1.0
         Kyaw: 20.0
-        Kap0: 0
-        Kap1: 0
-        Kap2: 0
+        Kap0: 0.1
+        Kap1: 0.1
+        Kap2: 0.1
 
 idling:
     desired_height_limit:   -1.10

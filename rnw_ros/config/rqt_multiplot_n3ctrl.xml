@@ -336,11 +336,11 @@
                                         <relative_minimum>-1000</relative_minimum>
                                         <type>0</type>
                                     </scale>
-                                    <topic>/n3ctrl/disturbance</topic>
-                                    <type>geometry_msgs/Vector3Stamped</type>
+                                    <topic>/n3ctrl/debug</topic>
+                                    <type>n3ctrl/ControllerDebug</type>
                                 </x_axis>
                                 <y_axis>
-                                    <field>vector/x</field>
+                                    <field>lpf_thrust/x</field>
                                     <field_type>0</field_type>
                                     <scale>
                                         <absolute_maximum>1000</absolute_maximum>
@@ -349,8 +349,8 @@
                                         <relative_minimum>-1000</relative_minimum>
                                         <type>0</type>
                                     </scale>
-                                    <topic>/n3ctrl/disturbance</topic>
-                                    <type>geometry_msgs/Vector3Stamped</type>
+                                    <topic>/n3ctrl/debug</topic>
+                                    <type>n3ctrl/ControllerDebug</type>
                                 </y_axis>
                             </axes>
                             <color>
@@ -360,7 +360,7 @@
                             <data>
                                 <circular_buffer_capacity>1000</circular_buffer_capacity>
                                 <time_frame_length>10</time_frame_length>
-                                <type>0</type>
+                                <type>3</type>
                             </data>
                             <style>
                                 <lines_interpolate>false</lines_interpolate>
@@ -387,11 +387,11 @@
                                         <relative_minimum>-1000</relative_minimum>
                                         <type>0</type>
                                     </scale>
-                                    <topic>/n3ctrl/disturbance</topic>
-                                    <type>geometry_msgs/Vector3Stamped</type>
+                                    <topic>/n3ctrl/debug</topic>
+                                    <type>n3ctrl/ControllerDebug</type>
                                 </x_axis>
                                 <y_axis>
-                                    <field>vector/y</field>
+                                    <field>lpf_thrust/y</field>
                                     <field_type>0</field_type>
                                     <scale>
                                         <absolute_maximum>1000</absolute_maximum>
@@ -400,8 +400,8 @@
                                         <relative_minimum>-1000</relative_minimum>
                                         <type>0</type>
                                     </scale>
-                                    <topic>/n3ctrl/disturbance</topic>
-                                    <type>geometry_msgs/Vector3Stamped</type>
+                                    <topic>/n3ctrl/debug</topic>
+                                    <type>n3ctrl/ControllerDebug</type>
                                 </y_axis>
                             </axes>
                             <color>
@@ -411,7 +411,7 @@
                             <data>
                                 <circular_buffer_capacity>1000</circular_buffer_capacity>
                                 <time_frame_length>10</time_frame_length>
-                                <type>0</type>
+                                <type>3</type>
                             </data>
                             <style>
                                 <lines_interpolate>false</lines_interpolate>
@@ -438,11 +438,11 @@
                                         <relative_minimum>-1000</relative_minimum>
                                         <type>0</type>
                                     </scale>
-                                    <topic>/n3ctrl/disturbance</topic>
-                                    <type>geometry_msgs/Vector3Stamped</type>
+                                    <topic>/n3ctrl/debug</topic>
+                                    <type>n3ctrl/ControllerDebug</type>
                                 </x_axis>
                                 <y_axis>
-                                    <field>vector/z</field>
+                                    <field>lpf_thrust/z</field>
                                     <field_type>0</field_type>
                                     <scale>
                                         <absolute_maximum>1000</absolute_maximum>
@@ -451,8 +451,8 @@
                                         <relative_minimum>-1000</relative_minimum>
                                         <type>0</type>
                                     </scale>
-                                    <topic>/n3ctrl/disturbance</topic>
-                                    <type>geometry_msgs/Vector3Stamped</type>
+                                    <topic>/n3ctrl/debug</topic>
+                                    <type>n3ctrl/ControllerDebug</type>
                                 </y_axis>
                             </axes>
                             <color>
@@ -462,7 +462,7 @@
                             <data>
                                 <circular_buffer_capacity>1000</circular_buffer_capacity>
                                 <time_frame_length>10</time_frame_length>
-                                <type>0</type>
+                                <type>3</type>
                             </data>
                             <style>
                                 <lines_interpolate>false</lines_interpolate>
@@ -482,7 +482,7 @@
                         <visible>true</visible>
                     </legend>
                     <plot_rate>30</plot_rate>
-                    <title>disturbance (newton)</title>
+                    <title>lpf_specific_thrust</title>
                 </column_2>
             </row_0>
             <row_1>
@@ -666,7 +666,7 @@
                                     <type>n3ctrl/ControllerDebug</type>
                                 </x_axis>
                                 <y_axis>
-                                    <field>lpf_acc/x</field>
+                                    <field>cmd_a/x</field>
                                     <field_type>0</field_type>
                                     <scale>
                                         <absolute_maximum>1000</absolute_maximum>
@@ -699,14 +699,116 @@
                                 <type>0</type>
                             </style>
                             <subscriber_queue_size>100</subscriber_queue_size>
-                            <title>Untitled Curve</title>
+                            <title>x</title>
                         </curve_0>
+                        <curve_1>
+                            <axes>
+                                <x_axis>
+                                    <field>header/stamp</field>
+                                    <field_type>0</field_type>
+                                    <scale>
+                                        <absolute_maximum>1000</absolute_maximum>
+                                        <absolute_minimum>0</absolute_minimum>
+                                        <relative_maximum>0</relative_maximum>
+                                        <relative_minimum>-1000</relative_minimum>
+                                        <type>0</type>
+                                    </scale>
+                                    <topic>/n3ctrl/debug</topic>
+                                    <type>n3ctrl/ControllerDebug</type>
+                                </x_axis>
+                                <y_axis>
+                                    <field>cmd_a/y</field>
+                                    <field_type>0</field_type>
+                                    <scale>
+                                        <absolute_maximum>1000</absolute_maximum>
+                                        <absolute_minimum>0</absolute_minimum>
+                                        <relative_maximum>0</relative_maximum>
+                                        <relative_minimum>-1000</relative_minimum>
+                                        <type>0</type>
+                                    </scale>
+                                    <topic>/n3ctrl/debug</topic>
+                                    <type>n3ctrl/ControllerDebug</type>
+                                </y_axis>
+                            </axes>
+                            <color>
+                                <custom_color>#000000</custom_color>
+                                <type>0</type>
+                            </color>
+                            <data>
+                                <circular_buffer_capacity>1000</circular_buffer_capacity>
+                                <time_frame_length>10</time_frame_length>
+                                <type>3</type>
+                            </data>
+                            <style>
+                                <lines_interpolate>false</lines_interpolate>
+                                <pen_style>1</pen_style>
+                                <pen_width>1</pen_width>
+                                <render_antialias>false</render_antialias>
+                                <steps_invert>false</steps_invert>
+                                <sticks_baseline>0</sticks_baseline>
+                                <sticks_orientation>2</sticks_orientation>
+                                <type>0</type>
+                            </style>
+                            <subscriber_queue_size>100</subscriber_queue_size>
+                            <title>y</title>
+                        </curve_1>
+                        <curve_2>
+                            <axes>
+                                <x_axis>
+                                    <field>header/stamp</field>
+                                    <field_type>0</field_type>
+                                    <scale>
+                                        <absolute_maximum>1000</absolute_maximum>
+                                        <absolute_minimum>0</absolute_minimum>
+                                        <relative_maximum>0</relative_maximum>
+                                        <relative_minimum>-1000</relative_minimum>
+                                        <type>0</type>
+                                    </scale>
+                                    <topic>/n3ctrl/debug</topic>
+                                    <type>n3ctrl/ControllerDebug</type>
+                                </x_axis>
+                                <y_axis>
+                                    <field>cmd_a/z</field>
+                                    <field_type>0</field_type>
+                                    <scale>
+                                        <absolute_maximum>1000</absolute_maximum>
+                                        <absolute_minimum>0</absolute_minimum>
+                                        <relative_maximum>0</relative_maximum>
+                                        <relative_minimum>-1000</relative_minimum>
+                                        <type>0</type>
+                                    </scale>
+                                    <topic>/n3ctrl/debug</topic>
+                                    <type>n3ctrl/ControllerDebug</type>
+                                </y_axis>
+                            </axes>
+                            <color>
+                                <custom_color>#000000</custom_color>
+                                <type>0</type>
+                            </color>
+                            <data>
+                                <circular_buffer_capacity>1000</circular_buffer_capacity>
+                                <time_frame_length>10</time_frame_length>
+                                <type>3</type>
+                            </data>
+                            <style>
+                                <lines_interpolate>false</lines_interpolate>
+                                <pen_style>1</pen_style>
+                                <pen_width>1</pen_width>
+                                <render_antialias>false</render_antialias>
+                                <steps_invert>false</steps_invert>
+                                <sticks_baseline>0</sticks_baseline>
+                                <sticks_orientation>2</sticks_orientation>
+                                <type>0</type>
+                            </style>
+                            <subscriber_queue_size>100</subscriber_queue_size>
+                            <title>z</title>
+                        </curve_2>
                     </curves>
                     <legend>
                         <visible>true</visible>
                     </legend>
                     <plot_rate>30</plot_rate>
-                    <title>Untitled Plot</title>
+                    <title>cmd_acc</title>
                 </column_2>
             </row_1>
         </plots>
