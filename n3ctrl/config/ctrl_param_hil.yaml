@@ -1,6 +1,6 @@
 mass        : 1
 gra         : 9.81
-hov_percent : 0.392
+hov_percent : 0.32
 full_thrust : 100 # this one is not used
 ctrl_rate   : 100.0
 js_ctrl_lock_velo: 0.3
@@ -37,22 +37,22 @@ indi_lpf: 0.001
 gain:
     hover:
         # Controller gain in minimun snap
-        Kp0: 4.35
-        Kp1: 4.35
+        Kp0: 2.3
+        Kp1: 2.3
         Kp2: 2.5
-        Kv0: 4.15
-        Kv1: 4.15
+        Kv0: 2.5
+        Kv1: 2.5
         Kv2: 5.5
-        Kvi0: 1.0
-        Kvi1: 1.0
-        Kvi2: 1.0
-        Ka0: 0.65
-        Ka1: 0.65
+        Kvi0: 0.0
+        Kvi1: 0.0
+        Kvi2: 0.0
+        Ka0: 0.0
+        Ka1: 0.0
         Ka2: 0.0
         Kyaw: 20.0
-        Kap0: 0.01
-        Kap1: 0.01
-        Kap2: 0.01
+        Kap0: 1
+        Kap1: 1
+        Kap2: 1
     track:
         Kp0: 2.3
         Kp1: 2.3

@@ -96,11 +96,11 @@
         <remap from="~poly_traj" to="/$(arg drone_name)/traj"/>
     </node>
 
-    <node pkg="rqt_multiplot" type="rqt_multiplot" name="rqt_multiplot" output="log" required="true"
-          args="--multiplot-config $(find rnw_ros)/config/rqt_multiplot_indi.xml --multiplot-run-all"/>
-
 <!--    <node pkg="rqt_multiplot" type="rqt_multiplot" name="rqt_multiplot" output="log" required="true"-->
-<!--          args="&#45;&#45;multiplot-config $(find rnw_ros)/config/rqt_multiplot_tuning_drone2.xml &#45;&#45;multiplot-run-all"/>-->
+<!--          args="&#45;&#45;multiplot-config $(find rnw_ros)/config/rqt_multiplot_indi.xml &#45;&#45;multiplot-run-all"/>-->
+
+    <node pkg="rqt_multiplot" type="rqt_multiplot" name="rqt_multiplot" output="log" required="true"
+          args="--multiplot-config $(find rnw_ros)/config/rqt_multiplot_tuning_drone2.xml --multiplot-run-all"/>
 
     <node pkg="rqt_reconfigure" type="rqt_reconfigure" name="rqt_reconfigure"/>
 
