@@ -65,7 +65,7 @@ void Controller::update(const Desired_State_t& des,const Odom_Data_t& odom,const
   Eigen::Vector3d vg = - Vector3d::UnitZ() * param.gra;
 
   // lpf acc
-  lpf_acc.filter( odom.q * imu.a + vg );
+  lpf_acc.filter( imu.q * imu.a + vg );
 
   // do not run the actual controller when the quadrotor is not armed
   if ( flight_status == flight_status_e::STOPED ) {
@@ -96,9 +96,9 @@ void Controller::update(const Desired_State_t& des,const Odom_Data_t& odom,const
 
   Vector3d cmd_acc = velocity_loop(cmd_vel,des,odom);
 
-  Vector3d specific_thrust = cmd_acc - vg;
+  //Vector3d specific_thrust = cmd_acc - vg;
   // or use INDI
-  //Vector3d specific_thrust = acceleration_loop(cmd_acc);
+  Vector3d specific_thrust = acceleration_loop(cmd_acc);
 
   Vector3d thrust_vector = regulate_trust_vector(specific_thrust * param.mass);
 

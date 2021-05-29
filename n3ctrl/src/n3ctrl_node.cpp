@@ -37,6 +37,9 @@ void gain_cfg_callback(n3ctrl::GainsConfig & config, uint32_t level ){
 
   pFSM->update_gains(gains);
 
+  pFSM->controller.lpf_acc.T = config.lpf_indi;
+  pFSM->controller.lpf_thrust.T = config.lpf_indi;
+
 }
 
 void mySigintHandler(int sig) {

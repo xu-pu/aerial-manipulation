@@ -7,7 +7,7 @@ js_ctrl_lock_velo: 0.3
 use_yaw_rate_ctrl: false
 pub_debug_msgs: true
 
-enable_dynamic_reconfigure: false
+enable_dynamic_reconfigure: true
 
 # disturbances are measured and controlled through the integral term in velocity loop
 # x/y/z_limit's unit is Newton(N)
@@ -33,8 +33,8 @@ hover:
     percent_higher_limit: 0.45
 
 lpf:
-  acc: 0.1
-  thrust: 0.1
+  acc: 10
+  thrust: 10
 
 gain:
     hover:
@@ -52,9 +52,9 @@ gain:
         Ka1: 0.65
         Ka2: 0.0
         Kyaw: 20.0
-        Kap0: 0.1
-        Kap1: 0.1
-        Kap2: 0.1
+        Kap0: 0.01
+        Kap1: 0.01
+        Kap2: 0.01
     track:
         Kp0: 2.3
         Kp1: 2.3
