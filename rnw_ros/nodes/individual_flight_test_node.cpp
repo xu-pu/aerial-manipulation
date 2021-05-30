@@ -108,11 +108,11 @@ struct individual_drone_test_t {
 
       vector<Vector3d> waypoints;
       waypoints.emplace_back(Vector3d::Zero());
-
       for (int i=0; i < cycles; i++ ) {
         waypoints.emplace_back(0,amp,0);
         waypoints.emplace_back(0,-amp,0);
       }
+      waypoints.emplace_back(Vector3d::Zero());
 
       drone.follow_waypoints_in_intermediate_frame(waypoints);
 
