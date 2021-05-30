@@ -140,7 +140,7 @@ void Controller::update(const Desired_State_t& des,const Odom_Data_t& odom,const
 
   dbg_msg.plant_p = to_vector3_msg(odom.p);
   dbg_msg.plant_v = to_vector3_msg(odom.v);
-  dbg_msg.plant_a = to_vector3_msg(odom.q*imu.a);
+  dbg_msg.plant_a = to_vector3_msg(imu.q*imu.a);
 
   dbg_msg.cmd_v = to_vector3_msg(cmd_vel);
   dbg_msg.cmd_a = to_vector3_msg(cmd_acc);
