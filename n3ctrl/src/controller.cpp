@@ -233,7 +233,7 @@ Eigen::Vector3d Controller::regulate_trust_vector(Eigen::Vector3d const & cmd ){
     constraint_info = boost::str(boost::format("thrust too low F_des(2)=%.3f; ")% F_des(2));
     F_des = F_des / F_des(2) * (0.5 * param.mass * param.gra);
   }
-  else if (F_des(2) > 2 * param.mass * param.gra){
+  else if (F_des(2) > 5 * param.mass * param.gra){
     constraint_info = boost::str(boost::format("thrust too high F_des(2)=%.3f; ")% F_des(2));
     F_des = F_des / F_des(2) * (2 * param.mass * param.gra);
   }
