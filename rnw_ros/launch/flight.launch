@@ -48,6 +48,11 @@
         <param name="pub_debug_msgs" type="bool" value="true"/>
     </node>
 
+    <node pkg="rnw_ros" type="pub_euler_angles_node" name="pub_euler_angles_node">
+        <remap from="~odom" to="$(arg topic_odom_uav)"/>
+        <remap from="~imu" to="/djiros/imu"/>
+    </node>
+
     <node name="record" pkg="rosbag" type="record" output="screen" args="-a" />
     
 </launch>
