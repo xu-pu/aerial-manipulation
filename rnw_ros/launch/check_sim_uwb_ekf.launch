@@ -1,5 +1,7 @@
 <launch>
 
+    <arg name="drone_name" default="drone2" />
+
 	<arg name="uavname" default="hil" />
     <arg name="imu_topic" default="/djiros/imu"/>
     <arg name="topic_odom_uav" default="/odom/uav"/>
@@ -19,22 +21,22 @@
 
     <param name="ctrl_cmd_stream_timeout" value="0.5"/>
 
-    <node pkg="n3ctrl" type="n3ctrl_node" name="n3ctrl" output="screen" required="true">
-        <!--subscribers-->
-		<remap from="~joy" to="/djiros/rc" />
-        <remap from="~odom" to="$(arg topic_odom_uav)" />
-		<remap from="~imu" to="/djiros/imu" />
-		<remap from="~cmd" to="/position_cmd" />
-        <!--publishers-->
-		<remap from="~desire_pose" to="/desire_pose" />
-		<remap from="~traj_start_trigger" to="/traj_start_trigger" />
-		<remap from="~ctrl" to="/djiros/ctrl" />
-        <!--params-->
-        <rosparam command="load" file="$(find n3ctrl)/config/ctrl_param_$(arg uavname).yaml" />
-        <param name="work_mode" value="real-time" />
-        <param name="js_ctrl_mode" value="feedback" />
-        <param name="pub_debug_msgs" type="bool" value="true"/>
-    </node>
+<!--    <node pkg="n3ctrl" type="n3ctrl_node" name="n3ctrl" output="screen" required="true">-->
+<!--        &lt;!&ndash;subscribers&ndash;&gt;-->
+<!--		<remap from="~joy" to="/djiros/rc" />-->
+<!--        <remap from="~odom" to="$(arg topic_odom_uav)" />-->
+<!--		<remap from="~imu" to="/djiros/imu" />-->
+<!--		<remap from="~cmd" to="/position_cmd" />-->
+<!--        &lt;!&ndash;publishers&ndash;&gt;-->
+<!--		<remap from="~desire_pose" to="/desire_pose" />-->
+<!--		<remap from="~traj_start_trigger" to="/traj_start_trigger" />-->
+<!--		<remap from="~ctrl" to="/djiros/ctrl" />-->
+<!--        &lt;!&ndash;params&ndash;&gt;-->
+<!--        <rosparam command="load" file="$(find n3ctrl)/config/ctrl_param_$(arg uavname).yaml" />-->
+<!--        <param name="work_mode" value="real-time" />-->
+<!--        <param name="js_ctrl_mode" value="feedback" />-->
+<!--        <param name="pub_debug_msgs" type="bool" value="true"/>-->
+<!--    </node>-->
 
     <node pkg="joy" type="joy_node" name="joy_node" output="screen">
         <param name="~autorepeat_rate" value="0" />
@@ -50,7 +52,24 @@
         <remap from="~gps" to="/djiros/gps" />
         <remap from="~imu" to="/djiros/imu" />
         <!--publishers-->
-        <remap from="~odom" to="$(arg topic_odom_uav)" />
+        <remap from="~odom" to="/$(arg drone_name)/odom" />
+    </node>
+
+    <node pkg="uwb_transceiver" type="uwb_transceiver_node" name="uwb_master_$(arg drone_name)" output="screen">
+        <rosparam command="load" file="$(find uwb_transceiver)/config/config.yaml" />
+        <param name="serial_port" value="/dev/tty.uwb.$(arg drone_name)"/>
+        <remap from="~odom" to="/$(arg drone_name)/odom"/>
+        <remap from="~position_cmd" to="/$(arg drone_name)/position_cmd"/>
+        <param name="role" type="int" value="1"/> <!--master-->
+    </node>
+
+    <node pkg="uwb_transceiver" type="uwb_transceiver_node" name="uwb_slave_$(arg drone_name)" output="screen">
+        <rosparam command="load" file="$(find uwb_transceiver)/config/config.yaml" />
+        <param name="serial_port" value="/dev/tty.uwb.slave"/>
+        <remap from="~odom" to="$(arg topic_odom_uav)"/>
+        <remap from="~position_cmd" to="/position_cmd"/>
+        <param name="role" type="int" value="2"/> <!--slave-->
+        <param name="debug/m_debug_packet_info" type="int" value="0"/>
     </node>
 
     <!--  visualization  -->
@@ -62,12 +81,7 @@
         <param name="name" value="sim_tf" />
     </node>
 
-    <node pkg="rnw_ros" type="visualize_disturbance_node" name="visualize_disturbance_node" required="false">
-        <remap from="~odom" to="$(arg topic_odom_uav)"/>
-        <remap from="~disturbance" to="/n3ctrl/disturbance"/>
-    </node>
-
-    <node pkg="rqt_multiplot" type="rqt_multiplot" name="rqt_multiplot" output="log" required="true"
-          args="--multiplot-config $(find rnw_ros)/config/rqt_multiplot_n3ctrl.xml --multiplot-run-all"/>
+<!--    <node pkg="rqt_multiplot" type="rqt_multiplot" name="rqt_multiplot" output="log" required="true"-->
+<!--          args="&#45;&#45;multiplot-config $(find rnw_ros)/config/rqt_multiplot_n3ctrl.xml &#45;&#45;multiplot-run-all"/>-->
 
 </launch>
