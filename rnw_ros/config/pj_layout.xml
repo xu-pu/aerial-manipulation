@@ -1,0 +1,203 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<root version="2.3.8">
+ <tabbed_widget parent="main_window" name="Main Window">
+  <plotmatrix columns="2" rows="2" tab_name="plot">
+   <plot col="0" style="Lines" row="0">
+    <range left="7.584063" right="42.374975" bottom="-2.291424" top="1.791800"/>
+    <limitY/>
+    <curve R="214" custom_transform="noTransform" name="/n3ctrl/debug/cmd_a/x" G="39" B="40"/>
+    <curve R="26" custom_transform="noTransform" name="/n3ctrl/debug/lpf_acc/x" G="201" B="56"/>
+    <curve R="31" custom_transform="noTransform" name="/n3ctrl/debug/plant_a/x" G="119" B="180"/>
+    <transform value="noTransform"/>
+   </plot>
+   <plot col="0" style="Lines" row="1">
+    <range left="7.584063" right="42.374975" bottom="-1.096621" top="2.941819"/>
+    <limitY/>
+    <curve R="148" custom_transform="noTransform" name="/n3ctrl/debug/cmd_a/z" G="103" B="189"/>
+    <curve R="23" custom_transform="noTransform" name="/n3ctrl/debug/lpf_acc/z" G="190" B="207"/>
+    <curve R="214" custom_transform="noTransform" name="/n3ctrl/debug/plant_a/z" G="39" B="40"/>
+    <transform value="noTransform"/>
+   </plot>
+   <plot col="1" style="Lines" row="0">
+    <range left="7.584063" right="42.374975" bottom="-2.003722" top="1.599637"/>
+    <limitY/>
+    <curve R="214" custom_transform="noTransform" name="/n3ctrl/debug/cmd_a/y" G="39" B="40"/>
+    <curve R="241" custom_transform="noTransform" name="/n3ctrl/debug/lpf_acc/y" G="76" B="193"/>
+    <curve R="255" custom_transform="noTransform" name="/n3ctrl/debug/plant_a/y" G="127" B="14"/>
+    <transform value="noTransform"/>
+   </plot>
+   <plot col="1" style="Lines" row="1">
+    <range left="-1152.762936" right="-1103.104027" bottom="0.000000" top="1000.000000"/>
+    <limitY/>
+    <transform value="noTransform"/>
+   </plot>
+  </plotmatrix>
+  <plotmatrix columns="1" rows="2" tab_name="plot">
+   <plot col="0" style="Lines" row="0">
+    <range left="5.301503" right="48.356214" bottom="-13.338120" top="17.853409"/>
+    <limitY/>
+    <curve R="31" custom_transform="noTransform" name="/djiros/ctrl/axes.0" G="119" B="180"/>
+    <curve R="188" custom_transform="noTransform" name="/rpy/imu/vector/x" G="189" B="34"/>
+    <transform value="noTransform"/>
+   </plot>
+   <plot col="0" style="Lines" row="1">
+    <range left="5.301503" right="48.356214" bottom="-9.797952" top="9.456803"/>
+    <limitY/>
+    <curve R="26" custom_transform="noTransform" name="/djiros/ctrl/axes.1" G="201" B="56"/>
+    <curve R="214" custom_transform="noTransform" name="/rpy/imu/vector/y" G="39" B="40"/>
+    <transform value="noTransform"/>
+   </plot>
+  </plotmatrix>
+  <plotmatrix columns="2" rows="2" tab_name="plot">
+   <plot col="0" style="Lines" row="0">
+    <range left="23.191265" right="37.316257" bottom="-0.841754" top="0.580955"/>
+    <limitY/>
+    <curve R="23" custom_transform="noTransform" name="/n3ctrl/debug/plant_p/x" G="190" B="207"/>
+    <curve R="255" custom_transform="noTransform" name="/position_cmd/position/x" G="127" B="14"/>
+    <transform value="noTransform"/>
+   </plot>
+   <plot col="0" style="Lines" row="1">
+    <range left="23.191265" right="37.316257" bottom="0.612539" top="0.649311"/>
+    <limitY/>
+    <curve R="26" custom_transform="noTransform" name="/n3ctrl/debug/ref_p/z" G="201" B="56"/>
+    <curve R="148" custom_transform="noTransform" name="/position_cmd/position/z" G="103" B="189"/>
+    <transform value="noTransform"/>
+   </plot>
+   <plot col="1" style="Lines" row="0">
+    <range left="23.191265" right="37.316257" bottom="-0.779207" top="-0.587581"/>
+    <limitY/>
+    <curve R="23" custom_transform="noTransform" name="/n3ctrl/debug/plant_p/y" G="190" B="207"/>
+    <curve R="214" custom_transform="noTransform" name="/n3ctrl/debug/ref_p/y" G="39" B="40"/>
+    <curve R="241" custom_transform="noTransform" name="/position_cmd/position/y" G="76" B="193"/>
+    <transform value="noTransform"/>
+   </plot>
+   <plot col="1" style="Lines" row="1">
+    <range left="5.301503" right="48.356214" bottom="0.000000" top="1000.000000"/>
+    <limitY/>
+    <transform value="noTransform"/>
+   </plot>
+  </plotmatrix>
+  <currentPlotMatrix index="2"/>
+ </tabbed_widget>
+ <use_relative_time_offset enabled="1"/>
+ <!-- - - - - - - - - - - - - - - -->
+ <!-- - - - - - - - - - - - - - - -->
+ <Plugins>
+  <plugin ID="DataLoad CSV">
+   <default time_axis=""/>
+  </plugin>
+  <plugin ID="DataLoad ROS bags">
+   <use_header_stamp value="true"/>
+   <use_renaming_rules value="true"/>
+   <discard_large_arrays value="true"/>
+   <max_array_size value="100"/>
+  </plugin>
+  <plugin ID="DataLoad ULog"/>
+  <plugin ID="ROS Topic Subscriber">
+   <use_header_stamp value="false"/>
+   <use_renaming_rules value="true"/>
+   <discard_large_arrays value="true"/>
+   <max_array_size value="100"/>
+  </plugin>
+  <plugin status="idle" ID="ROS /rosout Visualization"/>
+  <plugin status="idle" ID="ROS Topic Re-Publisher"/>
+ </Plugins>
+ <!-- - - - - - - - - - - - - - - -->
+ <previouslyLoaded_Datafiles>
+  <fileInfo prefix="" filename="/home/sheep/Dropbox/mphil_bags/2021-05-30-16-50-58.gain60.imuacc.bag">
+   <selected_datasources value="/djiros/ctrl;/n3ctrl/debug;/rpy/imu"/>
+  </fileInfo>
+  <fileInfo prefix="" filename="/home/sheep/Dropbox/mphil_bags/2021-05-30-17-01-31.gain60.lpf005.bag">
+   <selected_datasources value="/djiros/ctrl;/n3ctrl/debug;/rpy/imu"/>
+  </fileInfo>
+  <fileInfo prefix="" filename="/home/sheep/Dropbox/mphil_bags/2021-05-30-17-10-16.gain60.lpf001.bag">
+   <selected_datasources value="/djiros/ctrl;/n3ctrl/debug;/rpy/imu;/position_cmd"/>
+   <plugin ID="DataLoad ROS bags">
+    <use_header_stamp value="true"/>
+    <use_renaming_rules value="true"/>
+    <discard_large_arrays value="true"/>
+    <max_array_size value="100"/>
+   </plugin>
+  </fileInfo>
+ </previouslyLoaded_Datafiles>
+ <!-- - - - - - - - - - - - - - - -->
+ <customMathEquations/>
+ <snippets>
+  <snippet name="1st_derivative" language="JS">
+   <global>var prevX = 0
+var prevY = 0</global>
+   <equation>dx = time - prevX
+dy = value - prevY
+prevX = time
+prevY = value
+
+return dy/dx</equation>
+  </snippet>
+  <snippet name="1st_order_lowpass" language="JS">
+   <global>var prevY = 0
+var alpha = 0.1</global>
+   <equation>prevY = alpha * value + (1.-alpha) * prevY
+
+return prevY</equation>
+  </snippet>
+  <snippet name="2D_velocity" language="JS">
+   <global>var prev_x = 0
+var prev_y = 0
+var prev_t = 0</global>
+   <equation>X = $$your_odometry/position/x$$
+Y = $$your_odometry/position/y$$
+
+var dist = sqrt( (X-prev_x)*(X-prev_x) + (Y-prev_y)*(Y-prev_y) )
+var dT = time - prev_t
+
+prev_x = X
+prev_y = Y
+prev_t = time
+
+return dist / dT</equation>
+  </snippet>
+  <snippet name="average_two_curves" language="JS">
+   <global></global>
+   <equation>a = $$PLOT_A$$
+b = $$PLOT_B$$
+
+return (a+b)/2</equation>
+  </snippet>
+  <snippet name="integral" language="JS">
+   <global>var integral = 0</global>
+   <equation>integral += value
+return integral</equation>
+  </snippet>
+  <snippet name="rad_to_deg" language="JS">
+   <global></global>
+   <equation>return value*180/3.1417</equation>
+  </snippet>
+  <snippet name="remove_offset" language="JS">
+   <global>var is_first = true
+var first_value = 0</global>
+   <equation>if (is_first)
+{
+  is_first = false
+  first_value = value
+}
+
+return value - first_value</equation>
+  </snippet>
+  <snippet name="yaw_from_quaternion" language="JS">
+   <global>// source: https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
+
+function quaternionToYaw(x, y, z, w)
+{
+  // yaw (z-axis rotation)
+  t1 = 2.0 * (w * z + x * y);
+  t2 = 1.0 - 2.0 * (y * y + z * z);
+  yaw = Math.atan2(t1, t2);
+
+  return yaw
+}</global>
+   <equation>return quaternionToYaw(x, y, z, w);</equation>
+  </snippet>
+ </snippets>
+ <!-- - - - - - - - - - - - - - - -->
+</root>
+
