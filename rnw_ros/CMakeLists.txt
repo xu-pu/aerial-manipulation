@@ -192,6 +192,7 @@ set(RNW_NODES
         rnw_caging_node
         rnw_cable_node
         dbg_rnw_cable_node
+        ekf_odom_node
 )
 
 FOREACH(NODE ${RNW_NODES})
