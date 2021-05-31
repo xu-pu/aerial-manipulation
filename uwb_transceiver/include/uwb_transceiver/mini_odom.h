@@ -62,6 +62,10 @@ struct Mini_odom
     T angle_spd_x;
     T angle_spd_y;
     T angle_spd_z;
+
+    uint32_t sec;
+    uint32_t nsec;
+
 };
 
 template <typename T, typename T2>

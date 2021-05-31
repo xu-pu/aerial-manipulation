@@ -1,6 +1,8 @@
 #include "uwb_transceiver/drone_swarm_payload.h"
 #include "uwb_transceiver/mini_odom.h"
 
+#include <quadrotor_msgs/Float64Stamped.h>
+
 using namespace uwb_comm;
 
 struct n3ctrl_state_t {
@@ -115,6 +117,8 @@ void drone_swarm_payload_t::init_as_slave() {
 
   pub_cmd = nh.advertise<quadrotor_msgs::PositionCommand>("position_cmd",100);
 
+  pub_latency = nh.advertise<quadrotor_msgs::Float64Stamped>("latency",100);
+
   sub_n3ctrl = nh.subscribe<n3ctrl::N3CtrlState>(
           "n3ctrl",
           100,
@@ -156,6 +160,15 @@ void drone_swarm_payload_t::slave_decode(const char *buffer) {
   auto * odom_ptr = (mini_odom_f32_t const *)buffer;
   if ( odom_ptr->seq != latest_odom.header.seq ) {
     miniodom_to_odom<float>(*odom_ptr,latest_odom);
+
+    ros::Time t(odom_ptr->sec,odom_ptr->nsec);
+    double lat_ms = (ros::Time::now() - t).toSec() * 1000;
+    ROS_INFO("[uwb] latency %fms", lat_ms);
+    quadrotor_msgs::Float64Stamped lat_msg;
+    lat_msg.header.stamp = ros::Time::now();
+    lat_msg.value = lat_ms;
+    pub_latency.publish(lat_msg);
+
     latest_odom.header.stamp = ros::Time::now() - odom_latency;
     latest_odom.header.frame_id = "world";
     pub_odom.publish(latest_odom);
@@ -187,6 +200,9 @@ void drone_swarm_payload_t::slave_decode(const char *buffer) {
 bool drone_swarm_payload_t::master_encode(char *buffer) {
   mini_odom_f32_t buffer_odom;
   odom_to_miniodom<float,uint32_t>(latest_odom,buffer_odom);
+  auto t = ros::Time::now();
+  buffer_odom.sec = t.sec;
+  buffer_odom.nsec = t.nsec;
   pos_cmd_data_f32_t buffer_cmd = encode_pos_cmd<float>(latest_cmd);
   memcpy(buffer, (char*)&buffer_odom, sizeof(mini_odom_f32_t));
   memcpy(buffer+sizeof(mini_odom_f32_t), (char*)&buffer_cmd, sizeof(pos_cmd_data_f32_t));

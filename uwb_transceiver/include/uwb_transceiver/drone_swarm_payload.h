@@ -48,6 +48,8 @@ namespace uwb_comm {
 
         ros::Publisher pub_cmd;
 
+        ros::Publisher pub_latency;
+
         nav_msgs::Odometry latest_odom;
 
         quadrotor_msgs::PositionCommand latest_cmd;
