@@ -123,6 +123,9 @@ void drone_swarm_payload_t::init_as_slave() {
           ros::TransportHints().tcpNoDelay()
   );
 
+  nh.getParam("odom_latency_ms",odom_latency_ms);
+  odom_latency = ros::Duration(odom_latency_ms/1000.);
+
 }
 
 void drone_swarm_payload_t::init_as_master() {
@@ -153,7 +156,7 @@ void drone_swarm_payload_t::slave_decode(const char *buffer) {
   auto * odom_ptr = (mini_odom_f32_t const *)buffer;
   if ( odom_ptr->seq != latest_odom.header.seq ) {
     miniodom_to_odom<float>(*odom_ptr,latest_odom);
-    latest_odom.header.stamp = ros::Time::now();
+    latest_odom.header.stamp = ros::Time::now() - odom_latency;
     latest_odom.header.frame_id = "world";
     pub_odom.publish(latest_odom);
   }

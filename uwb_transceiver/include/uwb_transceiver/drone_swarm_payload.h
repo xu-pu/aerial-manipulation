@@ -56,6 +56,10 @@ namespace uwb_comm {
 
         double msg_timeout_sec = 1;
 
+        double odom_latency_ms = 0;
+
+        ros::Duration odom_latency;
+
         explicit drone_swarm_payload_t( ros::NodeHandle & );
 
         void on_odom( nav_msgs::OdometryConstPtr const & );
