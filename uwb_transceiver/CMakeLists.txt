@@ -150,7 +150,8 @@ include_directories(
    include
    ${EIGEN3_INCLUDE_DIR}
 #   ../rosserial/rosserial_client/src/ros_lib/
- )
+   /home/sheep/am_ws/devel/include # for clion only
+)
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}

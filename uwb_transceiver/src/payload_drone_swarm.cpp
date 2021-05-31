@@ -83,7 +83,7 @@ quadrotor_msgs::PositionCommand decode_pos_cmd( pos_cmd_data_t<T> const & dat ){
 }
 
 using pos_cmd_data_f32_t = pos_cmd_data_t<float>;
-using mini_odom_f32_t = Mini_odom<float,int>;
+using mini_odom_f32_t = Mini_odom<float,uint32_t>;
 
 drone_swarm_payload_t::drone_swarm_payload_t(ros::NodeHandle & _nh) : nh(_nh) {
   latest_cmd.header.seq = 0;
@@ -151,10 +151,15 @@ void drone_swarm_payload_t::slave_decode(const char *buffer) {
 
   // process odom
   auto * odom_ptr = (mini_odom_f32_t const *)buffer;
-  miniodom_to_odom<float>(*odom_ptr,latest_odom);
-  latest_odom.header.stamp = ros::Time::now();
-  latest_odom.header.frame_id = "world";
-  pub_odom.publish(latest_odom);
+  if ( odom_ptr->seq != latest_odom.header.seq ) {
+    miniodom_to_odom<float>(*odom_ptr,latest_odom);
+    latest_odom.header.stamp = ros::Time::now();
+    latest_odom.header.frame_id = "world";
+    pub_odom.publish(latest_odom);
+  }
+  else {
+    //ROS_INFO("[uwb] odom #%u again", odom_ptr->seq);
+  }
 
   // process cmd
   auto * cmd_ptr = (pos_cmd_data_f32_t const *)(buffer+sizeof(mini_odom_f32_t));
@@ -178,7 +183,7 @@ void drone_swarm_payload_t::slave_decode(const char *buffer) {
 
 bool drone_swarm_payload_t::master_encode(char *buffer) {
   mini_odom_f32_t buffer_odom;
-  odom_to_miniodom<float, int>(latest_odom,buffer_odom);
+  odom_to_miniodom<float,uint32_t>(latest_odom,buffer_odom);
   pos_cmd_data_f32_t buffer_cmd = encode_pos_cmd<float>(latest_cmd);
   memcpy(buffer, (char*)&buffer_odom, sizeof(mini_odom_f32_t));
   memcpy(buffer+sizeof(mini_odom_f32_t), (char*)&buffer_cmd, sizeof(pos_cmd_data_f32_t));

@@ -58,13 +58,13 @@
 
     <node pkg="uwb_transceiver" type="uwb_transceiver_node" name="uwb_master_drone2" output="screen">
         <rosparam command="load" file="$(find uwb_transceiver)/config/config.yaml" />
-        <param name="serial_port" value="/dev/tty.uwb.master2"/>
+        <param name="serial_port" value="/dev/tty.uwb.drone2"/>
         <remap from="~odom" to="/drone2/odom"/>
         <remap from="~position_cmd" to="/drone2/position_cmd"/>
         <param name="role" type="int" value="1"/> <!--master-->
     </node>
 
-    <node pkg="uwb_transceiver" type="uwb_transceiver_node" name="uwb_slave_drone2" output="log">
+    <node pkg="uwb_transceiver" type="uwb_transceiver_node" name="uwb_slave_drone2" output="screen">
         <rosparam command="load" file="$(find uwb_transceiver)/config/config.yaml" />
         <param name="serial_port" value="/dev/tty.uwb.slave"/>
         <remap from="~odom" to="$(arg topic_odom_uav)"/>
