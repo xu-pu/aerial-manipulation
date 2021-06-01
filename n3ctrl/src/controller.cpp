@@ -92,11 +92,12 @@ void Controller::update(const Desired_State_t& des,const Odom_Data_t& odom,const
   double yaw_curr = get_yaw_from_quaternion(odom.q);
   Matrix3d wRc = rotz(yaw_curr); // intermediate frame or control frame, where control gains are defined
 
-  Vector3d cmd_acc = command_acceleration_n3ctrl(des,odom);
+  //Vector3d cmd_acc = command_acceleration_n3ctrl(des,odom);
+  Vector3d cmd_acc = command_acceleration_sertac(des,odom);
 
-  //Vector3d specific_thrust = cmd_acc - vg;
+  Vector3d specific_thrust = cmd_acc - vg;
   // or use INDI
-  Vector3d specific_thrust = acceleration_loop(cmd_acc);
+  //Vector3d specific_thrust = acceleration_loop(cmd_acc);
 
   Vector3d thrust_vector = regulate_trust_vector(specific_thrust * param.mass);
 
@@ -284,9 +285,9 @@ Eigen::Vector3d Controller::command_acceleration_sertac(const Desired_State_t &d
   Matrix3d wRc = rotz(yaw_curr); // intermediate frame or control frame, where control gains are defined
   Matrix3d cRw = wRc.transpose();
 
-  Vector3d e_p = odom.p - des.p;
-  Vector3d e_v = odom.v - des.v;
-  Vector3d e_a = lpf_acc.value - des.a;
+  Vector3d e_p = des.p - odom.p;
+  Vector3d e_v = des.v - odom.v;
+  Vector3d e_a = des.a - lpf_acc.value;
 
   return   wRc * Kp * cRw * e_p
          + wRc * Kv * cRw * e_v
