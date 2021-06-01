@@ -92,9 +92,7 @@ void Controller::update(const Desired_State_t& des,const Odom_Data_t& odom,const
   double yaw_curr = get_yaw_from_quaternion(odom.q);
   Matrix3d wRc = rotz(yaw_curr); // intermediate frame or control frame, where control gains are defined
 
-  Vector3d cmd_vel = position_loop(des,odom);
-
-  Vector3d cmd_acc = velocity_loop(cmd_vel,des,odom);
+  Vector3d cmd_acc = command_acceleration_n3ctrl(des,odom,imu);
 
   //Vector3d specific_thrust = cmd_acc - vg;
   // or use INDI
@@ -142,7 +140,6 @@ void Controller::update(const Desired_State_t& des,const Odom_Data_t& odom,const
   dbg_msg.plant_v = to_vector3_msg(odom.v);
   dbg_msg.plant_a = to_vector3_msg(imu.q*imu.a);
 
-  dbg_msg.cmd_v = to_vector3_msg(cmd_vel);
   dbg_msg.cmd_a = to_vector3_msg(cmd_acc);
 
   dbg_msg.int_v = to_vector3_msg(vel_err_integral.error_integral);
@@ -194,32 +191,6 @@ void Controller::publish_ctrl(const Controller_Output_t& u, const ros::Time& sta
   msg_disturbance.header.frame_id = "world";
   msg_disturbance.vector = to_vector3_msg(external_force_estimate());
   pub_disturbance.publish(msg_disturbance);
-
-}
-
-Eigen::Vector3d Controller::position_loop( const Desired_State_t& des,const Odom_Data_t& odom ){
-  double yaw_curr = get_yaw_from_quaternion(odom.q);
-  Matrix3d wRc = rotz(yaw_curr);
-  Matrix3d cRw = wRc.transpose();
-  Vector3d e_p = des.p - odom.p;
-  return des.v + wRc * Kp * cRw * e_p;
-}
-
-Eigen::Vector3d Controller::velocity_loop( Eigen::Vector3d const & cmd_vel, const Desired_State_t& des,const Odom_Data_t& odom ){
-
-  double yaw_curr = get_yaw_from_quaternion(odom.q);
-  Matrix3d wRc = rotz(yaw_curr);
-  Matrix3d cRw = wRc.transpose();
-
-  Vector3d e_v = cmd_vel - odom.v;
-  Vector3d e_a = des.a - lpf_acc.value;
-
-  Eigen::Vector3d u_v_i = vel_err_integral.update(e_v).output(Kvi,cRw);
-  Eigen::Vector3d u_v_p = wRc * Kv * cRw * e_v;
-  Eigen::Vector3d u_v_d = wRc * Ka * cRw * e_a;
-  Eigen::Vector3d u_v = u_v_p + u_v_i + u_v_d; // PID
-
-  return u_v + des.a;
 
 }
 
@@ -282,4 +253,27 @@ Eigen::Vector3d Controller::external_force_estimate(){
 
 Eigen::Vector3d Controller::f_ext_indi() {
   return param.mass * ( lpf_acc.value - lpf_thrust.value - Vector3d::UnitZ() * param.gra );
+}
+
+Eigen::Vector3d Controller::command_acceleration_n3ctrl(const Desired_State_t &des, const Odom_Data_t &odom, const Imu_Data_t &imu) {
+
+  double yaw_curr = get_yaw_from_quaternion(odom.q);
+  Matrix3d wRc = rotz(yaw_curr); // intermediate frame or control frame, where control gains are defined
+
+  Matrix3d cRw = wRc.transpose();
+  Vector3d e_p = des.p - odom.p;
+  Vector3d cmd_vel = des.v + wRc * Kp * cRw * e_p; // P Controller
+
+  dbg_msg.cmd_v = to_vector3_msg(cmd_vel);
+
+  Vector3d e_v = cmd_vel - odom.v;
+  Vector3d e_a = des.a - lpf_acc.value;
+
+  Eigen::Vector3d u_v_i = vel_err_integral.update(e_v).output(Kvi,cRw);
+  Eigen::Vector3d u_v_p = wRc * Kv * cRw * e_v;
+  Eigen::Vector3d u_v_d = wRc * Ka * cRw * e_a;
+  Eigen::Vector3d u_v = u_v_p + u_v_i + u_v_d; // PID Controller
+
+  return u_v + des.a;
+
 }

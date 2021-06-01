@@ -185,28 +185,15 @@ public:
     Eigen::Vector3d regulate_trust_vector(Eigen::Vector3d const & cmd );
 
     /**
-     * PID Velocity Controller
-     * @param cmd_vel
-     * @param des
-     * @param odom
-     * @return command acceleration - input to acceleration loop
-     */
-    Eigen::Vector3d velocity_loop( Eigen::Vector3d const & cmd_vel, const Desired_State_t& des,const Odom_Data_t& odom );
-
-    /**
-     * P Position Controller
-     * @param des
-     * @param odom
-     * @return command velocity - input to velocity loop
-     */
-    Eigen::Vector3d position_loop( const Desired_State_t& des,const Odom_Data_t& odom );
-
-    /**
      * Incremental Nonlinear Dynamic Inversion (INDI) Acceleration Controller
      * @param cmd_acc
      * @return specific thrust vector (F/m)
      */
     Eigen::Vector3d acceleration_loop( Eigen::Vector3d const & cmd_acc );
+
+    Eigen::Vector3d command_acceleration_n3ctrl(const Desired_State_t& des, const Odom_Data_t& odom, const Imu_Data_t& imu);
+
+    //Eigen::Vector3d command_acceleration_sertac(const Desired_State_t& des, const Odom_Data_t& odom, const Imu_Data_t& imu);
 
 };
 
