@@ -6,7 +6,6 @@
 #include <Eigen/Dense>
 #include <rnw_ros/ros_utils.h>
 
-
 struct vel_acc_estimator_t {
 
     Vector3d vel;
@@ -51,6 +50,45 @@ private:
 
 };
 
+struct odom_with_latency_t {
+
+    ros::Publisher pub_odom;
+
+    std::deque<nav_msgs::Odometry> timeline;
+
+    double latency_sec = 0;
+
+    odom_with_latency_t(){
+      ros::NodeHandle nh("~");
+      pub_odom = nh.advertise<nav_msgs::Odometry>("odom",100);
+      latency_sec = get_param_default<double>(nh,"odom_latency_ms",0.) / 1000.;
+    }
+
+    void update( nav_msgs::Odometry const & odom ){
+
+      if ( !timeline.empty() && odom.header.stamp <= timeline.back().header.stamp ) {
+        ROS_ERROR_STREAM("[sensor sim] out of order odom");
+      }
+      else {
+        timeline.emplace_back(odom);
+      }
+
+      std::deque<nav_msgs::Odometry> popped;
+
+      while ( !timeline.empty() ) {
+        if ( (ros::Time::now() - timeline.back().header.stamp).toSec() > latency_sec ) {
+          popped.emplace_back(timeline.back());
+          timeline.pop_front();
+        }
+      }
+
+      if ( !popped.empty() ) {
+        pub_odom.publish(popped.back());
+      }
+
+    }
+
+};
 
 Eigen::Vector3d gps2pos( sensor_msgs::NavSatFix const & msg ){
 
@@ -83,15 +121,14 @@ struct sensor_sim_t {
     ros::Subscriber sub_gps;
 
     ros::Publisher pub_imu;
-    ros::Publisher pub_odom;
-
-    //std::deque<sensor_msgs::Imu>
 
     sensor_msgs::Imu latest_imu;
 
     sensor_msgs::NavSatFix latest_gps;
 
     vel_acc_estimator_t vel_acc;
+
+    odom_with_latency_t odom_with_latency;
 
     Vector3d g = Vector3d(0,0,9.81);
 
@@ -115,8 +152,6 @@ struct sensor_sim_t {
               ros::TransportHints().tcpNoDelay()
       );
 
-      pub_odom = nh.advertise<nav_msgs::Odometry>("odom",100);
-
       pub_imu = nh.advertise<sensor_msgs::Imu>("imu_out",100);
 
     }
@@ -134,6 +169,7 @@ struct sensor_sim_t {
     }
 
     void on_gps( sensor_msgs::NavSatFixConstPtr const & msg ){
+
       latest_gps = *msg;
       Vector3d pos = gps2pos(*msg);
       vel_acc.update(pos,latest_gps.header.stamp);
@@ -145,7 +181,8 @@ struct sensor_sim_t {
       odom.pose.pose.position = uav_utils::to_point_msg(pos);
       odom.twist.twist.angular = latest_imu.angular_velocity;
       odom.twist.twist.linear = uav_utils::to_vector3_msg(vel_acc.vel);
-      pub_odom.publish(odom);
+
+      odom_with_latency.update(odom);
 
     }
 

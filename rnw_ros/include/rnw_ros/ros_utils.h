@@ -64,4 +64,30 @@ inline double sec_since( ros::Time const & t ){
   return (ros::Time::now() - t).toSec();
 }
 
+template<typename T>
+struct sliding_window_t {
+
+    explicit sliding_window_t( size_t sz_ ): sz(sz_) { }
+
+    size_t size() const { return sz; }
+
+    void push_back( T const & item ){
+      data.template emplace_back(item);
+      while ( data.size() <= sz ) {
+        data.pop_front();
+      }
+    }
+
+    bool empty() const  { return data.empty(); }
+
+    T & back() { return data.back(); }
+
+private:
+
+    size_t sz;
+
+    std::deque<T> data;
+
+};
+
 #endif //SRC_ROS_UTILS_H
