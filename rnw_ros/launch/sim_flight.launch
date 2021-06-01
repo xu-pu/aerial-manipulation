@@ -23,7 +23,7 @@
         <!--subscribers-->
 		<remap from="~joy" to="/djiros/rc" />
         <remap from="~odom" to="$(arg topic_odom_uav)" />
-		<remap from="~imu" to="/djiros/imu" />
+		<remap from="~imu" to="/djiros/imu_out" />
 		<remap from="~cmd" to="/position_cmd" />
         <!--publishers-->
 		<remap from="~desire_pose" to="/desire_pose" />
@@ -44,20 +44,10 @@
 
     <!-- odom for the drones, simulated and fake ones   -->
 
-<!--    <node pkg="n3ctrl" type="n1_sim_helper.py" name="n1_sim_helper" output="screen" required="true">-->
-<!--        &lt;!&ndash;subscribers&ndash;&gt;-->
-<!--        <remap from="~velo" to="/djiros/velo" />-->
-<!--        <remap from="~gps" to="/djiros/gps" />-->
-<!--        <remap from="~imu" to="/djiros/imu" />-->
-<!--        &lt;!&ndash;publishers&ndash;&gt;-->
-<!--        <remap from="~odom" to="$(arg topic_odom_uav)" />-->
-<!--    </node>-->
-
     <node pkg="rnw_ros" type="pub_simulated_sensors" name="pub_simulated_sensors">
-<!--        <remap from="~velo" to="/djiros/velo" />-->
         <remap from="~gps" to="/djiros/gps" />
         <remap from="~imu_in" to="/djiros/imu" />
-        <!--publishers-->
+        <remap from="~imu_out" to="/djiros/imu_sim" />
         <remap from="~odom" to="$(arg topic_odom_uav)" />
     </node>
 
