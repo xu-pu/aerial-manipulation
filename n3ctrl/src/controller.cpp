@@ -92,7 +92,7 @@ void Controller::update(const Desired_State_t& des,const Odom_Data_t& odom,const
   double yaw_curr = get_yaw_from_quaternion(odom.q);
   Matrix3d wRc = rotz(yaw_curr); // intermediate frame or control frame, where control gains are defined
 
-  Vector3d cmd_acc = command_acceleration_n3ctrl(des,odom,imu);
+  Vector3d cmd_acc = command_acceleration_n3ctrl(des,odom);
 
   //Vector3d specific_thrust = cmd_acc - vg;
   // or use INDI
@@ -255,12 +255,12 @@ Eigen::Vector3d Controller::f_ext_indi() {
   return param.mass * ( lpf_acc.value - lpf_thrust.value - Vector3d::UnitZ() * param.gra );
 }
 
-Eigen::Vector3d Controller::command_acceleration_n3ctrl(const Desired_State_t &des, const Odom_Data_t &odom, const Imu_Data_t &imu) {
+Eigen::Vector3d Controller::command_acceleration_n3ctrl(const Desired_State_t &des, const Odom_Data_t &odom) {
 
   double yaw_curr = get_yaw_from_quaternion(odom.q);
   Matrix3d wRc = rotz(yaw_curr); // intermediate frame or control frame, where control gains are defined
-
   Matrix3d cRw = wRc.transpose();
+
   Vector3d e_p = des.p - odom.p;
   Vector3d cmd_vel = des.v + wRc * Kp * cRw * e_p; // P Controller
 
@@ -275,5 +275,21 @@ Eigen::Vector3d Controller::command_acceleration_n3ctrl(const Desired_State_t &d
   Eigen::Vector3d u_v = u_v_p + u_v_i + u_v_d; // PID Controller
 
   return u_v + des.a;
+
+}
+
+Eigen::Vector3d Controller::command_acceleration_sertac(const Desired_State_t &des, const Odom_Data_t &odom) {
+
+  double yaw_curr = get_yaw_from_quaternion(odom.q);
+  Matrix3d wRc = rotz(yaw_curr); // intermediate frame or control frame, where control gains are defined
+  Matrix3d cRw = wRc.transpose();
+
+  Vector3d e_p = odom.p - des.p;
+  Vector3d e_v = odom.v - des.v;
+  Vector3d e_a = lpf_acc.value - des.a;
+
+  return   wRc * Kp * cRw * e_p
+         + wRc * Kv * cRw * e_v
+         + wRc * Ka * cRw * e_a;
 
 }

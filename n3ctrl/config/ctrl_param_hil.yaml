@@ -50,9 +50,9 @@ gain:
         Ka1: 0.0
         Ka2: 0.0
         Kyaw: 20.0
-        Kap0: 1
-        Kap1: 1
-        Kap2: 1
+        Kap0: 1.0
+        Kap1: 1.0
+        Kap2: 1.0
     track:
         Kp0: 2.3
         Kp1: 2.3
@@ -63,13 +63,13 @@ gain:
         Kvi0: 0.1
         Kvi1: 0.1
         Kvi2: 0.1
-        Ka0: 1.0
-        Ka1: 1.0
-        Ka2: 1.0
+        Ka0: 0.0
+        Ka1: 0.0
+        Ka2: 0.0
         Kyaw: 20.0
-        Kap0: 0.1
-        Kap1: 0.1
-        Kap2: 0.1
+        Kap0: 1.0
+        Kap1: 1.0
+        Kap2: 1.0
 
 idling:
     desired_height_limit:   -1.10

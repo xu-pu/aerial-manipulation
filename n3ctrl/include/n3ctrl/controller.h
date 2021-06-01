@@ -191,9 +191,9 @@ public:
      */
     Eigen::Vector3d acceleration_loop( Eigen::Vector3d const & cmd_acc );
 
-    Eigen::Vector3d command_acceleration_n3ctrl(const Desired_State_t& des, const Odom_Data_t& odom, const Imu_Data_t& imu);
+    Eigen::Vector3d command_acceleration_n3ctrl(const Desired_State_t& des, const Odom_Data_t& odom);
 
-    //Eigen::Vector3d command_acceleration_sertac(const Desired_State_t& des, const Odom_Data_t& odom, const Imu_Data_t& imu);
+    Eigen::Vector3d command_acceleration_sertac(const Desired_State_t& des, const Odom_Data_t& odom);
 
 };
 
