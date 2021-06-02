@@ -76,6 +76,10 @@ public: // these methods will take ACTION
 
     void follow_waypoints_in_intermediate_frame( vector<Vector3d> const & waypoints ) const;
 
+public: // static helpers
+
+    static AmTraj create_setting( double max_vel, double max_acc );
+
 private:
 
     void setup_trajectory_generator();

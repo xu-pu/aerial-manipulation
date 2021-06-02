@@ -209,3 +209,7 @@ void drone_interface_t::follow_waypoints_in_intermediate_frame(const vector<Vect
 bool drone_interface_t::odom_in_time() const {
   return message_in_time(latest_odom,message_timeout);
 }
+
+AmTraj drone_interface_t::create_setting( double max_vel, double max_acc ) {
+  return AmTraj(1024, 16, 0.4, max_vel, max_acc, 23, 0.02);
+}
