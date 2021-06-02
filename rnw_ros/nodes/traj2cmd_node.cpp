@@ -95,8 +95,8 @@ struct traj_server_t {
       else if ( poly_traj.available ) {
         // traj finished
         quadrotor_msgs::PositionCommand cmd;
-        poly_traj.gen_pos_cmd(cmd,*odom,poly_traj.final_time,yaw_rate);
-        cmd.trajectory_flag = cmd.TRAJECTORY_STATUS_COMPLETED;
+        poly_traj.gen_pos_cmd(cmd,*odom,t,yaw_rate);
+        cmd.trajectory_flag = cmd.TRAJECTORY_STATUS_READY;
         cmd.trajectory_id = traj_id;
         pub_pos_cmd.publish(cmd);
         if ( !latch ) {

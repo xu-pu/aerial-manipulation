@@ -78,6 +78,10 @@
         <param name="name" value="odom_$(arg drone_name)" />
     </node>
 
+    <node pkg="rnw_ros" type="visualize_pos_cmd_node" name="pos_cmd_viz_$(arg drone_name)" output="screen" required="true">
+        <remap from="~position_cmd" to="/$(arg drone_name)/position_cmd"/>
+    </node>
+
     <node pkg="rnw_ros" type="visualize_traj_node" name="traj_viz_$(arg drone_name)" output="screen" required="true">
         <param name="lift_dt" type="double" value="0.05"/>
         <param name="length_g" type="double" value="0.5"/>
