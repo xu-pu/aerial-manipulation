@@ -12,6 +12,9 @@ swarm:
   cable1: 0.475
   cable2: 0.74
   angle: 90
+cable:
+  drone1: 1
+  drone2: 1
 caging:
   desired_grip_depth: 0.06
 rnw:

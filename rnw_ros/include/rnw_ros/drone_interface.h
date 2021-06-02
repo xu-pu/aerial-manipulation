@@ -22,6 +22,8 @@ struct drone_interface_t {
 
     string name;
 
+    double cable_length;
+
     nav_msgs::Odometry latest_odom;
 
     n3ctrl::N3CtrlState latest_n3ctrl;

@@ -116,13 +116,18 @@ struct cable_rnw_node_t {
 
       ROS_WARN_STREAM("[cable rnw] land triggered!");
 
-      Vector3d cur_tip = uav_utils::from_point_msg(rnw_planner.latest_cone_state.tip);
-      Vector3d cur_contact = uav_utils::from_point_msg(rnw_planner.latest_cone_state.contact_point);
+      Vector3d C = cone.contact_point();
+      Vector3d rest_tip = cone.tip_at_rest();
+      Vector3d dir = (rest_tip - C).normalized();
+      Vector3d landing_spot = rest_tip + 0.6 * drone.cable_length * dir;
 
-      Vector3d v = cur_tip - cur_contact;
-      Vector3d rest_tip = cur_contact + v.norm() * Vector3d(v.x(),v.y(),0).normalized();
+      vector<Vector3d> waypoints;
+      waypoints.emplace_back(rest_tip + drone.cable_length * Vector3d::UnitZ());
+      waypoints.emplace_back(landing_spot);
 
-      drone.go_to_point(rest_tip);
+      auto setting = drone_interface_t::create_setting(0.5,0.5);
+
+      drone.execute_trajectory(drone.plan(setting,waypoints));
 
     }
 

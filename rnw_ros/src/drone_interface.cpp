@@ -37,6 +37,9 @@ void drone_interface_t::init( string const & drone_name ){
 
   name = drone_name;
 
+  stringstream param_cable; param_cable << "/cable/" << name;
+  cable_length = get_ros_param_required<double>(nh,param_cable.str());
+
   initialized = true;
 
 }
