@@ -46,7 +46,8 @@ void drone_interface_t::on_odom( nav_msgs::OdometryConstPtr const & msg ){
 }
 
 void drone_interface_t::on_n3ctrl( n3ctrl::N3CtrlStateConstPtr const & msg ){
-  if ( latest_n3ctrl.state != msg->state ) {
+  if ( n3ctrl_accept_traj(latest_n3ctrl) != n3ctrl_accept_traj(*msg) ) {
+    // if drone's availability changed, make sure current traj is discarded
     reset_traj();
   }
   latest_n3ctrl = *msg;
@@ -230,4 +231,8 @@ void drone_interface_t::reset_traj() const {
   msg.header.stamp = ros::Time::now();
   msg.action = quadrotor_msgs::PolynomialTrajectory::ACTION_ABORT;
   pub_traj.publish(msg);
+}
+
+bool drone_interface_t::n3ctrl_accept_traj( n3ctrl::N3CtrlState const & msg ) {
+  return msg.state >= n3ctrl::N3CtrlState::STATE_CMD_HOVER;
 }

@@ -86,6 +86,8 @@ public: // static helpers
 
     static AmTraj create_setting( double max_vel, double max_acc );
 
+    static bool n3ctrl_accept_traj( n3ctrl::N3CtrlState const & );
+
 private:
 
     void setup_trajectory_generator();
