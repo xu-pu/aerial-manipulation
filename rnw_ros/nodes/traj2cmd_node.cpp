@@ -33,8 +33,11 @@ struct traj_server_t {
 
     double yaw_rate = 1;
 
+    bool latch = true;
+
     explicit traj_server_t( ros::NodeHandle & nh ){
 
+      latch = get_param_default<bool>(nh,"latch",true);
       yaw_rate_deg = get_param_default<double>(nh,"yaw_rate_deg",30.);
       yaw_rate = yaw_rate_deg * deg2rad;
 
@@ -92,11 +95,13 @@ struct traj_server_t {
       else if ( poly_traj.available ) {
         // traj finished
         quadrotor_msgs::PositionCommand cmd;
-        poly_traj.gen_pos_cmd(cmd,*odom,t,yaw_rate);
+        poly_traj.gen_pos_cmd(cmd,*odom,poly_traj.final_time,yaw_rate);
         cmd.trajectory_flag = cmd.TRAJECTORY_STATUS_COMPLETED;
         cmd.trajectory_id = traj_id;
         pub_pos_cmd.publish(cmd);
-        on_cleanup();
+        if ( !latch ) {
+          on_cleanup();
+        }
       }
       else {
         // idle
