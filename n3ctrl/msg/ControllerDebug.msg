@@ -10,6 +10,12 @@ geometry_msgs/Vector3 plant_p
 geometry_msgs/Vector3 plant_v
 geometry_msgs/Vector3 plant_a
 
+# control errors
+
+geometry_msgs/Vector3 err_p
+geometry_msgs/Vector3 err_v
+geometry_msgs/Vector3 err_a
+
 # from inner control loops
 
 geometry_msgs/Vector3 cmd_v
@@ -18,7 +24,6 @@ geometry_msgs/Vector3 cmd_a
 # disturbance
 
 geometry_msgs/Vector3 int_v
-geometry_msgs/Vector3 disturbance
 
 # lpf
 

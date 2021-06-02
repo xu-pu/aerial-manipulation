@@ -92,8 +92,8 @@ void Controller::update(const Desired_State_t& des,const Odom_Data_t& odom,const
   double yaw_curr = get_yaw_from_quaternion(odom.q);
   Matrix3d wRc = rotz(yaw_curr); // intermediate frame or control frame, where control gains are defined
 
-  //Vector3d cmd_acc = command_acceleration_n3ctrl(des,odom);
-  Vector3d cmd_acc = command_acceleration_sertac(des,odom);
+  Vector3d cmd_acc = command_acceleration_n3ctrl(des,odom);
+  //Vector3d cmd_acc = command_acceleration_sertac(des,odom);
 
   Vector3d specific_thrust = cmd_acc - vg;
   // or use INDI
@@ -182,7 +182,6 @@ void Controller::publish_ctrl(const Controller_Output_t& u, const ros::Time& sta
       dbg_msg.header.stamp = ros::Time::now();
       dbg_msg.header.frame_id = "world";
       dbg_msg.full_thrust = param.full_thrust;
-      dbg_msg.disturbance = to_vector3_msg(external_force_estimate());
       dbg_msg.lpf_acc = to_vector3_msg(lpf_acc.value);
       pub_dbg_info.publish(dbg_msg);
     }
@@ -288,6 +287,10 @@ Eigen::Vector3d Controller::command_acceleration_sertac(const Desired_State_t &d
   Vector3d e_p = des.p - odom.p;
   Vector3d e_v = des.v - odom.v;
   Vector3d e_a = des.a - lpf_acc.value;
+
+  dbg_msg.err_p = to_vector3_msg(cRw*e_p);
+  dbg_msg.err_v = to_vector3_msg(cRw*e_v);
+  dbg_msg.err_a = to_vector3_msg(cRw*e_a);
 
   return   wRc * Kp * cRw * e_p
          + wRc * Kv * cRw * e_v
