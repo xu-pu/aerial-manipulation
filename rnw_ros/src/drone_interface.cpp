@@ -46,6 +46,9 @@ void drone_interface_t::on_odom( nav_msgs::OdometryConstPtr const & msg ){
 }
 
 void drone_interface_t::on_n3ctrl( n3ctrl::N3CtrlStateConstPtr const & msg ){
+  if ( latest_n3ctrl.state != msg->state ) {
+    reset_traj();
+  }
   latest_n3ctrl = *msg;
 }
 
@@ -220,4 +223,11 @@ bool drone_interface_t::odom_in_time() const {
 
 AmTraj drone_interface_t::create_setting( double max_vel, double max_acc ) {
   return AmTraj(1024, 16, 0.4, max_vel, max_acc, 23, 0.02);
+}
+
+void drone_interface_t::reset_traj() const {
+  quadrotor_msgs::PolynomialTrajectory msg;
+  msg.header.stamp = ros::Time::now();
+  msg.action = quadrotor_msgs::PolynomialTrajectory::ACTION_ABORT;
+  pub_traj.publish(msg);
 }
