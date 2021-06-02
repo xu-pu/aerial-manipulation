@@ -118,10 +118,15 @@ struct cable_rnw_node_t {
       Vector3d rest_tip = cone.tip_at_rest();
       Vector3d dir = (rest_tip - C).normalized();
       Vector3d landing_spot = rest_tip + 0.6 * drone.cable_length * dir;
+      Vector3d stopping_spot = landing_spot;
+      stopping_spot.z() = -0.5;
 
       vector<Vector3d> waypoints;
-      waypoints.emplace_back(rest_tip + drone.cable_length * Vector3d::UnitZ());
+      if ( cone.latest_cone_state.euler_angles.y < 75 * deg2rad ) {
+        waypoints.emplace_back(rest_tip + drone.cable_length * Vector3d::UnitZ());
+      }
       waypoints.emplace_back(landing_spot);
+      waypoints.emplace_back(stopping_spot);
 
       auto setting = drone_interface_t::create_setting(0.5,0.5);
 
