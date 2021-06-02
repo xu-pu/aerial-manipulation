@@ -98,8 +98,10 @@ struct cable_rnw_node_t {
 
       Vector3d suspend_pt = Vector3d::UnitZ() * drone.cable_length;
 
+      double cur_nutation = rad2deg * cone.latest_cone_state.euler_angles.y;
+
       vector<Vector3d> waypoints;
-      for ( double theta : range(90,rnw_config.rnw.desired_nutation,10) ) {
+      for ( double theta : range(cur_nutation,rnw_config.rnw.desired_nutation,10) ) {
         Vector3d tip = cone.tip_at_nutation(theta * deg2rad);
         waypoints.emplace_back(tip+suspend_pt);
       }
