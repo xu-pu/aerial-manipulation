@@ -82,7 +82,7 @@ void drone_interface_t::execute_trajectory(quadrotor_msgs::PolynomialTrajectory 
 }
 
 void drone_interface_t::setup_trajectory_generator() {
-  traj_generator = AmTraj(1024, 16, 0.4, max_vel, max_acc, 23, 0.02);
+  traj_generator = create_setting(max_vel,max_acc);
 }
 
 void drone_interface_t::set_max_vel(double val) {
@@ -106,24 +106,6 @@ quadrotor_msgs::PolynomialTrajectory drone_interface_t::plan(Vector3d const & tg
 
 quadrotor_msgs::PolynomialTrajectory drone_interface_t::plan(Vector3d const & tgt, double yaw ) const {
   return plan(traj_generator,tgt,yaw);
-}
-
-void drone_interface_t::go_to_point( const Vector3d & target) const {
-
-  if (!ready()) return;
-
-  execute_trajectory(plan(target));
-
-}
-
-void drone_interface_t::go_to_point_in_intermediate_frame( const Vector3d & point ) const {
-
-  if (!ready()) return;
-
-  Vector3d target = point_in_intermediate_frame(point,latest_odom);
-
-  execute_trajectory(plan(target));
-
 }
 
 quadrotor_msgs::PolynomialTrajectory drone_interface_t::plan(const vector<Vector3d> & waypoints_in ) const {
@@ -186,6 +168,24 @@ quadrotor_msgs::PolynomialTrajectory drone_interface_t::plan( AmTraj const & gen
 
 quadrotor_msgs::PolynomialTrajectory drone_interface_t::plan( AmTraj const & generator, Vector3d const & tgt ) const {
   return plan(generator,tgt,uav_yaw_from_odom(latest_odom));
+}
+
+void drone_interface_t::go_to_point( const Vector3d & target) const {
+
+  if (!ready()) return;
+
+  execute_trajectory(plan(target));
+
+}
+
+void drone_interface_t::go_to_point_in_intermediate_frame( const Vector3d & point ) const {
+
+  if (!ready()) return;
+
+  Vector3d target = point_in_intermediate_frame(point,latest_odom);
+
+  execute_trajectory(plan(target));
+
 }
 
 void drone_interface_t::follow_waypoints(const vector<Vector3d> &waypoints) const {
