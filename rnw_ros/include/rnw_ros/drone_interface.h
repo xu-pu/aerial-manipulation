@@ -54,6 +54,10 @@ public: // these method only perform planning
 
     quadrotor_msgs::PolynomialTrajectory plan( AmTraj const & generator, Vector3d const & tgt, double yaw ) const;
 
+    quadrotor_msgs::PolynomialTrajectory plan( AmTraj const & generator, vector<Vector3d> const & waypoints_in ) const;
+
+    quadrotor_msgs::PolynomialTrajectory plan( AmTraj const & generator, Vector3d const & tgt ) const;
+
     quadrotor_msgs::PolynomialTrajectory plan( Vector3d const & tgt ) const;
 
     quadrotor_msgs::PolynomialTrajectory plan( Vector3d const & tgt, double yaw ) const;
