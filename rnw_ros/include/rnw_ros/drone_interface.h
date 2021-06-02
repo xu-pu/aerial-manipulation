@@ -50,13 +50,13 @@ struct drone_interface_t {
 
 public: // these method only perform planning
 
-    quadrotor_msgs::PolynomialTrajectory gen_traj_go_to_point( Vector3d const & tgt ) const;
+    quadrotor_msgs::PolynomialTrajectory plan( Vector3d const & tgt ) const;
 
-    quadrotor_msgs::PolynomialTrajectory gen_traj_go_to_point( Vector3d const & tgt, double yaw ) const;
+    quadrotor_msgs::PolynomialTrajectory plan( Vector3d const & tgt, double yaw ) const;
 
-    quadrotor_msgs::PolynomialTrajectory gen_traj_from_waypoint( vector<Vector3d> const & waypoints_in ) const;
+    quadrotor_msgs::PolynomialTrajectory plan( vector<Vector3d> const & waypoints_in ) const;
 
-    quadrotor_msgs::PolynomialTrajectory gen_traj_from_waypoint( vector<Vector3d> const & waypoints_in, double final_yaw ) const;
+    quadrotor_msgs::PolynomialTrajectory plan( vector<Vector3d> const & waypoints_in, double final_yaw ) const;
 
 public: // these methods will take ACTION
 

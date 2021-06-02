@@ -153,7 +153,7 @@ struct cable_rnw_node_t {
       }
       else if ( rnw_planner.cmd_fsm == rnw_planner_v2_t::cmd_fsm_e::pending ) {
         rnw_command_t cmd = rnw_planner.take_cmd();
-        auto traj = drone.gen_traj_go_to_point(cmd.control_point_setpoint);
+        auto traj = drone.plan(cmd.control_point_setpoint);
         drone.execute_trajectory(traj);
         cmd_start_time = ros::Time::now();
         cmd_duration = ros::Duration(get_traj_duration(traj));

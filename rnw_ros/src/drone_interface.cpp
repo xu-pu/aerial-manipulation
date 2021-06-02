@@ -100,24 +100,24 @@ void drone_interface_t::set_max_vel_acc(double mvel, double macc) {
   ROS_WARN("[%s] reconfigure max_vel=%f, max_acc=%f",name.c_str(),mvel,macc);
 }
 
-quadrotor_msgs::PolynomialTrajectory drone_interface_t::gen_traj_go_to_point( Vector3d const & to ) const {
-  return gen_traj_go_to_point(to,uav_yaw_from_odom(latest_odom));
+quadrotor_msgs::PolynomialTrajectory drone_interface_t::plan(Vector3d const & tgt ) const {
+  return plan(tgt, uav_yaw_from_odom(latest_odom));
 }
 
-quadrotor_msgs::PolynomialTrajectory drone_interface_t::gen_traj_go_to_point( Vector3d const & to, double yaw ) const {
+quadrotor_msgs::PolynomialTrajectory drone_interface_t::plan(Vector3d const & tgt, double yaw ) const {
 
   Vector3d from = uav_utils::from_point_msg(latest_odom.pose.pose.position);
 
-  double dist = (to-from).norm();
+  double dist = (tgt - from).norm();
 
   if ( dist < epsi_distance ) {
-    return gen_setpoint_traj(latest_odom,to,yaw,0.5);
+    return gen_setpoint_traj(latest_odom, tgt, yaw, 0.5);
   }
   else {
     vector<Vector3d> waypoints;
     waypoints.emplace_back(from);
-    waypoints.emplace_back((from+to)/2);
-    waypoints.emplace_back(to);
+    waypoints.emplace_back((from + tgt) / 2);
+    waypoints.emplace_back(tgt);
     Vector3d v0 = Vector3d::Zero();
     auto traj = traj_generator.genOptimalTrajDTC(waypoints, v0, v0, v0, v0);
     return to_ros_msg(traj,uav_yaw_from_odom(latest_odom),yaw,ros::Time::now());
@@ -129,7 +129,7 @@ void drone_interface_t::go_to_point( const Vector3d & target) const {
 
   if (!ready()) return;
 
-  execute_trajectory(gen_traj_go_to_point(target));
+  execute_trajectory(plan(target));
 
 }
 
@@ -139,15 +139,15 @@ void drone_interface_t::go_to_point_in_intermediate_frame( const Vector3d & poin
 
   Vector3d target = point_in_intermediate_frame(point,latest_odom);
 
-  execute_trajectory(gen_traj_go_to_point(target));
+  execute_trajectory(plan(target));
 
 }
 
-quadrotor_msgs::PolynomialTrajectory drone_interface_t::gen_traj_from_waypoint( const vector<Vector3d> & waypoints_in ) const {
-  return gen_traj_from_waypoint(waypoints_in,uav_yaw_from_odom(latest_odom));
+quadrotor_msgs::PolynomialTrajectory drone_interface_t::plan(const vector<Vector3d> & waypoints_in ) const {
+  return plan(waypoints_in, uav_yaw_from_odom(latest_odom));
 }
 
-quadrotor_msgs::PolynomialTrajectory drone_interface_t::gen_traj_from_waypoint( vector<Vector3d> const & waypoints_in, double final_yaw ) const {
+quadrotor_msgs::PolynomialTrajectory drone_interface_t::plan(vector<Vector3d> const & waypoints_in, double final_yaw ) const {
 
   vector<Vector3d> waypoints_out;
   // make sure always start with the drone's current position
@@ -163,7 +163,7 @@ quadrotor_msgs::PolynomialTrajectory drone_interface_t::gen_traj_from_waypoint( 
   waypoints_out.back() = waypoints_in.back();
 
   if (waypoints_out.size() < 3 ) {
-    return gen_traj_go_to_point(waypoints_out.back());
+    return plan(waypoints_out.back());
   }
 
   Vector3d v0 = Vector3d::Zero();
@@ -176,7 +176,7 @@ void drone_interface_t::follow_waypoints(const vector<Vector3d> &waypoints) cons
 
   if (!ready()) return;
 
-  execute_trajectory(gen_traj_from_waypoint(waypoints));
+  execute_trajectory(plan(waypoints));
 
 }
 
@@ -184,7 +184,7 @@ void drone_interface_t::follow_waypoints( vector<Vector3d> const & waypoints, do
 
   if (!ready()) return;
 
-  execute_trajectory(gen_traj_from_waypoint(waypoints,yaw));
+  execute_trajectory(plan(waypoints, yaw));
 
 }
 
@@ -194,7 +194,7 @@ void drone_interface_t::follow_waypoints_in_intermediate_frame(const vector<Vect
 
   vector<Vector3d> waypoints = points_in_intermediate_frame(points,latest_odom);
 
-  execute_trajectory(gen_traj_from_waypoint(waypoints));
+  execute_trajectory(plan(waypoints));
 
 }
 
