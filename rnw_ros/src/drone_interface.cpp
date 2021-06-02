@@ -105,24 +105,7 @@ quadrotor_msgs::PolynomialTrajectory drone_interface_t::plan(Vector3d const & tg
 }
 
 quadrotor_msgs::PolynomialTrajectory drone_interface_t::plan(Vector3d const & tgt, double yaw ) const {
-
-  Vector3d from = uav_utils::from_point_msg(latest_odom.pose.pose.position);
-
-  double dist = (tgt - from).norm();
-
-  if ( dist < epsi_distance ) {
-    return gen_setpoint_traj(latest_odom, tgt, yaw, 0.5);
-  }
-  else {
-    vector<Vector3d> waypoints;
-    waypoints.emplace_back(from);
-    waypoints.emplace_back((from + tgt) / 2);
-    waypoints.emplace_back(tgt);
-    Vector3d v0 = Vector3d::Zero();
-    auto traj = traj_generator.genOptimalTrajDTC(waypoints, v0, v0, v0, v0);
-    return to_ros_msg(traj,uav_yaw_from_odom(latest_odom),yaw,ros::Time::now());
-  }
-
+  return plan(traj_generator,tgt,yaw);
 }
 
 void drone_interface_t::go_to_point( const Vector3d & target) const {
@@ -148,6 +131,10 @@ quadrotor_msgs::PolynomialTrajectory drone_interface_t::plan(const vector<Vector
 }
 
 quadrotor_msgs::PolynomialTrajectory drone_interface_t::plan(vector<Vector3d> const & waypoints_in, double final_yaw ) const {
+  return plan(traj_generator,waypoints_in,final_yaw);
+}
+
+quadrotor_msgs::PolynomialTrajectory drone_interface_t::plan( AmTraj const & generator, vector<Vector3d> const & waypoints_in, double final_yaw ) const {
 
   vector<Vector3d> waypoints_out;
   // make sure always start with the drone's current position
@@ -167,8 +154,29 @@ quadrotor_msgs::PolynomialTrajectory drone_interface_t::plan(vector<Vector3d> co
   }
 
   Vector3d v0 = Vector3d::Zero();
-  auto traj = traj_generator.genOptimalTrajDTC(waypoints_out, v0, v0, v0, v0);
+  auto traj = generator.genOptimalTrajDTC(waypoints_out, v0, v0, v0, v0);
   return to_ros_msg(traj, uav_yaw_from_odom(latest_odom), final_yaw, ros::Time::now());
+
+}
+
+quadrotor_msgs::PolynomialTrajectory drone_interface_t::plan( AmTraj const & generator, Vector3d const & tgt, double yaw ) const {
+
+  Vector3d from = uav_utils::from_point_msg(latest_odom.pose.pose.position);
+
+  double dist = (tgt - from).norm();
+
+  if ( dist < epsi_distance ) {
+    return gen_setpoint_traj(latest_odom, tgt, yaw, 0.5);
+  }
+  else {
+    vector<Vector3d> waypoints;
+    waypoints.emplace_back(from);
+    waypoints.emplace_back((from + tgt) / 2);
+    waypoints.emplace_back(tgt);
+    Vector3d v0 = Vector3d::Zero();
+    auto traj = generator.genOptimalTrajDTC(waypoints, v0, v0, v0, v0);
+    return to_ros_msg(traj,uav_yaw_from_odom(latest_odom),yaw,ros::Time::now());
+  }
 
 }
 
