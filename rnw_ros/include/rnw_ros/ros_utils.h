@@ -23,6 +23,40 @@ using namespace std;
 constexpr double deg2rad = M_PI/180.;
 constexpr double rad2deg = 180./M_PI;
 
+inline vector<double> reverse( vector<double> const & src ){
+  vector<double> rst(src);
+  for ( size_t i=0; i<src.size(); i++ ) {
+    rst.at(i) = src.at(src.size()-i-1);
+  }
+  return rst;
+}
+
+inline vector<double> range_increase( double from, double to, double interval ){
+  assert(from<to);
+  assert(interval>0);
+  vector<double> rst;
+  rst.push_back(from);
+  while ( rst.back() + interval < to ) {
+    rst.push_back(rst.back() + interval);
+  }
+  if ( to > rst.back() ) {
+    rst.push_back(to);
+  }
+  return rst;
+}
+
+inline vector<double> range( double from, double to, double interval ){
+  if ( from < to ) {
+    return range_increase(from,to,interval);
+  }
+  else if ( from > to ) {
+    return reverse(range_increase(to,from,interval));
+  }
+  else {
+    return {from};
+  }
+}
+
 template<typename T>
 bool message_in_time( T msg, double sec ){
   return ( ros::Time::now() - msg.header.stamp ).toSec() < sec;

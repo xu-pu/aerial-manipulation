@@ -96,16 +96,12 @@ struct cable_rnw_node_t {
 
       ROS_WARN_STREAM("[cable rnw] swing up triggered!");
 
-      constexpr int segments = 10;
+      Vector3d suspend_pt = Vector3d::UnitZ() * drone.cable_length;
 
-      // from M_PI_2 to nutation
       vector<Vector3d> waypoints;
-      for ( int i=0; i<=segments; i++ ) {
-        waypoints.emplace_back(point_at_nutation(
-                cone.latest_cone_state,
-                uav_utils::from_point_msg(cone.latest_cone_state.tip),
-                M_PI_2 - (M_PI_2 - rnw_config.rnw.desired_nutation * deg2rad) * i / segments
-        ));
+      for ( double theta : range(90,rnw_config.rnw.desired_nutation,10) ) {
+        Vector3d tip = cone.tip_at_nutation(theta * deg2rad);
+        waypoints.emplace_back(tip+suspend_pt);
       }
 
       drone.follow_waypoints(waypoints);
