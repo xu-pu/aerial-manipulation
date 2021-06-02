@@ -8,6 +8,8 @@
 #include <ros/ros.h>
 #include <rnw_msgs/ConeState.h>
 
+#include "rnw_ros/ros_utils.h"
+
 struct cone_interface_t {
 
     static constexpr double msg_timeout = 1;
@@ -21,6 +23,16 @@ struct cone_interface_t {
     void on_cone_state( rnw_msgs::ConeStateConstPtr const & msg );
 
     bool odom_in_time() const;
+
+public:
+
+    Vector3d contact_point() const;
+
+    Vector3d tip() const;
+
+    Vector3d tip_at_rest() const;
+
+    Vector3d tip_at_nutation( double rad ) const;
 
 };
 
