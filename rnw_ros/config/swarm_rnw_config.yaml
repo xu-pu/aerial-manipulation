@@ -25,7 +25,7 @@ rnw:
   desired_nutation: 60
   desired_grip_depth: 0.06
   tau: 30
-  max_vel: 2
+  max_vel: 3
   max_acc: 1.5
   rocking_max_vel: 2
   rocking_max_acc: 1
