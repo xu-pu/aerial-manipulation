@@ -39,7 +39,9 @@ struct cable_rnw_node_t {
 
     ros::Subscriber sub_cone_state;
 
-    cable_rnw_node_t( ros::NodeHandle & nh, rnw_config_t & cfg ) : rnw_config(cfg), rnw_planner(cfg), drone("drone2") {
+    cable_rnw_node_t( ros::NodeHandle & nh, rnw_config_t & cfg ) : rnw_config(cfg), rnw_planner(cfg) {
+
+      drone.init(get_ros_param_required<string>(nh,"drone_name"));
 
       drone.set_max_vel_acc(rnw_config.rnw.rocking_max_vel,rnw_config.rnw.max_acc);
 

@@ -1,5 +1,7 @@
 <launch>
 
+    <arg name="drone_name" default="drone1" />
+
     <param name="/use_sim_time" type="bool" value="false"/>
 
     <rosparam command="load" file="$(find rnw_ros)/config/swarm_rnw_config.yaml"/>
@@ -32,20 +34,20 @@
         <rosparam file="$(find mocap2odom)/config/calib.yaml" command="load" />
     </node>
 
-    <node pkg="uwb_transceiver" type="uwb_transceiver_node" name="uwb_master_drone2" output="screen">
+    <node pkg="uwb_transceiver" type="uwb_transceiver_node" name="uwb_master_$(arg drone_name)" output="screen">
         <rosparam command="load" file="$(find uwb_transceiver)/config/config.yaml" />
-        <param name="serial_port" value="/dev/tty.uwb.drone2"/>
-        <remap from="~odom" to="/drone2/odom"/>
-        <remap from="~position_cmd" to="/drone2/position_cmd"/>
-        <remap from="~n3ctrl" to="/drone2/state"/>
+        <param name="serial_port" value="/dev/tty.uwb.$(arg drone_name)"/>
+        <remap from="~odom" to="/$(arg drone_name)/odom"/>
+        <remap from="~position_cmd" to="/$(arg drone_name)/position_cmd"/>
+        <remap from="~n3ctrl" to="/$(arg drone_name)/state"/>
         <param name="role" type="int" value="1"/> <!--master-->
         <param name="debug/m_debug_packet_info" type="int" value="0"/>
     </node>
 
-    <node pkg="rnw_ros" type="traj2cmd_node" name="traj2cmd_drone2" output="screen" required="true">
-        <remap from="~traj" to="/drone2/traj"/>
-        <remap from="~odom" to="/drone2/odom"/>
-        <remap from="~position_cmd" to="/drone2/position_cmd"/>
+    <node pkg="rnw_ros" type="traj2cmd_node" name="traj2cmd_$(arg drone_name)" output="screen" required="true">
+        <remap from="~traj" to="/$(arg drone_name)/traj"/>
+        <remap from="~odom" to="/$(arg drone_name)/odom"/>
+        <remap from="~position_cmd" to="/$(arg drone_name)/position_cmd"/>
     </node>
 
     <!--  RnW  -->
@@ -56,24 +58,25 @@
     </node>
 
     <node pkg="rnw_ros" type="rnw_cable_node" name="rnw_cable_node" required="true" output="screen">
+        <param name="drone_name" type="string" value="$(arg drone_name)"/>
     </node>
 
     <!--  Visualization  -->
 
-    <node pkg="rnw_ros" type="odom2tf_node" name="drone2_tf" output="screen">
-        <remap from="~odom" to="/drone2/odom"/>
-        <param name="name" value="odom_drone2" />
+    <node pkg="rnw_ros" type="odom2tf_node" name="$(arg drone_name)_tf" output="screen">
+        <remap from="~odom" to="/$(arg drone_name)/odom"/>
+        <param name="name" value="odom_$(arg drone_name)" />
     </node>
 
-    <node pkg="rnw_ros" type="visualize_traj_node" name="traj_viz_drone2" output="screen" required="true">
+    <node pkg="rnw_ros" type="visualize_traj_node" name="traj_viz_$(arg drone_name)" output="screen" required="true">
         <param name="lift_dt" type="double" value="0.05"/>
         <param name="length_g" type="double" value="0.5"/>
         <param name="clear_after_n_sec" type="double" value="0"/>
-        <remap from="~poly_traj" to="/drone2/traj"/>
+        <remap from="~poly_traj" to="/$(arg drone_name)/traj"/>
     </node>
 
-    <node pkg="rnw_ros" type="visualize_pos_cmd_node" name="pos_cmd_viz_drone2" output="screen" required="true">
-        <remap from="~position_cmd" to="/drone2/position_cmd"/>
+    <node pkg="rnw_ros" type="visualize_pos_cmd_node" name="pos_cmd_viz_$(arg drone_name)" output="screen" required="true">
+        <remap from="~position_cmd" to="/$(arg drone_name)/position_cmd"/>
     </node>
 
     <node pkg="rnw_ros" type="visualize_cone_node" name="visualize_cone_node" output="screen" required="true">
@@ -84,6 +87,6 @@
 
     <node name="rviz_traj" pkg="rviz" type="rviz" output="log" required="false" args="-d $(find rnw_ros)/config/swarm.rviz" />
 
-    <node name="record" pkg="rosbag" type="record" output="screen" args="-a -x '(.*)visual(.*)|/(.*)viz(.*)'" />
+<!--    <node name="record" pkg="rosbag" type="record" output="screen" args="-a -x '(.*)visual(.*)|/(.*)viz(.*)'" />-->
 
 </launch>
