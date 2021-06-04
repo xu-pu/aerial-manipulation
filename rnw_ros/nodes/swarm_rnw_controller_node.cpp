@@ -67,8 +67,8 @@ struct swarm_planner_t {
       double rad = deg2rad * 0.5 * rnw_config.swarm.angle;
       Vector3d setpoint1 = calc_pt_at_cp_frame(cmd.control_point_setpoint,cmd.heading,rnw_config.swarm.cable1,-rad);
       Vector3d setpoint2 = calc_pt_at_cp_frame(cmd.control_point_setpoint,cmd.heading,rnw_config.swarm.cable2,rad);
-      nav_msgs::Odometry odom1 = swarm_interface.latest_odom_drone1;
-      nav_msgs::Odometry odom2 = swarm_interface.latest_odom_drone2;
+      nav_msgs::Odometry odom1 = swarm_interface.drone1.latest_odom;
+      nav_msgs::Odometry odom2 = swarm_interface.drone2.latest_odom;
 
       quadrotor_msgs::PolynomialTrajectory traj1 = genetate_uav_traj(odom1,setpoint1);
       quadrotor_msgs::PolynomialTrajectory traj2 = genetate_uav_traj(odom2,setpoint2);
@@ -85,8 +85,8 @@ struct swarm_planner_t {
     }
 
     void go_to_setpoint( Vector3d const & sp1, Vector3d const & sp2 ) const {
-      nav_msgs::Odometry odom1 = swarm_interface.latest_odom_drone1;
-      nav_msgs::Odometry odom2 = swarm_interface.latest_odom_drone2;
+      nav_msgs::Odometry odom1 = swarm_interface.drone1.latest_odom;
+      nav_msgs::Odometry odom2 = swarm_interface.drone2.latest_odom;
       quadrotor_msgs::PolynomialTrajectory traj1 = genetate_uav_traj(odom1,sp1);
       quadrotor_msgs::PolynomialTrajectory traj2 = genetate_uav_traj(odom2,sp2);
       swarm_interface.send_traj(traj1,traj2);

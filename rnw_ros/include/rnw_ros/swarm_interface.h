@@ -10,43 +10,21 @@
 #include <quadrotor_msgs/PolynomialTrajectory.h>
 #include <n3ctrl/N3CtrlState.h>
 
+#include "rnw_ros/drone_interface.h"
+
 struct swarm_interface_t {
+
+    drone_interface_t drone1;
+
+    drone_interface_t drone2;
 
     ros::NodeHandle & nh;
 
     ros::Publisher pub_abort;
 
-    ros::Publisher pub_traj_drone1;
-
-    ros::Publisher pub_traj_drone2;
-
-    ros::Subscriber sub_odom_drone1;
-
-    ros::Subscriber sub_odom_drone2;
-
-    ros::Subscriber sub_n3ctrl_drone1;
-
-    ros::Subscriber sub_n3ctrl_drone2;
-
-    nav_msgs::Odometry latest_odom_drone1;
-
-    nav_msgs::Odometry latest_odom_drone2;
-
-    n3ctrl::N3CtrlState latest_n3ctrl_drone1;
-
-    n3ctrl::N3CtrlState latest_n3ctrl_drone2;
-
     static quadrotor_msgs::PolynomialTrajectory abort_traj();
 
     explicit swarm_interface_t( ros::NodeHandle & _nh );
-
-    void on_odom_drone1( nav_msgs::OdometryConstPtr const & msg );
-
-    void on_odom_drone2( nav_msgs::OdometryConstPtr const & msg );
-
-    void on_n3ctrl_drone1( n3ctrl::N3CtrlStateConstPtr const & msg );
-
-    void on_n3ctrl_drone2( n3ctrl::N3CtrlStateConstPtr const & msg );
 
     void on_became_ready() const;
 
@@ -60,10 +38,6 @@ struct swarm_interface_t {
 
     void on_integrity_check( ros::TimerEvent const & e );
 
-    bool drone1_connected() const;
-
-    bool drone2_connected() const;
-
     bool ready() const;
 
     void send_abort() const;
@@ -72,17 +46,9 @@ private:
 
     ros::Timer integrity_check_timer;
 
-    bool drone1_connected_latch = false;
-
-    bool drone2_connected_latch = false;
-
     bool swarm_ready_latch = false;
 
     bool check_swarm_ready = true;
-
-    static constexpr double odom_timeout_sec = 0.5;
-
-    static constexpr double n3ctrl_timeout_sec = 1;
 
 };
 

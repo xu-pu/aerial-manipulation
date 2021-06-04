@@ -103,8 +103,8 @@ struct individual_drone_test_t {
       wpts.emplace_back(0.4,0,0.2);
 
       swarm.send_traj(
-              local_wpts2traj(swarm.latest_odom_drone1,wpts),
-              local_wpts2traj(swarm.latest_odom_drone2,wpts)
+              local_wpts2traj(swarm.drone1.latest_odom,wpts),
+              local_wpts2traj(swarm.drone2.latest_odom,wpts)
       );
 
     }
@@ -116,8 +116,8 @@ struct individual_drone_test_t {
         return;
       }
 
-      Vector3d pt_srt = uav_utils::from_point_msg(swarm.latest_odom_drone1.pose.pose.position);
-      Vector3d pt_end = point_in_frame(swarm.latest_odom_drone2,Vector3d(0,1.4,0));
+      Vector3d pt_srt = uav_utils::from_point_msg(swarm.drone1.latest_odom.pose.pose.position);
+      Vector3d pt_end = point_in_frame(swarm.drone2.latest_odom,Vector3d(0,1.4,0));
 
       if ((pt_srt-pt_end).norm() < 0.05) {
         ROS_WARN_STREAM("close enough, no need to align");
@@ -129,7 +129,7 @@ struct individual_drone_test_t {
       wpts.emplace_back((pt_srt+pt_end)/2);
       wpts.push_back(pt_end);
 
-      swarm.send_traj_just_drone1(wpts2traj(swarm.latest_odom_drone1,wpts));
+      swarm.send_traj_just_drone1(wpts2traj(swarm.drone1.latest_odom,wpts));
 
     }
 
@@ -143,8 +143,8 @@ struct individual_drone_test_t {
       vector<Vector3d> wpts = gen_waypoint_zigzag(5,0.5,0.5);
 
       swarm.send_traj(
-              local_wpts2traj(swarm.latest_odom_drone1,wpts),
-              local_wpts2traj(swarm.latest_odom_drone2,wpts)
+              local_wpts2traj(swarm.drone1.latest_odom,wpts),
+              local_wpts2traj(swarm.drone2.latest_odom,wpts)
       );
 
     }
@@ -156,8 +156,8 @@ struct individual_drone_test_t {
         return;
       }
 
-      Vector3d pos1 = uav_utils::from_point_msg(swarm.latest_odom_drone1.pose.pose.position);
-      Vector3d pos2 = uav_utils::from_point_msg(swarm.latest_odom_drone2.pose.pose.position);
+      Vector3d pos1 = uav_utils::from_point_msg(swarm.drone1.latest_odom.pose.pose.position);
+      Vector3d pos2 = uav_utils::from_point_msg(swarm.drone2.latest_odom.pose.pose.position);
 
       double dist = (pos1 - pos2).norm();
 
@@ -188,15 +188,15 @@ struct individual_drone_test_t {
       }
 
       swarm.send_traj(
-              wpts2traj(swarm.latest_odom_drone1,wpts_drone1),
-              wpts2traj(swarm.latest_odom_drone2,wpts_drone2)
+              wpts2traj(swarm.drone1.latest_odom,wpts_drone1),
+              wpts2traj(swarm.drone2.latest_odom,wpts_drone2)
       );
 
     }
 
     void move_drone1_relative( Vector3d const & pt ){
-      Vector3d setpoint = uav_utils::from_point_msg(swarm.latest_odom_drone1.pose.pose.position) + 0.5 * pt;
-      quadrotor_msgs::PolynomialTrajectory traj = gen_setpoint_traj(swarm.latest_odom_drone1, setpoint, 1);
+      Vector3d setpoint = uav_utils::from_point_msg(swarm.drone1.latest_odom.pose.pose.position) + 0.5 * pt;
+      quadrotor_msgs::PolynomialTrajectory traj = gen_setpoint_traj(swarm.drone1.latest_odom, setpoint, 1);
       swarm.send_traj_just_drone1(traj);
     }
 
