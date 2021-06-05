@@ -135,7 +135,7 @@ struct rnw_node_t {
       ROS_WARN_STREAM("[rnw_planner] land triggered!");
       rnw_planner.stop_walking();
 
-      double heading = rnw_planner.latest_cone_state.euler_angles.x + M_PI_2;
+      double heading = cone.latest_cone_state.euler_angles.x + M_PI_2;
       double spread = deg2rad * 0.5 * rnw_config.swarm.angle;
 
       Vector3d rest_tip = cone.tip_at_nutation(M_PI_2);
