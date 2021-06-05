@@ -123,7 +123,6 @@ struct rnw_node_t {
       else {
         ROS_WARN_STREAM("[rnw_planner] swarm not ready, can not start rnw!");
       }
-
     }
 
     void on_abort( std_msgs::HeaderConstPtr const & msg ){
@@ -164,7 +163,9 @@ struct rnw_node_t {
       waypoints1.back().z() = -0.5;
       waypoints2.back().z() = -0.5;
 
-      swarm.follow(waypoints1,waypoints2);
+      auto setting = drone_interface_t::create_setting(0.5,0.5);
+
+      swarm.follow(waypoints1,waypoints2,setting);
 
     }
 
@@ -189,7 +190,9 @@ struct rnw_node_t {
         waypoints_drone2.emplace_back(control_frame * suspend_pt_drone2);
       }
 
-      swarm.follow(waypoints_drone1,waypoints_drone2);
+      auto setting = drone_interface_t::create_setting(2,1);
+
+      swarm.follow(waypoints_drone1,waypoints_drone2,setting);
 
     }
 
