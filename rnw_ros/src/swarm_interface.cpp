@@ -81,3 +81,11 @@ void swarm_interface_t::go_to(const Vector3d &pt1, const Vector3d &pt2) const {
 void swarm_interface_t::follow(const vector<Vector3d> &waypoints1, const vector<Vector3d> &waypoints2) const {
   send_traj(drone1.plan((waypoints1)),drone2.plan(waypoints2));
 }
+
+void swarm_interface_t::go_to( Vector3d const & pt1, Vector3d const & pt2, AmTraj const & setting ) const {
+  send_traj(drone1.plan(setting,pt1),drone2.plan(setting,pt2));
+}
+
+void swarm_interface_t::follow( vector<Vector3d> const & waypoints1, vector<Vector3d> const & waypoints2, AmTraj const & setting ) const {
+  send_traj(drone1.plan(setting,waypoints1),drone2.plan(setting,waypoints2));
+}

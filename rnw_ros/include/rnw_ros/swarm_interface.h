@@ -46,7 +46,11 @@ public: // these method will TAKE ACTION
 
     void go_to( Vector3d const & pt1, Vector3d const & pt2 ) const;
 
+    void go_to( Vector3d const & pt1, Vector3d const & pt2, AmTraj const & setting ) const;
+
     void follow( vector<Vector3d> const & waypoints1, vector<Vector3d> const & waypoints2 ) const;
+
+    void follow( vector<Vector3d> const & waypoints1, vector<Vector3d> const & waypoints2, AmTraj const & setting ) const;
 
 private:
 
