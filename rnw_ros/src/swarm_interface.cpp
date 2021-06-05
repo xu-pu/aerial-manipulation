@@ -17,9 +17,9 @@ swarm_interface_t::swarm_interface_t( ros::NodeHandle & _nh ) : nh(_nh), drone1(
 
 }
 
-bool swarm_interface_t::ready() const {
+bool swarm_interface_t::ready( bool print_reason ) const {
   if ( check_swarm_ready ) {
-    return drone1.ready() && drone2.ready();
+    return drone1.ready(print_reason) && drone2.ready(print_reason);
   }
   else {
     return true;
@@ -47,7 +47,7 @@ void swarm_interface_t::send_traj_just_drone2( quadrotor_msgs::PolynomialTraject
 
 void swarm_interface_t::on_integrity_check(const ros::TimerEvent &e) {
 
-  bool swarm_ready = ready();
+  bool swarm_ready = ready(false);
   if ( swarm_ready_latch && !swarm_ready ) {
     on_exit_ready();
   }
@@ -65,6 +65,7 @@ void swarm_interface_t::on_became_ready() const {
 
 void swarm_interface_t::on_exit_ready() const {
   ROS_ERROR_STREAM("[swarm] exit ready state! abort!");
+  ready(true);
   send_abort();
 }
 

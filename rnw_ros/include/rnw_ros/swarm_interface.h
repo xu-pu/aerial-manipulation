@@ -32,7 +32,7 @@ struct swarm_interface_t {
 
     void on_integrity_check( ros::TimerEvent const & e );
 
-    bool ready() const;
+    bool ready( bool print_reason = true ) const;
 
     void send_abort() const;
 
