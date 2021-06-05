@@ -30,12 +30,6 @@ struct swarm_interface_t {
 
     void on_exit_ready() const;
 
-    void send_traj( quadrotor_msgs::PolynomialTrajectory const & traj1, quadrotor_msgs::PolynomialTrajectory const & traj2 ) const;
-
-    void send_traj_just_drone1( quadrotor_msgs::PolynomialTrajectory const & msg ) const;
-
-    void send_traj_just_drone2( quadrotor_msgs::PolynomialTrajectory const & msg ) const;
-
     void on_integrity_check( ros::TimerEvent const & e );
 
     bool ready() const;
@@ -43,6 +37,12 @@ struct swarm_interface_t {
     void send_abort() const;
 
 public: // these method will TAKE ACTION
+
+    void send_traj( quadrotor_msgs::PolynomialTrajectory const & traj1, quadrotor_msgs::PolynomialTrajectory const & traj2 ) const;
+
+    void send_traj_just_drone1( quadrotor_msgs::PolynomialTrajectory const & msg ) const;
+
+    void send_traj_just_drone2( quadrotor_msgs::PolynomialTrajectory const & msg ) const;
 
     void go_to( Vector3d const & pt1, Vector3d const & pt2 ) const;
 
