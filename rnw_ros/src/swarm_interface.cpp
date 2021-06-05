@@ -73,3 +73,7 @@ void swarm_interface_t::send_abort() const {
   m.stamp = ros::Time::now();
   pub_abort.publish(m);
 }
+
+void swarm_interface_t::go_to(const Vector3d &pt1, const Vector3d &pt2) const {
+  send_traj(drone1.plan(pt1),drone2.plan(pt2));
+}

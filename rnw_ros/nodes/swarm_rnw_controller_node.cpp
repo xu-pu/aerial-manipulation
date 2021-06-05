@@ -12,6 +12,32 @@
 #include "rnw_ros/rnw_planner_v2.h"
 #include "rnw_ros/swarm_interface.h"
 
+struct ref_frame_t {
+
+    Matrix3d R;
+
+    Vector3d T;
+
+    ref_frame_t( Matrix3d const & R_, Vector3d const & T_ ): R(R_), T(T_) { }
+
+    ref_frame_t(){
+      R.setIdentity();
+      T.setZero();
+    }
+
+    Vector3d operator*( Vector3d const & pt ) const {
+      return R * pt + T;
+    }
+
+};
+
+ref_frame_t calc_control_frame( Vector3d const & tip, double heading ){
+  return {
+          Eigen::AngleAxisd(heading,Vector3d::UnitZ()).toRotationMatrix(),
+          tip
+  };
+}
+
 struct swarm_planner_t {
 
     rnw_config_t & rnw_config;
@@ -28,30 +54,6 @@ struct swarm_planner_t {
       rocking_generator = AmTraj(1024, 16, 0.4, rnw_config.rnw.rocking_max_vel, rnw_config.rnw.rocking_max_acc, 23, 0.02);
     }
 
-    quadrotor_msgs::PolynomialTrajectory genetate_uav_traj( nav_msgs::Odometry const & from, Vector3d const & to ) const {
-
-      constexpr double epsi = 0.05;
-
-      Vector3d pt_start = uav_utils::from_point_msg(from.pose.pose.position);
-
-      double dist = (to-pt_start).norm();
-
-      if ( dist < epsi ) {
-        return gen_setpoint_traj(from,to,0.5);
-      }
-      else {
-        // plan traj
-        vector<Vector3d> wpts;
-        wpts.emplace_back(pt_start);
-        wpts.emplace_back((pt_start+to)/2);
-        wpts.emplace_back(to);
-        Vector3d v0 = Vector3d::Zero();
-        auto traj = rocking_generator.genOptimalTrajDTC(wpts,v0,v0,v0,v0);
-        return to_ros_msg(traj,from,ros::Time::now());
-      }
-
-    }
-
     /**
      * Execute the command, return an estimated time cost
      * @param cmd
@@ -64,14 +66,17 @@ struct swarm_planner_t {
         return 0;
       }
 
-      double rad = deg2rad * 0.5 * rnw_config.swarm.angle;
-      Vector3d setpoint1 = calc_pt_at_cp_frame(cmd.control_point_setpoint,cmd.heading,rnw_config.swarm.cable1,-rad);
-      Vector3d setpoint2 = calc_pt_at_cp_frame(cmd.control_point_setpoint,cmd.heading,rnw_config.swarm.cable2,rad);
-      nav_msgs::Odometry odom1 = swarm_interface.drone1.latest_odom;
-      nav_msgs::Odometry odom2 = swarm_interface.drone2.latest_odom;
+      ref_frame_t control_frame = calc_control_frame(cmd.control_point_setpoint,cmd.heading);
 
-      quadrotor_msgs::PolynomialTrajectory traj1 = genetate_uav_traj(odom1,setpoint1);
-      quadrotor_msgs::PolynomialTrajectory traj2 = genetate_uav_traj(odom2,setpoint2);
+      double rad = deg2rad * 0.5 * rnw_config.swarm.angle;
+      Vector3d suspend_pt_drone1 = swarm_interface.drone1.cable_length * Vector3d(0,sin(-rad),cos(-rad));
+      Vector3d suspend_pt_drone2 = swarm_interface.drone2.cable_length * Vector3d(0,sin(rad),cos(rad));
+
+      Vector3d setpoint1 = control_frame * suspend_pt_drone1;
+      Vector3d setpoint2 = control_frame * suspend_pt_drone2;
+
+      quadrotor_msgs::PolynomialTrajectory traj1 = swarm_interface.drone1.plan(setpoint1);
+      quadrotor_msgs::PolynomialTrajectory traj2 = swarm_interface.drone2.plan(setpoint2);
 
       swarm_interface.send_traj(traj1,traj2);
 
@@ -82,14 +87,6 @@ struct swarm_planner_t {
 
       return std::max(dt1,dt2);
 
-    }
-
-    void go_to_setpoint( Vector3d const & sp1, Vector3d const & sp2 ) const {
-      nav_msgs::Odometry odom1 = swarm_interface.drone1.latest_odom;
-      nav_msgs::Odometry odom2 = swarm_interface.drone2.latest_odom;
-      quadrotor_msgs::PolynomialTrajectory traj1 = genetate_uav_traj(odom1,sp1);
-      quadrotor_msgs::PolynomialTrajectory traj2 = genetate_uav_traj(odom2,sp2);
-      swarm_interface.send_traj(traj1,traj2);
     }
 
 };
@@ -199,7 +196,7 @@ struct rnw_node_t {
       Vector3d tgt1 = calc_pt_at_cp_frame(rest_tip,heading,rnw_config.swarm.cable1*0.9,-M_PI_2);
       Vector3d tgt2 = calc_pt_at_cp_frame(rest_tip,heading,rnw_config.swarm.cable2*0.9,M_PI_2);
 
-      swarm_planner.go_to_setpoint(tgt1,tgt2);
+      swarm_planner.swarm_interface.go_to(tgt1,tgt2);
 
     }
 
@@ -226,7 +223,7 @@ struct rnw_node_t {
       Vector3d tgt1 = calc_pt_at_cp_frame(tip,heading,rnw_config.swarm.cable1,-ang);
       Vector3d tgt2 = calc_pt_at_cp_frame(tip,heading,rnw_config.swarm.cable2,ang);
 
-      swarm_planner.go_to_setpoint(tgt1,tgt2);
+      swarm_planner.swarm_interface.go_to(tgt1,tgt2);
 
     }
 

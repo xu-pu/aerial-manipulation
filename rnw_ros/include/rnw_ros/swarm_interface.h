@@ -42,6 +42,10 @@ struct swarm_interface_t {
 
     void send_abort() const;
 
+public: // these method will TAKE ACTION
+
+    void go_to( Vector3d const & pt1, Vector3d const & pt2 ) const;
+
 private:
 
     ros::Timer integrity_check_timer;
