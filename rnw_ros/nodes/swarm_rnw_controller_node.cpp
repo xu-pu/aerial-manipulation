@@ -11,6 +11,7 @@
 #include "rnw_ros/pose_utils.h"
 #include "rnw_ros/rnw_planner_v2.h"
 #include "rnw_ros/swarm_interface.h"
+#include "rnw_ros/cone_interface.h"
 
 struct ref_frame_t {
 
@@ -43,6 +44,8 @@ struct rnw_node_t {
     rnw_config_t & rnw_config;
 
     swarm_interface_t swarm;
+
+    cone_interface_t cone;
 
     rnw_planner_v2_t rnw_planner;
 
@@ -152,25 +155,23 @@ struct rnw_node_t {
       ROS_WARN_STREAM("[rnw_planner] swing up triggered!");
       rnw_planner.stop_walking();
 
-      double heading = rnw_planner.latest_cone_state.euler_angles.x + M_PI_2;
+      double heading = cone.latest_cone_state.euler_angles.x + M_PI_2;
+      double cur_nutation = rad2deg * cone.latest_cone_state.euler_angles.y;
+      double spread = deg2rad * 0.5 * rnw_config.swarm.angle;
 
-      Vector3d cur_tip = uav_utils::from_point_msg(rnw_planner.latest_cone_state.tip);
-      Vector3d cur_contact = uav_utils::from_point_msg(rnw_planner.latest_cone_state.contact_point);
+      Vector3d suspend_pt_drone1 = swarm.drone1.cable_length * Vector3d(0, sin(-spread), cos(-spread));
+      Vector3d suspend_pt_drone2 = swarm.drone2.cable_length * Vector3d(0, sin(spread), cos(spread));
 
-      Vector3d v = cur_tip - cur_contact;
-      double len = v.norm();
-      Vector3d dir_2d = Vector3d(v.x(),v.y(),0).normalized();
-      double nut_comp = M_PI_2 - deg2rad * rnw_config.rnw.desired_nutation;
-      Vector3d tip = dir_2d * std::cos(nut_comp) * len;
-      tip.z() = std::sin(nut_comp) * len;
-      tip = tip + cur_contact;
+      vector<Vector3d> waypoints_drone1;
+      vector<Vector3d> waypoints_drone2;
+      for ( double theta : range(cur_nutation,rnw_config.rnw.desired_nutation,10) ) {
+        Vector3d tip = cone.tip_at_nutation(theta * deg2rad);
+        ref_frame_t control_frame = calc_control_frame(tip,heading);
+        waypoints_drone1.emplace_back(control_frame * suspend_pt_drone1);
+        waypoints_drone2.emplace_back(control_frame * suspend_pt_drone2);
+      }
 
-      double ang = 0.5 * rnw_config.swarm.angle * deg2rad;
-
-      Vector3d tgt1 = calc_pt_at_cp_frame(tip,heading,rnw_config.swarm.cable1,-ang);
-      Vector3d tgt2 = calc_pt_at_cp_frame(tip,heading,rnw_config.swarm.cable2,ang);
-
-      swarm.go_to(tgt1,tgt2);
+      swarm.follow(waypoints_drone1,waypoints_drone2);
 
     }
 

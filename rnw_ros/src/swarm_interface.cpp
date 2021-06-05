@@ -77,3 +77,7 @@ void swarm_interface_t::send_abort() const {
 void swarm_interface_t::go_to(const Vector3d &pt1, const Vector3d &pt2) const {
   send_traj(drone1.plan(pt1),drone2.plan(pt2));
 }
+
+void swarm_interface_t::follow(const vector<Vector3d> &waypoints1, const vector<Vector3d> &waypoints2) const {
+  send_traj(drone1.plan((waypoints1)),drone2.plan(waypoints2));
+}
