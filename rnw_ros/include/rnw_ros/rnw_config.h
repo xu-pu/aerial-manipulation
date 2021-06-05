@@ -149,10 +149,13 @@ struct rnw_config_t {
     } rnw;
 
     struct {
-        double cable1;
-        double cable2;
         double angle;
     } swarm;
+
+    struct {
+        double drone1;
+        double drone2;
+    } cable;
 
     struct {
         double desired_grip_depth;

@@ -179,9 +179,10 @@ void rnw_config_t::load_from_ros( ros::NodeHandle & nh ){
   rnw.EKd = get_param_default<double>(nh, "/rnw/EKd", 0);
   rnw.tau_ff = get_param_default<double>(nh, "/rnw/tau_ff", 0);
 
-  swarm.cable1 = get_param_default<double>(nh, "/swarm/cable1", 1);
-  swarm.cable2 = get_param_default<double>(nh, "/swarm/cable2", 1);
   swarm.angle = get_param_default<double>(nh, "/swarm/angle", 90);
+
+  cable.drone1 = get_param_default<double>(nh, "/cable/drone1", 1);
+  cable.drone2 = get_param_default<double>(nh, "/cable/drone2", 1);
 
   caging.desired_grip_depth = get_param_default<double>(nh, "/caging/desired_grip_depth", 0.06);
 

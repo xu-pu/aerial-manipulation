@@ -143,8 +143,8 @@ struct rnw_node_t {
       Vector3d v = cur_tip - cur_contact;
       Vector3d rest_tip = cur_contact + v.norm() * Vector3d(v.x(),v.y(),0).normalized();
 
-      Vector3d tgt1 = calc_pt_at_cp_frame(rest_tip,heading,rnw_config.swarm.cable1*0.9,-M_PI_2);
-      Vector3d tgt2 = calc_pt_at_cp_frame(rest_tip,heading,rnw_config.swarm.cable2*0.9,M_PI_2);
+      Vector3d tgt1 = calc_pt_at_cp_frame(rest_tip,heading,rnw_config.cable.drone1*0.9,-M_PI_2);
+      Vector3d tgt2 = calc_pt_at_cp_frame(rest_tip,heading,rnw_config.cable.drone2*0.9,M_PI_2);
 
       swarm.go_to(tgt1,tgt2);
 
