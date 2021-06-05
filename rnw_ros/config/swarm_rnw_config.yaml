@@ -9,8 +9,6 @@ flu_T_tcp:
   z: -0.114698
 insert_below_tip: 0.1
 swarm:
-  cable1: 0.475
-  cable2: 0.74
   angle: 90
 cable:
   drone1: 0.45
