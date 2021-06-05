@@ -38,64 +38,11 @@ ref_frame_t calc_control_frame( Vector3d const & tip, double heading ){
   };
 }
 
-struct swarm_planner_t {
-
-    rnw_config_t & rnw_config;
-
-    swarm_interface_t swarm_interface;
-
-    AmTraj rocking_generator;
-
-    swarm_planner_t(ros::NodeHandle & nh, rnw_config_t & cfg ) :
-            rnw_config(cfg),
-            swarm_interface(nh),
-            rocking_generator(1024, 16, 0.4, 0.5, 0.5, 23, 0.02)
-    {
-      rocking_generator = AmTraj(1024, 16, 0.4, rnw_config.rnw.rocking_max_vel, rnw_config.rnw.rocking_max_acc, 23, 0.02);
-    }
-
-    /**
-     * Execute the command, return an estimated time cost
-     * @param cmd
-     * @return estimated duration (sec)
-     */
-    double execute_cmd( rnw_command_t const & cmd ) const {
-
-      if ( !swarm_interface.ready() ) {
-        ROS_ERROR_STREAM("[rnw_planner] swarm not ready, can not execute commands!");
-        return 0;
-      }
-
-      ref_frame_t control_frame = calc_control_frame(cmd.control_point_setpoint,cmd.heading);
-
-      double rad = deg2rad * 0.5 * rnw_config.swarm.angle;
-      Vector3d suspend_pt_drone1 = swarm_interface.drone1.cable_length * Vector3d(0,sin(-rad),cos(-rad));
-      Vector3d suspend_pt_drone2 = swarm_interface.drone2.cable_length * Vector3d(0,sin(rad),cos(rad));
-
-      Vector3d setpoint1 = control_frame * suspend_pt_drone1;
-      Vector3d setpoint2 = control_frame * suspend_pt_drone2;
-
-      quadrotor_msgs::PolynomialTrajectory traj1 = swarm_interface.drone1.plan(setpoint1);
-      quadrotor_msgs::PolynomialTrajectory traj2 = swarm_interface.drone2.plan(setpoint2);
-
-      swarm_interface.send_traj(traj1,traj2);
-
-      double dt1 = get_traj_duration(traj1);
-      double dt2 = get_traj_duration(traj2);
-
-      ROS_INFO_STREAM("[rnw_planner] execute cmd #" << cmd.cmd_idx << ", drone1 " << dt1 << "s, drone2 " << dt2 << "s");
-
-      return std::max(dt1,dt2);
-
-    }
-
-};
-
 struct rnw_node_t {
 
     rnw_config_t & rnw_config;
 
-    swarm_planner_t swarm_planner;
+    swarm_interface_t swarm;
 
     rnw_planner_v2_t rnw_planner;
 
@@ -118,7 +65,7 @@ struct rnw_node_t {
     rnw_node_t(ros::NodeHandle & nh, rnw_config_t & cfg )
             : rnw_config(cfg),
               rnw_planner(cfg),
-              swarm_planner(nh,cfg)
+              swarm(nh)
     {
 
       timer = nh.createTimer(ros::Rate(30), &rnw_node_t::spin, this);
@@ -167,7 +114,7 @@ struct rnw_node_t {
 
     void on_start( std_msgs::HeaderConstPtr const & msg ){
       ROS_WARN_STREAM("[rnw_planner] start triggered!");
-      if ( swarm_planner.swarm_interface.ready() ) {
+      if (swarm.ready()) {
         rnw_planner.start_walking();
       }
       else {
@@ -196,7 +143,7 @@ struct rnw_node_t {
       Vector3d tgt1 = calc_pt_at_cp_frame(rest_tip,heading,rnw_config.swarm.cable1*0.9,-M_PI_2);
       Vector3d tgt2 = calc_pt_at_cp_frame(rest_tip,heading,rnw_config.swarm.cable2*0.9,M_PI_2);
 
-      swarm_planner.swarm_interface.go_to(tgt1,tgt2);
+      swarm.go_to(tgt1,tgt2);
 
     }
 
@@ -223,7 +170,42 @@ struct rnw_node_t {
       Vector3d tgt1 = calc_pt_at_cp_frame(tip,heading,rnw_config.swarm.cable1,-ang);
       Vector3d tgt2 = calc_pt_at_cp_frame(tip,heading,rnw_config.swarm.cable2,ang);
 
-      swarm_planner.swarm_interface.go_to(tgt1,tgt2);
+      swarm.go_to(tgt1,tgt2);
+
+    }
+
+    /**
+     * Execute the command, return an estimated time cost
+     * @param cmd
+     * @return estimated duration (sec)
+     */
+    double execute_rnw_cmd( rnw_command_t const & cmd ) const {
+
+      if ( !swarm.ready() ) {
+        ROS_ERROR_STREAM("[rnw_planner] swarm not ready, can not execute commands!");
+        return 0;
+      }
+
+      ref_frame_t control_frame = calc_control_frame(cmd.control_point_setpoint,cmd.heading);
+
+      double rad = deg2rad * 0.5 * rnw_config.swarm.angle;
+      Vector3d suspend_pt_drone1 = swarm.drone1.cable_length * Vector3d(0,sin(-rad),cos(-rad));
+      Vector3d suspend_pt_drone2 = swarm.drone2.cable_length * Vector3d(0,sin(rad),cos(rad));
+
+      Vector3d setpoint1 = control_frame * suspend_pt_drone1;
+      Vector3d setpoint2 = control_frame * suspend_pt_drone2;
+
+      quadrotor_msgs::PolynomialTrajectory traj1 = swarm.drone1.plan(setpoint1);
+      quadrotor_msgs::PolynomialTrajectory traj2 = swarm.drone2.plan(setpoint2);
+
+      swarm.send_traj(traj1,traj2);
+
+      double dt1 = get_traj_duration(traj1);
+      double dt2 = get_traj_duration(traj2);
+
+      ROS_INFO_STREAM("[rnw_planner] execute cmd #" << cmd.cmd_idx << ", drone1 " << dt1 << "s, drone2 " << dt2 << "s");
+
+      return std::max(dt1,dt2);
 
     }
 
@@ -241,7 +223,7 @@ struct rnw_node_t {
       }
       else if ( rnw_planner.cmd_fsm == rnw_planner_v2_t::cmd_fsm_e::pending ) {
         rnw_command_t cmd = rnw_planner.take_cmd();
-        double time_to_go = swarm_planner.execute_cmd(cmd);
+        double time_to_go = execute_rnw_cmd(cmd);
         cmd_start_time = ros::Time::now();
         cmd_duration = ros::Duration(time_to_go);
       }
@@ -274,7 +256,8 @@ int main( int argc, char** argv ) {
       rnw_config.rnw.max_acc = config.max_acc;
       rnw_config.rnw.rocking_max_vel = config.rocking_max_vel;
       rnw_config.rnw.rocking_max_acc = config.rocking_max_acc;
-      rnw_node.swarm_planner.rocking_generator = AmTraj(1024, 16, 0.4, rnw_config.rnw.rocking_max_vel, rnw_config.rnw.rocking_max_acc, 23, 0.02);
+      rnw_node.swarm.drone1.set_max_vel_acc(rnw_config.rnw.rocking_max_vel,rnw_config.rnw.rocking_max_acc);
+      rnw_node.swarm.drone2.set_max_vel_acc(rnw_config.rnw.rocking_max_vel,rnw_config.rnw.rocking_max_acc);
       ROS_INFO_STREAM(rnw_config.rnw.to_string());
   });
   server.updateConfig(rnw_config.rnw.to_config());
