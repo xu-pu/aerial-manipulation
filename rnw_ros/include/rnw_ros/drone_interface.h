@@ -106,6 +106,8 @@ private:
 
     ros::Publisher pub_traj;
 
+    bool just_checking = false;
+
 };
 
 #endif //RNW_ROS_DRONE_INTERFACE_H

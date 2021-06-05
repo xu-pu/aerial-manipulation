@@ -42,6 +42,8 @@ void drone_interface_t::init( string const & drone_name ){
 
   initialized = true;
 
+  just_checking = get_param_default<bool>(nh,"/just_checking",false);
+
 }
 
 void drone_interface_t::on_odom( nav_msgs::OdometryConstPtr const & msg ){
@@ -58,23 +60,28 @@ void drone_interface_t::on_n3ctrl( n3ctrl::N3CtrlStateConstPtr const & msg ){
 
 bool drone_interface_t::ready( bool print_reason ) const {
 
+  if ( just_checking ) {
+    ROS_ERROR("[%s] not actually checking the system, for testing only!",name.c_str());
+    return true;
+  }
+
   if ( !initialized ) {
-    if (print_reason) ROS_ERROR_STREAM("[drone_interface] ros interface not initialized");
+    if (print_reason) ROS_ERROR("[%s] ros interface not initialized",name.c_str());
     return false;
   }
 
   if ( !message_in_time(latest_odom,message_timeout) ) {
-    if (print_reason) ROS_ERROR_STREAM("[drone_interface] odom timeout!");
+    if (print_reason) ROS_ERROR("[%s] odom timeout!",name.c_str());
     return false;
   }
 
   if ( !message_in_time(latest_n3ctrl,message_timeout) ) {
-    if (print_reason) ROS_ERROR_STREAM("[drone_interface] n3ctrl timeout!");
+    if (print_reason) ROS_ERROR("[%s] n3ctrl timeout!",name.c_str());
     return false;
   }
 
   if ( latest_n3ctrl.state < n3ctrl::N3CtrlState::STATE_CMD_HOVER ) {
-    if (print_reason) ROS_ERROR_STREAM("[drone_interface] n3ctrl won't take cmd at current state!");
+    if (print_reason) ROS_ERROR("[%s] n3ctrl won't take cmd at current state!",name.c_str());
     return false;
   }
 
