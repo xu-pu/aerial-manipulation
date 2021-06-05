@@ -136,17 +136,35 @@ struct rnw_node_t {
       rnw_planner.stop_walking();
 
       double heading = rnw_planner.latest_cone_state.euler_angles.x + M_PI_2;
+      double spread = deg2rad * 0.5 * rnw_config.swarm.angle;
 
-      Vector3d cur_tip = uav_utils::from_point_msg(rnw_planner.latest_cone_state.tip);
-      Vector3d cur_contact = uav_utils::from_point_msg(rnw_planner.latest_cone_state.contact_point);
+      Vector3d rest_tip = cone.tip_at_nutation(M_PI_2);
+      ref_frame_t rest_frame = calc_control_frame(rest_tip,heading);
 
-      Vector3d v = cur_tip - cur_contact;
-      Vector3d rest_tip = cur_contact + v.norm() * Vector3d(v.x(),v.y(),0).normalized();
+      Vector3d suspend_pt_drone1 = swarm.drone1.cable_length * Vector3d(0, sin(-spread), cos(-spread));
+      Vector3d suspend_pt_drone2 = swarm.drone2.cable_length * Vector3d(0, sin(spread), cos(spread));
+      Vector3d rest_pt_drone1 = swarm.drone1.cable_length * 0.8 * Vector3d(0, sin(-M_PI_2), cos(-M_PI_2));
+      Vector3d rest_pt_drone2 = swarm.drone2.cable_length * 0.8 * Vector3d(0, sin(M_PI_2), cos(M_PI_2));
 
-      Vector3d tgt1 = calc_pt_at_cp_frame(rest_tip,heading,rnw_config.cable.drone1*0.9,-M_PI_2);
-      Vector3d tgt2 = calc_pt_at_cp_frame(rest_tip,heading,rnw_config.cable.drone2*0.9,M_PI_2);
+      vector<Vector3d> waypoints1;
+      vector<Vector3d> waypoints2;
+      if ( cone.latest_cone_state.euler_angles.y > deg2rad * 80 ) {
+        // put down the object
+        waypoints1.emplace_back(rest_frame*suspend_pt_drone1);
+        waypoints2.emplace_back(rest_frame*suspend_pt_drone2);
+      }
 
-      swarm.go_to(tgt1,tgt2);
+      // landing spot
+      waypoints1.emplace_back(rest_frame*rest_pt_drone1);
+      waypoints2.emplace_back(rest_frame*rest_pt_drone2);
+
+      // disarm
+      waypoints1.emplace_back(rest_frame*rest_pt_drone1);
+      waypoints2.emplace_back(rest_frame*rest_pt_drone2);
+      waypoints1.back().z() = -0.5;
+      waypoints2.back().z() = -0.5;
+
+      swarm.follow(waypoints1,waypoints2);
 
     }
 
