@@ -77,6 +77,8 @@ struct rnw_config_t {
 
         double tau;
 
+        double waiting_ratio;
+
         double max_vel;
 
         double max_acc;

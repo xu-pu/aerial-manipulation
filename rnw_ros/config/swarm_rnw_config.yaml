@@ -22,6 +22,7 @@ rnw:
   # tip over at 30 deg, 20 good angle
   desired_nutation: 70
   desired_grip_depth: 0.06
+  waiting_ratio: 0.8
   tau: 20
   max_vel: 3
   max_acc: 3

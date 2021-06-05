@@ -245,7 +245,7 @@ struct rnw_node_t {
       }
       else if ( rnw_planner.cmd_fsm == rnw_planner_v2_t::cmd_fsm_e::pending ) {
         rnw_command_t cmd = rnw_planner.take_cmd();
-        double time_to_go = execute_rnw_cmd(cmd);
+        double time_to_go = rnw_config.rnw.waiting_ratio * execute_rnw_cmd(cmd);
         cmd_start_time = ros::Time::now();
         cmd_duration = ros::Duration(time_to_go);
       }

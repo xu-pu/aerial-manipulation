@@ -48,8 +48,6 @@
         </node>
     </group>
 
-<!--    <node pkg="rnw_ros" type="gamepad_drone_cmd_node" name="gamepad_drone_cmd_node" output="screen"/>-->
-
     <node pkg="rnw_ros" type="gamepad_trigger_node" name="gamepad" output="screen">
         <remap from="~RB" to="/abort"/>
     </node>
@@ -71,8 +69,6 @@
     </node>
 
     <!--  RnW  -->
-
-    <node pkg="rnw_ros" type="check_planning_assistant_node" name="check_planning_assistant_node"  output="screen"/>
 
     <node pkg="rnw_ros" type="swarm_rnw_controller_node" name="swarm_rnw_controller_node" required="true" output="screen"/>
 
@@ -121,5 +117,7 @@
     </node>
 
 <!--    <node name="record" pkg="rosbag" type="record" output="screen" args="-a -x '(.*)visual(.*)|/(.*)viz(.*)'" />-->
+
+    <node pkg="rqt_reconfigure" type="rqt_reconfigure" name="rqt_reconfigure"/>
 
 </launch>
