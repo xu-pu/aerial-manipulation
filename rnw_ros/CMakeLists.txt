@@ -110,6 +110,7 @@ generate_dynamic_reconfigure_options(
         cfg/RNW.cfg
         cfg/TuningConeState.cfg
         cfg/VelAcc.cfg
+        cfg/ThrustTest.cfg
 )
 ###################################
 ## catkin specific configuration ##

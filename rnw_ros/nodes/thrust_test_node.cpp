@@ -1,6 +1,8 @@
 #include <ros/ros.h>
 #include <sensor_msgs/Joy.h>
 #include <std_msgs/UInt8.h>
+#include <dynamic_reconfigure/server.h>
+#include <rnw_ros/ThrustTestConfig.h>
 
 struct thrust_test_node_t {
 
@@ -77,7 +79,13 @@ int main( int argc, char** argv ) {
 
   ros::init(argc,argv,"thrust_test_node");
 
-  ros::NodeHandle nh("~");
+  thrust_test_node_t node;
+
+  dynamic_reconfigure::Server<rnw_ros::ThrustTestConfig> server;
+  server.setCallback([&]( rnw_ros::ThrustTestConfig & config, uint32_t level ){
+      node.thrust_percent = config.thrust_percentage / 100.;
+      ROS_WARN("[thrust_test] set thrust to %d%%",(int)config.thrust_percentage);
+  });
 
   ros::spin();
 
