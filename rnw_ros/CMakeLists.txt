@@ -194,6 +194,7 @@ set(RNW_NODES
         dbg_rnw_cable_node
         ekf_odom_node
         pub_simulated_sensors
+        thrust_test_node
 )
 
 FOREACH(NODE ${RNW_NODES})
