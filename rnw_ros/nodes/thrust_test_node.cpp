@@ -3,8 +3,11 @@
 #include <std_msgs/UInt8.h>
 #include <dynamic_reconfigure/server.h>
 #include <rnw_ros/ThrustTestConfig.h>
+#include <djiros/DroneArmControl.h>
 
 struct thrust_test_node_t {
+
+    djiros::DroneArmControl arm;
 
     enum class flight_status_e {
         STOPED      = 0,
@@ -44,6 +47,12 @@ struct thrust_test_node_t {
 
       if ( thrust_percent > arm_threshold && flight_status == flight_status_e::STOPED ) {
         // need to arm
+        arm.request.arm = 1;
+        ros::service::call("/djiros/drone_arm_control",arm);
+      }
+      else if ( thrust_percent < arm_threshold && flight_status != flight_status_e::STOPED ) {
+        arm.request.arm = 0;
+        ros::service::call("/djiros/drone_arm_control",arm);
       }
 
       pub_ctrl.publish(make_thrust_cmd(thrust_percent));
