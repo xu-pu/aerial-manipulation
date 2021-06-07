@@ -91,30 +91,6 @@ vector<Vector3d> gen_wpts_push_topple(
 
 }
 
-vector<Vector3d> gen_wpts_insert_topple(rnw_config_t const & rnw_config ){
-
-  vector<Vector3d> wpts;
-  wpts.emplace_back(0,0,rnw_config.rnw.hover_above_tip); // above tip
-  //wpts.emplace_back(0,0,0); // tip point
-  wpts.emplace_back(0,0,-rnw_config.rnw.insertion_depth); // inserted
-
-  Vector3d offset(rnw_config.rnw.topple_init,0,-rnw_config.rnw.insertion_depth);
-
-  constexpr size_t segments = 5;
-  double rad_step = rnw_config.rnw.desired_nutation/segments*deg2rad;
-
-  for ( size_t i=0; i<=segments; i++ ) {
-    double rad = i*rad_step;
-    double forward = sin(rad)*rnw_config.cone.height();
-    double downward = (1-cos(rad))*rnw_config.cone.height();
-    Vector3d v(forward,0,-downward);
-    wpts.emplace_back(offset+v);
-  }
-
-  return wpts;
-
-}
-
 void rnw_config_t::load_from_ros( ros::NodeHandle & nh ){
 
   X_tcp_cage.x() = get_param_default(nh,"/X_tcp_cage/x",0.);
@@ -154,7 +130,6 @@ void rnw_config_t::load_from_ros( ros::NodeHandle & nh ){
   ground_z = get_param_default<double>(nh, "/ground_z", 0.);
 
   rnw.insertion_depth  = get_param_default<double>(nh, "/rnw/insertion_depth", 0.);
-  rnw.topple_init      = get_param_default<double>(nh, "/rnw/topple_init", 0.);
   rnw.desired_nutation = get_param_default<double>(nh, "/rnw/desired_nutation", 30.);
   rnw.tau              = get_param_default<double>(nh, "/rnw/tau", 30.);
   rnw.max_vel          = get_param_default<double>(nh, "/rnw/max_vel", 0.5);

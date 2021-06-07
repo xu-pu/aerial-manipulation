@@ -71,8 +71,6 @@ struct rnw_config_t {
 
         double insertion_depth;
 
-        double topple_init;
-
         double desired_nutation;
 
         double tau;
@@ -125,7 +123,6 @@ struct rnw_config_t {
           std::stringstream ss;
           ss << "RnW Parameters:\n"
              << "insertion_depth: " << insertion_depth << "\n"
-             << "topple_init: " << topple_init << "\n"
              << "desired_nutation: " << desired_nutation << "\n"
              << "max_vel: " << max_vel << "\n"
              << "max_acc: " << max_acc << "\n"
@@ -137,7 +134,6 @@ struct rnw_config_t {
         inline rnw_ros::RNWConfig to_config() const {
           rnw_ros::RNWConfig config;
           config.insertion_depth = insertion_depth;
-          config.topple_init = topple_init;
           config.tau = tau;
           config.desired_nutation = desired_nutation;
           config.max_vel = max_vel;

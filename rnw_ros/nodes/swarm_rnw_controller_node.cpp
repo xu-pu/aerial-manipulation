@@ -271,7 +271,6 @@ int main( int argc, char** argv ) {
       ROS_WARN_STREAM("[rnw] re-config rnw");
       rnw_config.rnw.hover_above_tip = config.hover_above_tip;
       rnw_config.rnw.insertion_depth = config.insertion_depth;
-      rnw_config.rnw.topple_init = config.topple_init;
       rnw_config.rnw.desired_nutation = config.desired_nutation;
       rnw_config.rnw.tau = config.tau;
       rnw_config.rnw.max_vel = config.max_vel;

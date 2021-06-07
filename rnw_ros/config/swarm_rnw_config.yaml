@@ -18,7 +18,6 @@ caging:
 rnw:
   hover_above_tip: 0.03
   insertion_depth: 0.12 # 0.11
-  topple_init: 0.05
   # tip over at 30 deg, 20 good angle
   desired_nutation: 65
   desired_grip_depth: 0.06

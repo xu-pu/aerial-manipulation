@@ -82,14 +82,6 @@ double calc_obj_heading( rnw_msgs::ConeState const & s1, rnw_msgs::ConeState con
 double calc_mid_rad( double r1, double r2 );
 
 /**
- * For downward mounted caging end-effector
- * Waypoints for initialization, insert -> topple
- * @param rnw_config
- * @return
- */
-vector<Vector3d> gen_wpts_insert_topple(rnw_config_t const & rnw_config );
-
-/**
  * For forward mounted open cage, no insertion
  * waypoints are for the UAV in the world frame
  * @param rnw_config
