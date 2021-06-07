@@ -134,7 +134,6 @@ void rnw_config_t::load_from_ros( ros::NodeHandle & nh ){
   rnw.tau              = get_param_default<double>(nh, "/rnw/tau", 30.);
   rnw.rocking_max_vel  = get_param_default<double>(nh, "/rnw/rocking_max_vel", 0.5);
   rnw.rocking_max_acc  = get_param_default<double>(nh, "/rnw/rocking_max_acc", 0.5);
-  rnw.hover_above_tip  = get_param_default<double>(nh,"/rnw/hover_above_tip",0.03);
   rnw.adjust_nutation_threshold  = get_param_default<double>(nh,"/rnw/adjust_nutation_threshold",5.);
   rnw.adjust_grip_depth_threshold = get_param_default<double>(nh, "/rnw/adjust_grip_depth_threshold", 0.05);
   rnw.ang_vel_threshold = get_param_default<double>(nh, "/rnw/ang_vel_threshold", 0);

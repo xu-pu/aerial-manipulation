@@ -81,8 +81,6 @@ struct rnw_config_t {
 
         double rocking_max_acc;
 
-        double hover_above_tip;
-
         double adjust_nutation_threshold;
 
         double adjust_grip_depth_threshold;
@@ -132,7 +130,6 @@ struct rnw_config_t {
           config.desired_nutation = desired_nutation;
           config.rocking_max_vel = rocking_max_vel;
           config.rocking_max_acc = rocking_max_acc;
-          config.hover_above_tip = hover_above_tip;
           return config;
         }
 
