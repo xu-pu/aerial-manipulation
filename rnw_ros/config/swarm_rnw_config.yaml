@@ -44,6 +44,8 @@ rnw:
   EKi: 0
   EKd: 0
   tau_ff: 0.1
+  specify_heading: true
+  heading_deg: 0
 topple:
   forward: 0.4
   downward: 0.05
