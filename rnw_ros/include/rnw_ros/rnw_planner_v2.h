@@ -18,7 +18,7 @@ struct precession_regulator_t {
 
     rnw_config_t const & rnw_config;
 
-    double desired_heading_yaw;
+    double desired_heading;
 
     double cur_relative_yaw;
 

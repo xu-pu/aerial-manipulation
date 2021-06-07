@@ -158,7 +158,7 @@ void rnw_planner_v2_t::plan_cmd_walk(){
   Vector3d setpoint_apex = G + next_v;
 
   rnw_command.control_point_setpoint = setpoint_apex;
-  rnw_command.heading = precession_regulator.desired_heading_yaw;
+  rnw_command.heading = precession_regulator.desired_heading;
   rnw_command.cmd_idx++;
   step_count++;
   cmd_fsm = cmd_fsm_e::pending;
@@ -194,7 +194,15 @@ void rnw_planner_v2_t::cmd_complete(){
 precession_regulator_t::precession_regulator_t(rnw_config_t const & c ) : rnw_config(c) {}
 
 void precession_regulator_t::start(rnw_msgs::ConeState const & cone_state ){
-  desired_heading_yaw = cone_yaw(cone_state);
+  if ( rnw_config.rnw.specify_heading ) {
+    desired_heading = rnw_config.rnw.heading;
+    ROS_INFO("[rnw_planner] heading direction specified in config");
+  }
+  else  {
+    desired_heading = cone_yaw(cone_state);
+    ROS_INFO("[rnw_planner] did not specify heading direction, use the current value");
+  }
+  ROS_INFO("[rnw_planner] heading=%d",(int)(desired_heading * rad2deg));
   cur_relative_yaw = 0;
   step_count = 0;
   last_step = cone_state;
@@ -212,14 +220,14 @@ void precession_regulator_t::step(rnw_msgs::ConeState const & cone_state ){
   }
 
   if ( step_count >= rnw_config.rnw.lap_start ) {
-    desired_heading_yaw += ( deg2rad * rnw_config.rnw.lap_ang_vel_deg );
-    desired_heading_yaw = uav_utils::normalize_angle(desired_heading_yaw);
+    desired_heading += (deg2rad * rnw_config.rnw.lap_ang_vel_deg );
+    desired_heading = uav_utils::normalize_angle(desired_heading);
   }
 
   if ( step_count > 1 ) {
     // update heading direction
-    double diff_odd = uav_utils::normalize_angle(cone_yaw(last_step_odd) - desired_heading_yaw);
-    double diff_even = uav_utils::normalize_angle(cone_yaw(last_step_even) - desired_heading_yaw);
+    double diff_odd = uav_utils::normalize_angle(cone_yaw(last_step_odd) - desired_heading);
+    double diff_even = uav_utils::normalize_angle(cone_yaw(last_step_even) - desired_heading);
     cur_relative_yaw = ( diff_odd + diff_even ) / 2;
 
     ROS_ERROR_STREAM("[rnw_planner] heading direction error " << cur_relative_yaw*rad2deg << " deg");
