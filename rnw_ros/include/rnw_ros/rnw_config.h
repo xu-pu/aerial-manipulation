@@ -69,6 +69,10 @@ struct rnw_config_t {
 
     struct {
 
+        bool specify_heading = false;
+
+        double heading;
+
         double insertion_depth;
 
         double desired_nutation;
