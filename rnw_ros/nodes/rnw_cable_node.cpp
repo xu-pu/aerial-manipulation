@@ -43,7 +43,7 @@ struct cable_rnw_node_t {
 
       drone.init(get_ros_param_required<string>(nh,"drone_name"));
 
-      drone.set_max_vel_acc(rnw_config.rnw.rocking_max_vel,rnw_config.rnw.max_acc);
+      drone.set_max_vel_acc(rnw_config.rnw.rocking_max_vel,rnw_config.rnw.rocking_max_acc);
 
       timer = nh.createTimer(ros::Rate(30), &cable_rnw_node_t::spin, this);
 

@@ -39,7 +39,7 @@ struct caging_rnw_node_t {
 
     caging_rnw_node_t( ros::NodeHandle & nh, rnw_config_t & cfg ) : rnw_config(cfg), rnw_planner(cfg), drone("drone1") {
 
-      drone.set_max_vel_acc(rnw_config.rnw.rocking_max_vel,rnw_config.rnw.max_acc);
+      drone.set_max_vel_acc(rnw_config.rnw.rocking_max_vel,rnw_config.rnw.rocking_max_acc);
 
       timer = nh.createTimer(ros::Rate(30), &caging_rnw_node_t::spin, this);
 
