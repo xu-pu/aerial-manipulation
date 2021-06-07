@@ -4,6 +4,8 @@
 #include <djiros/DroneArmControl.h>
 #include <nav_msgs/Odometry.h>
 
+#include "rnw_ros/ros_utils.h"
+
 struct arm_manager_node_t {
 
     bool prepare_to_disarm = false;
@@ -22,6 +24,8 @@ struct arm_manager_node_t {
     arm_manager_node_t(){
 
       ros::NodeHandle nh("~");
+
+      disarm_height = get_ros_param_required<double>(nh,"disarm_height");
 
       sub_odom = nh.subscribe<nav_msgs::Odometry>(
               "odom",
