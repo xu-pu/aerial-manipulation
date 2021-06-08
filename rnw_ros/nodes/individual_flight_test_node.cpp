@@ -98,7 +98,7 @@ struct individual_drone_test_t {
         return;
       }
 
-      auto setting = drone_interface_t::create_setting(0.5,0.5);
+      auto setting = drone_interface_t::create_setting(0.3,0.5);
       Vector3d landing_spot(drone.latest_odom.pose.pose.position.x, drone.latest_odom.pose.pose.position.y, -1);
       drone.execute_trajectory(drone.plan(setting,landing_spot));
 

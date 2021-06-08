@@ -1,6 +1,6 @@
 <launch>
 
-    <arg name="drone_name" default="drone1" />
+    <arg name="drone_name" default="drone2" />
 
     <param name="/use_sim_time" type="bool" value="false"/>
 
@@ -40,6 +40,7 @@
         <remap from="~odom" to="/$(arg drone_name)/odom"/>
         <remap from="~position_cmd" to="/$(arg drone_name)/position_cmd"/>
         <remap from="~n3ctrl" to="/$(arg drone_name)/state"/>
+        <remap from="~trigger" to="/$(arg drone_name)/trigger"/>
         <param name="role" type="int" value="1"/> <!--master-->
         <param name="debug/m_debug_packet_info" type="int" value="0"/>
     </node>
@@ -89,9 +90,9 @@
 
 <!--    <node name="record" pkg="rosbag" type="record" output="screen" args="-a -x '(.*)visual(.*)|/(.*)viz(.*)'" />-->
 
-    <node pkg="rqt_multiplot" type="rqt_multiplot" name="rqt_multiplot" output="log" required="true"
-          args="--multiplot-config $(find rnw_ros)/config/rqt_multiplot_tuning_drone2.xml --multiplot-run-all"/>
+<!--    <node pkg="rqt_multiplot" type="rqt_multiplot" name="rqt_multiplot" output="log" required="true"-->
+<!--          args="&#45;&#45;multiplot-config $(find rnw_ros)/config/rqt_multiplot_tuning_drone2.xml &#45;&#45;multiplot-run-all"/>-->
 
-    <node pkg="rqt_reconfigure" type="rqt_reconfigure" name="rqt_reconfigure"/>
+<!--    <node pkg="rqt_reconfigure" type="rqt_reconfigure" name="rqt_reconfigure"/>-->
 
 </launch>
