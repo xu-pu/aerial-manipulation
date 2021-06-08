@@ -21,15 +21,15 @@ rnw:
   # tip over at 30 deg, 20 good angle
   desired_nutation: 65
   desired_grip_depth: 0.06
-  waiting_ratio: 0.8
-  tau: 30
+  waiting_ratio: 1
+  tau: 20
   max_vel: 4
   max_acc: 4
   rocking_max_vel: 2
   rocking_max_acc: 2
   adjust_nutation_threshold: 5
   adjust_grip_depth_threshold: 0.05
-  ang_vel_threshold: 0.5
+  ang_vel_threshold: 0.1
   min_nutation_deg: 5
   yaw_gain: 0.2
   desired_spin_deg: 30
@@ -44,7 +44,7 @@ rnw:
   EKd: 0
   tau_ff: 0.1
   specify_heading: true
-  heading_deg: 0
+  heading_deg: -90
 topple:
   forward: 0.4
   downward: 0.05
