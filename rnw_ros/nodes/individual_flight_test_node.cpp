@@ -34,6 +34,8 @@ struct individual_drone_test_t {
 
     ros::Subscriber sub_trigger_rock;
 
+    ros::Subscriber sub_trigger_take_off;
+
     AmTraj traj_generator;
 
     explicit individual_drone_test_t(ros::NodeHandle & _nh ) : nh(_nh), traj_generator(1024, 16, 0.4, 1, 0.5, 23, 0.02) {
@@ -49,8 +51,8 @@ struct individual_drone_test_t {
       sub_trigger_rock = nh.subscribe<std_msgs::Header>(
               "/gamepad/B", 10, &individual_drone_test_t::trigger_rock, this);
 
-//      sub_trigger_disarm = nh.subscribe<std_msgs::Header>(
-//              "/gamepad/A", 10, &individual_drone_test_t::trigger_disarm, this);
+      sub_trigger_take_off = nh.subscribe<std_msgs::Header>(
+              "/gamepad/LB", 10, &individual_drone_test_t::trigger_take_off, this);
 
     }
 
@@ -117,6 +119,10 @@ struct individual_drone_test_t {
       waypoints.emplace_back(Vector3d::Zero());
 
       drone.follow_waypoints_in_intermediate_frame(waypoints);
+
+    }
+
+    void trigger_take_off( std_msgs::HeaderConstPtr const & msg ) const {
 
     }
 

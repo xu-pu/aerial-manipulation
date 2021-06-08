@@ -1,6 +1,8 @@
 #include "rnw_ros/drone_interface.h"
 #include "rnw_ros/rnw_utils.h"
 
+#include <std_msgs/UInt8.h>
+
 drone_interface_t::drone_interface_t() = default;
 
 drone_interface_t::drone_interface_t( string const & drone_name ){
@@ -34,6 +36,10 @@ void drone_interface_t::init( string const & drone_name ){
   stringstream topic_traj; topic_traj << "/" << drone_name << "/traj";
 
   pub_traj = nh.advertise<quadrotor_msgs::PolynomialTrajectory>(topic_traj.str(),10);
+
+  stringstream topic_trigger; topic_trigger << "/" << drone_name << "/trigger";
+
+  pub_trigger = nh.advertise<std_msgs::UInt8>(topic_trigger.str(),100);
 
   name = drone_name;
 
@@ -245,4 +251,11 @@ void drone_interface_t::reset_traj() const {
 
 bool drone_interface_t::n3ctrl_accept_traj( n3ctrl::N3CtrlState const & msg ) {
   return msg.state >= n3ctrl::N3CtrlState::STATE_CMD_HOVER;
+}
+
+void drone_interface_t::take_off() const {
+  std_msgs::UInt8 msg;
+  msg.data = trigger_take_off;
+  pub_trigger.publish(msg);
+  ROS_WARN("[%s] prepare to take off!", name.c_str());
 }

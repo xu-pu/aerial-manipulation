@@ -14,6 +14,13 @@
 
 struct drone_interface_t {
 
+    enum trigger_e {
+        trigger_idle = 0,
+        trigger_prepare_disarm = 1,
+        trigger_take_off = 2,
+        trigger_disarm_now = 3
+    };
+
     static constexpr double message_timeout = 1;
 
     static constexpr double epsi_distance = 0.05;
@@ -70,6 +77,8 @@ public: // these method only perform planning
 
 public: // these methods will take ACTION
 
+    void take_off() const;
+
     void reset_traj() const;
 
     void execute_trajectory(quadrotor_msgs::PolynomialTrajectory const & traj ) const;
@@ -105,6 +114,8 @@ private:
     ros::Subscriber sub_n3ctrl;
 
     ros::Publisher pub_traj;
+
+    ros::Publisher pub_trigger;
 
     bool just_checking = false;
 

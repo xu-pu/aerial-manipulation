@@ -8,7 +8,7 @@
 
     <!--  DJI  -->
 
-    <node pkg="djiros" type="djiros_node" name="djiros" output="log" launch-prefix="" required="true">
+    <node pkg="djiros" type="djiros_node" name="djiros" output="screen" launch-prefix="" required="true">
         <param name="log_level" type="string" value="info"/>
         <param name="serial_name" type="string" value="/dev/tty.dji.n3"/>
         <param name="baud_rate" type="int" value="921600"/>
@@ -36,6 +36,7 @@
         <rosparam command="load" file="$(find uwb_transceiver)/config/config.yaml" />
         <param name="serial_port" value="/dev/tty.uwb.$(arg drone_name)"/>
         <remap from="~odom" to="/$(arg drone_name)/odom"/>
+        <remap from="~trigger" to="/$(arg drone_name)/trigger"/>
         <remap from="~position_cmd" to="/$(arg drone_name)/position_cmd"/>
         <remap from="~n3ctrl" to="/$(arg drone_name)/state"/>
         <param name="role" type="int" value="1"/> <!--master-->
@@ -70,6 +71,10 @@
         <param name="pub_debug_msgs" type="bool" value="true"/>
     </node>
 
+<!--    <node pkg="rnw_ros" type="arm_manager_node" name="arm_manager_node" output="screen">-->
+<!--        <param name="disarm_height" type="double" value="0.2"/>-->
+<!--    </node>-->
+
     <!--  Plan  -->
 
     <node pkg="joy" type="joy_node" name="joy_node" output="screen">
@@ -97,7 +102,7 @@
         <param name="name" value="sim_tf" />
     </node>
 
-    <node pkg="rqt_multiplot" type="rqt_multiplot" name="rqt_multiplot" output="log" required="true"
-          args="--multiplot-config $(find rnw_ros)/config/rqt_multiplot_n3ctrl.xml --multiplot-run-all"/>
+<!--    <node pkg="rqt_multiplot" type="rqt_multiplot" name="rqt_multiplot" output="log" required="true"-->
+<!--          args="&#45;&#45;multiplot-config $(find rnw_ros)/config/rqt_multiplot_n3ctrl.xml &#45;&#45;multiplot-run-all"/>-->
 
 </launch>
