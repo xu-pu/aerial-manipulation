@@ -1,6 +1,19 @@
 #include "uwb_transceiver/drone_swarm_payload.h"
+#include <djiros/DroneArmControl.h>
 
 using namespace uwb_comm;
+
+std_msgs::Header gen_trigger_msg(){
+  std_msgs::Header msg;
+  msg.frame_id = "world";
+  msg.stamp = ros::Time::now();
+  return msg;
+}
+
+enum trigger_e {
+    trigger_idle = 0,
+    trigger_arm_motors = 1,
+};
 
 struct n3ctrl_state_t {
     uint8_t state;
@@ -179,6 +192,14 @@ void drone_swarm_payload_t::on_n3ctrl(const n3ctrl::N3CtrlStateConstPtr & msg) {
   latest_n3ctrl = *msg;
 }
 
+void drone_swarm_payload_t::on_triggers( const std_msgs::UInt8ConstPtr & msg ) {
+  if ( msg->data > 0 ) {
+    while ( !trigger_queue.empty() ) { trigger_queue.pop(); }
+    ROS_WARN("[uwb_master] trigger %u received", msg->data);
+    while ( trigger_queue.size() < 5 ) { trigger_queue.push(msg->data); }
+  }
+}
+
 void drone_swarm_payload_t::init_as_slave() {
 
   pub_odom = nh.advertise<nav_msgs::Odometry>("odom",100);
@@ -216,6 +237,14 @@ void drone_swarm_payload_t::init_as_master() {
           ros::TransportHints().tcpNoDelay()
   );
 
+  sub_triggers = nh.subscribe<std_msgs::UInt8>(
+          "trigger",
+          100,
+          &drone_swarm_payload_t::on_triggers,
+          this,
+          ros::TransportHints().tcpNoDelay()
+  );
+
   pub_n3ctrl = nh.advertise<n3ctrl::N3CtrlState>("n3ctrl",100);
 
 }
@@ -241,6 +270,15 @@ void drone_swarm_payload_t::slave_decode(const char *buffer) {
     pub_cmd.publish(latest_cmd);
   }
 
+  //////// triggers
+  switch (data.trigger) {
+    case trigger_arm_motors:
+      arm_motors();
+      break;
+    default:
+      break;
+  }
+
 }
 
 bool drone_swarm_payload_t::master_encode(char *buffer) {
@@ -248,6 +286,10 @@ bool drone_swarm_payload_t::master_encode(char *buffer) {
   encode_odom(data,latest_odom);
   encode_cmd(data,latest_cmd);
   data.trigger = 0;
+  if ( !trigger_queue.empty() ) {
+    data.trigger = trigger_queue.back();
+    trigger_queue.pop();
+  }
   memcpy(buffer, (char*)(&data), sizeof(forward_data_t));
   return odom_on_time();
 }
@@ -276,4 +318,11 @@ int drone_swarm_payload_t::data_length_master() {
 
 int drone_swarm_payload_t::data_length_slave() {
   return sizeof(n3ctrl_state_t);
+}
+
+void drone_swarm_payload_t::arm_motors(){
+  ROS_WARN("[uwb_receiver] arm motors!!!");
+  djiros::DroneArmControl arm;
+  arm.request.arm = 1;
+  ros::service::call("/djiros/drone_arm_control",arm);
 }

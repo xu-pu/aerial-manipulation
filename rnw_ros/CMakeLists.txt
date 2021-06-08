@@ -197,7 +197,6 @@ set(RNW_NODES
         ekf_odom_node
         pub_simulated_sensors
         thrust_test_node
-        arm_manager_node
 )
 
 FOREACH(NODE ${RNW_NODES})

@@ -5,10 +5,12 @@
 #ifndef UWB_COMM_DRONE_SWARM_PAYLOAD_H
 #define UWB_COMM_DRONE_SWARM_PAYLOAD_H
 
+#include <queue>
 #include <ros/ros.h>
 #include <nav_msgs/Odometry.h>
 #include <quadrotor_msgs/PositionCommand.h>
 #include <n3ctrl/N3CtrlState.h>
+#include <std_msgs/UInt8.h>
 
 #include "uwb_transceiver/payload.h"
 
@@ -42,6 +44,8 @@ namespace uwb_comm {
 
         ros::Subscriber sub_n3ctrl;
 
+        ros::Subscriber sub_triggers;
+
         ros::Publisher pub_n3ctrl;
 
         ros::Publisher pub_odom;
@@ -60,6 +64,8 @@ namespace uwb_comm {
 
         ros::Duration odom_latency;
 
+        std::queue<uint8_t> trigger_queue;
+
         explicit drone_swarm_payload_t( ros::NodeHandle & );
 
         void on_odom( nav_msgs::OdometryConstPtr const & );
@@ -68,9 +74,13 @@ namespace uwb_comm {
 
         void on_n3ctrl( n3ctrl::N3CtrlStateConstPtr const & );
 
+        void on_triggers( std_msgs::UInt8ConstPtr const & );
+
         bool odom_on_time() const;
 
         bool n3ctrl_on_time() const;
+
+        static void arm_motors();
 
     };
 

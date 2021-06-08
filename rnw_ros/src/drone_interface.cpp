@@ -253,9 +253,9 @@ bool drone_interface_t::n3ctrl_accept_traj( n3ctrl::N3CtrlState const & msg ) {
   return msg.state >= n3ctrl::N3CtrlState::STATE_CMD_HOVER;
 }
 
-void drone_interface_t::take_off() const {
+void drone_interface_t::arm_motors() const {
   std_msgs::UInt8 msg;
-  msg.data = trigger_take_off;
+  msg.data = trigger_arm_motors;
   pub_trigger.publish(msg);
   ROS_WARN("[%s] prepare to take off!", name.c_str());
 }

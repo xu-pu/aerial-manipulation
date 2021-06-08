@@ -123,7 +123,7 @@ struct individual_drone_test_t {
     }
 
     void trigger_take_off( std_msgs::HeaderConstPtr const & msg ) const {
-
+      drone.arm_motors();
     }
 
 };

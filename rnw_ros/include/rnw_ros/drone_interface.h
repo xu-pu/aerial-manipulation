@@ -16,9 +16,7 @@ struct drone_interface_t {
 
     enum trigger_e {
         trigger_idle = 0,
-        trigger_prepare_disarm = 1,
-        trigger_take_off = 2,
-        trigger_disarm_now = 3
+        trigger_arm_motors = 1,
     };
 
     static constexpr double message_timeout = 1;
@@ -77,7 +75,7 @@ public: // these method only perform planning
 
 public: // these methods will take ACTION
 
-    void take_off() const;
+    void arm_motors() const;
 
     void reset_traj() const;
 
