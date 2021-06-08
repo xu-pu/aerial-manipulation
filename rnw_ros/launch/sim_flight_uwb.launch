@@ -1,0 +1,101 @@
+<launch>
+
+	<arg name="uavname" default="hil" />
+
+    <arg name="drone_name" default="drone2" />
+
+    <rosparam command="load" file="$(find rnw_ros)/config/swarm_rnw_config.yaml"/>
+
+    <!--  DJI  -->
+
+    <node pkg="djiros" type="djiros_node" name="djiros" output="log" launch-prefix="" required="true">
+        <param name="log_level" type="string" value="info"/>
+        <param name="serial_name" type="string" value="/dev/tty.dji.n3"/>
+        <param name="baud_rate" type="int" value="921600"/>
+        <param name="app_id"        type="int"      value="1024795"/>
+        <param name="app_version"   type="int"      value="1"/>
+        <param name="enc_key"       type="string"   value="a5f11a418f3dcdc39c4a1efb35a9dd4545e47b56cae9d98c988468277a9305dc"/>
+        <param name="sensor_mode" type="bool" value="false"/>
+        <param name="align_with_fmu" type="bool" value="false"/>
+    </node>
+
+    <param name="ctrl_cmd_stream_timeout" value="0.5"/>
+
+    <node pkg="rnw_ros" type="pub_simulated_sensors" name="pub_simulated_sensors">
+        <remap from="~gps" to="/djiros/gps" />
+        <remap from="~imu_in" to="/djiros/imu" />
+        <remap from="~imu_out" to="/djiros/imu_sim" />
+        <remap from="~odom" to="/$(arg drone_name)/odom" />
+    </node>
+
+    <!--  UWB  -->
+
+    <node pkg="uwb_transceiver" type="uwb_transceiver_node" name="uwb_master_$(arg drone_name)" output="screen" required="false" respawn="true">
+        <rosparam command="load" file="$(find uwb_transceiver)/config/config.yaml" />
+        <param name="serial_port" value="/dev/tty.uwb.$(arg drone_name)"/>
+        <remap from="~odom" to="/$(arg drone_name)/odom"/>
+        <remap from="~position_cmd" to="/$(arg drone_name)/position_cmd"/>
+        <remap from="~n3ctrl" to="/$(arg drone_name)/state"/>
+        <param name="role" type="int" value="1"/> <!--master-->
+        <param name="debug/m_debug_packet_info" type="int" value="0"/>
+    </node>
+
+    <node pkg="uwb_transceiver" type="uwb_transceiver_node" name="uwb_slave_node" output="screen">
+        <rosparam command="load" file="$(find uwb_transceiver)/config/config.yaml" />
+        <param name="serial_port" value="/dev/tty.uwb.slave"/>
+        <remap from="~odom" to="/drone/odom"/>
+        <remap from="~position_cmd" to="/drone/position_cmd"/>
+        <remap from="~n3ctrl" to="/n3ctrl/n3ctrl_state"/>
+        <param name="role" type="int" value="2"/> <!--slave-->
+        <param name="debug/m_debug_packet_info" type="int" value="0"/>
+    </node>
+
+    <!--  Control  -->
+
+    <node pkg="n3ctrl" type="n3ctrl_node" name="n3ctrl" output="screen" required="true">
+        <!--subscribers-->
+		<remap from="~joy" to="/djiros/rc" />
+		<remap from="~imu" to="/djiros/imu" />
+        <remap from="~odom" to="/drone/odom" />
+        <remap from="~cmd" to="/drone/position_cmd" />
+        <!--publishers-->
+		<remap from="~desire_pose" to="/desire_pose" />
+		<remap from="~ctrl" to="/djiros/ctrl" />
+        <!--params-->
+        <rosparam command="load" file="$(find n3ctrl)/config/ctrl_param_$(arg uavname).yaml" />
+        <param name="work_mode" value="real-time" />
+        <param name="js_ctrl_mode" value="feedback" />
+        <param name="pub_debug_msgs" type="bool" value="true"/>
+    </node>
+
+    <!--  Plan  -->
+
+    <node pkg="joy" type="joy_node" name="joy_node" output="screen">
+        <param name="~autorepeat_rate" value="0" />
+    </node>
+
+    <node pkg="rnw_ros" type="gamepad_trigger_node" name="gamepad" output="screen"/>
+
+    <node pkg="rnw_ros" type="individual_flight_test_node" name="individual_flight_test_node" output="screen">
+        <param name="drone_name" type="string" value="$(arg drone_name)"/>
+    </node>
+
+    <node pkg="rnw_ros" type="traj2cmd_node" name="traj2cmd_$(arg drone_name)" output="screen" required="true">
+        <remap from="~traj" to="/$(arg drone_name)/traj"/>
+        <remap from="~odom" to="/$(arg drone_name)/odom"/>
+        <remap from="~position_cmd" to="/$(arg drone_name)/position_cmd"/>
+    </node>
+
+    <!--  Visualization  -->
+
+    <node name="rviz_traj" pkg="rviz" type="rviz" output="log" args="-d $(find rnw_ros)/config/flight.rviz" />
+
+    <node pkg="rnw_ros" type="odom2tf_node" name="sim_tf" output="screen">
+        <remap from="~odom" to="/drone/odom"/>
+        <param name="name" value="sim_tf" />
+    </node>
+
+    <node pkg="rqt_multiplot" type="rqt_multiplot" name="rqt_multiplot" output="log" required="true"
+          args="--multiplot-config $(find rnw_ros)/config/rqt_multiplot_n3ctrl.xml --multiplot-run-all"/>
+
+</launch>
