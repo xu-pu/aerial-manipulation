@@ -129,7 +129,8 @@ struct rnw_config_t {
 
         inline rnw_ros::RNWConfig to_config() const {
           rnw_ros::RNWConfig config;
-          config.insertion_depth = insertion_depth;
+          config.waiting_ratio = waiting_ratio;
+          config.ang_vel_threshold = ang_vel_threshold;
           config.tau = tau;
           config.desired_nutation = desired_nutation;
           config.rocking_max_vel = rocking_max_vel;

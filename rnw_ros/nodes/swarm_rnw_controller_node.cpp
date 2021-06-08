@@ -283,7 +283,8 @@ int main( int argc, char** argv ) {
   server.updateConfig(rnw_config.rnw.to_config());
   server.setCallback([&]( rnw_ros::RNWConfig & config, uint32_t level ){
       ROS_WARN_STREAM("[rnw] re-config rnw");
-      rnw_config.rnw.insertion_depth = config.insertion_depth;
+      rnw_config.rnw.waiting_ratio = config.waiting_ratio;
+      rnw_config.rnw.ang_vel_threshold = config.ang_vel_threshold;
       rnw_config.rnw.desired_nutation = config.desired_nutation;
       rnw_config.rnw.tau = config.tau;
       rnw_config.rnw.rocking_max_vel = config.rocking_max_vel;
