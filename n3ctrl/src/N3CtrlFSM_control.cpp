@@ -91,7 +91,10 @@ void N3CtrlFSM::process_control(const ros::Time& now_time)
 			hov_thr_kf.process(u.thrust);
 			hov_thr_kf.publish_thr();
 #else
-      if ( param.hover.use_hov_percent_kf && controller.flight_status != Controller::flight_status_e::STOPED ) {
+      if ( param.hover.use_hov_percent_kf
+           && controller.flight_status != Controller::flight_status_e::STOPED
+           && (ros::Time::now() - controller.controller_last_active).toSec() < 50./1000 )
+      {
         hov_thr_kf.update(imu_data.q, u.thrust, imu_data.a, controller.external_force_estimate());
       }
       param.config_full_thrust(hov_thr_kf.get_hov_thr());

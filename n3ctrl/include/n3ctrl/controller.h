@@ -142,6 +142,8 @@ public:
 
 	error_integral_t vel_err_integral;
 
+	ros::Time controller_last_active;
+
 	// low-pass-filters
 	vector3d_lpf_t lpf_acc; // acceleration in world frame
 	vector3d_lpf_t lpf_thrust; // specific thrust in world frame
@@ -212,6 +214,12 @@ public:
     Eigen::Vector3d f_ext_indi();
 
     static void disarm();
+
+public:
+
+    ros::Time arm_time;
+
+    double sec_since_motor_armed() const;
 
 };
 

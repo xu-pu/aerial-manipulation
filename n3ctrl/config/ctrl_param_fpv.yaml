@@ -26,6 +26,8 @@ disarm:
   enable: true
   max_height: 0.2
 
+wait_before_take_off: 3
+
 hover:
     set_hov_percent_to_zero: false
     use_hov_percent_kf: true

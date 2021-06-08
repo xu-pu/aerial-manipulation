@@ -90,6 +90,20 @@ void Controller::update(const Desired_State_t& des,const Odom_Data_t& odom,const
     u.yaw = 0;
     return;
   }
+  else if ( sec_since_motor_armed() < param.wait_before_take_off ) {
+    // count down
+    u.roll  = 0;
+    u.pitch = 0;
+    u.thrust = 0.1;
+    u.mode = Controller_Output_t::VERT_THRU;
+    u.yaw_mode = Controller_Output_t::CTRL_YAW_RATE;
+    u.yaw = 0;
+    int count_down = std::ceil(param.wait_before_take_off - sec_since_motor_armed());
+    ROS_INFO("[n3ctrl] countdown to take off, %d...", count_down);
+    return;
+  }
+
+  controller_last_active = ros::Time::now();
 
   double yaw_curr = get_yaw_from_quaternion(odom.q);
   Matrix3d wRc = rotz(yaw_curr); // intermediate frame or control frame, where control gains are defined
@@ -234,6 +248,9 @@ Eigen::Vector3d Controller::acceleration_loop( Eigen::Vector3d const & cmd_acc )
 }
 
 void Controller::on_flight_status( std_msgs::UInt8ConstPtr const & msg ){
+  if ( flight_status == flight_status_e::STOPED && msg->data > 0 ) {
+    arm_time = ros::Time::now();
+  }
   flight_status = (flight_status_e)msg->data;
 }
 
@@ -305,4 +322,13 @@ void Controller::disarm(){
   djiros::DroneArmControl arm;
   arm.request.arm = 0;
   ros::service::call("/djiros/drone_arm_control",arm);
+}
+
+double Controller::sec_since_motor_armed() const {
+  if ( flight_status == flight_status_e::STOPED ) {
+    return -1;
+  }
+  else {
+    return (ros::Time::now() - arm_time).toSec();
+  }
 }

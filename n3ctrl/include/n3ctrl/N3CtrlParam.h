@@ -70,6 +70,8 @@ public:
 	    double max_height;
 	} disarm;
 
+	double wait_before_take_off;
+
 	double indi_lpf;
 
 	Gain hover_gain, track_gain;

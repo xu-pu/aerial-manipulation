@@ -105,6 +105,8 @@ void Parameter_t::config_from_ros_handle(const ros::NodeHandle& nh)
 
   read_essential_param(nh, "indi_lpf", indi_lpf);
 
+  read_essential_param(nh, "wait_before_take_off", wait_before_take_off);
+
 };
 
 void Parameter_t::init()
