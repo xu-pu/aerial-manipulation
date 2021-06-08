@@ -90,3 +90,8 @@ void swarm_interface_t::go_to( Vector3d const & pt1, Vector3d const & pt2, AmTra
 void swarm_interface_t::follow( vector<Vector3d> const & waypoints1, vector<Vector3d> const & waypoints2, AmTraj const & setting ) const {
   send_traj(drone1.plan(setting,waypoints1),drone2.plan(setting,waypoints2));
 }
+
+void swarm_interface_t::arm_motors() const {
+  drone1.arm_motors();
+  drone2.arm_motors();
+}

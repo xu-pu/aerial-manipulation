@@ -40,6 +40,7 @@
         <remap from="~odom" to="/drone1/odom"/>
         <remap from="~position_cmd" to="/drone1/position_cmd"/>
         <remap from="~n3ctrl" to="/drone1/state"/>
+        <remap from="~trigger" to="/$(arg drone_name)/trigger"/>
         <param name="role" type="int" value="1"/> <!--master-->
         <param name="debug/m_debug_packet_info" type="int" value="0"/>
     </node>
@@ -50,6 +51,7 @@
         <remap from="~odom" to="/drone2/odom"/>
         <remap from="~position_cmd" to="/drone2/position_cmd"/>
         <remap from="~n3ctrl" to="/drone2/state"/>
+        <remap from="~trigger" to="/$(arg drone_name)/trigger"/>
         <param name="role" type="int" value="1"/> <!--master-->
         <param name="debug/m_debug_packet_info" type="int" value="0"/>
     </node>

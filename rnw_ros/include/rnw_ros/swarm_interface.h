@@ -52,6 +52,8 @@ public: // these method will TAKE ACTION
 
     void follow( vector<Vector3d> const & waypoints1, vector<Vector3d> const & waypoints2, AmTraj const & setting ) const;
 
+    void arm_motors() const;
+
 private:
 
     ros::Timer integrity_check_timer;

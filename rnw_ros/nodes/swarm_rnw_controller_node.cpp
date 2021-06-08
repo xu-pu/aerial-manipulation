@@ -61,6 +61,8 @@ struct rnw_node_t {
 
     ros::Subscriber sub_trigger_land;
 
+    ros::Subscriber sub_trigger_arm;
+
     ros::Time cmd_start_time;
 
     ros::Duration cmd_duration;
@@ -106,6 +108,13 @@ struct rnw_node_t {
               "/abort",
               10,
               &rnw_node_t::on_abort,
+              this
+      );
+
+      sub_trigger_arm = nh.subscribe<std_msgs::Header>(
+              "/gamepad/LB",
+              10,
+              &rnw_node_t::on_arm_motors,
               this
       );
 
@@ -194,6 +203,11 @@ struct rnw_node_t {
 
       swarm.follow(waypoints_drone1,waypoints_drone2,setting);
 
+    }
+
+    void on_arm_motors( std_msgs::HeaderConstPtr const & msg ) const {
+      ROS_WARN("[rnw_swarm] arm motors of both drones");
+      swarm.arm_motors();
     }
 
     /**
