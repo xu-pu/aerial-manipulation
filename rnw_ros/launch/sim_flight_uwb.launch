@@ -21,10 +21,12 @@
 
     <param name="ctrl_cmd_stream_timeout" value="0.5"/>
 
-    <node pkg="rnw_ros" type="pub_simulated_sensors" name="pub_simulated_sensors">
+    <node pkg="n3ctrl" type="n1_sim_helper.py" name="n1_sim_helper" output="screen" required="true">
+        <!--subscribers-->
+        <remap from="~velo" to="/djiros/velo" />
         <remap from="~gps" to="/djiros/gps" />
-        <remap from="~imu_in" to="/djiros/imu" />
-        <remap from="~imu_out" to="/djiros/imu_sim" />
+        <remap from="~imu" to="/djiros/imu" />
+        <!--publishers-->
         <remap from="~odom" to="/$(arg drone_name)/odom" />
     </node>
 
