@@ -241,12 +241,12 @@ bool Controller::can_disarm(const Odom_Data_t &odom) const {
   return odom.p.z() <= param.disarm.max_height;
 }
 
-bool Controller::want_to_disarm(const Desired_State_t &des) const {
+bool Controller::is_disarm_cmd(const Desired_State_t &des) const {
   return des.p.z() < -0.1;
 }
 
 bool Controller::should_disarm(const Desired_State_t &des, const Odom_Data_t &odom ) const {
-  return param.disarm.enable && can_disarm(odom) && want_to_disarm(des);
+  return param.disarm.enable && can_disarm(odom) && is_disarm_cmd(des);
 }
 
 Eigen::Vector3d Controller::external_force_estimate(){

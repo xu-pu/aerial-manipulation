@@ -159,20 +159,6 @@ public:
 	
 	void publish_ctrl(const Controller_Output_t& u, const ros::Time& stamp, const ros::Time& extra_stamp);
 
-	void on_flight_status( std_msgs::UInt8ConstPtr const & msg );
-
-	bool can_disarm( const Odom_Data_t& odom ) const;
-
-	bool want_to_disarm(const Desired_State_t& des ) const;
-
-	bool should_disarm(const Desired_State_t &des, const Odom_Data_t &odom ) const;
-
-	Eigen::Vector3d external_force_estimate();
-
-	Eigen::Vector3d f_ext_indi();
-
-	static void disarm();
-
 private:
 	bool is_configured;
 
@@ -196,6 +182,36 @@ public:
     Eigen::Vector3d command_acceleration_n3ctrl(const Desired_State_t& des, const Odom_Data_t& odom);
 
     Eigen::Vector3d command_acceleration_sertac(const Desired_State_t& des, const Odom_Data_t& odom);
+
+    void on_flight_status( std_msgs::UInt8ConstPtr const & msg );
+
+    /**
+     * Enter disarm stage when reached certain height
+     * @param odom
+     * @return
+     */
+    bool can_disarm( const Odom_Data_t& odom ) const;
+
+    /**
+     * Disarm when setpoint z is negative
+     * @param des
+     * @return
+     */
+    bool is_disarm_cmd( const Desired_State_t& des ) const;
+
+    /**
+     * Decide disarm or not
+     * @param des
+     * @param odom
+     * @return
+     */
+    bool should_disarm(const Desired_State_t &des, const Odom_Data_t &odom ) const;
+
+    Eigen::Vector3d external_force_estimate();
+
+    Eigen::Vector3d f_ext_indi();
+
+    static void disarm();
 
 };
 
