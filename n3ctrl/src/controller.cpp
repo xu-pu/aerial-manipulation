@@ -7,6 +7,7 @@
 #include <geometry_msgs/WrenchStamped.h>
 #include <boost/format.hpp>
 #include <n3ctrl/ControllerDebug.h>
+#include <djiros/DroneArmControl.h>
 
 using namespace Eigen;
 using std::cout;
@@ -69,17 +70,18 @@ void Controller::update(const Desired_State_t& des,const Odom_Data_t& odom,const
 
   // do not run the actual controller when the quadrotor is not armed
   if ( flight_status == flight_status_e::STOPED ) {
-    ROS_WARN_STREAM("[n3ctrl] not armed!");
+    //ROS_WARN_STREAM("[n3ctrl] not armed!");
     u.roll  = 0;
     u.pitch = 0;
-    u.thrust = 0;
+    u.thrust = 0.1;
     u.mode = Controller_Output_t::VERT_THRU;
     u.yaw_mode = Controller_Output_t::CTRL_YAW_RATE;
     u.yaw = 0;
     return;
   }
-  else if (disarm(des,odom)) {
-    ROS_WARN_STREAM("[n3ctrl] disarm!");
+  else if (should_disarm(des, odom)) {
+    ROS_WARN_STREAM("[n3ctrl] should_disarm!");
+    disarm();
     u.roll  = 0;
     u.pitch = 0;
     u.thrust = 0;
@@ -243,7 +245,7 @@ bool Controller::want_to_disarm(const Desired_State_t &des) const {
   return des.p.z() < -0.1;
 }
 
-bool Controller::disarm( const Desired_State_t &des, const Odom_Data_t &odom ) const {
+bool Controller::should_disarm(const Desired_State_t &des, const Odom_Data_t &odom ) const {
   return param.disarm.enable && can_disarm(odom) && want_to_disarm(des);
 }
 
@@ -296,4 +298,11 @@ Eigen::Vector3d Controller::command_acceleration_sertac(const Desired_State_t &d
          + wRc * Kv * cRw * e_v
          + wRc * Ka * cRw * e_a;
 
+}
+
+void Controller::disarm(){
+  ROS_WARN("[n3ctrl] sending disarm to sdk!!!");
+  djiros::DroneArmControl arm;
+  arm.request.arm = 0;
+  ros::service::call("/djiros/drone_arm_control",arm);
 }

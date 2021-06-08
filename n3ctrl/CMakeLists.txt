@@ -29,6 +29,7 @@ find_package(catkin REQUIRED COMPONENTS
   uav_utils
   message_generation
   dynamic_reconfigure
+  djiros
 )
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")

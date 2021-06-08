@@ -165,11 +165,13 @@ public:
 
 	bool want_to_disarm(const Desired_State_t& des ) const;
 
-	bool disarm( const Desired_State_t &des, const Odom_Data_t &odom ) const;
+	bool should_disarm(const Desired_State_t &des, const Odom_Data_t &odom ) const;
 
 	Eigen::Vector3d external_force_estimate();
 
 	Eigen::Vector3d f_ext_indi();
+
+	static void disarm();
 
 private:
 	bool is_configured;
