@@ -153,6 +153,7 @@ void rnw_config_t::load_from_ros( ros::NodeHandle & nh ){
   rnw.waiting_ratio = get_param_default<double>(nh, "/rnw/waiting_ratio", 1);
   rnw.specify_heading = get_param_default<bool>(nh, "/rnw/specify_heading", false);
   rnw.heading = deg2rad * get_param_default<double>(nh, "/rnw/heading_deg", -90);
+  rnw.min_step_interval = get_param_default<double>(nh, "/rnw/min_step_interval", 0);
 
   swarm.angle = get_param_default<double>(nh, "/swarm/angle", 90);
 

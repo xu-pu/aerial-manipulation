@@ -176,3 +176,14 @@ cone tip points out
 left: drone1
 
 right: drone2
+
+
+
+
+
+## Planner
+
+`step_direction` value range: $\pm1$ , the tilting will be a rotation along $(0,0,\pm1)$ at $G$
+
+take $+ 1$ step when $\phi < 0$, $\psi$ increasess
+

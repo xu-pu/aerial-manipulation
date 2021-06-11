@@ -44,6 +44,8 @@ struct precession_regulator_t {
 
 struct rnw_command_t {
 
+    ros::Time stamp;
+
     uint32_t cmd_idx = 0;
 
     Vector3d control_point_setpoint;
@@ -100,10 +102,6 @@ struct rnw_planner_v2_t {
 
 public:
 
-    void fsm_update();
-
-    void fsm_transition( cone_fsm_e from, cone_fsm_e to );
-
     rnw_config_t const & rnw_config;
 
     ros::Publisher pub_rnw_state;
@@ -124,7 +122,7 @@ public:
 
     precession_regulator_t precession_regulator;
 
-    void plan_next_cmd();
+    void control_loop();
 
     void plan_cmd_walk();
 

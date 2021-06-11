@@ -14,70 +14,9 @@ void rnw_planner_v2_t::on_cone_state( rnw_msgs::ConeStateConstPtr const & msg ){
 
 void rnw_planner_v2_t::spin(){
 
-  //ROS_INFO_STREAM("[rnw] planner main loop spinning");
-
-  if (!cone_state_init) {
-    ROS_WARN("[rnw_planner] waiting for cone_state");
-    return;
-  }
-
-  fsm_update();
-
-  /// Finished updating states
-  /////////////////////////////////
-  /// Do Planning
-
-  if ( cmd_fsm == cmd_fsm_e::idle && cone_fsm == cone_fsm_e::qstatic ) {
-    //ROS_INFO_STREAM("[rnw_planner] plan next cmd");
-    plan_next_cmd();
-  }
-  else if ( cmd_fsm == cmd_fsm_e::pending ) {
-    //ROS_INFO_STREAM("[rnw_planner] cmd pending, do not plan");
-  }
-  else if ( cmd_fsm == cmd_fsm_e::executing ) {
-    //ROS_INFO_STREAM("[rnw_planner] cmd executing, do not plan");
-  }
+  control_loop();
 
   pub_rnw_state.publish(to_rnw_state());
-
-}
-
-void rnw_planner_v2_t::fsm_update(){
-  if ( latest_cone_state.euler_angles.y < rnw_config.rnw.min_nutation_deg * deg2rad ) {
-    fsm_transition(cone_fsm, cone_fsm_e::idle);
-  }
-//  else if ( !latest_cone_state.is_point_contact ){
-//    fsm_transition(fsm, cone_fsm_e::idle);
-//  }
-  else if ( abs(latest_cone_state.euler_angles_velocity.z) < rnw_config.rnw.ang_vel_threshold ) {
-    fsm_transition(cone_fsm, cone_fsm_e::qstatic);
-  }
-  else {
-    fsm_transition(cone_fsm, cone_fsm_e::rocking);
-  }
-}
-
-void rnw_planner_v2_t::fsm_transition(cone_fsm_e from, cone_fsm_e to ){
-
-  if ( from == cone_fsm_e::rocking && to == cone_fsm_e::qstatic ) {
-    ROS_INFO_STREAM("[rnw] from rocking to qstatic");
-  }
-
-  if ( to == cone_fsm_e::rocking && from == cone_fsm_e::qstatic ) {
-    ROS_INFO_STREAM("[rnw] from qstatic to rocking");
-  }
-
-  if ( to == cone_fsm_e::idle ) {
-    cmd_fsm = cmd_fsm_e::idle;
-    step_count = 0;
-  }
-
-  if ( from != cone_fsm_e::idle && to == cone_fsm_e::idle ) {
-    ROS_INFO_STREAM("[rnw] object became idle");
-    stop_walking();
-  }
-
-  cone_fsm = to;
 
 }
 
@@ -112,16 +51,51 @@ rnw_msgs::RnwState rnw_planner_v2_t::to_rnw_state() const {
   return msg;
 }
 
-void rnw_planner_v2_t::plan_next_cmd(){
-  if ( is_walking ) {
-    ROS_INFO_STREAM("[rnw_planner] plan next step of r-n-w");
-    plan_cmd_walk();
-    //plan_cmd_walk_corridor();
-    //plan_cmd_walk_no_feedforward();
+void rnw_planner_v2_t::control_loop(){
+
+  if (!cone_state_init) {
+    ROS_WARN("[rnw_planner] waiting for cone_state");
+    return;
   }
+
+  if ( !is_walking ) {
+    return;
+  }
+
+  if ( latest_cone_state.euler_angles.y < rnw_config.rnw.min_nutation_deg * deg2rad ) {
+    stop_walking();
+  }
+
+  // avoid transient states
+  if ( ros::Time::now() - rnw_command.stamp < ros::Duration(rnw_config.rnw.min_step_interval) ) {
+    return;
+  }
+
+  if ( abs(latest_cone_state.euler_angles_velocity.z) > rnw_config.rnw.ang_vel_threshold
+       || abs(latest_cone_state.euler_angles_velocity.x) > rnw_config.rnw.ang_vel_threshold ) {
+    return;
+  }
+
+  /**
+   * if phi > epsi, make sure rot direction match, otherwise ignore the direction condition
+   * this will allow initialization
+   */
+
+  double epsi_phi = 10 * deg2rad;
+
+  bool direction_matched = -1 * rot_dir * latest_cone_state.euler_angles.z > epsi_phi;
+
+  bool low_energy = std::abs(latest_cone_state.euler_angles.z) < epsi_phi;
+
+  if ( direction_matched || low_energy ) {
+    plan_cmd_walk();
+  }
+
 }
 
 void rnw_planner_v2_t::plan_cmd_walk(){
+
+  rnw_command.stamp = ros::Time::now();
 
   // adjust nutation first
 
@@ -143,8 +117,6 @@ void rnw_planner_v2_t::plan_cmd_walk(){
 
   // left-right step
 
-  rot_dir = -rot_dir;
-
   double steering_term = 0;
   if ( rnw_config.rnw.enable_steering ) {
     steering_term = - rnw_config.rnw.yaw_gain * precession_regulator.cur_relative_yaw;
@@ -164,6 +136,8 @@ void rnw_planner_v2_t::plan_cmd_walk(){
   cmd_fsm = cmd_fsm_e::pending;
 
   precession_regulator.step(latest_cone_state);
+
+  rot_dir = -rot_dir;
 
 }
 

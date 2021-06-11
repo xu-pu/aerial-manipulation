@@ -79,6 +79,8 @@ struct rnw_config_t {
 
         double tau;
 
+        double min_step_interval;
+
         double waiting_ratio;
 
         double rocking_max_vel;
