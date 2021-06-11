@@ -121,16 +121,6 @@ struct rnw_config_t {
 
         double tau_ff = 0;
 
-        inline std::string to_string() const {
-          std::stringstream ss;
-          ss << "RnW Parameters:\n"
-             << "insertion_depth: " << insertion_depth << "\n"
-             << "desired_nutation: " << desired_nutation << "\n"
-             << "rocking_max_vel: " << rocking_max_vel << "\n"
-             << "rocking_max_acc: " << rocking_max_acc << "\n";
-          return ss.str();
-        }
-
         inline rnw_ros::RNWConfig to_config() const {
           rnw_ros::RNWConfig config;
           config.waiting_ratio = waiting_ratio;
