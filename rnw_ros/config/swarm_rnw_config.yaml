@@ -24,8 +24,6 @@ rnw:
   desired_grip_depth: 0.06
   waiting_ratio: 0.9
   tau: 10
-  max_vel: 4
-  max_acc: 4
   rocking_max_vel: 3
   rocking_max_acc: 3
   adjust_nutation_threshold: 5
