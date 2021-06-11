@@ -139,6 +139,7 @@ struct rnw_config_t {
           config.desired_nutation = desired_nutation;
           config.rocking_max_vel = rocking_max_vel;
           config.rocking_max_acc = rocking_max_acc;
+          config.direct_control = direct_control;
           return config;
         }
 

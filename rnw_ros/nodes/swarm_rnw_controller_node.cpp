@@ -288,6 +288,7 @@ int main( int argc, char** argv ) {
       rnw_config.rnw.tau = config.tau;
       rnw_config.rnw.rocking_max_vel = config.rocking_max_vel;
       rnw_config.rnw.rocking_max_acc = config.rocking_max_acc;
+      rnw_config.rnw.direct_control = config.direct_control;
       rnw_node.swarm.drone1.set_max_vel_acc(rnw_config.rnw.rocking_max_vel,rnw_config.rnw.rocking_max_acc);
       rnw_node.swarm.drone2.set_max_vel_acc(rnw_config.rnw.rocking_max_vel,rnw_config.rnw.rocking_max_acc);
       ROS_INFO_STREAM(rnw_config.rnw.to_string());
