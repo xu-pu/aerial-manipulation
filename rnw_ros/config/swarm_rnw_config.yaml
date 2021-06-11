@@ -10,6 +10,7 @@ flu_T_tcp:
 insert_below_tip: 0.1
 swarm:
   angle: 90
+# have to be 90, 80 will loose tension
 cable:
   drone1: 1.22
   drone2: 1.22
@@ -21,12 +22,12 @@ rnw:
   # tip over at 30 deg, 20 good angle
   desired_nutation: 65
   desired_grip_depth: 0.06
-  waiting_ratio: 1
-  tau: 20
+  waiting_ratio: 0.9
+  tau: 30
   max_vel: 4
   max_acc: 4
   rocking_max_vel: 3
-  rocking_max_acc: 3
+  rocking_max_acc: 2.5
   adjust_nutation_threshold: 5
   adjust_grip_depth_threshold: 0.05
   ang_vel_threshold: 0.1
