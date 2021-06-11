@@ -249,7 +249,10 @@ struct rnw_node_t {
      */
     void spin(const ros::TimerEvent &event ){
       rnw_planner.spin();
-      if ( rnw_planner.is_walking && rnw_planner.rnw_command.cmd_idx > last_cmd_idx ) {
+      if ( !rnw_planner.is_walking ) {
+        last_cmd_idx = rnw_planner.rnw_command.cmd_idx;
+      }
+      else if ( rnw_planner.rnw_command.cmd_idx > last_cmd_idx ) {
         ROS_WARN("[swarm_rnw] new command #%u received!",rnw_planner.rnw_command.cmd_idx);
         execute_rnw_cmd(rnw_planner.rnw_command);
         last_cmd_idx = rnw_planner.rnw_command.cmd_idx;

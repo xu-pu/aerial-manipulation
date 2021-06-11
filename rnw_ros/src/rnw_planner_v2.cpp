@@ -21,11 +21,7 @@ void rnw_planner_v2_t::spin(){
 }
 
 void rnw_planner_v2_t::start_walking(){
-  if (cone_fsm == cone_fsm_e::idle ) {
-    ROS_ERROR_STREAM("[rnw] Can't start walking when object is idle!");
-    is_walking = false;
-  }
-  else if ( !is_walking ) {
+  if ( !is_walking ) {
     precession_regulator.start(latest_cone_state);
     is_walking = true;
     walk_idx++;
