@@ -63,10 +63,6 @@ struct rnw_node_t {
 
     ros::Subscriber sub_trigger_arm;
 
-    ros::Time cmd_start_time;
-
-    ros::Duration cmd_duration;
-
     rnw_node_t(ros::NodeHandle & nh, rnw_config_t & cfg )
             : rnw_config(cfg),
               rnw_planner(cfg),
@@ -245,23 +241,18 @@ struct rnw_node_t {
 
     }
 
+    uint32_t last_cmd_idx = 0;
+
     /**
      * Spin the rnw_planner.
      * If there is pending command, execute.
-     * After execution, rnw_planner.cmd_complete()
      */
     void spin(const ros::TimerEvent &event ){
       rnw_planner.spin();
-      if ( rnw_planner.cmd_fsm == rnw_planner_v2_t::cmd_fsm_e::executing ) {
-        if (ros::Time::now() > cmd_start_time + cmd_duration) {
-          rnw_planner.cmd_complete();
-        }
-      }
-      else if ( rnw_planner.cmd_fsm == rnw_planner_v2_t::cmd_fsm_e::pending ) {
-        rnw_command_t cmd = rnw_planner.take_cmd();
-        double time_to_go = rnw_config.rnw.waiting_ratio * execute_rnw_cmd(cmd);
-        cmd_start_time = ros::Time::now();
-        cmd_duration = ros::Duration(time_to_go);
+      if ( rnw_planner.is_walking && rnw_planner.rnw_command.cmd_idx > last_cmd_idx ) {
+        ROS_WARN("[swarm_rnw] new command #%u received!",rnw_planner.rnw_command.cmd_idx);
+        execute_rnw_cmd(rnw_planner.rnw_command);
+        last_cmd_idx = rnw_planner.rnw_command.cmd_idx;
       }
     }
 
