@@ -227,17 +227,22 @@ struct rnw_node_t {
       Vector3d setpoint1 = control_frame * suspend_pt_drone1;
       Vector3d setpoint2 = control_frame * suspend_pt_drone2;
 
-      quadrotor_msgs::PolynomialTrajectory traj1 = swarm.drone1.plan(setpoint1);
-      quadrotor_msgs::PolynomialTrajectory traj2 = swarm.drone2.plan(setpoint2);
-
-      swarm.send_traj(traj1,traj2);
-
-      double dt1 = get_traj_duration(traj1);
-      double dt2 = get_traj_duration(traj2);
-
-      ROS_INFO_STREAM("[rnw_planner] execute cmd #" << cmd.cmd_idx << ", drone1 " << dt1 << "s, drone2 " << dt2 << "s");
-
-      return std::max(dt1,dt2);
+      if ( rnw_config.rnw.direct_control ) {
+        swarm.send_traj(
+                gen_setpoint_traj(swarm.drone1.latest_odom,setpoint1,5),
+                gen_setpoint_traj(swarm.drone2.latest_odom,setpoint2,5)
+        );
+        return 0;
+      }
+      else {
+        quadrotor_msgs::PolynomialTrajectory traj1 = swarm.drone1.plan(setpoint1);
+        quadrotor_msgs::PolynomialTrajectory traj2 = swarm.drone2.plan(setpoint2);
+        swarm.send_traj(traj1,traj2);
+        double dt1 = get_traj_duration(traj1);
+        double dt2 = get_traj_duration(traj2);
+        ROS_INFO_STREAM("[rnw_planner] execute cmd #" << cmd.cmd_idx << ", drone1 " << dt1 << "s, drone2 " << dt2 << "s");
+        return std::max(dt1,dt2);
+      }
 
     }
 

@@ -69,6 +69,8 @@ struct rnw_config_t {
 
     struct {
 
+        bool direct_control;
+
         bool specify_heading = false;
 
         double heading;
