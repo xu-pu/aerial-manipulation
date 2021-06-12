@@ -137,30 +137,6 @@ void rnw_planner_v2_t::plan_cmd_walk(){
 
 }
 
-rnw_command_t rnw_planner_v2_t::take_cmd(){
-  switch ( cmd_fsm ) {
-    case cmd_fsm_e::idle:
-      ROS_ERROR("[rnw] there is no command at the moment");
-      break;
-    case cmd_fsm_e::pending:
-      ROS_INFO_STREAM("[rnw] command is taken, now executing, step #" << step_count);
-      cmd_fsm = cmd_fsm_e::executing;
-      break;
-    case cmd_fsm_e::executing:
-      ROS_ERROR("[rnw] command is already taken!");
-      break;
-    default:
-      ROS_ERROR("[rnw] invalid rnw_cmd state!");
-  }
-  return rnw_command;
-}
-
-void rnw_planner_v2_t::cmd_complete(){
-  if ( cmd_fsm == cmd_fsm_e::executing ) {
-    cmd_fsm = cmd_fsm_e::idle;
-  }
-}
-
 precession_regulator_t::precession_regulator_t(rnw_config_t const & c ) : rnw_config(c) {}
 
 void precession_regulator_t::start(rnw_msgs::ConeState const & cone_state ){

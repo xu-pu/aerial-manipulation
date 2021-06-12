@@ -69,19 +69,6 @@ struct rnw_planner_v2_t {
      */
     void spin();
 
-    /**
-     * Call when the current command is executed
-     * fsm: "executing" -> "idle"
-     */
-    void cmd_complete();
-
-    /**
-     * Take the current pending command
-     * fsm: "pending" -> "executing"
-     * @return rnw_cmd pointer
-     */
-    rnw_command_t take_cmd();
-
     rnw_command_t rnw_command;
 
     void start_walking();

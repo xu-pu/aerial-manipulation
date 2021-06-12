@@ -29,10 +29,6 @@ struct cable_rnw_node_t {
 
     ros::Subscriber sub_trigger_land;
 
-    ros::Time cmd_start_time;
-
-    ros::Duration cmd_duration;
-
     drone_interface_t drone;
 
     cone_interface_t cone;
@@ -149,24 +145,19 @@ struct cable_rnw_node_t {
 
     }
 
-    /**
-     * Spin the rnw_planner.
-     * If there is pending command, execute.
-     * After execution, rnw_planner.cmd_complete()
-     */
+    uint32_t last_cmd_idx = 0;
+
     void spin(const ros::TimerEvent &event ){
       rnw_planner.spin();
-      if ( rnw_planner.cmd_fsm == rnw_planner_v2_t::cmd_fsm_e::executing ) {
-        if (ros::Time::now() > cmd_start_time + cmd_duration) {
-          rnw_planner.cmd_complete();
-        }
+      if ( !rnw_planner.is_walking ) {
+        last_cmd_idx = rnw_planner.rnw_command.cmd_idx;
       }
-      else if ( rnw_planner.cmd_fsm == rnw_planner_v2_t::cmd_fsm_e::pending ) {
-        rnw_command_t cmd = rnw_planner.take_cmd();
-        auto traj = drone.plan(cmd.control_point_setpoint + drone.cable_length * Vector3d::UnitZ());
-        drone.execute_trajectory(traj);
-        cmd_start_time = ros::Time::now();
-        cmd_duration = ros::Duration(get_traj_duration(traj));
+      else if ( rnw_planner.rnw_command.cmd_idx > last_cmd_idx ) {
+        ROS_WARN("[swarm_rnw] new command #%u received!",rnw_planner.rnw_command.cmd_idx);
+        drone.execute_trajectory(
+                drone.plan(rnw_planner.rnw_command.control_point_setpoint + drone.cable_length * Vector3d::UnitZ())
+        );
+        last_cmd_idx = rnw_planner.rnw_command.cmd_idx;
       }
     }
 
