@@ -104,18 +104,9 @@ struct cone_visualizer_t {
     }
 
     void on_cone_state( rnw_msgs::ConeStateConstPtr const & msg  ){
-
       latest_cone_state = *msg;
-
-      if ( cone_is_qstatic(latest_cone_state,rnw_cfg) ) {
-        color = color_qstatic;
-      }
-      else {
-        color = color_default;
-      }
-
+      color = color_default;
       pub_marker_cone.publish(gen_markers());
-
     }
 
     void on_rnw_state( rnw_msgs::RnwStateConstPtr const & msg ){
