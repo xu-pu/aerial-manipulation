@@ -91,8 +91,6 @@ public:
 
     uint8_t walk_idx = 0;
 
-    double desired_yaw;
-
     precession_regulator_t precession_regulator;
 
     void control_loop();
