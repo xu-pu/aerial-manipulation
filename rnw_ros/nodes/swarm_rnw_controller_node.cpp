@@ -169,8 +169,8 @@ struct rnw_node_t {
       waypoints2.back().z() = -0.5;
 
       auto setting = drone_interface_t::create_setting(0.5,0.5);
-
-      swarm.follow(waypoints1,waypoints2,setting);
+      swarm.drone1.execute_trajectory(swarm.drone1.plan(setting,waypoints1),true);
+      swarm.drone2.execute_trajectory(swarm.drone2.plan(setting,waypoints2),true);
 
     }
 

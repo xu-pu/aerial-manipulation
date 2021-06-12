@@ -95,8 +95,8 @@ bool drone_interface_t::ready( bool print_reason ) const {
 
 }
 
-void drone_interface_t::execute_trajectory(quadrotor_msgs::PolynomialTrajectory const & traj ) const {
-  if ( ready(true) ) {
+void drone_interface_t::execute_trajectory(quadrotor_msgs::PolynomialTrajectory const & traj, bool do_not_check ) const {
+  if ( do_not_check || ready(true) ) {
     pub_traj.publish(traj);
   }
 }

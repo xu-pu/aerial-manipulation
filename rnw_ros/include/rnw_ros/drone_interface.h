@@ -79,7 +79,7 @@ public: // these methods will take ACTION
 
     void reset_traj() const;
 
-    void execute_trajectory(quadrotor_msgs::PolynomialTrajectory const & traj ) const;
+    void execute_trajectory(quadrotor_msgs::PolynomialTrajectory const & traj, bool do_not_check = false ) const;
 
     void go_to_point( Vector3d const & target ) const;
 
