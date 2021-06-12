@@ -133,7 +133,10 @@ void rnw_planner_v2_t::plan_cmd_walk(){
   }
 
   double energy_term = 0;
-  if ( rnw_config.rnw.enable_energy_feedback && !peak_phi_dot_history.empty() ) {
+  if ( rnw_config.rnw.enable_energy_feedback
+       && !peak_phi_dot_history.empty()
+       && peak_phi_dot > rnw_config.rnw.peak_phi_dot_threshold )
+  {
     energy_term = rnw_config.rnw.EKp * ( peak_phi_dot_history.back() - peak_phi_dot );
     ROS_INFO("[rnw_planner] energy_term = %f degrees", rad2deg*energy_term);
   }
