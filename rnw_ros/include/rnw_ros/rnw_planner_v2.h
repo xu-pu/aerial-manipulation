@@ -42,14 +42,25 @@ struct precession_regulator_t {
 
 };
 
+/**
+ * Information required to carry out the tilting
+ * no more, no less
+ */
 struct rnw_command_t {
 
     ros::Time stamp;
 
     uint32_t seq = 0;
 
+    /**
+     * Desired position of the control point
+     */
     Vector3d setpoint;
 
+    /**
+     * Heading direction of r-n-w
+     * This is used to adjust yaw of robots
+     */
     double heading;
 
 };
@@ -67,8 +78,6 @@ struct rnw_planner_v2_t {
      */
     void spin();
 
-    rnw_command_t cmd;
-
     void start_walking();
 
     void stop_walking();
@@ -79,17 +88,19 @@ public:
 
     ros::Publisher pub_rnw_state;
 
-    bool cone_state_init = false;
-
     rnw_msgs::ConeState latest_cone_state;
 
-    double rot_dir = -1;
-
-    size_t step_count;
+    bool cone_state_init = false;
 
     bool is_walking = false;
 
-    uint8_t walk_idx = 0;
+    size_t walk_idx = 0;
+
+    size_t step_count;
+
+    double rot_dir = -1;
+
+    rnw_command_t cmd;
 
     precession_regulator_t precession_regulator;
 
