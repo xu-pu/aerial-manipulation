@@ -89,10 +89,6 @@ struct rnw_config_t {
 
         double rocking_max_acc;
 
-        double adjust_nutation_threshold;
-
-        double adjust_grip_depth_threshold;
-
         double ang_vel_threshold;
 
         double min_nutation_deg;
