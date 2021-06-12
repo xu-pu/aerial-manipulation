@@ -45,7 +45,11 @@ rnw_msgs::RnwState rnw_planner_v2_t::to_rnw_state() const {
   msg.header.frame_id = "world";
   msg.is_walking = is_walking;
   msg.step_count = step_count;
-  msg.setpoint = uav_utils::to_point_msg(cmd.setpoint);
+  msg.walk_count = walk_idx;
+  msg.step_direction = static_cast<int8_t>(step_direction);
+  msg.cmd_time = cmd.stamp;
+  msg.cmd_idx = cmd.seq;
+  msg.cmd_setpoint = uav_utils::to_point_msg(cmd.setpoint);
   return msg;
 }
 

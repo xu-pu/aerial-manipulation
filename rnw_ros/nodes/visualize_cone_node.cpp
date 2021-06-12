@@ -144,7 +144,7 @@ struct cone_visualizer_t {
 
       marker.action = visualization_msgs::Marker::ADD;
       marker.points.push_back(latest_cone_state.tip);
-      marker.points.push_back(latest_rnw_state.setpoint);
+      marker.points.push_back(latest_rnw_state.cmd_setpoint);
 
       bool show_cmd = rnw_cmd_ontime() && latest_rnw_state.is_walking;
 

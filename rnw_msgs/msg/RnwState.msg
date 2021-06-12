@@ -1,4 +1,9 @@
 Header header
 bool is_walking
+uint32 walk_count
 uint32 step_count
-geometry_msgs/Point setpoint
+float32 heading
+int8 step_direction
+time cmd_time
+uint32 cmd_idx
+geometry_msgs/Point cmd_setpoint
