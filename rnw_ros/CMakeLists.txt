@@ -150,7 +150,6 @@ include_directories(
 add_library(${PROJECT_NAME}
         src/rnw_utils.cpp
         src/cone_state_estimator.cpp
-        src/rnw_planner.cpp
         src/swarm_interface.cpp
         src/rnw_planner_v2.cpp
         src/drone_interface.cpp
