@@ -32,8 +32,6 @@ rnw:
   min_nutation_deg: 5
   yaw_gain: 0.2
   desired_spin_deg: 30
-  spin_Ki: 0.1
-  spin_Kp: 0.1
   lap_ang_vel_deg: 0
   lap_start: 2
   enable_steering: true

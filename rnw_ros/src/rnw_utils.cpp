@@ -138,8 +138,6 @@ void rnw_config_t::load_from_ros( ros::NodeHandle & nh ){
   rnw.min_nutation_deg = get_param_default<double>(nh, "/rnw/min_nutation_deg", 0);
   rnw.yaw_gain = get_param_default<double>(nh, "/rnw/yaw_gain", 0);
   rnw.desired_spin_deg = get_param_default<double>(nh, "/rnw/desired_spin_deg", 30);
-  rnw.spin_Kp = get_param_default<double>(nh, "/rnw/spin_Kp", 1);
-  rnw.spin_Ki = get_param_default<double>(nh, "/rnw/spin_Ki", 1);
   rnw.lap_ang_vel_deg = get_param_default<double>(nh, "/rnw/lap_ang_vel_deg", 0);
   rnw.lap_start = (size_t)get_param_default<int>(nh, "/rnw/lap_start", 6);
   rnw.enable_steering = get_param_default<bool>(nh, "/rnw/enable_steering", true);

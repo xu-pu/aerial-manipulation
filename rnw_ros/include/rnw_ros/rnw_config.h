@@ -97,10 +97,6 @@ struct rnw_config_t {
 
         double desired_spin_deg;
 
-        double spin_Ki;
-
-        double spin_Kp;
-
         double lap_ang_vel_deg;
 
         size_t lap_start;
