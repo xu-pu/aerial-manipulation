@@ -21,7 +21,7 @@ rnw:
   tau: 10
   rocking_max_vel: 3
   rocking_max_acc: 3
-  ang_vel_threshold: 0.3
+  ang_vel_threshold: 0.5
   min_step_interval: 0.5
   min_nutation_deg: 5
   yaw_gain: 0.2
@@ -31,7 +31,7 @@ rnw:
   enable_steering: true
   enable_energy_feedback: true
   peak_phi_dot_threshold: 1.5
-  EKp: 0.1
+  EKp: 0.5
   EKi: 0
   EKd: 0
   tau_ff: 0.1
