@@ -75,18 +75,6 @@ struct rnw_planner_v2_t {
 
     void stop_walking();
 
-    enum class cmd_fsm_e {
-        idle,
-        pending,
-        executing
-    } cmd_fsm = cmd_fsm_e::idle;
-
-    enum class cone_fsm_e {
-        idle,
-        qstatic,
-        rocking
-    } cone_fsm = cone_fsm_e::idle;
-
 public:
 
     rnw_config_t const & rnw_config;

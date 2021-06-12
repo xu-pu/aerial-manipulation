@@ -131,7 +131,6 @@ void rnw_planner_v2_t::plan_cmd_walk(){
   cmd.heading = precession_regulator.desired_heading;
   cmd.seq++;
   step_count++;
-  cmd_fsm = cmd_fsm_e::pending;
 
   precession_regulator.step(latest_cone_state);
 
