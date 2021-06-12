@@ -16,6 +16,8 @@ void rnw_planner_v2_t::spin(){
 
   control_loop();
 
+  ///// Publish debug/log information
+
   pub_rnw_state.publish(to_rnw_state());
 
 }
