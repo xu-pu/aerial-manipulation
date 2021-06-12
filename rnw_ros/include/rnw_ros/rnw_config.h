@@ -93,6 +93,8 @@ struct rnw_config_t {
 
         bool enable_energy_feedback = true;
 
+        double peak_phi_dot_threshold = 0;
+
         double EKp = 0;
 
         double EKi = 0;
@@ -103,13 +105,15 @@ struct rnw_config_t {
 
         inline rnw_ros::RNWConfig to_config() const {
           rnw_ros::RNWConfig config;
-          config.waiting_ratio = waiting_ratio;
           config.ang_vel_threshold = ang_vel_threshold;
           config.tau = tau;
           config.desired_nutation = desired_nutation;
           config.rocking_max_vel = rocking_max_vel;
           config.rocking_max_acc = rocking_max_acc;
           config.direct_control = direct_control;
+          config.enable_energy_feedback = enable_energy_feedback;
+          config.EKp = EKp;
+          config.peak_phi_dot_threshold = peak_phi_dot_threshold;
           return config;
         }
 

@@ -129,9 +129,17 @@ void rnw_planner_v2_t::plan_cmd_walk(){
   double steering_term = 0;
   if ( rnw_config.rnw.enable_steering ) {
     steering_term = - rnw_config.rnw.yaw_gain * precession_regulator.cur_relative_yaw;
+    ROS_INFO("[rnw_planner] steering_term = %f degrees", rad2deg*steering_term);
   }
 
-  double rot_rad = step_direction * (rnw_config.rnw.tau * deg2rad ) + steering_term;
+  double energy_term = 0;
+  if ( rnw_config.rnw.enable_energy_feedback && !peak_phi_dot_history.empty() ) {
+    energy_term = rnw_config.rnw.EKp * ( peak_phi_dot_history.back() - peak_phi_dot );
+    ROS_INFO("[rnw_planner] energy_term = %f degrees", rad2deg*energy_term);
+  }
+  ROS_INFO("[rnw_planner] peak_phi_dot = %f", peak_phi_dot);
+
+  double rot_rad = step_direction * (rnw_config.rnw.tau * deg2rad ) + steering_term + energy_term;
 
   Matrix3d rot = Eigen::AngleAxisd(rot_rad,Vector3d::UnitZ()).toRotationMatrix();
   Vector3d v = C_prime - G;

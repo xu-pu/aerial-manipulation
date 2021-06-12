@@ -29,8 +29,9 @@ rnw:
   lap_ang_vel_deg: 0
   lap_start: 2
   enable_steering: true
-  enable_energy_feedback: true
-  EKp: 0.2
+  enable_energy_feedback: false
+  peak_phi_dot_threshold: 2
+  EKp: 0.1
   EKi: 0
   EKd: 0
   tau_ff: 0.1
