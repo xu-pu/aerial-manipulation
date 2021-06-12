@@ -46,9 +46,9 @@ struct rnw_command_t {
 
     ros::Time stamp;
 
-    uint32_t cmd_idx = 0;
+    uint32_t seq = 0;
 
-    Vector3d control_point_setpoint;
+    Vector3d setpoint;
 
     double heading;
 
@@ -69,7 +69,7 @@ struct rnw_planner_v2_t {
      */
     void spin();
 
-    rnw_command_t rnw_command;
+    rnw_command_t cmd;
 
     void start_walking();
 

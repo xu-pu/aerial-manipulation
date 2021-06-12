@@ -45,7 +45,7 @@ rnw_msgs::RnwState rnw_planner_v2_t::to_rnw_state() const {
   msg.header.frame_id = "world";
   msg.is_walking = is_walking;
   msg.step_count = step_count;
-  msg.setpoint = uav_utils::to_point_msg(rnw_command.control_point_setpoint);
+  msg.setpoint = uav_utils::to_point_msg(cmd.setpoint);
   return msg;
 }
 
@@ -65,7 +65,7 @@ void rnw_planner_v2_t::control_loop(){
   }
 
   // avoid transient states
-  if ( ros::Time::now() - rnw_command.stamp < ros::Duration(rnw_config.rnw.min_step_interval) ) {
+  if (ros::Time::now() - cmd.stamp < ros::Duration(rnw_config.rnw.min_step_interval) ) {
     return;
   }
 
@@ -93,7 +93,7 @@ void rnw_planner_v2_t::control_loop(){
 
 void rnw_planner_v2_t::plan_cmd_walk(){
 
-  rnw_command.stamp = ros::Time::now();
+  cmd.stamp = ros::Time::now();
 
   // adjust nutation first
 
@@ -127,9 +127,9 @@ void rnw_planner_v2_t::plan_cmd_walk(){
   Vector3d next_v = rot * v;
   Vector3d setpoint_apex = G + next_v;
 
-  rnw_command.control_point_setpoint = setpoint_apex;
-  rnw_command.heading = precession_regulator.desired_heading;
-  rnw_command.cmd_idx++;
+  cmd.setpoint = setpoint_apex;
+  cmd.heading = precession_regulator.desired_heading;
+  cmd.seq++;
   step_count++;
   cmd_fsm = cmd_fsm_e::pending;
 
@@ -190,7 +190,7 @@ rnw_msgs::RnwCmd rnw_command_t::to_ros_msg() const {
   rnw_msgs::RnwCmd msg;
   msg.header.stamp = ros::Time::now();
   msg.header.frame_id = "world";
-  msg.cmd_idx = cmd_idx;
-  msg.setpoint = uav_utils::to_point_msg(control_point_setpoint);
+  msg.cmd_idx = seq;
+  msg.setpoint = uav_utils::to_point_msg(setpoint);
   return msg;
 }

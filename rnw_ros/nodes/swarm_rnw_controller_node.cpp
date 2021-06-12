@@ -218,7 +218,7 @@ struct rnw_node_t {
         return 0;
       }
 
-      ref_frame_t control_frame = calc_control_frame(cmd.control_point_setpoint,cmd.heading);
+      ref_frame_t control_frame = calc_control_frame(cmd.setpoint, cmd.heading);
 
       double rad = deg2rad * 0.5 * rnw_config.swarm.angle;
       Vector3d suspend_pt_drone1 = swarm.drone1.cable_length * Vector3d(0,sin(-rad),cos(-rad));
@@ -240,7 +240,7 @@ struct rnw_node_t {
         swarm.send_traj(traj1,traj2);
         double dt1 = get_traj_duration(traj1);
         double dt2 = get_traj_duration(traj2);
-        ROS_INFO_STREAM("[rnw_planner] execute cmd #" << cmd.cmd_idx << ", drone1 " << dt1 << "s, drone2 " << dt2 << "s");
+        ROS_INFO_STREAM("[rnw_planner] execute cmd #" << cmd.seq << ", drone1 " << dt1 << "s, drone2 " << dt2 << "s");
         return std::max(dt1,dt2);
       }
 
@@ -255,12 +255,12 @@ struct rnw_node_t {
     void spin(const ros::TimerEvent &event ){
       rnw_planner.spin();
       if ( !rnw_planner.is_walking ) {
-        last_cmd_idx = rnw_planner.rnw_command.cmd_idx;
+        last_cmd_idx = rnw_planner.cmd.seq;
       }
-      else if ( rnw_planner.rnw_command.cmd_idx > last_cmd_idx ) {
-        ROS_WARN("[swarm_rnw] new command #%u received!",rnw_planner.rnw_command.cmd_idx);
-        execute_rnw_cmd(rnw_planner.rnw_command);
-        last_cmd_idx = rnw_planner.rnw_command.cmd_idx;
+      else if (rnw_planner.cmd.seq > last_cmd_idx ) {
+        ROS_WARN("[swarm_rnw] new command #%u received!",rnw_planner.cmd.seq);
+        execute_rnw_cmd(rnw_planner.cmd);
+        last_cmd_idx = rnw_planner.cmd.seq;
       }
     }
 

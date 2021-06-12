@@ -150,14 +150,14 @@ struct cable_rnw_node_t {
     void spin(const ros::TimerEvent &event ){
       rnw_planner.spin();
       if ( !rnw_planner.is_walking ) {
-        last_cmd_idx = rnw_planner.rnw_command.cmd_idx;
+        last_cmd_idx = rnw_planner.cmd.seq;
       }
-      else if ( rnw_planner.rnw_command.cmd_idx > last_cmd_idx ) {
-        ROS_WARN("[swarm_rnw] new command #%u received!",rnw_planner.rnw_command.cmd_idx);
+      else if (rnw_planner.cmd.seq > last_cmd_idx ) {
+        ROS_WARN("[swarm_rnw] new command #%u received!",rnw_planner.cmd.seq);
         drone.execute_trajectory(
-                drone.plan(rnw_planner.rnw_command.control_point_setpoint + drone.cable_length * Vector3d::UnitZ())
+                drone.plan(rnw_planner.cmd.setpoint + drone.cable_length * Vector3d::UnitZ())
         );
-        last_cmd_idx = rnw_planner.rnw_command.cmd_idx;
+        last_cmd_idx = rnw_planner.cmd.seq;
       }
     }
 
