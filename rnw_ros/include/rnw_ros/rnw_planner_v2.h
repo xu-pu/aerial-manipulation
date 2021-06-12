@@ -52,8 +52,6 @@ struct rnw_command_t {
 
     double heading;
 
-    rnw_msgs::RnwCmd to_ros_msg() const;
-
 };
 
 struct rnw_planner_v2_t {

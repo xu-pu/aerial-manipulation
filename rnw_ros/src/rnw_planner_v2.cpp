@@ -184,12 +184,3 @@ void precession_regulator_t::step(rnw_msgs::ConeState const & cone_state ){
   last_step = cone_state;
 
 }
-
-rnw_msgs::RnwCmd rnw_command_t::to_ros_msg() const {
-  rnw_msgs::RnwCmd msg;
-  msg.header.stamp = ros::Time::now();
-  msg.header.frame_id = "world";
-  msg.cmd_idx = seq;
-  msg.setpoint = uav_utils::to_point_msg(setpoint);
-  return msg;
-}
