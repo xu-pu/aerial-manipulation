@@ -96,9 +96,9 @@ public:
 
     size_t walk_idx = 0;
 
-    size_t step_count;
+    size_t step_count = 0;
 
-    double rot_dir = -1;
+    double step_direction = -1;
 
     rnw_command_t cmd;
 

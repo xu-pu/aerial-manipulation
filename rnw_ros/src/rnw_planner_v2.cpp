@@ -81,7 +81,7 @@ void rnw_planner_v2_t::control_loop(){
 
   double epsi_phi = 10 * deg2rad;
 
-  bool direction_matched = -1 * rot_dir * latest_cone_state.euler_angles.z > epsi_phi;
+  bool direction_matched = -1 * step_direction * latest_cone_state.euler_angles.z > epsi_phi;
 
   bool low_energy = std::abs(latest_cone_state.euler_angles.z) < epsi_phi;
 
@@ -120,7 +120,7 @@ void rnw_planner_v2_t::plan_cmd_walk(){
     steering_term = - rnw_config.rnw.yaw_gain * precession_regulator.cur_relative_yaw;
   }
 
-  double rot_rad = rot_dir * ( rnw_config.rnw.tau * deg2rad ) + steering_term;
+  double rot_rad = step_direction * (rnw_config.rnw.tau * deg2rad ) + steering_term;
 
   Matrix3d rot = Eigen::AngleAxisd(rot_rad,Vector3d::UnitZ()).toRotationMatrix();
   Vector3d v = C_prime - G;
@@ -134,7 +134,7 @@ void rnw_planner_v2_t::plan_cmd_walk(){
 
   precession_regulator.step(latest_cone_state);
 
-  rot_dir = -rot_dir;
+  step_direction = -step_direction;
 
 }
 
