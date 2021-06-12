@@ -43,12 +43,6 @@ Vector3d cone_rot2euler( Matrix3d const & R ){
 
 }
 
-Vector3d tip_position_to_uav_position( Vector3d const & tip, rnw_config_t const & config ){
-  Vector3d rst = tip;
-  rst.z()  = rst.z() - config.insert_below_tip - config.X_tcp_cage.z();
-  return rst;
-}
-
 vector<Vector3d> gen_wpts_push_topple(
         nav_msgs::Odometry const & uav_odom,
         rnw_msgs::ConeState const & cone_state,
@@ -93,24 +87,15 @@ vector<Vector3d> gen_wpts_push_topple(
 
 void rnw_config_t::load_from_ros( ros::NodeHandle & nh ){
 
-  X_tcp_cage.x() = get_param_default(nh,"/X_tcp_cage/x",0.);
-  X_tcp_cage.y() = get_param_default(nh,"/X_tcp_cage/y",0.);
-  X_tcp_cage.z() = get_param_default(nh,"/X_tcp_cage/z",0.);
-
   flu_T_tcp.x() = get_param_default(nh,"/flu_T_tcp/x",0.);
   flu_T_tcp.y() = get_param_default(nh,"/flu_T_tcp/y",0.);
   flu_T_tcp.z() = get_param_default(nh,"/flu_T_tcp/z",0.);
-
-  insert_below_tip = get_param_default(nh,"/insert_below_tip",5.);
 
   zigzag.step_forward = get_param_default(nh,"/zigzag/step_forward",0.1);
   zigzag.step_sideways = get_param_default(nh,"/zigzag/step_sideways",0.1);
   zigzag.cycles = get_param_default(nh,"/zigzag/cycles",5);
   zigzag.max_vel = get_param_default(nh,"/zigzag/max_vel",1);
   zigzag.max_acc = get_param_default(nh,"/zigzag/max_acc",0.5);
-
-  topple.forward = get_param_default(nh,"/topple/forward",0.2);
-  topple.downward = get_param_default(nh,"/topple/downward",0.03);
 
   cone.radius = get_param_default(nh,"/cone/radius",0.15);
 

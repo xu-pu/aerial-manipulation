@@ -1,13 +1,8 @@
 ground_z: -0.03
-X_tcp_cage:
-  x: 0.000548455
-  y: 0.00354947
-  z: -0.194698
 flu_T_tcp:
   x: -0.07
   y: 0
   z: -0.114698
-insert_below_tip: 0.1
 swarm:
   angle: 90
 # have to be 90, 80 will loose tension
@@ -18,7 +13,6 @@ caging:
   desired_grip_depth: 0.06
 rnw:
   direct_control: false
-  hover_above_tip: 0.03
   insertion_depth: 0.12 # 0.11
   # tip over at 30 deg, 20 good angle
   desired_nutation: 65
@@ -42,9 +36,6 @@ rnw:
   tau_ff: 0.1
   specify_heading: true
   heading_deg: -90
-topple:
-  forward: 0.4
-  downward: 0.05
 zigzag:
   step_forward: 0.1
   step_sideways: 0.1
