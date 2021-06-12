@@ -28,6 +28,8 @@ void rnw_planner_v2_t::start_walking(){
     is_walking = true;
     walk_idx++;
     step_count = 0;
+    peak_phi_dot = 0;
+    peak_phi_dot_history.clear();
   }
 }
 
@@ -67,6 +69,11 @@ void rnw_planner_v2_t::control_loop(){
   if ( latest_cone_state.euler_angles.y < rnw_config.rnw.min_nutation_deg * deg2rad ) {
     stop_walking();
   }
+
+  /////////// From this point, r-n-w is normal and in progress
+
+  // for the energy controller
+  peak_phi_dot = std::max(peak_phi_dot,std::abs(latest_cone_state.euler_angles_velocity.z));
 
   // avoid transient states
   if (ros::Time::now() - cmd.stamp < ros::Duration(rnw_config.rnw.min_step_interval) ) {
@@ -139,6 +146,9 @@ void rnw_planner_v2_t::plan_cmd_walk(){
   precession_regulator.step(latest_cone_state);
 
   step_direction = -step_direction;
+
+  peak_phi_dot_history.push_back(peak_phi_dot);
+  peak_phi_dot = 0;
 
 }
 

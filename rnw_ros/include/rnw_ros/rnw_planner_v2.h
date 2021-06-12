@@ -100,6 +100,10 @@ public:
 
     double step_direction = -1;
 
+    double peak_phi_dot = 0;
+
+    vector<double> peak_phi_dot_history;
+
     rnw_command_t cmd;
 
     precession_regulator_t precession_regulator;
