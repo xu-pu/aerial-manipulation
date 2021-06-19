@@ -7,3 +7,5 @@ int8 step_direction
 time cmd_time
 uint32 cmd_idx
 geometry_msgs/Point cmd_setpoint
+float32 step_size_deg
+float32 err_integral

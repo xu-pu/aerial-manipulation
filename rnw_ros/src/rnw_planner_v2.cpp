@@ -49,6 +49,11 @@ void rnw_planner_v2_t::stop_walking(){
   if ( is_walking ) {
     is_walking = false;
     step_count = 0;
+    energy_err_integral = 0;
+    latest_tau_rad = 0;
+    peak_phi_dot = 0;
+    peak_phi_dot_history.clear();
+    energy_initialized = false;
   }
 }
 
@@ -63,6 +68,8 @@ rnw_msgs::RnwState rnw_planner_v2_t::to_rnw_state() const {
   msg.cmd_time = cmd.stamp;
   msg.cmd_idx = cmd.seq;
   msg.cmd_setpoint = uav_utils::to_point_msg(cmd.setpoint);
+  msg.err_integral = (float)energy_err_integral;
+  msg.step_size_deg = (float)(rad2deg*latest_tau_rad);
   return msg;
 }
 
