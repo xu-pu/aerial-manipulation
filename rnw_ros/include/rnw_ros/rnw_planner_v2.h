@@ -101,7 +101,7 @@ public:
 
     void control_loop();
 
-    void plan_cmd_walk();
+    void plan_next_step();
 
 };
 

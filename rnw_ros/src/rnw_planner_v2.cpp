@@ -128,12 +128,12 @@ void rnw_planner_v2_t::control_loop(){
   bool low_energy = std::abs(latest_cone_state.euler_angles.z) < epsi_phi;
 
   if ( direction_matched || low_energy ) {
-    plan_cmd_walk();
+    plan_next_step();
   }
 
 }
 
-void rnw_planner_v2_t::plan_cmd_walk(){
+void rnw_planner_v2_t::plan_next_step(){
 
   cmd.stamp = ros::Time::now();
 
