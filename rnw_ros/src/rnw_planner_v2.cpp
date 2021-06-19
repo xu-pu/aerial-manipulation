@@ -149,9 +149,8 @@ void rnw_planner_v2_t::plan_cmd_walk(){
   }
 
   /**
-   * Calculate step size on positive steps
+   * regulate step magnitude based on energy
    * negative steps follow the positive steps to ensure symmetry
-   * difference between positive and negative steps are for steering (precession regulation) only
    */
 
   if ( step_direction > 0 ) {
