@@ -141,8 +141,9 @@ void rnw_planner_v2_t::plan_cmd_walk(){
   }
 
   /**
-   * Calculate step size when step_direction > 0
-   * negative steps follow the positive steps strictly to ensure symmetry
+   * Calculate step size on positive steps
+   * negative steps follow the positive steps to ensure symmetry
+   * difference between positive and negative steps are for steering (precession regulation) only
    */
 
   if ( step_direction > 0 ) {
