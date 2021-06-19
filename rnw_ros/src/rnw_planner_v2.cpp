@@ -83,16 +83,24 @@ void rnw_planner_v2_t::control_loop(){
 
   /////////// From this point, r-n-w is normal and in progress
 
+  double ang_vel_thresh = rnw_config.rnw.ang_vel_threshold;
+  double min_step_interval = rnw_config.rnw.min_step_interval;
+
+  if ( !energy_initialized ) {
+    ang_vel_thresh = rnw_config.rnw.init_ang_vel_threshold;
+    min_step_interval = rnw_config.rnw.init_min_step_interval;
+  }
+
   // for the energy controller
   peak_phi_dot = std::max(peak_phi_dot,std::abs(latest_cone_state.euler_angles_velocity.z));
 
   // avoid transient states
-  if (ros::Time::now() - cmd.stamp < ros::Duration(rnw_config.rnw.min_step_interval) ) {
+  if (ros::Time::now() - cmd.stamp < ros::Duration(min_step_interval) ) {
     return;
   }
 
-  if ( abs(latest_cone_state.euler_angles_velocity.z) > rnw_config.rnw.ang_vel_threshold
-       || abs(latest_cone_state.euler_angles_velocity.x) > rnw_config.rnw.ang_vel_threshold ) {
+  if ( abs(latest_cone_state.euler_angles_velocity.z) > ang_vel_thresh
+       || abs(latest_cone_state.euler_angles_velocity.x) > ang_vel_thresh ) {
     return;
   }
 
@@ -161,6 +169,8 @@ void rnw_planner_v2_t::plan_cmd_walk(){
 
     double energy_term = 0;
 
+    double tau_ff = energy_initialized ? rnw_config.rnw.tau : rnw_config.rnw.init_tau;
+
     if ( rnw_config.rnw.enable_energy_feedback && energy_initialized && !peak_phi_dot_history.empty() ) {
       double err_E = peak_phi_dot - peak_phi_dot_history.back();
       energy_err_integral += err_E;
@@ -173,7 +183,7 @@ void rnw_planner_v2_t::plan_cmd_walk(){
      * the minimum action is 0 where the control point don't move,
      * if it became negative, it simply reverse oscillation direction, useless
      */
-    latest_tau_rad = std::max<double>( rnw_config.rnw.tau * deg2rad + energy_term, 0. );
+    latest_tau_rad = std::max<double>( tau_ff * deg2rad + energy_term, 0. );
 
   }
 
