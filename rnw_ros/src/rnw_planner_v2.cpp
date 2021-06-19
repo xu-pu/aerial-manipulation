@@ -32,6 +32,7 @@ void rnw_planner_v2_t::start_walking(){
     peak_phi_dot_history.clear();
     energy_initialized = false;
     latest_tau_rad = 0;
+    step_direction = 1;
   }
 }
 
@@ -87,6 +88,11 @@ void rnw_planner_v2_t::control_loop(){
     return;
   }
 
+  if ( !energy_initialized && peak_phi_dot > rnw_config.rnw.init_threshold ) {
+    energy_initialized = true;
+    ROS_WARN("[rnw_planner] rnw energy initialized!");
+  }
+
   /**
    * if phi > epsi, make sure rot direction match, otherwise ignore the direction condition
    * this will allow initialization
@@ -128,28 +134,31 @@ void rnw_planner_v2_t::plan_cmd_walk(){
 
   // left-right step
 
-  /**
-   * Calculate step size when step_direction > 0
-   * negative steps follow the positive steps strictly to ensure symmetry
-   */
-
   double steering_term = 0;
   if ( rnw_config.rnw.enable_steering ) {
     steering_term = - rnw_config.rnw.yaw_gain * precession_regulator.cur_relative_yaw;
     ROS_INFO("[rnw_planner] steering_term = %f degrees", rad2deg*steering_term);
   }
 
-  double energy_term = 0;
-  if ( rnw_config.rnw.enable_energy_feedback
-       && !peak_phi_dot_history.empty()
-       && peak_phi_dot > rnw_config.rnw.peak_phi_dot_threshold )
-  {
-    energy_term = rnw_config.rnw.EKp * ( peak_phi_dot_history.back() - peak_phi_dot );
-    ROS_INFO("[rnw_planner] energy_term = %f degrees", rad2deg*energy_term);
-  }
-  ROS_INFO("[rnw_planner] peak_phi_dot = %f", peak_phi_dot);
+  /**
+   * Calculate step size when step_direction > 0
+   * negative steps follow the positive steps strictly to ensure symmetry
+   */
 
-  double rot_rad = step_direction * (rnw_config.rnw.tau * deg2rad ) + steering_term + energy_term;
+  if ( step_direction > 0 ) {
+
+    double energy_term = 0;
+
+    if ( rnw_config.rnw.enable_energy_feedback && energy_initialized && !peak_phi_dot_history.empty() ) {
+      energy_term = rnw_config.rnw.EKp * ( peak_phi_dot_history.back() - peak_phi_dot );
+      ROS_INFO("[rnw_planner] energy_term = %f degrees", rad2deg*energy_term);
+    }
+
+    latest_tau_rad = rnw_config.rnw.tau * deg2rad + energy_term;
+
+  }
+
+  double rot_rad = step_direction * latest_tau_rad + steering_term;
 
   Matrix3d rot = Eigen::AngleAxisd(rot_rad,Vector3d::UnitZ()).toRotationMatrix();
   Vector3d v = C_prime - G;
