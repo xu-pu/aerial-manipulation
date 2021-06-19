@@ -5,7 +5,6 @@ flu_T_tcp:
   z: -0.114698
 swarm:
   angle: 90
-# have to be 90, 80 will loose tension
 cable:
   drone1: 1.22
   drone2: 1.22
@@ -13,8 +12,7 @@ caging:
   desired_grip_depth: 0.06
 rnw:
   direct_control: false
-  insertion_depth: 0.12 # 0.11
-  # tip over at 30 deg, 20 good angle
+  insertion_depth: 0.12
   desired_nutation: 65
   desired_grip_depth: 0.06
   waiting_ratio: 0.9
@@ -29,7 +27,7 @@ rnw:
   enable_energy_feedback: true
   peak_phi_dot_threshold: 1.5
   EKp: 0.5
-  EKi: 0
+  EKi: 0.5
   EKd: 0
   tau_ff: 0.1
   specify_heading: true
@@ -38,7 +36,7 @@ rnw:
   init_tau: 15
   init_ang_vel_threshold: 0.1
   init_min_step_interval: 1
-  tau: 10
+  tau: 5
   ang_vel_threshold: 0.5
   min_step_interval: 0.5
 zigzag:

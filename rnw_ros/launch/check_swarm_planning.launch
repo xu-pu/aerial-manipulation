@@ -74,7 +74,7 @@
 
     <!--  Visualization  -->
 
-    <node name="rviz" pkg="rviz" type="rviz" output="log" required="true" args="-d $(find rnw_ros)/config/swarm.rviz"/>
+    <node name="rviz" pkg="rviz" type="rviz" output="log" required="false" args="-d $(find rnw_ros)/config/swarm.rviz"/>
 
     <node pkg="rnw_ros" type="visualize_cone_node" name="visualize_cone_node" output="screen" required="true">
         <param name="cone_color_r" type="double" value="0"/>
