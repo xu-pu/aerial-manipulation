@@ -123,7 +123,7 @@ void rnw_planner_v2_t::plan_cmd_walk(){
   Vector3d e1 = (Dg-G).normalized();
   Vector3d e2 = Vector3d::UnitZ();
   Vector3d K = e1.cross(e2);
-  Vector3d C = point_at_grip_depth(latest_cone_state,rnw_config.caging.desired_grip_depth);
+  Vector3d C = uav_utils::from_point_msg(latest_cone_state.tip);
 
   // make sure they are radiant
   double cur_nutation = latest_cone_state.euler_angles.y;
