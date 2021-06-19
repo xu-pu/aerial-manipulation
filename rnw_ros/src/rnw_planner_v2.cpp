@@ -215,8 +215,8 @@ void precession_regulator_t::step(rnw_msgs::ConeState const & cone_state ){
 
   if ( step_count > 1 ) {
     // update heading direction
-    double diff_odd = uav_utils::normalize_angle(cone_yaw(last_step_odd) - desired_heading);
-    double diff_even = uav_utils::normalize_angle(cone_yaw(last_step_even) - desired_heading);
+    double diff_odd = uav_utils::normalize_angle(calc_cone_heading_direction(last_step_odd) - desired_heading);
+    double diff_even = uav_utils::normalize_angle(calc_cone_heading_direction(last_step_even) - desired_heading);
     cur_relative_yaw = ( diff_odd + diff_even ) / 2;
 
     ROS_ERROR_STREAM("[rnw_planner] heading direction error " << cur_relative_yaw*rad2deg << " deg");

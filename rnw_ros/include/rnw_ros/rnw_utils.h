@@ -61,6 +61,8 @@ double uav_yaw_from_cone_yaw( double cone_yaw );
 
 double cone_yaw( rnw_msgs::ConeState const & cone_state );
 
+double calc_cone_heading_direction( rnw_msgs::ConeState const & cone_state );
+
 /**
  * For forward mounted open cage, no insertion
  * waypoints are for the UAV in the world frame
