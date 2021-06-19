@@ -95,6 +95,8 @@ public:
 
     vector<double> peak_phi_dot_history;
 
+    double energy_err_integral = 0;
+
     rnw_command_t cmd;
 
     void control_loop();

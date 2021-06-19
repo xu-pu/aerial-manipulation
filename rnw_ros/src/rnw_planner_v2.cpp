@@ -41,6 +41,7 @@ void rnw_planner_v2_t::start_walking(){
     }
     heading_step_pos = desired_heading_direction;
     heading_step_neg = desired_heading_direction;
+    energy_err_integral = 0;
   }
 }
 
@@ -139,9 +140,12 @@ void rnw_planner_v2_t::plan_cmd_walk(){
   // rotate along K, positive rotation increase nutation
   Vector3d C_prime = rotate_point_along_axis(C,G,K,theta);
 
-  // left-right step
+  /**
+   * regulate heading direction
+   */
 
   double steering_term = 0;
+
   if ( rnw_config.rnw.enable_steering && step_count > 2 ) {
     double heading_err = uav_utils::normalize_angle( heading_step_pos + heading_step_neg - 2 * desired_heading_direction ) / 2;
     steering_term = - rnw_config.rnw.yaw_gain * heading_err;
@@ -158,11 +162,18 @@ void rnw_planner_v2_t::plan_cmd_walk(){
     double energy_term = 0;
 
     if ( rnw_config.rnw.enable_energy_feedback && energy_initialized && !peak_phi_dot_history.empty() ) {
-      energy_term = rnw_config.rnw.EKp * ( peak_phi_dot_history.back() - peak_phi_dot );
+      double err_E = peak_phi_dot - peak_phi_dot_history.back();
+      energy_err_integral += err_E;
+      energy_term = - ( rnw_config.rnw.EKp * err_E + rnw_config.rnw.EKi * energy_err_integral );
       ROS_INFO("[rnw_planner] energy_term = %f degrees", rad2deg*energy_term);
     }
 
-    latest_tau_rad = rnw_config.rnw.tau * deg2rad + energy_term;
+    /**
+     * latest_tau_rad is a magnitude to control the step size
+     * the minimum action is 0 where the control point don't move,
+     * if it became negative, it simply reverse oscillation direction, useless
+     */
+    latest_tau_rad = std::max<double>( rnw_config.rnw.tau * deg2rad + energy_term, 0. );
 
   }
 
@@ -185,11 +196,14 @@ void rnw_planner_v2_t::plan_cmd_walk(){
     heading_step_neg = calc_cone_heading_direction(latest_cone_state);
   }
 
+  if ( step_direction > 0 ) {
+    peak_phi_dot_history.push_back(peak_phi_dot);
+  }
+
   ////////////////////////////////
 
   step_direction = -step_direction;
 
-  peak_phi_dot_history.push_back(peak_phi_dot);
   peak_phi_dot = 0;
 
 }
