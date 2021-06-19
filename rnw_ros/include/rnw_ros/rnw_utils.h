@@ -48,22 +48,6 @@ inline Vector3d calc_pt_at_cp_frame( Vector3d const & CP, double heading, double
   return R*pt+CP;
 }
 
-/**
- * There are some bugs in the traj generator
- * - create mid points to make sure there is at least 3 waypoints
- * - remove waypoint too close together
- * @param wpts
- * @return
- */
-bool check_waypoints( vector<Vector3d> & wpts );
-
-vector<Vector3d> add_mid_points( vector<Vector3d> const & src );
-
-inline bool cone_is_qstatic( rnw_msgs::ConeState const & cone_state, rnw_config_t const & cfg ){
-  return cone_state.euler_angles.y > cfg.rnw.min_nutation_deg * deg2rad
-         && cone_state.euler_angles_velocity.z <= cfg.rnw.ang_vel_threshold;
-}
-
 double uav_yaw_from_cone_state( rnw_msgs::ConeState const & cone_state );
 
 double uav_yaw_from_odom( nav_msgs::Odometry const & odom );
@@ -76,10 +60,6 @@ double uav_yaw_from_odom( nav_msgs::Odometry const & odom );
 double uav_yaw_from_cone_yaw( double cone_yaw );
 
 double cone_yaw( rnw_msgs::ConeState const & cone_state );
-
-double calc_obj_heading( rnw_msgs::ConeState const & s1, rnw_msgs::ConeState const & s2 );
-
-double calc_mid_rad( double r1, double r2 );
 
 /**
  * For forward mounted open cage, no insertion

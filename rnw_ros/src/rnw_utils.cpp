@@ -178,55 +178,6 @@ Vector3d rotate_point_along_axis( Vector3d const & X, Vector3d const & O, Vector
   return Vrot+O;
 }
 
-bool check_waypoints( vector<Vector3d> & wpts ){
-
-  if ( wpts.size() < 2 ) {
-    return false;
-  }
-
-  // first check points too close together
-
-  constexpr double dist_epsi = 0.005;
-
-  vector<Vector3d> pts;
-
-  pts.push_back(wpts.front());
-
-  for ( size_t i=1; i<wpts.size(); i++ ) {
-    Vector3d pt = wpts.at(i);
-    if ( dist(pts.back(),pt) > dist_epsi ) {
-      pts.push_back(pt);
-    }
-    else {
-      ROS_ERROR_STREAM("[rnw] there is redundant waypoint, removed!");
-    }
-  }
-
-  if ( pts.size() < 2 ) {
-    return false;
-  }
-
-  wpts = add_mid_points(pts);
-
-  return true;
-
-}
-
-vector<Vector3d> add_mid_points( vector<Vector3d> const & src ){
-
-  vector<Vector3d> rst;
-  rst.push_back(src.front());
-
-  for ( size_t i=1; i<src.size(); i++ ) {
-    Vector3d pt = src.at(i);
-    rst.emplace_back((rst.back()+pt)/2);
-    rst.push_back(pt);
-  }
-
-  return rst;
-
-}
-
 double uav_yaw_from_cone_state( rnw_msgs::ConeState const & cone_state ){
   double cone_yaw = uav_utils::get_yaw_from_quaternion(uav_utils::from_quaternion_msg(cone_state.odom.pose.pose.orientation));
   return uav_utils::normalize_angle(cone_yaw-M_PI);
@@ -238,20 +189,6 @@ double uav_yaw_from_odom( nav_msgs::Odometry const & odom ){
 
 double cone_yaw( rnw_msgs::ConeState const & cone_state ){
   return uav_utils::get_yaw_from_quaternion(uav_utils::from_quaternion_msg(cone_state.odom.pose.pose.orientation));
-}
-
-double calc_mid_rad( double r1, double r2 ){
-  double r = uav_utils::normalize_angle((r1+r2)/2);
-  if ( abs(uav_utils::normalize_angle(r-r1)) > M_PI_2 ) {
-    r = uav_utils::normalize_angle(r+M_PI);
-  }
-  return r;
-}
-
-double calc_obj_heading( rnw_msgs::ConeState const & s1, rnw_msgs::ConeState const & s2 ){
-  double y1 = cone_yaw(s1);
-  double y2 = cone_yaw(s2);
-  return calc_mid_rad(y1,y2);
 }
 
 double uav_yaw_from_cone_yaw( double cone_yaw ){
