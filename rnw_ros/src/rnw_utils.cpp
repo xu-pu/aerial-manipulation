@@ -114,12 +114,19 @@ void rnw_config_t::load_from_ros( ros::NodeHandle & nh ){
 
   ground_z = get_param_default<double>(nh, "/ground_z", 0.);
 
+  rnw.init_threshold = get_param_default<double>(nh, "/rnw/init_threshold", 1);
+  rnw.init_tau = get_param_default<double>(nh, "/rnw/init_tau", 15);
+  rnw.init_ang_vel_threshold = get_param_default<double>(nh, "/rnw/init_ang_vel_threshold", 0.1);
+  rnw.init_min_step_interval = get_param_default<double>(nh, "/rnw/init_min_step_interval", 0.5);
+
+  rnw.tau = get_param_default<double>(nh, "/rnw/tau", 30.);
+  rnw.ang_vel_threshold = get_param_default<double>(nh, "/rnw/ang_vel_threshold", 0);
+  rnw.min_step_interval = get_param_default<double>(nh, "/rnw/min_step_interval", 0);
+
   rnw.insertion_depth  = get_param_default<double>(nh, "/rnw/insertion_depth", 0.);
   rnw.desired_nutation = get_param_default<double>(nh, "/rnw/desired_nutation", 30.);
-  rnw.tau              = get_param_default<double>(nh, "/rnw/tau", 30.);
   rnw.rocking_max_vel  = get_param_default<double>(nh, "/rnw/rocking_max_vel", 0.5);
   rnw.rocking_max_acc  = get_param_default<double>(nh, "/rnw/rocking_max_acc", 0.5);
-  rnw.ang_vel_threshold = get_param_default<double>(nh, "/rnw/ang_vel_threshold", 0);
   rnw.min_nutation_deg = get_param_default<double>(nh, "/rnw/min_nutation_deg", 0);
   rnw.yaw_gain = get_param_default<double>(nh, "/rnw/yaw_gain", 0);
   rnw.desired_spin_deg = get_param_default<double>(nh, "/rnw/desired_spin_deg", 30);
@@ -134,7 +141,6 @@ void rnw_config_t::load_from_ros( ros::NodeHandle & nh ){
   rnw.waiting_ratio = get_param_default<double>(nh, "/rnw/waiting_ratio", 1);
   rnw.specify_heading = get_param_default<bool>(nh, "/rnw/specify_heading", false);
   rnw.heading = deg2rad * get_param_default<double>(nh, "/rnw/heading_deg", -90);
-  rnw.min_step_interval = get_param_default<double>(nh, "/rnw/min_step_interval", 0);
   rnw.direct_control = get_param_default<bool>(nh, "/rnw/direct_control", false);
   rnw.peak_phi_dot_threshold = get_param_default<double>(nh, "/rnw/peak_phi_dot_threshold", 0);
 
