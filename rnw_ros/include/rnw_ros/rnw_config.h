@@ -57,6 +57,30 @@ struct rnw_config_t {
 
     struct {
 
+        /**
+         * initialization
+         */
+
+        double init_threshold; // consider initialized when peak_phi_dot > init_threshold
+
+        double init_tau;
+
+        double init_ang_vel_threshold;
+
+        double init_min_step_interval;
+
+        /**
+         * after initialization
+         */
+
+        double tau;
+
+        double ang_vel_threshold;
+
+        double min_step_interval;
+
+        /*********************************/
+
         bool direct_control;
 
         bool specify_heading = false;
@@ -67,17 +91,11 @@ struct rnw_config_t {
 
         double desired_nutation;
 
-        double tau;
-
-        double min_step_interval;
-
         double waiting_ratio;
 
         double rocking_max_vel;
 
         double rocking_max_acc;
-
-        double ang_vel_threshold;
 
         double min_nutation_deg;
 

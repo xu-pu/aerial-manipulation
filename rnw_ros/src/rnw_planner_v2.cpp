@@ -30,6 +30,8 @@ void rnw_planner_v2_t::start_walking(){
     step_count = 0;
     peak_phi_dot = 0;
     peak_phi_dot_history.clear();
+    energy_initialized = false;
+    latest_tau_rad = 0;
   }
 }
 
@@ -125,6 +127,11 @@ void rnw_planner_v2_t::plan_cmd_walk(){
   Vector3d C_prime = rotate_point_along_axis(C,G,K,theta);
 
   // left-right step
+
+  /**
+   * Calculate step size when step_direction > 0
+   * negative steps follow the positive steps strictly to ensure symmetry
+   */
 
   double steering_term = 0;
   if ( rnw_config.rnw.enable_steering ) {

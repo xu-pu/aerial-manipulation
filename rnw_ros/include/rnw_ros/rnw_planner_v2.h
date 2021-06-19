@@ -100,6 +100,10 @@ public:
 
     double step_direction = -1;
 
+    bool energy_initialized = false;
+
+    double latest_tau_rad = 0;
+
     double peak_phi_dot = 0;
 
     vector<double> peak_phi_dot_history;
