@@ -120,4 +120,7 @@
 
     <node pkg="rqt_reconfigure" type="rqt_reconfigure" name="rqt_reconfigure"/>
 
+    <node pkg="rqt_multiplot" type="rqt_multiplot" name="rqt_multiplot" output="log" required="true"
+          args="--multiplot-config $(find rnw_ros)/config/rqt_multiplot_rnw.xml --multiplot-run-all"/>
+
 </launch>
