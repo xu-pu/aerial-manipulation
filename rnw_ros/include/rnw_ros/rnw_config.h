@@ -123,15 +123,24 @@ struct rnw_config_t {
 
         inline rnw_ros::RNWConfig to_config() const {
           rnw_ros::RNWConfig config;
-          config.ang_vel_threshold = ang_vel_threshold;
+
           config.tau = tau;
+          config.ang_vel_threshold = ang_vel_threshold;
+          config.min_step_interval = min_step_interval;
+
+          config.init_tau = init_tau;
+          config.init_ang_vel_threshold = init_ang_vel_threshold;
+          config.init_min_step_interval = init_min_step_interval;
+
+          config.enable_energy_feedback = enable_energy_feedback;
+          config.EKp = EKp;
+          config.EKi = EKi;
+
           config.desired_nutation = desired_nutation;
           config.rocking_max_vel = rocking_max_vel;
           config.rocking_max_acc = rocking_max_acc;
           config.direct_control = direct_control;
-          config.enable_energy_feedback = enable_energy_feedback;
-          config.EKp = EKp;
-          config.peak_phi_dot_threshold = peak_phi_dot_threshold;
+
           return config;
         }
 

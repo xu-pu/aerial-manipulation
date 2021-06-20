@@ -282,15 +282,27 @@ int main( int argc, char** argv ) {
   server.updateConfig(rnw_config.rnw.to_config());
   server.setCallback([&]( rnw_ros::RNWConfig & config, uint32_t level ){
       ROS_WARN_STREAM("[rnw] re-config rnw");
-      rnw_config.rnw.ang_vel_threshold = config.ang_vel_threshold;
-      rnw_config.rnw.desired_nutation = config.desired_nutation;
+
+      // settings for initialization
+      rnw_config.rnw.init_tau = config.init_tau;
+      rnw_config.rnw.init_ang_vel_threshold = config.init_ang_vel_threshold;
+      rnw_config.rnw.init_min_step_interval = config.init_min_step_interval;
+
+      // settings for after initialized
       rnw_config.rnw.tau = config.tau;
+      rnw_config.rnw.ang_vel_threshold = config.ang_vel_threshold;
+      rnw_config.rnw.min_step_interval = config.min_step_interval;
+
+      // settings for energy regulation
+      rnw_config.rnw.enable_energy_feedback = config.enable_energy_feedback;
+      rnw_config.rnw.EKp = config.EKp;
+      rnw_config.rnw.EKi = config.EKi;
+
+      rnw_config.rnw.desired_nutation = config.desired_nutation;
+      rnw_config.rnw.direct_control = config.direct_control;
+
       rnw_config.rnw.rocking_max_vel = config.rocking_max_vel;
       rnw_config.rnw.rocking_max_acc = config.rocking_max_acc;
-      rnw_config.rnw.direct_control = config.direct_control;
-      rnw_config.rnw.enable_energy_feedback = config.enable_energy_feedback;
-      rnw_config.rnw.peak_phi_dot_threshold = config.peak_phi_dot_threshold;
-      rnw_config.rnw.EKp = config.EKp;
       rnw_node.swarm.drone1.set_max_vel_acc(rnw_config.rnw.rocking_max_vel,rnw_config.rnw.rocking_max_acc);
       rnw_node.swarm.drone2.set_max_vel_acc(rnw_config.rnw.rocking_max_vel,rnw_config.rnw.rocking_max_acc);
   });
