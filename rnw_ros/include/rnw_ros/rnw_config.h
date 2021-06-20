@@ -127,17 +127,9 @@ struct rnw_config_t {
 
         double insertion_depth;
 
-        double waiting_ratio;
-
-        double desired_spin_deg;
-
         double lap_ang_vel_deg;
 
         size_t lap_start;
-
-        double peak_phi_dot_threshold = 0;
-
-        double tau_ff = 0;
 
         inline rnw_ros::RNWConfig to_config() const {
           rnw_ros::RNWConfig config;

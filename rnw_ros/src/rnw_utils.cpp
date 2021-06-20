@@ -129,7 +129,6 @@ void rnw_config_t::load_from_ros( ros::NodeHandle & nh ){
   rnw.rocking_max_acc  = get_param_default<double>(nh, "/rnw/rocking_max_acc", 0.5);
   rnw.min_nutation_deg = get_param_default<double>(nh, "/rnw/min_nutation_deg", 0);
   rnw.yaw_gain = get_param_default<double>(nh, "/rnw/yaw_gain", 0);
-  rnw.desired_spin_deg = get_param_default<double>(nh, "/rnw/desired_spin_deg", 30);
   rnw.lap_ang_vel_deg = get_param_default<double>(nh, "/rnw/lap_ang_vel_deg", 0);
   rnw.lap_start = (size_t)get_param_default<int>(nh, "/rnw/lap_start", 6);
   rnw.enable_steering = get_param_default<bool>(nh, "/rnw/enable_steering", true);
@@ -137,12 +136,9 @@ void rnw_config_t::load_from_ros( ros::NodeHandle & nh ){
   rnw.EKp = get_param_default<double>(nh, "/rnw/EKp", 0);
   rnw.EKi = get_param_default<double>(nh, "/rnw/EKi", 0);
   rnw.EKd = get_param_default<double>(nh, "/rnw/EKd", 0);
-  rnw.tau_ff = get_param_default<double>(nh, "/rnw/tau_ff", 0);
-  rnw.waiting_ratio = get_param_default<double>(nh, "/rnw/waiting_ratio", 1);
   rnw.specify_heading = get_param_default<bool>(nh, "/rnw/specify_heading", false);
   rnw.heading = deg2rad * get_param_default<double>(nh, "/rnw/heading_deg", -90);
   rnw.direct_control = get_param_default<bool>(nh, "/rnw/direct_control", false);
-  rnw.peak_phi_dot_threshold = get_param_default<double>(nh, "/rnw/peak_phi_dot_threshold", 0);
 
   swarm.angle = get_param_default<double>(nh, "/swarm/angle", 90);
 
