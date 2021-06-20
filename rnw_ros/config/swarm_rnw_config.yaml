@@ -11,6 +11,7 @@ cable:
 caging:
   desired_grip_depth: 0.06
 rnw:
+  phi_epsi: 10
   direct_control: false
   insertion_depth: 0.12
   desired_nutation: 65

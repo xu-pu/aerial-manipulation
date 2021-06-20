@@ -121,11 +121,9 @@ void rnw_planner_v2_t::control_loop(){
    * this will allow initialization
    */
 
-  double epsi_phi = 10 * deg2rad;
+  bool direction_matched = -1 * step_direction * latest_cone_state.euler_angles.z >= rnw_config.rnw.phi_epsi;
 
-  bool direction_matched = -1 * step_direction * latest_cone_state.euler_angles.z >= epsi_phi;
-
-  bool low_energy = std::abs(latest_cone_state.euler_angles.z) < epsi_phi;
+  bool low_energy = std::abs(latest_cone_state.euler_angles.z) < rnw_config.rnw.phi_epsi;
 
   if ( direction_matched || low_energy ) {
     plan_next_step();
