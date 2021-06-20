@@ -6,8 +6,8 @@ flu_T_tcp:
 swarm:
   angle: 90
 cable:
-  drone1: 1.22
-  drone2: 1.22
+  drone1: 1.262
+  drone2: 1.236
 caging:
   desired_grip_depth: 0.06
 rnw:
@@ -26,19 +26,19 @@ rnw:
   enable_steering: true
   enable_energy_feedback: true
   peak_phi_dot_threshold: 1.5
-  EKp: 0.5
-  EKi: 0.5
+  EKp: 0.1
+  EKi: 0.1
   EKd: 0
   tau_ff: 0.1
   specify_heading: true
   heading_deg: -90
   init_threshold: 1
   init_tau: 15
-  init_ang_vel_threshold: 0.1
-  init_min_step_interval: 1
+  init_ang_vel_threshold: 0.2
+  init_min_step_interval: 0.5
   tau: 5
   ang_vel_threshold: 0.5
-  min_step_interval: 0.5
+  min_step_interval: 0.3
 zigzag:
   step_forward: 0.1
   step_sideways: 0.1
