@@ -69,6 +69,8 @@ struct rnw_config_t {
 
         double init_min_step_interval;
 
+        double phi_epsi;
+
         /**
          * after initialization
          */
@@ -79,27 +81,53 @@ struct rnw_config_t {
 
         double min_step_interval;
 
-        /*********************************/
+        /**
+         * energy regulator
+         */
 
-        bool direct_control;
+        bool enable_energy_feedback = true;
+
+        double EKp = 0;
+
+        double EKi = 0;
+
+        double EKd = 0;
+
+        /**
+         * precession regulator
+         */
+
+        bool enable_steering = true;
 
         bool specify_heading = false;
 
         double heading;
 
-        double insertion_depth;
+        double yaw_gain;
+
+        /**
+         * posture regulator
+         */
 
         double desired_nutation;
 
-        double waiting_ratio;
+        double min_nutation_deg;
+
+        /**
+         * drone motion
+         */
+
+        bool direct_control;
 
         double rocking_max_vel;
 
         double rocking_max_acc;
 
-        double min_nutation_deg;
+        /*********************************/
 
-        double yaw_gain;
+        double insertion_depth;
+
+        double waiting_ratio;
 
         double desired_spin_deg;
 
@@ -107,17 +135,7 @@ struct rnw_config_t {
 
         size_t lap_start;
 
-        bool enable_steering = true;
-
-        bool enable_energy_feedback = true;
-
         double peak_phi_dot_threshold = 0;
-
-        double EKp = 0;
-
-        double EKi = 0;
-
-        double EKd = 0;
 
         double tau_ff = 0;
 
