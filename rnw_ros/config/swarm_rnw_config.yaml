@@ -6,8 +6,8 @@ flu_T_tcp:
 swarm:
   angle: 90
 cable:
-  drone1: 1.262
-  drone2: 1.236
+  drone1: 1.257
+  drone2: 1.263
 caging:
   desired_grip_depth: 0.06
 rnw:
