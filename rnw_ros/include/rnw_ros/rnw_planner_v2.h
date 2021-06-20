@@ -46,6 +46,8 @@ struct rnw_planner_v2_t {
 
     void stop_walking();
 
+    void reset_states();
+
 public:
 
     rnw_config_t const & rnw_config;
@@ -75,7 +77,7 @@ public:
      * Current rocking magnitude, updated upon each positive step
      */
 
-    double latest_tau_rad = 0;
+    double tau = 0;
 
     /**
      * Here we store the heading direction at the latest positive and negative step
@@ -95,7 +97,16 @@ public:
 
     vector<double> peak_phi_dot_history;
 
-    double energy_err_integral = 0;
+    double e_KE_integral = 0;
+
+    struct {
+        double tilt;
+        double tau_ff;
+        double tau_energy_term;
+        double tau_steering_term;
+        double e_psi;
+        double e_KE;
+    } data_log;
 
     rnw_command_t cmd;
 

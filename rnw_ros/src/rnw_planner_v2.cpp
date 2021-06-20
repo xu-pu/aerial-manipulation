@@ -20,40 +20,46 @@ void rnw_planner_v2_t::spin(){
 
 }
 
+void rnw_planner_v2_t::reset_states(){
+  step_count = 0;
+  peak_phi_dot = 0;
+  peak_phi_dot_history.clear();
+  energy_initialized = false;
+  step_direction = 1;
+  tau = 0;
+  e_KE_integral = 0;
+  data_log = { 0 };
+}
+
 void rnw_planner_v2_t::start_walking(){
-  if ( !is_walking ) {
-    is_walking = true;
-    walk_idx++;
-    step_count = 0;
-    peak_phi_dot = 0;
-    peak_phi_dot_history.clear();
-    energy_initialized = false;
-    latest_tau_rad = 0;
-    step_direction = 1;
-    latest_tau_rad = 0;
-    if ( rnw_config.rnw.specify_heading ) {
-      desired_heading_direction = rnw_config.rnw.heading;
-      ROS_INFO("[rnw_planner] heading direction specified in config");
-    }
-    else  {
-      desired_heading_direction = calc_cone_heading_direction(latest_cone_state);
-      ROS_INFO("[rnw_planner] did not specify heading direction, use the current value");
-    }
-    heading_step_pos = desired_heading_direction;
-    heading_step_neg = desired_heading_direction;
-    energy_err_integral = 0;
+
+  if ( is_walking ) return;
+
+  reset_states();
+  is_walking = true;
+  walk_idx++;
+
+  /**
+   * Setup Heading Direction
+   */
+
+  if ( rnw_config.rnw.specify_heading ) {
+    desired_heading_direction = rnw_config.rnw.heading;
+    ROS_INFO("[rnw_planner] heading direction specified in config");
   }
+  else  {
+    desired_heading_direction = calc_cone_heading_direction(latest_cone_state);
+    ROS_INFO("[rnw_planner] did not specify heading direction, use the current value");
+  }
+  heading_step_pos = desired_heading_direction;
+  heading_step_neg = desired_heading_direction;
+
 }
 
 void rnw_planner_v2_t::stop_walking(){
   if ( is_walking ) {
     is_walking = false;
-    step_count = 0;
-    energy_err_integral = 0;
-    latest_tau_rad = 0;
-    peak_phi_dot = 0;
-    peak_phi_dot_history.clear();
-    energy_initialized = false;
+    reset_states();
   }
 }
 
@@ -68,9 +74,20 @@ rnw_msgs::RnwState rnw_planner_v2_t::to_rnw_state() const {
   msg.cmd_time = cmd.stamp;
   msg.cmd_idx = cmd.seq;
   msg.cmd_setpoint = uav_utils::to_point_msg(cmd.setpoint);
-  msg.err_integral = (float)energy_err_integral;
-  msg.step_size_deg = (float)(rad2deg*latest_tau_rad);
+
+  msg.initialized = energy_initialized;
+  msg.tau = (float)tau;
+  msg.tau_ff = (float)data_log.tau_ff;
+  msg.tau_energy_term = (float)data_log.tau_energy_term;
+  msg.tau_steering_term = (float)data_log.tau_steering_term;
+  msg.tilt = (float)data_log.tilt;
+  msg.e_KE = (float)data_log.e_KE;
+  msg.e_KE_integral = (float)e_KE_integral;
+  msg.e_psi = (float)data_log.e_psi;
+  msg.peak_phi_dot = (float)(peak_phi_dot_history.empty() ? 0. : peak_phi_dot_history.back());
+
   return msg;
+
 }
 
 void rnw_planner_v2_t::control_loop(){
@@ -161,9 +178,11 @@ void rnw_planner_v2_t::plan_next_step(){
 
   if ( rnw_config.rnw.enable_steering && step_count > 2 ) {
     double heading_err = uav_utils::normalize_angle( heading_step_pos + heading_step_neg - 2 * desired_heading_direction ) / 2;
+    data_log.e_psi = rad2deg * heading_err;
     steering_term = - rnw_config.rnw.yaw_gain * heading_err;
-    ROS_INFO("[rnw_planner] deviation = %f deg, steering_term = %f deg",rad2deg*heading_err,rad2deg*steering_term);
   }
+
+  data_log.tau_steering_term = rad2deg * steering_term;
 
   /**
    * regulate step magnitude based on energy
@@ -177,22 +196,22 @@ void rnw_planner_v2_t::plan_next_step(){
     double tau_ff = energy_initialized ? rnw_config.rnw.tau : rnw_config.rnw.init_tau;
 
     if ( rnw_config.rnw.enable_energy_feedback && energy_initialized && !peak_phi_dot_history.empty() ) {
-      double err_E = peak_phi_dot - peak_phi_dot_history.back();
-      energy_err_integral += err_E;
-      energy_term = - ( rnw_config.rnw.EKp * err_E + rnw_config.rnw.EKi * energy_err_integral );
-      ROS_INFO("[rnw_planner] energy_term = %f degrees", rad2deg*energy_term);
+      double e_KE = peak_phi_dot - peak_phi_dot_history.back();
+      e_KE_integral += e_KE;
+      energy_term = - (rnw_config.rnw.EKp * e_KE + rnw_config.rnw.EKi * e_KE_integral );
+      data_log.e_KE = e_KE;
     }
 
-    /**
-     * latest_tau_rad is a magnitude to control the step size
-     * the minimum action is 0 where the control point don't move,
-     * if it became negative, it simply reverse oscillation direction, useless
-     */
-    latest_tau_rad = std::max<double>( tau_ff * deg2rad + energy_term, 0. );
+    data_log.tau_ff = tau_ff;
+    data_log.tau_energy_term = rad2deg * energy_term;
+
+    tau = std::max<double>( tau_ff * deg2rad + energy_term, 0. );
 
   }
 
-  double rot_rad = step_direction * latest_tau_rad + steering_term;
+  double rot_rad = step_direction * tau + steering_term;
+
+  data_log.tilt = rad2deg * rot_rad;
 
   Matrix3d rot = Eigen::AngleAxisd(rot_rad,Vector3d::UnitZ()).toRotationMatrix();
   Vector3d v = C_prime - G;
