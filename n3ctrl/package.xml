@@ -46,6 +46,7 @@
   <depend>uav_utils</depend>
   <depend>geometry_msgs</depend>
   <depend>quadrotor_msgs</depend>
+  <depend>djiros</depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>
