@@ -138,6 +138,8 @@ struct rnw_config_t {
           config.ang_vel_threshold = ang_vel_threshold;
           config.min_step_interval = min_step_interval;
 
+          config.phi_epsi = rad2deg * phi_epsi;
+          config.init_threshold = init_threshold;
           config.init_tau = init_tau;
           config.init_ang_vel_threshold = init_ang_vel_threshold;
           config.init_min_step_interval = init_min_step_interval;

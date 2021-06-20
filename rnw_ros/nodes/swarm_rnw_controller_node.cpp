@@ -284,6 +284,8 @@ int main( int argc, char** argv ) {
       ROS_WARN_STREAM("[rnw] re-config rnw");
 
       // settings for initialization
+      rnw_config.rnw.phi_epsi = deg2rad * config.phi_epsi;
+      rnw_config.rnw.init_threshold = config.init_threshold;
       rnw_config.rnw.init_tau = config.init_tau;
       rnw_config.rnw.init_ang_vel_threshold = config.init_ang_vel_threshold;
       rnw_config.rnw.init_min_step_interval = config.init_min_step_interval;
