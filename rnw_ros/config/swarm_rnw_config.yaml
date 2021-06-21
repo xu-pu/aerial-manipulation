@@ -11,7 +11,7 @@ cable:
 caging:
   desired_grip_depth: 0.06
 rnw:
-  phi_epsi: 10
+  phi_epsi: 5
   direct_control: false
   insertion_depth: 0.12
   desired_nutation: 65
@@ -23,7 +23,7 @@ rnw:
   lap_ang_vel_deg: 0
   lap_start: 2
   enable_steering: true
-  enable_energy_feedback: true
+  enable_energy_feedback: false
   EKp: 0.1
   EKi: 0.1
   EKd: 0
