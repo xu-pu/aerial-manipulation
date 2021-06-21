@@ -187,3 +187,8 @@ right: drone2
 
 take $+ 1$ step when $\phi < 0$, $\psi$ increasess
 
+
+
+
+
+heavy object tip over at 25
