@@ -196,7 +196,8 @@ void rnw_planner_v2_t::plan_next_step(){
     double tau_ff = energy_initialized ? rnw_config.rnw.tau : rnw_config.rnw.init_tau;
 
     if ( rnw_config.rnw.enable_energy_feedback && energy_initialized && !peak_phi_dot_history.empty() ) {
-      double e_KE = peak_phi_dot - peak_phi_dot_history.back();
+      double des_KE = rnw_config.rnw.specify_energy ? rnw_config.rnw.desired_energy : peak_phi_dot_history.back();
+      double e_KE = peak_phi_dot - des_KE;
       e_KE_integral += e_KE;
       energy_term = - (rnw_config.rnw.EKp * e_KE + rnw_config.rnw.EKi * e_KE_integral );
       data_log.e_KE = e_KE;
