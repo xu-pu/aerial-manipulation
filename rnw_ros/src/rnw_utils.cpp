@@ -133,6 +133,8 @@ void rnw_config_t::load_from_ros( ros::NodeHandle & nh ){
   rnw.lap_start = (size_t)get_param_default<int>(nh, "/rnw/lap_start", 6);
   rnw.enable_steering = get_param_default<bool>(nh, "/rnw/enable_steering", true);
   rnw.enable_energy_feedback = get_param_default<bool>(nh, "/rnw/enable_energy_feedback", true);
+  rnw.specify_energy = get_param_default<bool>(nh, "/rnw/specify_energy", false);
+  rnw.desired_energy = get_param_default<double>(nh, "/rnw/desired_energy", 1);
   rnw.EKp = get_param_default<double>(nh, "/rnw/EKp", 0);
   rnw.EKi = get_param_default<double>(nh, "/rnw/EKi", 0);
   rnw.EKd = get_param_default<double>(nh, "/rnw/EKd", 0);

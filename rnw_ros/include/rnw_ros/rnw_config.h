@@ -87,6 +87,10 @@ struct rnw_config_t {
 
         bool enable_energy_feedback = true;
 
+        bool specify_energy = false;
+
+        double desired_energy = 1;
+
         double EKp = 0;
 
         double EKi = 0;
@@ -145,6 +149,7 @@ struct rnw_config_t {
           config.init_min_step_interval = init_min_step_interval;
 
           config.enable_energy_feedback = enable_energy_feedback;
+          config.desired_energy = desired_energy;
           config.EKp = EKp;
           config.EKi = EKi;
 

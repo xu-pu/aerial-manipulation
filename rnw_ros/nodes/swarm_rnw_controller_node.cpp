@@ -299,6 +299,8 @@ int main( int argc, char** argv ) {
       rnw_config.rnw.enable_energy_feedback = config.enable_energy_feedback;
       rnw_config.rnw.EKp = config.EKp;
       rnw_config.rnw.EKi = config.EKi;
+      rnw_config.rnw.specify_energy = config.specify_energy;
+      rnw_config.rnw.desired_energy = config.desired_energy;
 
       rnw_config.rnw.desired_nutation = config.desired_nutation;
       rnw_config.rnw.direct_control = config.direct_control;

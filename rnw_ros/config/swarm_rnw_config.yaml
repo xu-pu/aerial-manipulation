@@ -24,6 +24,8 @@ rnw:
   lap_start: 2
   enable_steering: true
   enable_energy_feedback: false
+  specify_energy: false
+  desired_energy: 2
   EKp: 0.1
   EKi: 0.1
   EKd: 0
