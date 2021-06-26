@@ -152,6 +152,8 @@ struct rnw_config_t {
           config.desired_energy = desired_energy;
           config.EKp = EKp;
           config.EKi = EKi;
+          config.specify_energy = specify_energy;
+          config.desired_energy = desired_energy;
 
           config.desired_nutation = desired_nutation;
           config.rocking_max_vel = rocking_max_vel;

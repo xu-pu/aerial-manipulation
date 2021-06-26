@@ -14,7 +14,7 @@ rnw:
   phi_epsi: 5
   direct_control: false
   insertion_depth: 0.12
-  desired_nutation: 45
+  desired_nutation: 65
   desired_grip_depth: 0.06
   rocking_max_vel: 3
   rocking_max_acc: 3
@@ -23,19 +23,19 @@ rnw:
   lap_ang_vel_deg: 0
   lap_start: 2
   enable_steering: true
-  enable_energy_feedback: false
-  specify_energy: false
+  enable_energy_feedback: true
+  specify_energy: true
   desired_energy: 2
   EKp: 0.1
   EKi: 0.1
   EKd: 0
   specify_heading: true
   heading_deg: 90
-  init_threshold: 0.8
-  init_tau: 15
+  init_threshold: 2
+  init_tau: 10
   init_ang_vel_threshold: 0.2
   init_min_step_interval: 0.5
-  tau: 10
+  tau: 5
   ang_vel_threshold: 0.5
   min_step_interval: 0.3
 zigzag:
