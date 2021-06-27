@@ -4,7 +4,7 @@ flu_T_tcp:
   y: 0
   z: -0.114698
 swarm:
-  angle: 90
+  angle: 120
 cable:
   drone1: 1.04
   drone2: 1.06
@@ -14,7 +14,7 @@ rnw:
   phi_epsi: 5
   direct_control: false
   insertion_depth: 0.12
-  desired_nutation: 65
+  desired_nutation: 55
   desired_grip_depth: 0.06
   rocking_max_vel: 3
   rocking_max_acc: 3
@@ -27,15 +27,15 @@ rnw:
   specify_energy: true
   desired_energy: 2
   EKp: 0.1
-  EKi: 0.1
+  EKi: 0
   EKd: 0
   specify_heading: true
   heading_deg: 90
-  init_threshold: 2
-  init_tau: 10
-  init_ang_vel_threshold: 0.2
+  init_threshold: 1
+  init_tau: 15
+  init_ang_vel_threshold: 0.5
   init_min_step_interval: 0.5
-  tau: 5
+  tau: 10
   ang_vel_threshold: 0.5
   min_step_interval: 0.3
 zigzag:
