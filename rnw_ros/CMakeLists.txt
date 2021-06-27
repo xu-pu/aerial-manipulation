@@ -23,6 +23,7 @@ find_package(catkin REQUIRED COMPONENTS
         rnw_msgs
         dynamic_reconfigure
         djiros
+        rosbag
 )
 
 find_package(Ceres REQUIRED)
@@ -204,6 +205,10 @@ FOREACH(NODE ${RNW_NODES})
     #add_dependencies(${NODE} ${PROJECT_NAME}_generate_messages_cpp)
     add_dependencies(${NODE} ${PROJECT_NAME}_gencfg)
 ENDFOREACH()
+
+add_executable(extract_thrust scripts/extract_thrust.cpp)
+target_link_libraries(extract_thrust ${catkin_LIBRARIES})
+add_dependencies(extract_thrust ${PROJECT_NAME}_gencfg)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
