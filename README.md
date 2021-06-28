@@ -194,3 +194,6 @@ take $+ 1$ step when $\phi < 0$, $\psi$ increasess
 heavy object tip over at 25
 
 steel object gain 60
+
+exp9 for 45 120
+exp8 for 45 90
