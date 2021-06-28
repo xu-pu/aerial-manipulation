@@ -123,8 +123,7 @@ void rnw_planner_v2_t::control_loop(){
     return;
   }
 
-  if ( abs(latest_cone_state.euler_angles_velocity.z) > ang_vel_thresh
-       || abs(latest_cone_state.euler_angles_velocity.x) > ang_vel_thresh ) {
+  if ( abs(latest_cone_state.euler_angles_velocity.z) > ang_vel_thresh ) {
     return;
   }
 
