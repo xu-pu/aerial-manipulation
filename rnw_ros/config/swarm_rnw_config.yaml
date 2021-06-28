@@ -32,10 +32,10 @@ rnw:
   specify_heading: true
   heading_deg: 90
   init_threshold: 1
-  init_tau: 20
+  init_tau: 30
   init_ang_vel_threshold: 0.5
   init_min_step_interval: 0.5
-  tau: 20
+  tau: 30
   ang_vel_threshold: 1
   min_step_interval: 0.3
 zigzag:

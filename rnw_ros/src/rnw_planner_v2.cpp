@@ -1,5 +1,7 @@
 #include "rnw_ros/rnw_planner_v2.h"
 
+#include <uav_utils/utils.h>
+
 rnw_planner_v2_t::rnw_planner_v2_t( rnw_config_t const & cfg ) : rnw_config(cfg) {
   ros::NodeHandle nh("~");
   pub_rnw_state = nh.advertise<rnw_msgs::RnwState>("/rnw/state",100);
@@ -113,6 +115,10 @@ void rnw_planner_v2_t::control_loop(){
   if ( !energy_initialized ) {
     ang_vel_thresh = rnw_config.rnw.init_ang_vel_threshold;
     min_step_interval = rnw_config.rnw.init_min_step_interval;
+  }
+
+  if ( !peak_phi_dot_history.empty() ) {
+    ang_vel_thresh = uav_utils::clamp<double>(0.5*peak_phi_dot_history.back(),0.1,ang_vel_thresh);
   }
 
   // for the energy controller
