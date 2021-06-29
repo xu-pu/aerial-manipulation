@@ -121,6 +121,41 @@ void gen_csv( string const & name ){
 
 }
 
+vector<rnw_msgs::ConeState> extract_phi_peaks(){
+
+  vector<rnw_msgs::ConeState> rst;
+
+  for ( size_t i=1; i<v_cone_state.size()-1; i++ ) {
+
+    double phi_cur = abs(v_cone_state.at(i).euler_angles.z);
+    double phi_pre = abs(v_cone_state.at(i-1).euler_angles.z);
+    double phi_nxt = abs(v_cone_state.at(i+1).euler_angles.z);
+
+    if ( phi_cur > phi_nxt && phi_cur > phi_pre ) {
+      rst.emplace_back(v_cone_state.at(i));
+    }
+
+  }
+
+  return rst;
+
+}
+
+void gen_amp( string const & bag_name ){
+
+  auto rst = extract_phi_peaks();
+
+  std::string result_dir = "/home/sheep/";
+  stringstream ss; ss << result_dir << "/" << bag_name << ".peaks.csv";
+  ofstream ofs(ss.str());
+
+  for ( auto iter : rst ) {
+    ofs << (iter.header.stamp-start_time).toSec() << "," << iter.euler_angles.z << endl;
+  }
+
+  ofs.close();
+
+}
 
 int main( int argc, char** argv ) {
 
@@ -135,6 +170,8 @@ int main( int argc, char** argv ) {
   sync_all_data(bag);
 
   gen_csv(bag_name);
+
+  gen_amp(bag_name);
 
   bag.close();
 
