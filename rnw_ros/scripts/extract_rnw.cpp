@@ -8,6 +8,8 @@
 #include <rnw_msgs/RnwState.h>
 #include <nav_msgs/Odometry.h>
 #include <rnw_msgs/ConeState.h>
+#include <Eigen/Dense>
+#include <uav_utils/converters.h>
 
 using namespace std;
 
@@ -32,6 +34,10 @@ void extract_rnw_data( rosbag::Bag & bag ) {
     rnw_msgs::RnwState::ConstPtr i = m.instantiate<rnw_msgs::RnwState>();
     if (i == nullptr) continue;
 
+    if ( i->is_walking ) {
+      v_rnw_state.emplace_back(*i);
+    }
+
     if ( !latch.is_walking && i->is_walking ) {
       // start
       start_time = i->header.stamp;
@@ -41,8 +47,6 @@ void extract_rnw_data( rosbag::Bag & bag ) {
       end_time = latch.header.stamp;
       break;
     }
-
-    v_rnw_state.emplace_back(*i);
 
     latch = *i;
 
@@ -86,11 +90,42 @@ void sync_all_data( rosbag::Bag & bag ){
   sync_topic<nav_msgs::Odometry>(bag,"/drone2/odom",v_drone2_odom);
 }
 
+double calc_angle( rnw_msgs::ConeState const & cone, nav_msgs::Odometry const & odom1, nav_msgs::Odometry const & odom2 ){
+
+  Eigen::Vector3d cp = uav_utils::from_point_msg(cone.tip);
+  Eigen::Vector3d d1 = uav_utils::from_point_msg(odom1.pose.pose.position);
+  Eigen::Vector3d d2 = uav_utils::from_point_msg(odom2.pose.pose.position);
+
+  Eigen::Vector3d v1 = d1-cp;
+  Eigen::Vector3d v2 = d2-cp;
+
+  return std::atan2(v1.cross(v2).norm(), v1.dot(v2));
+
+}
+
+
+void gen_csv( string const & name ){
+
+  std::string result_dir = "/home/sheep/";
+  stringstream ss; ss << result_dir << "/" << name << ".cont.csv";
+  ofstream ofs(ss.str());
+
+  for ( size_t i=0; i<v_rnw_state.size(); i++ ) {
+    ofs << (v_rnw_state.at(i).header.stamp - start_time).toSec() << ","
+        << v_cone_state.at(i).euler_angles.y << ","
+        << v_cone_state.at(i).euler_angles.z << ","
+        << calc_angle(v_cone_state.at(i),v_drone1_odom.at(i),v_drone2_odom.at(i)) << endl;
+  }
+
+  ofs.close();
+
+}
+
+
 int main( int argc, char** argv ) {
 
   std::string bag_dir = "/home/sheep/Dropbox/mphil_bags";
   std::string bag_name = "2021-06-27-23-24-28.exp8.ground.heavy.45.90.bag";
-  std::string result_dir = "/home/sheep/";
 
   rosbag::Bag bag;
   stringstream ss; ss << bag_dir << "/" << bag_name;
@@ -98,6 +133,8 @@ int main( int argc, char** argv ) {
 
   extract_rnw_data(bag);
   sync_all_data(bag);
+
+  gen_csv(bag_name);
 
   bag.close();
 
