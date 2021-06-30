@@ -1,4 +1,4 @@
-ground_z: -0.01
+ground_z: -0.03
 flu_T_tcp:
   x: -0.07
   y: 0
@@ -16,8 +16,8 @@ rnw:
   insertion_depth: 0.12
   desired_nutation: 50
   desired_grip_depth: 0.06
-  rocking_max_vel: 10
-  rocking_max_acc: 5
+  rocking_max_vel: 3
+  rocking_max_acc: 3
   min_nutation_deg: 5
   yaw_gain: 0.2
   lap_ang_vel_deg: 0
@@ -32,10 +32,10 @@ rnw:
   specify_heading: true
   heading_deg: 90
   init_threshold: 1
-  init_tau: 30
+  init_tau: 10
   init_ang_vel_threshold: 0.5
   init_min_step_interval: 0.5
-  tau: 30
+  tau: 5
   ang_vel_threshold: 1
   min_step_interval: 0.3
 zigzag:
