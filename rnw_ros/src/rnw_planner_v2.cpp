@@ -117,9 +117,9 @@ void rnw_planner_v2_t::control_loop(){
     min_step_interval = rnw_config.rnw.init_min_step_interval;
   }
 
-  if ( !peak_phi_dot_history.empty() ) {
-    ang_vel_thresh = uav_utils::clamp<double>(0.5*peak_phi_dot_history.back(),0.1,ang_vel_thresh);
-  }
+//  if ( !peak_phi_dot_history.empty() ) {
+//    ang_vel_thresh = uav_utils::clamp<double>(0.5*peak_phi_dot_history.back(),0.1,ang_vel_thresh);
+//  }
 
   // for the energy controller
   peak_phi_dot = std::max(peak_phi_dot,std::abs(latest_cone_state.euler_angles_velocity.z));
