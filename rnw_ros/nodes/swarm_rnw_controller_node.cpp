@@ -195,7 +195,7 @@ struct rnw_node_t {
         waypoints_drone2.emplace_back(control_frame * suspend_pt_drone2);
       }
 
-      auto setting = drone_interface_t::create_setting(2,1);
+      auto setting = drone_interface_t::create_setting(1,1);
 
       swarm.follow(waypoints_drone1,waypoints_drone2,setting);
 
