@@ -23,21 +23,21 @@ rnw:
   lap_ang_vel_deg: 0
   lap_start: 2
   enable_steering: true
-  enable_energy_feedback: false
+  enable_energy_feedback: true
   specify_energy: true
-  desired_energy: 2
+  desired_energy: 2.5
   EKp: 0.1
-  EKi: 0
+  EKi: 0.1
   EKd: 0
   specify_heading: true
   heading_deg: 90
-  init_threshold: 1
+  init_threshold: 2.5
   init_tau: 15
   init_ang_vel_threshold: 0.5
   init_min_step_interval: 1
-  tau: 10
-  ang_vel_threshold: 1
-  min_step_interval: 0.3
+  tau: 15
+  ang_vel_threshold: 0.5
+  min_step_interval: 1
 zigzag:
   step_forward: 0.1
   step_sideways: 0.1
