@@ -191,7 +191,7 @@ void gen_amp( string const & bag_name ){
 int main( int argc, char** argv ) {
 
   std::string bag_dir = "/home/sheep/Dropbox/mphil_bags";
-  std::string bag_name = "2021-07-01-01-20-53.table6.perfect.ground.55.120.bag";
+  std::string bag_name = "2021-07-01-03-10-13.table9.perfect.55.90.bag";
 
   rosbag::Bag bag;
   stringstream ss; ss << bag_dir << "/" << bag_name;
