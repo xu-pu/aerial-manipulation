@@ -10,6 +10,7 @@
 #include <rnw_msgs/ConeState.h>
 #include <Eigen/Dense>
 #include <uav_utils/converters.h>
+#include "rnw_ros/rnw_utils.h"
 
 using namespace std;
 
@@ -20,6 +21,10 @@ vector<rnw_msgs::RnwState> v_rnw_state;
 vector<rnw_msgs::ConeState> v_cone_state;
 vector<nav_msgs::Odometry> v_drone1_odom;
 vector<nav_msgs::Odometry> v_drone2_odom;
+
+double mass = 2.6;
+double xCM = 0.15;
+double zCM = 0.37;
 
 void extract_rnw_data( rosbag::Bag & bag ) {
 
@@ -114,7 +119,8 @@ void gen_csv( string const & name ){
     ofs << (v_rnw_state.at(i).header.stamp - start_time).toSec() << ","
         << v_cone_state.at(i).euler_angles.y << ","
         << v_cone_state.at(i).euler_angles.z << ","
-        << calc_angle(v_cone_state.at(i),v_drone1_odom.at(i),v_drone2_odom.at(i)) << endl;
+        << calc_angle(v_cone_state.at(i),v_drone1_odom.at(i),v_drone2_odom.at(i)) << ","
+        << calc_mechanical_energy(v_cone_state.at(i),mass,xCM,zCM) << endl;
   }
 
   ofs.close();
@@ -160,7 +166,7 @@ void gen_amp( string const & bag_name ){
 int main( int argc, char** argv ) {
 
   std::string bag_dir = "/home/sheep/Dropbox/mphil_bags";
-  std::string bag_name = "2021-07-01-03-10-13.table9.perfect.55.90.bag";
+  std::string bag_name = "2021-07-01-01-20-53.table6.perfect.ground.55.120.bag";
 
   rosbag::Bag bag;
   stringstream ss; ss << bag_dir << "/" << bag_name;

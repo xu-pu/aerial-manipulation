@@ -211,7 +211,7 @@ target_link_libraries(extract_thrust ${catkin_LIBRARIES})
 add_dependencies(extract_thrust ${PROJECT_NAME}_gencfg)
 
 add_executable(extract_rnw scripts/extract_rnw.cpp)
-target_link_libraries(extract_rnw ${catkin_LIBRARIES})
+target_link_libraries(extract_rnw ${PROJECT_NAME} ${catkin_LIBRARIES})
 add_dependencies(extract_rnw ${PROJECT_NAME}_gencfg)
 
 ## Rename C++ executable without prefix
