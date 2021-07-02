@@ -13,6 +13,14 @@ double sympy_ME(double *dq, double g, double m, double *q, double r, double xCM,
 
 }
 
+double sympy_KE(double *dq, double m, double *q, double r, double xCM, double zCM) {
+
+  double KE_result;
+  KE_result = (1.0/2.0)*m*(pow(r*(sin(q[2])*sin(q[3])*dq[3] - cos(q[2])*cos(q[3])*dq[2] - cos(q[2])*dq[4]) - xCM*(sin(q[2])*sin(q[3])*cos(q[4])*dq[3] + sin(q[2])*sin(q[4])*cos(q[3])*dq[4] + sin(q[2])*sin(q[4])*dq[2] - cos(q[2])*cos(q[3])*cos(q[4])*dq[2] - cos(q[2])*cos(q[4])*dq[4]) + zCM*sin(q[2])*cos(q[3])*dq[3] + zCM*sin(q[3])*cos(q[2])*dq[2], 2) + pow(r*(sin(q[2])*cos(q[3])*dq[2] + sin(q[2])*dq[4] + sin(q[3])*cos(q[2])*dq[3]) - xCM*(sin(q[2])*cos(q[3])*cos(q[4])*dq[2] + sin(q[2])*cos(q[4])*dq[4] + sin(q[3])*cos(q[2])*cos(q[4])*dq[3] + sin(q[4])*cos(q[2])*cos(q[3])*dq[4] + sin(q[4])*cos(q[2])*dq[2]) - zCM*sin(q[2])*sin(q[3])*dq[2] + zCM*cos(q[2])*cos(q[3])*dq[3], 2) + pow(r*cos(q[3])*dq[3] + xCM*sin(q[3])*sin(q[4])*dq[4] - xCM*cos(q[3])*cos(q[4])*dq[3] - zCM*sin(q[3])*dq[3], 2));
+  return KE_result;
+
+}
+
 double calc_mechanical_energy( rnw_msgs::ConeState const & cone_state, double mass, double xCM, double zCM ){
   double dq[5], q[5];
   q[2] = cone_state.euler_angles.x;
@@ -22,6 +30,18 @@ double calc_mechanical_energy( rnw_msgs::ConeState const & cone_state, double ma
   dq[3] = cone_state.euler_angles_velocity.y;
   dq[4] = cone_state.euler_angles_velocity.z;
   return sympy_ME(dq,9.8,mass,q,cone_state.radius,xCM,zCM);
+}
+
+
+double calc_kinetic_energy( rnw_msgs::ConeState const & cone_state, double mass, double xCM, double zCM ){
+  double dq[5], q[5];
+  q[2] = cone_state.euler_angles.x;
+  q[3] = cone_state.euler_angles.y;
+  q[4] = cone_state.euler_angles.z;
+  dq[2] = cone_state.euler_angles_velocity.x;
+  dq[3] = cone_state.euler_angles_velocity.y;
+  dq[4] = cone_state.euler_angles_velocity.z;
+  return sympy_KE(dq,mass,q,cone_state.radius,xCM,zCM);
 }
 
 Vector3d cone_rot2euler( Matrix3d const & R ){

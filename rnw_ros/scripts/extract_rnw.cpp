@@ -147,6 +147,31 @@ vector<rnw_msgs::ConeState> extract_phi_peaks(){
 
 }
 
+void gen_ke( string const & bag_name ){
+
+  stringstream ss; ss << "/home/sheep/" << bag_name << ".ke.csv";
+  ofstream ofs(ss.str());
+
+  ros::Time st = v_rnw_state.front().header.stamp;
+  size_t step = 0;
+  double peak_ke = 0;
+  double ke = 0;
+
+  for ( size_t i=0; i<v_rnw_state.size(); i++ ) {
+    ofs << (v_rnw_state.at(i).header.stamp-st).toSec() << "," << ke << endl;
+    peak_ke = std::max<double>(peak_ke, calc_kinetic_energy(v_cone_state.at(i),mass,xCM,zCM));
+    if ( v_rnw_state.at(i).step_count > step ) {
+      step = v_rnw_state.at(i).step_count;
+      ke = peak_ke;
+      peak_ke = 0;
+    }
+  }
+
+  ofs.close();
+
+}
+
+
 void gen_amp( string const & bag_name ){
 
   auto rst = extract_phi_peaks();
@@ -178,6 +203,8 @@ int main( int argc, char** argv ) {
   gen_csv(bag_name);
 
   gen_amp(bag_name);
+
+  gen_ke(bag_name);
 
   bag.close();
 
