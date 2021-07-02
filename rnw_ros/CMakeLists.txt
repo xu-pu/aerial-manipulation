@@ -214,6 +214,10 @@ add_executable(extract_rnw scripts/extract_rnw.cpp)
 target_link_libraries(extract_rnw ${PROJECT_NAME} ${catkin_LIBRARIES})
 add_dependencies(extract_rnw ${PROJECT_NAME}_gencfg)
 
+add_executable(extract_old_rnw scripts/extract_old_rnw.cpp)
+target_link_libraries(extract_old_rnw ${PROJECT_NAME} ${catkin_LIBRARIES})
+add_dependencies(extract_old_rnw ${PROJECT_NAME}_gencfg)
+
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
 ## target back to the shorter version for ease of user use
