@@ -22,6 +22,35 @@ Vector3d point_in_frame( nav_msgs::Odometry const & odom, Vector3d const & pt ){
   return R*pt + T;
 }
 
+
+struct zig_zag_t {
+
+    double interval = 1;
+
+    double acc = 3;
+
+    double vel = 3;
+
+    drone_interface_t & drone;
+
+    double offset = 0.1;
+
+    ros::Timer timer;
+
+    explicit zig_zag_t( drone_interface_t & di ) : drone(di) {}
+
+    void start(){
+      ros::NodeHandle nh("~");
+      timer = nh.createTimer(interval,&zig_zag_t::on_timer,this);
+    }
+
+    void on_timer( ros::TimerEvent const & e ){
+      offset = -offset;
+      drone.go_to_point_in_intermediate_frame(offset * Vector3d::UnitY());
+    }
+
+};
+
 struct individual_drone_test_t {
 
     ros::NodeHandle & nh;
@@ -38,7 +67,9 @@ struct individual_drone_test_t {
 
     AmTraj traj_generator;
 
-    explicit individual_drone_test_t(ros::NodeHandle & _nh ) : nh(_nh), traj_generator(1024, 16, 0.4, 1, 0.5, 23, 0.02) {
+    zig_zag_t zig_zag;
+
+    explicit individual_drone_test_t(ros::NodeHandle & _nh ) : nh(_nh), traj_generator(1024, 16, 0.4, 1, 0.5, 23, 0.02),zig_zag(drone){
 
       drone.init(get_ros_param_required<string>(nh,"drone_name"));
 
@@ -80,15 +111,13 @@ struct individual_drone_test_t {
       return wpts2traj(odom,transform_pts(wpts,R,T));
     }
 
-    void trigger_zigzag( std_msgs::HeaderConstPtr const & msg ) const {
+    void trigger_zigzag( std_msgs::HeaderConstPtr const & msg ) {
 
       if ( !drone.ready(true) ) {
         return;
       }
 
-      vector<Vector3d> wpts = gen_waypoint_zigzag(5,0.5,0.5);
-
-      drone.execute_trajectory(local_wpts2traj(drone.latest_odom, wpts));
+      zig_zag.start();
 
     }
 
