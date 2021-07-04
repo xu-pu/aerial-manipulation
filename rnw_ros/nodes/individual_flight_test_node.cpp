@@ -40,6 +40,7 @@ struct zig_zag_t {
     explicit zig_zag_t( drone_interface_t & di ) : drone(di) {}
 
     void start(){
+      drone.set_max_vel_acc(vel,acc);
       ros::NodeHandle nh("~");
       timer = nh.createTimer(interval,&zig_zag_t::on_timer,this);
     }
@@ -83,7 +84,7 @@ struct individual_drone_test_t {
               "/gamepad/B", 10, &individual_drone_test_t::trigger_rock, this);
 
       sub_trigger_take_off = nh.subscribe<std_msgs::Header>(
-              "/gamepad/LB", 10, &individual_drone_test_t::trigger_take_off, this);
+              "/gamepad/Y", 10, &individual_drone_test_t::trigger_take_off, this);
 
     }
 
@@ -152,7 +153,7 @@ struct individual_drone_test_t {
     }
 
     void trigger_take_off( std_msgs::HeaderConstPtr const & msg ) const {
-      drone.arm_motors();
+      drone.go_to_point_in_intermediate_frame(Vector3d::UnitZ());
     }
 
 };
