@@ -11,6 +11,7 @@
 #include <Eigen/Dense>
 #include <uav_utils/converters.h>
 #include "rnw_ros/rnw_utils.h"
+#include <n3ctrl/N3CtrlState.h>
 
 using namespace std;
 
@@ -21,10 +22,62 @@ vector<rnw_msgs::RnwState> v_rnw_state;
 vector<rnw_msgs::ConeState> v_cone_state;
 vector<nav_msgs::Odometry> v_drone1_odom;
 vector<nav_msgs::Odometry> v_drone2_odom;
+vector<sensor_msgs::Joy> v_drone1_ctrl;
+
+ros::Time ready_time_ground;
+ros::Time ready_time_air;
 
 double mass = 2.6;
 double xCM = 0.15;
 double zCM = 0.37;
+
+void extract_ground_drone1_ready_time( rosbag::Bag & bag ) {
+
+  std::vector<std::string> topics;
+  topics.emplace_back("/drone1/state");
+  rosbag::View view(bag, rosbag::TopicQuery(topics));
+
+  bool found = false;
+
+  for (rosbag::MessageInstance const m: view) {
+    n3ctrl::N3CtrlState::ConstPtr i = m.instantiate<n3ctrl::N3CtrlState>();
+    if (i == nullptr) continue;
+    if ( i->state >= n3ctrl::N3CtrlState::STATE_CMD_HOVER ) {
+      ready_time_ground = i->header.stamp;
+      found = true;
+      break;
+    }
+  }
+
+  assert(found);
+
+  cout << "ready_time_ground: " << ready_time_ground << endl;
+
+}
+
+void extract_drone1_ready_time( rosbag::Bag & bag ) {
+
+  std::vector<std::string> topics;
+  topics.emplace_back("/n3ctrl/n3ctrl_state");
+  rosbag::View view(bag, rosbag::TopicQuery(topics));
+
+  bool found = false;
+
+  for (rosbag::MessageInstance const m: view) {
+    n3ctrl::N3CtrlState::ConstPtr i = m.instantiate<n3ctrl::N3CtrlState>();
+    if (i == nullptr) continue;
+    if ( i->state >= n3ctrl::N3CtrlState::STATE_CMD_HOVER ) {
+      ready_time_air = i->header.stamp;
+      found = true;
+      break;
+    }
+  }
+
+  assert(found);
+
+  cout << "ready_time_air: " << ready_time_air << endl;
+
+}
 
 void extract_rnw_data( rosbag::Bag & bag ) {
 
@@ -119,8 +172,11 @@ void gen_csv( string const & name ){
     ofs << (v_rnw_state.at(i).header.stamp - start_time).toSec() << ","
         << v_cone_state.at(i).euler_angles.y << ","
         << v_cone_state.at(i).euler_angles.z << ","
-        << calc_angle(v_cone_state.at(i),v_drone1_odom.at(i),v_drone2_odom.at(i)) << ","
-        << calc_mechanical_energy(v_cone_state.at(i),mass,xCM,zCM) << endl;
+        << calc_angle(v_cone_state.at(i),v_drone1_odom.at(i),v_drone2_odom.at(i));
+    if (!v_drone1_ctrl.empty()) {
+      ofs << "," << v_drone1_ctrl.at(i).axes.at(2);
+    }
+    ofs << endl;
   }
 
   ofs.close();
@@ -188,10 +244,44 @@ void gen_amp( string const & bag_name ){
 
 }
 
+void sync_thrust( rosbag::Bag & bag_ground, rosbag::Bag & bag_air ){
+
+  extract_ground_drone1_ready_time(bag_ground);
+  extract_drone1_ready_time(bag_air);
+
+  v_drone1_ctrl.clear();
+  v_drone1_ctrl.resize(v_rnw_state.size());
+
+  std::vector<std::string> topics;
+  topics.emplace_back("/djiros/ctrl");
+  rosbag::View view(bag_air, rosbag::TopicQuery(topics));
+
+  size_t idx = 0;
+
+  for (rosbag::MessageInstance const m: view) {
+    auto ptr = m.instantiate<sensor_msgs::Joy>();
+    if ( ptr == nullptr ) continue;
+    ros::Time ground_time = ready_time_ground + ( ptr->header.stamp - ready_time_air );
+    if ( ground_time >= v_rnw_state.at(idx).header.stamp ) {
+      v_drone1_ctrl.at(idx) = *ptr;
+      idx++;
+    }
+    if ( idx >= v_drone1_ctrl.size() ) {
+      break;
+    }
+  }
+
+  cout << "thrust of drone1" << ", " << idx << " synced" << endl;
+
+}
+
 int main( int argc, char** argv ) {
 
+  bool add_thrust = true;
+
   std::string bag_dir = "/home/sheep/Dropbox/mphil_bags";
-  std::string bag_name = "2021-07-01-03-10-13.table9.perfect.55.90.bag";
+  std::string bag_name = "2021-07-01-01-20-53.table6.perfect.ground.55.120.bag";
+  std::string air_bag_name = "2021-06-09-00-18-03.table6.perfect.drone1.55.120.bag";
 
   rosbag::Bag bag;
   stringstream ss; ss << bag_dir << "/" << bag_name;
@@ -199,6 +289,13 @@ int main( int argc, char** argv ) {
 
   extract_rnw_data(bag);
   sync_all_data(bag);
+
+  if ( add_thrust ) {
+    rosbag::Bag air_bag;
+    stringstream ss; ss << bag_dir << "/" << air_bag_name;
+    air_bag.open(ss.str());
+    sync_thrust(bag,air_bag);
+  }
 
   gen_csv(bag_name);
 
