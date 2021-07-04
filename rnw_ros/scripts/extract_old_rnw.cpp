@@ -64,7 +64,14 @@ void gen_ke( string const & bag_name ){
   double peak_ke = 0;
   double ke = 0;
 
+  lpf_1st_butterworth_t lpf_ang_vel_x(0.1);
+  lpf_1st_butterworth_t lpf_ang_vel_y(0.1);
+  lpf_1st_butterworth_t lpf_ang_vel_z(0.1);
+
   for (auto & i : v_rnw_state) {
+//    i.cone_state.euler_angles_velocity.x = lpf_ang_vel_x.filter(i.cone_state.euler_angles_velocity.x);
+//    i.cone_state.euler_angles_velocity.y = lpf_ang_vel_y.filter(i.cone_state.euler_angles_velocity.y);
+//    i.cone_state.euler_angles_velocity.z = lpf_ang_vel_z.filter(i.cone_state.euler_angles_velocity.z);
     ofs << (i.header.stamp-st).toSec() << "," << ke << endl;
     peak_ke = std::max<double>(peak_ke, calc_kinetic_energy(i.cone_state,mass,xCM,zCM));
     if ( i.step_count > step ) {
