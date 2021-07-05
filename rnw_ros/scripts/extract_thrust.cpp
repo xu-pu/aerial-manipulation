@@ -12,7 +12,7 @@ using namespace std;
 int main( int argc, char** argv ){
 
   std::string bag_dir = "/home/sheep/Dropbox/mphil_bags";
-  std::string bag_name = "2021-06-09-00-18-03.table6.perfect.drone1.55.120.bag";
+  std::string bag_name = "2021-06-06-14-30-29.zigzag.bag";
   std::string result_dir = "/home/sheep/";
 
   rosbag::Bag bag;
