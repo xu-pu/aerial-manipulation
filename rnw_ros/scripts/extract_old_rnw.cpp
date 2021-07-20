@@ -18,8 +18,10 @@ using namespace std;
 vector<rnw_msgs::WalkingState> v_rnw_state;
 
 double mass = 0.5;
-double xCM = 0.08;
-double zCM = 0.05;
+double xCM = -0.02;
+double zCM = 0.06;
+
+bool enable_lpf = true;
 
 void extract_rnw_data( rosbag::Bag & bag ) {
 
@@ -69,11 +71,23 @@ void gen_ke( string const & bag_name ){
   lpf_1st_butterworth_t lpf_ang_vel_z(0.1);
 
   for (auto & i : v_rnw_state) {
-//    i.cone_state.euler_angles_velocity.x = lpf_ang_vel_x.filter(i.cone_state.euler_angles_velocity.x);
-//    i.cone_state.euler_angles_velocity.y = lpf_ang_vel_y.filter(i.cone_state.euler_angles_velocity.y);
-//    i.cone_state.euler_angles_velocity.z = lpf_ang_vel_z.filter(i.cone_state.euler_angles_velocity.z);
-    ofs << (i.header.stamp-st).toSec() << "," << ke << endl;
-    peak_ke = std::max<double>(peak_ke, calc_kinetic_energy(i.cone_state,mass,xCM,zCM));
+
+    if ( enable_lpf ) {
+      i.cone_state.euler_angles_velocity.x = lpf_ang_vel_x.filter(i.cone_state.euler_angles_velocity.x);
+      i.cone_state.euler_angles_velocity.y = lpf_ang_vel_y.filter(i.cone_state.euler_angles_velocity.y);
+      i.cone_state.euler_angles_velocity.z = lpf_ang_vel_z.filter(i.cone_state.euler_angles_velocity.z);
+    }
+
+    double cur_ke = calc_kinetic_energy(i.cone_state,mass,xCM,zCM);
+    double cur_pe = calc_potential_energy(i.cone_state,mass,xCM,zCM);
+    peak_ke = std::max<double>(peak_ke,cur_ke);
+
+    ofs << (i.header.stamp-st).toSec() << ","
+        << ke << ","
+        << cur_ke << ","
+        << cur_pe << ","
+        << endl;
+
     if ( i.step_count > step ) {
       step = i.step_count;
       ke = peak_ke;

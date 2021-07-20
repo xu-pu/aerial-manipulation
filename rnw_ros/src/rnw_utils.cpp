@@ -21,6 +21,14 @@ double sympy_KE(double *dq, double m, double *q, double r, double xCM, double zC
 
 }
 
+double sympy_PE(double g, double m, double *q, double r, double xCM, double zCM) {
+
+  double PE_result;
+  PE_result = g*m*(r*sin(q[3]) - xCM*sin(q[3])*cos(q[4]) + zCM*cos(q[3]));
+  return PE_result;
+
+}
+
 double calc_mechanical_energy( rnw_msgs::ConeState const & cone_state, double mass, double xCM, double zCM ){
   double dq[5], q[5];
   q[2] = cone_state.euler_angles.x;
@@ -42,6 +50,14 @@ double calc_kinetic_energy( rnw_msgs::ConeState const & cone_state, double mass,
   dq[3] = cone_state.euler_angles_velocity.y;
   dq[4] = cone_state.euler_angles_velocity.z;
   return sympy_KE(dq,mass,q,cone_state.radius,xCM,zCM);
+}
+
+double calc_potential_energy( rnw_msgs::ConeState const & cone_state, double mass, double xCM, double zCM ){
+  double q[5];
+  q[2] = cone_state.euler_angles.x;
+  q[3] = cone_state.euler_angles.y;
+  q[4] = cone_state.euler_angles.z;
+  return sympy_PE(9.8,mass,q,cone_state.radius,xCM,zCM);
 }
 
 Vector3d cone_rot2euler( Matrix3d const & R ){

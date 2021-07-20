@@ -148,6 +148,8 @@ double calc_mechanical_energy( rnw_msgs::ConeState const & cone_state, double ma
 
 double calc_kinetic_energy( rnw_msgs::ConeState const & cone_state, double mass, double xCM, double zCM );
 
+double calc_potential_energy( rnw_msgs::ConeState const & cone_state, double mass, double xCM, double zCM );
+
 template<typename T, size_t window_size>
 struct median_filter_t {
 
