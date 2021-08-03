@@ -23,6 +23,7 @@ vector<rnw_msgs::ConeState> v_cone_state;
 vector<nav_msgs::Odometry> v_drone1_odom;
 vector<nav_msgs::Odometry> v_drone2_odom;
 vector<sensor_msgs::Joy> v_drone1_ctrl;
+vector<double> v_peak_ke;
 
 ros::Time ready_time_ground;
 ros::Time ready_time_air;
@@ -165,13 +166,20 @@ double calc_angle( rnw_msgs::ConeState const & cone, nav_msgs::Odometry const & 
 void gen_csv( string const & name ){
 
   std::string result_dir = "/home/sheep/";
-  stringstream ss; ss << result_dir << "/" << name << ".cont.csv";
+  stringstream ss; ss << result_dir << "/" << name << ".full.csv";
   ofstream ofs(ss.str());
 
   for ( size_t i=0; i<v_rnw_state.size(); i++ ) {
     ofs << (v_rnw_state.at(i).header.stamp - start_time).toSec() << ","
+        << v_cone_state.at(i).euler_angles.x << ","
         << v_cone_state.at(i).euler_angles.y << ","
         << v_cone_state.at(i).euler_angles.z << ","
+        << v_cone_state.at(i).euler_angles_velocity.x << ","
+        << v_cone_state.at(i).euler_angles_velocity.y << ","
+        << v_cone_state.at(i).euler_angles_velocity.z << ","
+        << v_cone_state.at(i).contact_point.x << ","
+        << v_cone_state.at(i).contact_point.y << ","
+        << v_peak_ke.at(i) << ","
         << calc_angle(v_cone_state.at(i),v_drone1_odom.at(i),v_drone2_odom.at(i));
     if (!v_drone1_ctrl.empty()) {
       ofs << "," << v_drone1_ctrl.at(i).axes.at(2);
@@ -205,6 +213,8 @@ vector<rnw_msgs::ConeState> extract_phi_peaks(){
 
 void gen_ke( string const & bag_name ){
 
+  v_peak_ke.resize(v_rnw_state.size());
+
   stringstream ss; ss << "/home/sheep/" << bag_name << ".ke.csv";
   ofstream ofs(ss.str());
 
@@ -214,6 +224,7 @@ void gen_ke( string const & bag_name ){
   double ke = 0;
 
   for ( size_t i=0; i<v_rnw_state.size(); i++ ) {
+    v_peak_ke.at(i) = ke;
     ofs << (v_rnw_state.at(i).header.stamp-st).toSec() << "," << ke << endl;
     peak_ke = std::max<double>(peak_ke, calc_kinetic_energy(v_cone_state.at(i),mass,xCM,zCM));
     if ( v_rnw_state.at(i).step_count > step ) {
@@ -226,7 +237,6 @@ void gen_ke( string const & bag_name ){
   ofs.close();
 
 }
-
 
 void gen_amp( string const & bag_name ){
 
@@ -280,8 +290,8 @@ int main( int argc, char** argv ) {
   bool add_thrust = true;
 
   std::string bag_dir = "/home/sheep/Dropbox/mphil_bags";
-  std::string bag_name = "2021-07-05-01-35-30.table11.ground.65.120.bag";
-  std::string air_bag_name = "2021-06-09-00-18-23.table11.drone1.65.120.bag";
+  std::string bag_name = "2021-07-01-01-20-53.table6.perfect.ground.55.120.bag";
+  std::string air_bag_name = "2021-06-09-00-18-03.table6.perfect.drone1.55.120.bag";
 
   rosbag::Bag bag;
   stringstream ss; ss << bag_dir << "/" << bag_name;
@@ -297,11 +307,11 @@ int main( int argc, char** argv ) {
     sync_thrust(bag,air_bag);
   }
 
-  gen_csv(bag_name);
-
   gen_amp(bag_name);
 
   gen_ke(bag_name);
+
+  gen_csv(bag_name);
 
   bag.close();
 
