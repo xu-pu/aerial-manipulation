@@ -17,7 +17,7 @@ def time_slice(data, t_start, t_end):
         i_end = i
         if data[i, 0] > t_end:
             break
-    print(i_start,i_end)
+    #print(i_start,i_end)
     return data[i_start:i_end, :]
 
 
@@ -31,7 +31,7 @@ if __name__ == '__main__':
     #plot_color = 'tab:blue'
     plot_color = foreground_color
 
-    data = genfromtxt('vid3.csv', delimiter=',')
+    data = genfromtxt('vid4.csv', delimiter=',')
 
     # change size and resolution
     plt.rcParams["figure.figsize"] = (10,10)
@@ -46,7 +46,7 @@ if __name__ == '__main__':
     plt.rcParams['ytick.labelleft'] = False
     plt.rcParams['ytick.labelright'] = True
     plt.rcParams['ytick.direction'] = 'in'
-    plt.rcParams['lines.linewidth'] = 2.5
+    plt.rcParams['lines.linewidth'] = 1.5
     plt.rcParams['lines.color'] = foreground_color
     plt.rcParams['figure.facecolor'] = background_color
     plt.rcParams['axes.facecolor'] = background_color
@@ -61,13 +61,17 @@ if __name__ == '__main__':
     ax.set_aspect('equal')
 
     fps = 60
-    speed = 10
+    speed = 8
     interval = (1000/fps)  # ms between frames
     duration_sec = data[-1, 0]
     frames = int(duration_sec * 1000 / interval / speed)
     t_start = 0
     t_window = 10
     t_end = t_start-t_window
+
+    ax.set_xlim((-0.3, 0.3))
+    ax.set_ylim((-2, 2.5))
+    ax.xaxis.set_ticklabels([])
 
     def init():
         return ax,
@@ -76,18 +80,24 @@ if __name__ == '__main__':
         offset = i*speed*interval/1000.
         if offset > 0:
             seg = time_slice(data, 0, offset)
-            ax.plot(seg[:, 7], seg[:, 8], color=plot_color)
+            ax.plot(seg[:, 4], seg[:, 5], color=plot_color)
         return ax,
 
     def render():
         Writer = animation.writers['ffmpeg']
         writer = Writer(fps=fps, metadata=dict(artist='Me'), bitrate=1800)
         anim = animation.FuncAnimation(fig, animate, init_func=init, frames=frames, blit=False)
-        anim.save('im.mp4', writer=writer)
+        anim.save('vid4.mp4', writer=writer)
 
     def preview():
         anim = animation.FuncAnimation(fig, animate, init_func=init, frames=frames, interval=interval, blit=False)
         plt.show()
 
-    preview()
+    just_static = False
 
+    if just_static:
+        ax.plot(data[:, 4], data[:, 5], color=plot_color)
+        plt.show()
+    else:
+        render()
+        #preview()
