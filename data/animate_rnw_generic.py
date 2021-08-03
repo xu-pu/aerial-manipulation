@@ -21,8 +21,14 @@ if __name__ == '__main__':
     plt.rcParams['axes.linewidth'] = 0.5
     plt.rcParams['xtick.color'] = foreground_color
     plt.rcParams['xtick.direction'] = 'in'
+    plt.rcParams['xtick.top'] = True
     plt.rcParams['ytick.color'] = foreground_color
-    plt.rcParams['lines.linewidth'] = 2
+    plt.rcParams['ytick.left'] = False
+    plt.rcParams['ytick.right'] = True
+    plt.rcParams['ytick.labelleft'] = False
+    plt.rcParams['ytick.labelright'] = True
+    plt.rcParams['ytick.direction'] = 'in'
+    plt.rcParams['lines.linewidth'] = 2.5
     plt.rcParams['lines.color'] = foreground_color
     plt.rcParams['figure.facecolor'] = background_color
     plt.rcParams['axes.facecolor'] = background_color
