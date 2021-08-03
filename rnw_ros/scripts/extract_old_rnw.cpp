@@ -63,12 +63,18 @@ void gen_ke( string const & bag_name ){
 
   ros::Time st = v_rnw_state.front().header.stamp;
   size_t step = 0;
-  double peak_ke = 0;
-  double ke = 0;
+  double ke_latch = 0;
+  double pe_latch = 0;
+  double ke_peak = 0;
+  double pe_peak = 0;
+  double last_phi_zero = 0;
+  double phi_limit = std::numeric_limits<double>::max();
+  double phi_limit_vel = 1;
+  double phi_dir = 1;
 
-  lpf_1st_butterworth_t lpf_ang_vel_x(0.1);
-  lpf_1st_butterworth_t lpf_ang_vel_y(0.1);
-  lpf_1st_butterworth_t lpf_ang_vel_z(0.1);
+  lpf_1st_butterworth_t lpf_ang_vel_x(0.01);
+  lpf_1st_butterworth_t lpf_ang_vel_y(0.01);
+  lpf_1st_butterworth_t lpf_ang_vel_z(0.01);
 
   for (auto & i : v_rnw_state) {
 
@@ -80,19 +86,23 @@ void gen_ke( string const & bag_name ){
 
     double cur_ke = calc_kinetic_energy(i.cone_state,mass,xCM,zCM);
     double cur_pe = calc_potential_energy(i.cone_state,mass,xCM,zCM);
-    peak_ke = std::max<double>(peak_ke,cur_ke);
+    double cur_amp = abs(i.cone_state.euler_angles.z);
+
+    if ( cur_amp < 0.04 ) {
+      ke_peak = cur_ke;
+      pe_peak = cur_pe;
+      last_phi_zero = cur_amp;
+    }
 
     ofs << (i.header.stamp-st).toSec() << ","
-        << ke << ","
+        << last_phi_zero << ","
+        << ke_peak << ","
+        << pe_peak << ","
         << cur_ke << ","
         << cur_pe << ","
+        << i.cone_state.euler_angles_velocity.z << ","
         << endl;
 
-    if ( i.step_count > step ) {
-      step = i.step_count;
-      ke = peak_ke;
-      peak_ke = 0;
-    }
   }
 
   ofs.close();
