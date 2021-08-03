@@ -2,6 +2,7 @@ from numpy import genfromtxt
 import matplotlib.pyplot as plt
 from matplotlib import animation
 from matplotlib.ticker import MaxNLocator
+import numpy as np
 
 if __name__ == '__main__':
 
@@ -43,10 +44,20 @@ if __name__ == '__main__':
 
     fig.tight_layout()
 
-    axs[0].plot(data[:, 0], data[:, 1], color=plot_color)
-    axs[1].plot(data[:, 0], data[:, 2], color=plot_color)
-    axs[2].plot(data[:, 0], data[:, 3], color=plot_color)
+    rad2deg = 180./np.pi
+
+    axs[0].plot(data[:, 0], rad2deg * data[:, 1], color=plot_color)
+    axs[0].set_ylim((-30,30))
+    axs[0].set_yticks([-20, 0, 20])
+    axs[1].plot(data[:, 0], rad2deg * data[:, 2], color=plot_color)
+    axs[1].set_ylim((0, 80))
+    axs[1].set_yticks([20, 40, 60])
+    axs[2].plot(data[:, 0], rad2deg * data[:, 3], color=plot_color)
+    axs[2].set_ylim((-50, 50))
+    axs[2].set_yticks([-40, 0, 40])
     axs[3].plot(data[:, 0], data[:, 9], color=plot_color)
+    axs[3].set_ylim((0, 0.4))
+    axs[3].set_yticks([0.1, 0.2, 0.3])
 
     for ax in axs:
         ax.xaxis.set_major_locator(MaxNLocator(integer=True))
