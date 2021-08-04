@@ -73,15 +73,21 @@ if __name__ == '__main__':
     ax.set_ylim((-2, 2.5))
     ax.xaxis.set_ticklabels([])
 
+    just_static = False
+
+    if not just_static:
+        line, = ax.plot([],[],color=plot_color)
+
     def init():
-        return ax,
+        return line,
 
     def animate(i):
         offset = i*speed*interval/1000.
         if offset > 0:
             seg = time_slice(data, 0, offset)
-            ax.plot(seg[:, 4], seg[:, 5], color=plot_color)
-        return ax,
+            line.set_data(seg[:, 4], seg[:, 5])
+            #ax.plot(seg[:, 4], seg[:, 5], color=plot_color)
+        return line,
 
     def render():
         Writer = animation.writers['ffmpeg']
@@ -92,8 +98,6 @@ if __name__ == '__main__':
     def preview():
         anim = animation.FuncAnimation(fig, animate, init_func=init, frames=frames, interval=interval, blit=False)
         plt.show()
-
-    just_static = False
 
     if just_static:
         ax.plot(data[:, 4], data[:, 5], color=plot_color)
