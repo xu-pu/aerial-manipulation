@@ -49,7 +49,10 @@ void gen_csv( string const & name ){
     ofs << (i.header.stamp - start_time).toSec() << ","
         << i.cone_state.euler_angles.x << ","
         << i.cone_state.euler_angles.y << ","
-        << i.cone_state.euler_angles.z << endl;
+        << i.cone_state.euler_angles.z << ","
+        << i.cone_state.contact_point.x << ","
+        << i.cone_state.contact_point.y << ","
+        << endl;
   }
 
   ofs.close();
