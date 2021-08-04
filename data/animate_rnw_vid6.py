@@ -25,10 +25,10 @@ if __name__ == '__main__':
     # background_color = 'blue'
     # foreground_color = 'red'
 
-    background_color = 'white'
-    foreground_color = 'black'
-    plot_color = 'tab:blue'
-    #plot_color = foreground_color
+    background_color = 'black'
+    foreground_color = 'white'
+    #plot_color = 'tab:blue'
+    plot_color = foreground_color
 
     data = genfromtxt('2021-07-01-04-24-56.vid2.ground.55.120.bag.full.csv', delimiter=',')
 
@@ -96,7 +96,7 @@ if __name__ == '__main__':
         Writer = animation.writers['ffmpeg']
         writer = Writer(fps=fps, metadata=dict(artist='Me'), bitrate=1800)
         anim = animation.FuncAnimation(fig, animate, init_func=init, frames=frames, blit=False)
-        anim.save('vid6.mp4', writer=writer)
+        anim.save('vid9.mp4', writer=writer)
 
     def preview():
         anim = animation.FuncAnimation(fig, animate, init_func=init, frames=frames, interval=interval, blit=False)
