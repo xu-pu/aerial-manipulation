@@ -31,7 +31,7 @@ if __name__ == '__main__':
     #plot_color = 'tab:blue'
     plot_color = foreground_color
 
-    data = genfromtxt('vid4.csv', delimiter=',')
+    data = genfromtxt('vid5.csv', delimiter=',')
 
     # change size and resolution
     plt.rcParams["figure.figsize"] = (10,10)
@@ -57,7 +57,7 @@ if __name__ == '__main__':
 
     # setup subplots
     fig, ax = plt.subplots(1, 1)
-    #fig.tight_layout()
+    fig.tight_layout()
     ax.set_aspect('equal')
 
     fps = 60
@@ -69,9 +69,10 @@ if __name__ == '__main__':
     t_window = 10
     t_end = t_start-t_window
 
-    ax.set_xlim((-0.3, 0.3))
-    ax.set_ylim((-2, 2.5))
-    ax.xaxis.set_ticklabels([])
+    ax.set_xlim((-1.6, 0.4))
+    ax.set_ylim((-2.4, -0.6))
+    ax.set_xticks([-1, 0])
+    ax.set_yticks([-2, -1])
 
     def init():
         return ax,
@@ -87,7 +88,7 @@ if __name__ == '__main__':
         Writer = animation.writers['ffmpeg']
         writer = Writer(fps=fps, metadata=dict(artist='Me'), bitrate=1800)
         anim = animation.FuncAnimation(fig, animate, init_func=init, frames=frames, blit=False)
-        anim.save('vid4.mp4', writer=writer)
+        anim.save('vid5.mp4', writer=writer)
 
     def preview():
         anim = animation.FuncAnimation(fig, animate, init_func=init, frames=frames, interval=interval, blit=False)
