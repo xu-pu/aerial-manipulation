@@ -61,7 +61,7 @@ if __name__ == '__main__':
     ax.set_aspect('equal')
 
     fps = 60
-    speed = 8
+    speed = 2
     interval = (1000/fps)  # ms between frames
     duration_sec = data[-1, 0]
     frames = int(duration_sec * 1000 / interval / speed)
@@ -74,15 +74,21 @@ if __name__ == '__main__':
     ax.set_xticks([-1, 0])
     ax.set_yticks([-2, -1])
 
+    just_static = False
+
+    if not just_static:
+        line, = ax.plot([],[],color=plot_color)
+
     def init():
-        return ax,
+        return line,
 
     def animate(i):
         offset = i*speed*interval/1000.
         if offset > 0:
             seg = time_slice(data, 0, offset)
-            ax.plot(seg[:, 4], seg[:, 5], color=plot_color)
-        return ax,
+            line.set_data(seg[:, 4], seg[:, 5])
+            #ax.plot(seg[:, 4], seg[:, 5], color=plot_color)
+        return line,
 
     def render():
         Writer = animation.writers['ffmpeg']
@@ -93,8 +99,6 @@ if __name__ == '__main__':
     def preview():
         anim = animation.FuncAnimation(fig, animate, init_func=init, frames=frames, interval=interval, blit=False)
         plt.show()
-
-    just_static = False
 
     if just_static:
         ax.plot(data[:, 4], data[:, 5], color=plot_color)

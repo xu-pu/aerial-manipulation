@@ -290,8 +290,8 @@ int main( int argc, char** argv ) {
   bool add_thrust = true;
 
   std::string bag_dir = "/home/sheep/Dropbox/mphil_bags";
-  std::string bag_name = "2021-07-01-01-20-53.table6.perfect.ground.55.120.bag";
-  std::string air_bag_name = "2021-06-09-00-18-03.table6.perfect.drone1.55.120.bag";
+  std::string bag_name = "2021-07-01-02-40-15.table7.perfect.ground.45.120.bag";
+  std::string air_bag_name = "2021-06-09-00-18-33.table7.perfect.drone1.45.120.bag";
 
   rosbag::Bag bag;
   stringstream ss; ss << bag_dir << "/" << bag_name;

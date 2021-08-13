@@ -61,7 +61,7 @@ if __name__ == '__main__':
     ax.set_aspect('equal')
 
     fps = 60
-    speed = 8
+    speed = 2
     interval = (1000/fps)  # ms between frames
     duration_sec = data[-1, 0]
     frames = int(duration_sec * 1000 / interval / speed)
