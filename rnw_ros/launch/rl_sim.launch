@@ -1,0 +1,18 @@
+<launch>
+
+    <node pkg="joy" type="joy_node" name="joy_node" output="screen">
+        <param name="~autorepeat_rate" value="0" />
+    </node>
+
+    <node pkg="rnw_ros" type="gamepad_trigger_node" name="gamepad" output="screen"/>
+
+    <!--  visualization  -->
+
+    <node name="rviz_traj" pkg="rviz" type="rviz" output="log" args="-d $(find rnw_ros)/config/rl.rviz" />
+
+    <node pkg="rnw_ros" type="odom2tf_node" name="FLU_tf" output="screen">
+        <remap from="~odom" to="/rl_agent/odom"/>
+        <param name="name" value="rl_agent_odom" />
+    </node>
+
+</launch>
