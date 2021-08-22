@@ -26,10 +26,10 @@ if __name__ == '__main__':
     # background_color = 'blue'
     # foreground_color = 'red'
 
-    background_color = 'black'
-    foreground_color = 'white'
-    #plot_color = 'tab:blue'
-    plot_color = foreground_color
+    background_color = 'white'
+    foreground_color = 'black'
+    plot_color = 'tab:blue'
+    #plot_color = foreground_color
 
     data = genfromtxt('vid5.csv', delimiter=',')
 
@@ -74,7 +74,7 @@ if __name__ == '__main__':
     ax.set_xticks([-1, 0])
     ax.set_yticks([-2, -1])
 
-    just_static = False
+    just_static = True
 
     if not just_static:
         line, = ax.plot([],[],color=plot_color)
