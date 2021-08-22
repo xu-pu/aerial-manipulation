@@ -9,10 +9,10 @@ if __name__ == '__main__':
     # background_color = 'blue'
     # foreground_color = 'red'
 
-    background_color = 'black'
-    foreground_color = 'white'
-    #plot_color = 'tab:blue'
-    plot_color = foreground_color
+    background_color = 'white'
+    foreground_color = 'black'
+    plot_color = 'tab:blue'
+    #plot_color = foreground_color
 
     data = genfromtxt('2021-07-01-04-24-56.vid2.ground.55.120.bag.full.csv', delimiter=',')
 

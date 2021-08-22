@@ -25,10 +25,10 @@ if __name__ == '__main__':
     # background_color = 'blue'
     # foreground_color = 'red'
 
-    background_color = 'black'
-    foreground_color = 'white'
-    #plot_color = 'tab:blue'
-    plot_color = foreground_color
+    background_color = 'white'
+    foreground_color = 'black'
+    plot_color = 'tab:blue'
+    #plot_color = foreground_color
 
     data = genfromtxt('2021-07-01-04-24-56.vid2.ground.55.120.bag.full.csv', delimiter=',')
 
@@ -73,7 +73,7 @@ if __name__ == '__main__':
     ax.set_xticks([-0.5, 0, 0.5])
     ax.set_yticks(range(-2, 3))
 
-    just_static = False
+    just_static = True
 
     if not just_static:
         line, = ax.plot([],[],color=plot_color)
@@ -103,7 +103,11 @@ if __name__ == '__main__':
         plt.show()
 
     if just_static:
-        ax.plot(data[:, 3], data[:, 6], color=plot_color)
+        offset = 40
+        duration = 20
+        seg = time_slice(data,offset,offset+duration)
+
+        ax.plot(seg[:, 3], seg[:, 6], color=plot_color)
         plt.show()
     else:
         render()

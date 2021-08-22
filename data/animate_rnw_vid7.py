@@ -25,10 +25,10 @@ if __name__ == '__main__':
     # background_color = 'blue'
     # foreground_color = 'red'
 
-    background_color = 'black'
-    foreground_color = 'white'
-    #plot_color = 'tab:blue'
-    plot_color = foreground_color
+    background_color = 'white'
+    foreground_color = 'black'
+    plot_color = 'tab:red'
+    #plot_color = foreground_color
 
     data_25 = genfromtxt('vid7.n25t40.bag.cont.csv', delimiter=',')
     data_30 = -genfromtxt('vid7.n30t40.bag.cont.csv', delimiter=',')
@@ -93,7 +93,7 @@ if __name__ == '__main__':
     axes[1].yaxis.set_ticklabels([])
     axes[2].yaxis.set_ticklabels([])
 
-    just_static = False
+    just_static = True
 
     if not just_static:
         line25, = axes[0].plot([], [], color=plot_color)
@@ -124,9 +124,9 @@ if __name__ == '__main__':
 
     if just_static:
         # ax.plot(data[:, 3], data[:, 6], color=plot_color)
-        axes[0].plot(data_25[:, 4], data_25[:, 5],color=foreground_color)
-        axes[1].plot(data_30[:, 4], data_30[:, 5],color=foreground_color)
-        axes[2].plot(data_35[:, 4], data_35[:, 5],color=foreground_color)
+        axes[0].plot(data_25[:, 4], data_25[:, 5],color=plot_color)
+        axes[1].plot(data_30[:, 4], data_30[:, 5],color=plot_color)
+        axes[2].plot(data_35[:, 4], data_35[:, 5],color=plot_color)
         plt.show()
     else:
         render()
