@@ -14,10 +14,10 @@ if __name__ == '__main__':
     plot_color = 'tab:blue'
     #plot_color = foreground_color
 
-    data = genfromtxt('2021-07-01-04-24-56.vid2.ground.55.120.bag.full.csv', delimiter=',')
+    data = genfromtxt('vid7.n25t40.bag.cont.csv', delimiter=',')
 
     # change size and resolution
-    plt.rcParams["figure.figsize"] = (20,12)
+    plt.rcParams["figure.figsize"] = (12,12)
     plt.rcParams['figure.dpi'] = 100
     plt.rcParams['axes.linewidth'] = 0.5
     plt.rcParams['xtick.color'] = foreground_color
@@ -40,7 +40,7 @@ if __name__ == '__main__':
 
 
     # setup subplots
-    fig, axs = plt.subplots(5, 1)
+    fig, axs = plt.subplots(4, 1)
 
     fig.tight_layout(pad=1)
 
@@ -49,36 +49,33 @@ if __name__ == '__main__':
     t_end = data[-1,0]
 
     # contact
-    axs[0].plot(data[:, 8], data[:, 7], color=plot_color)
-    axs[0].set_xlim((-2.3, 5.7))
+    axs[0].plot(data[:, 5], data[:, 4], color=plot_color)
+    #axs[0].set_xlim((-2.3, 5.7))
+    axs[0].set_xticks([-2,-1,0,1,2])
     axs[0].set_yticks([])
+    axs[0].set_xlim((-2, 2.5))
+    axs[0].set_ylim((-0.4, 0.4))
     axs[0].set_aspect('equal',adjustable='box')
     axs[0].xaxis.tick_top()
 
     # ke
-    axs[1].plot(data[:, 0], data[:, 9], color=plot_color)
+    axs[1].plot(data[:, 0], rad2deg * data[:, 1], color=plot_color)
     axs[1].set_xlim((0, t_end))
-    axs[1].set_ylim((0,0.6))
-    axs[1].set_yticks([0,0.3,0.6])
+    axs[1].set_ylim((-80,80))
+    axs[1].set_yticks([-60,0,60])
     axs[1].xaxis.set_ticklabels([])
     # phi
-    axs[2].plot(data[:, 0], rad2deg * data[:, 3], color=plot_color)
+    axs[2].plot(data[:, 0], rad2deg * data[:, 2], color=plot_color)
     axs[2].set_xlim((0, t_end))
-    axs[2].set_ylim((-60, 60))
-    axs[2].set_yticks([-50, 0, 50])
+    axs[2].set_ylim((0, 50))
+    axs[2].set_yticks([10, 25, 40])
     axs[2].xaxis.set_ticklabels([])
     # theta
-    axs[3].plot(data[:, 0], rad2deg * data[:, 2], color=plot_color)
+    axs[3].plot(data[:, 0], rad2deg * data[:, 3], color=plot_color)
     axs[3].set_xlim((0, t_end))
-    axs[3].set_ylim((30, 80))
-    axs[3].set_yticks([35,55,75])
-    axs[3].xaxis.set_ticklabels([])
-
-    # thrust
-    axs[4].plot(data[:, 0], data[:, 11], color=plot_color)
-    axs[4].set_xlim((0, t_end))
-    axs[4].set_ylim((10, 40))
-    axs[4].set_yticks([15, 25, 35])
+    axs[3].set_ylim((-80, 80))
+    axs[3].set_yticks([-60,0,60])
+    #axs[3].xaxis.set_ticklabels([])
 
     # for ax in axs:
     #     #ax.xaxis.set_major_locator(MaxNLocator(integer=True))
