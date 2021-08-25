@@ -57,7 +57,7 @@ struct rl_rnw_controller_t {
       auto const & c = cone.latest_cone_state;
 
       latest_obs.header = cone.latest_cone_state.header;
-      latest_obs.axes.resize(6);
+      latest_obs.axes.resize(6+5);
 
       latest_obs.axes.at(0) = (float)c.euler_angles.x;
       latest_obs.axes.at(1) = (float)c.euler_angles.y;
@@ -66,6 +66,12 @@ struct rl_rnw_controller_t {
       latest_obs.axes.at(4) = (float)c.euler_angles_velocity.x;
       latest_obs.axes.at(5) = (float)c.euler_angles_velocity.y;
       latest_obs.axes.at(6) = (float)c.euler_angles_velocity.z;
+
+      latest_obs.axes.at(7) = (float)c.radius;
+      latest_obs.axes.at(8) = (float)c.radius;
+      latest_obs.axes.at(9) = 0;
+      latest_obs.axes.at(10) = -(float)c.radius;
+      latest_obs.axes.at(11) = 1.5;
 
       pub_rl_obs.publish(latest_obs);
 
