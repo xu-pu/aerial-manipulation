@@ -198,6 +198,7 @@ set(RNW_NODES
         pub_simulated_sensors
         thrust_test_node
         rl_controller_node
+        pub_rnw_body_frame_node
 )
 
 FOREACH(NODE ${RNW_NODES})
