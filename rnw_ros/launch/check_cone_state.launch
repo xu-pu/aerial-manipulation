@@ -19,6 +19,13 @@
         <param name="max_euler_velocity" value="10"/>
     </node>
 
+    <node pkg="rnw_ros" type="pub_rnw_body_frame_node" name="pub_rnw_body_frame_node" required="true" output="screen"/>
+
+    <node pkg="rnw_ros" type="odom2tf_node" name="odom2tf_rnw_body_frame" output="screen" required="false">
+        <remap from="~odom" to="/cone/body_frame"/>
+        <param name="name" value="rnw_body_frame" />
+    </node>
+
     <node pkg="rnw_ros" type="pub_cone_debug_info_node" name="pub_cone_debug_info_node" output="screen" required="true"/>
 
     <node pkg="rnw_ros" type="visualize_cone_node" name="visualize_cone_node" output="screen" required="true">
