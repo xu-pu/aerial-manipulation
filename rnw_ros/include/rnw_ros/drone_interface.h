@@ -49,6 +49,8 @@ struct drone_interface_t {
 
     bool odom_in_time() const;
 
+    Vector3d position() const;
+
     void set_max_vel( double val );
 
     void set_max_acc( double val );
@@ -78,6 +80,8 @@ public: // these methods will take ACTION
     void arm_motors() const;
 
     void reset_traj() const;
+
+    void cmd_pos_vel( Vector3d const & pos, Vector3d const & vel ) const;
 
     void execute_trajectory(quadrotor_msgs::PolynomialTrajectory const & traj, bool do_not_check = false ) const;
 
@@ -112,6 +116,8 @@ private:
     ros::Subscriber sub_n3ctrl;
 
     ros::Publisher pub_traj;
+
+    ros::Publisher pub_pos_vel_cmd;
 
     ros::Publisher pub_trigger;
 

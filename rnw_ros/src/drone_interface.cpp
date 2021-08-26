@@ -2,6 +2,7 @@
 #include "rnw_ros/rnw_utils.h"
 
 #include <std_msgs/UInt8.h>
+#include <quadrotor_msgs/PositionCommand.h>
 
 drone_interface_t::drone_interface_t() = default;
 
@@ -40,6 +41,10 @@ void drone_interface_t::init( string const & drone_name ){
   stringstream topic_trigger; topic_trigger << "/" << drone_name << "/trigger";
 
   pub_trigger = nh.advertise<std_msgs::UInt8>(topic_trigger.str(),100);
+
+  stringstream topic_pos_vel_cmd; topic_pos_vel_cmd << "/" << drone_name << "/position_cmd";
+
+  pub_pos_vel_cmd = nh.advertise<quadrotor_msgs::PositionCommand>(topic_pos_vel_cmd.str(),10);
 
   name = drone_name;
 
@@ -258,4 +263,20 @@ void drone_interface_t::arm_motors() const {
   msg.data = trigger_arm_motors;
   pub_trigger.publish(msg);
   ROS_WARN("[%s] prepare to take off!", name.c_str());
+}
+
+Vector3d drone_interface_t::position() const {
+  return uav_utils::from_point_msg(latest_odom.pose.pose.position);
+}
+
+void drone_interface_t::cmd_pos_vel( const Vector3d & pos, const Vector3d & vel ) const {
+  quadrotor_msgs::PositionCommand rst;
+  rst.header.stamp = ros::Time::now();
+  rst.header.frame_id = "world";
+  rst.position = uav_utils::to_point_msg(pos);
+  rst.velocity = uav_utils::to_vector3_msg(vel);
+  rst.acceleration = uav_utils::to_vector3_msg(Vector3d::Zero());
+  rst.yaw = uav_yaw_from_odom(latest_odom);
+  rst.yaw_dot = 0;
+  pub_pos_vel_cmd.publish(rst);
 }
