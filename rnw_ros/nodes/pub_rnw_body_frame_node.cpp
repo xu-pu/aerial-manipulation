@@ -2,16 +2,13 @@
 
 #include "rnw_ros/rnw_utils.h"
 
-Eigen::Matrix3d calc_rnw_body_frame( rnw_msgs::ConeState const & cone_state ){
-  return (Eigen::AngleAxisd( cone_state.euler_angles.x + M_PI_2, Eigen::Vector3d::UnitZ()) *
-          Eigen::AngleAxisd( cone_state.euler_angles.y, Eigen::Vector3d::UnitY())).toRotationMatrix();
-}
-
 struct my_node_t {
 
     ros::Subscriber sub_cone_state;
 
     ros::Publisher pub_body_frame;
+
+    ros::Publisher pub_action_frame;
 
     my_node_t(){
 
@@ -25,18 +22,26 @@ struct my_node_t {
               ros::TransportHints().tcpNoDelay()
       );
 
-      pub_body_frame = nh.advertise<nav_msgs::Odometry>("/cone/body_frame",100);
+      pub_body_frame = nh.advertise<geometry_msgs::PoseStamped>("/cone/body_frame",100);
+
+      pub_action_frame = nh.advertise<geometry_msgs::PoseStamped>("/cone/action_frame",100);
 
     }
 
     void on_cone_state( rnw_msgs::ConeStateConstPtr const & msg ) const {
+
       auto R = calc_rnw_body_frame(*msg);
       Eigen::Quaterniond quat(R);
-      nav_msgs::Odometry rst;
+
+      geometry_msgs::PoseStamped rst;
       rst.header = msg->header;
-      rst.pose.pose.position = msg->disc_center;
-      rst.pose.pose.orientation = uav_utils::to_quaternion_msg(quat);
+      rst.pose.position = msg->disc_center;
+      rst.pose.orientation = uav_utils::to_quaternion_msg(quat);
       pub_body_frame.publish(rst);
+
+      rst.pose.position = msg->tip;
+      pub_action_frame.publish(rst);
+
     }
 
 };

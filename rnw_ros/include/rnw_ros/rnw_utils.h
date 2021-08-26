@@ -15,6 +15,8 @@
 
 #include "rnw_ros/rnw_config.h"
 
+Eigen::Matrix3d calc_rnw_body_frame( rnw_msgs::ConeState const & );
+
 Matrix3d intermediate_rotation( nav_msgs::Odometry const & );
 
 Vector3d point_in_intermediate_frame( Vector3d const & point, nav_msgs::Odometry const & frame );

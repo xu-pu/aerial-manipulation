@@ -327,3 +327,8 @@ Vector3d point_at_nutation( rnw_msgs::ConeState const & cone_state, Vector3d con
   tgt = tgt + cur_contact;
   return tgt;
 }
+
+Eigen::Matrix3d calc_rnw_body_frame( rnw_msgs::ConeState const & cone_state ){
+  return (Eigen::AngleAxisd( cone_state.euler_angles.x + M_PI_2, Eigen::Vector3d::UnitZ()) *
+          Eigen::AngleAxisd( cone_state.euler_angles.y, Eigen::Vector3d::UnitY())).toRotationMatrix();
+}
