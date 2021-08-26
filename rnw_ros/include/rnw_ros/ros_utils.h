@@ -124,4 +124,9 @@ private:
 
 };
 
+template<typename T>
+double latency( T msg ){
+  return (ros::Time::now() - msg.header.stamp).toSec();
+}
+
 #endif //SRC_ROS_UTILS_H

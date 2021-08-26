@@ -1,5 +1,52 @@
 <launch>
 
-    <node pkg="rnw_ros" type="rl_agent.zsh" name="rl_agent.zsh" output="screen"/>
+    <!--  Motion Capture  -->
+
+    <param name="/use_sim_time" type="bool" value="false"/>
+
+    <rosparam command="load" file="$(find rnw_ros)/config/swarm_rnw_config.yaml"/>
+
+    <node pkg="mocap_optitrack" type="mocap_node" name="mocap_node" respawn="false" launch-prefix="" required="true" output="log">
+        <rosparam file="$(find mocap_optitrack)/config/mocap.yaml" command="load" />
+    </node>
+
+    <node pkg="mocap2odom" type="mocap2odom" name="mocap2odom" output="screen" >
+        <param name="publish_uav_odom" type="bool" value="true"/>
+        <rosparam file="$(find mocap2odom)/config/calib.yaml" command="load" />
+    </node>
+
+    <node pkg="rnw_ros" type="pub_cone_state_node" name="pub_cone_state_node" required="true" output="log">
+        <param name="cut_euler_velocity" type="bool" value="true"/>
+        <param name="max_euler_velocity" value="10"/>
+    </node>
+
+    <!--  RL  -->
+
+    <node pkg="rnw_ros" type="rl_agent.zsh" name="rl_agent" output="screen"/>
+
+    <node pkg="rnw_ros" type="rl_controller_node" name="rl_controller_node" output="screen"/>
+
+    <!--  Visualization  -->
+
+    <node pkg="rnw_ros" type="pub_rnw_body_frame_node" name="pub_rnw_body_frame_node" required="false" output="screen"/>
+
+    <node pkg="rnw_ros" type="odom2tf_node" name="odom2tf_action_frame" output="screen" required="false">
+        <remap from="~pose" to="/cone/action_frame"/>
+        <param name="name" value="action_frame" />
+    </node>
+
+    <node pkg="rnw_ros" type="visualize_cone_node" name="visualize_cone_node" output="screen" required="true">
+        <param name="cone_color_r" type="double" value="0"/>
+        <param name="cone_color_g" type="double" value="1"/>
+        <param name="cone_color_b" type="double" value="0"/>
+    </node>
+
+    <node pkg="rnw_ros" type="visualize_rl_node" name="visualize_rl_node" output="screen" required="false"/>
+
+    <node name="rviz" pkg="rviz" type="rviz" output="log" required="false" args="-d $(find rnw_ros)/config/swarm.rviz"/>
+
+    <!--  Data  -->
+
+<!--    <node name="record" pkg="rosbag" type="record" output="screen" args="-a -x '(.*)visual(.*)|/(.*)viz(.*)'" required="false"/>-->
 
 </launch>
