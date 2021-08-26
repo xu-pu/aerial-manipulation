@@ -1,7 +1,14 @@
 #include "ros/ros.h"
 #include "rnw_ros/cone_interface.h"
+#include "rnw_ros/rnw_utils.h"
 
 #include <sensor_msgs/Joy.h>
+
+Eigen::Vector3d action_to_cp_vel( rnw_msgs::ConeState const & cone_state, Eigen::Vector2d const & action ){
+  auto R = calc_rnw_body_frame(cone_state);
+  Eigen::Vector3d act( action.x(), action.y(), 0 );
+  return R * act;
+}
 
 struct rl_rnw_controller_t {
 
@@ -12,6 +19,8 @@ struct rl_rnw_controller_t {
     cone_interface_t cone;
 
     ros::Publisher pub_rl_obs;
+
+    ros::Publisher pub_cp_vel_cmd;
 
     ros::Subscriber sub_rl_action;
 
@@ -29,6 +38,8 @@ struct rl_rnw_controller_t {
 
       pub_rl_obs = nh.advertise<sensor_msgs::Joy>("/rl_agent/observation",100);
 
+      pub_cp_vel_cmd = nh.advertise<geometry_msgs::Vector3Stamped>("/rl_agent/action_cp_vel",100);
+
       sub_rl_action = nh.subscribe<sensor_msgs::Joy>(
               "/rl_agent/action",
               1,
@@ -45,6 +56,20 @@ struct rl_rnw_controller_t {
 
     void on_rl_agent_action( sensor_msgs::JoyConstPtr const & msg ){
       latest_action = *msg;
+      if ( msg->axes.size() != 2 ) {
+        ROS_ERROR("[rl] incorrect action size, %lu", msg->axes.size());
+        return;
+      }
+
+      Eigen::Vector2d action { msg->axes.at(0), msg->axes.at(1) };
+
+      Eigen::Vector3d cp_vel = action_to_cp_vel(cone.latest_cone_state,action);
+
+      geometry_msgs::Vector3Stamped rst;
+      rst.header = msg->header;
+      rst.vector = uav_utils::to_vector3_msg(cp_vel);
+      pub_cp_vel_cmd.publish(rst);
+
     }
 
     void rl_loop( ros::TimerEvent const & e ){
