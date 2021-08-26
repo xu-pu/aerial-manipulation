@@ -1,0 +1,5 @@
+<launch>
+
+    <node pkg="rnw_ros" type="rl_agent.zsh" name="rl_agent.zsh" output="screen"/>
+
+</launch>
