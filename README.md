@@ -197,3 +197,8 @@ steel object gain 60
 
 exp9 for 45 120
 exp8 for 45 90
+
+
+in RL sim,add node to publish odom in rnw body frame
+green (y) points backwards
+blue (z) points upwards
