@@ -200,6 +200,7 @@ set(RNW_NODES
         rl_controller_node
         pub_rnw_body_frame_node
         visualize_rl_node
+        test_vel_cmd_node
 )
 
 FOREACH(NODE ${RNW_NODES})

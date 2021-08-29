@@ -1,0 +1,72 @@
+<launch>
+
+    <arg name="drone_name" default="drone1" />
+
+    <rosparam command="load" file="$(find rnw_ros)/config/swarm_rnw_config.yaml"/>
+
+    <!--  Simulation  -->
+
+    <arg name="uavname" default="hil" />
+
+    <node pkg="djiros" type="djiros_node" name="djiros" output="screen" launch-prefix="" required="true">
+        <param name="log_level" type="string" value="info"/>
+        <param name="serial_name" type="string" value="/dev/tty.dji.n3"/>
+        <param name="baud_rate" type="int" value="921600"/>
+        <param name="app_id"        type="int"      value="1024795"/>
+        <param name="app_version"   type="int"      value="1"/>
+        <param name="enc_key"       type="string"   value="a5f11a418f3dcdc39c4a1efb35a9dd4545e47b56cae9d98c988468277a9305dc"/>
+        <param name="sensor_mode" type="bool" value="false"/>
+        <param name="align_with_fmu" type="bool" value="false"/>
+    </node>
+
+    <param name="ctrl_cmd_stream_timeout" value="0.5"/>
+
+    <node pkg="n3ctrl" type="n1_sim_helper.py" name="n1_sim_helper" output="screen" required="true">
+        <!--subscribers-->
+        <remap from="~velo" to="/djiros/velo" />
+        <remap from="~gps" to="/djiros/gps" />
+        <remap from="~imu" to="/djiros/imu" />
+        <!--publishers-->
+        <remap from="~odom" to="/$(arg drone_name)/odom" />
+    </node>
+
+    <!--  Control  -->
+
+    <node pkg="n3ctrl" type="n3ctrl_node" name="n3ctrl" output="screen" required="true">
+        <!--subscribers-->
+        <remap from="~joy" to="/djiros/rc"/>
+        <remap from="~odom" to="/$(arg drone_name)/odom"/>
+        <remap from="~imu" to="/djiros/imu"/>
+        <remap from="~cmd" to="/$(arg drone_name)/position_cmd"/>
+        <!--publishers-->
+        <remap from="~desire_pose" to="/desire_pose" />
+        <remap from="~traj_start_trigger" to="/traj_start_trigger" />
+        <remap from="~ctrl" to="/djiros/ctrl" />
+        <!--params-->
+        <rosparam command="load" file="$(find n3ctrl)/config/ctrl_param_$(arg uavname).yaml" />
+        <param name="work_mode" value="real-time" />
+        <param name="js_ctrl_mode" value="feedback" />
+        <param name="pub_debug_msgs" type="bool" value="true"/>
+    </node>
+
+    <!--  Joy  -->
+
+    <node pkg="joy" type="joy_node" name="joy_node" output="screen">
+        <param name="~autorepeat_rate" value="0" />
+    </node>
+
+    <node pkg="rnw_ros" type="gamepad_trigger_node" name="gamepad" output="screen"/>
+
+    <!--  App  -->
+
+    <node pkg="rnw_ros" type="test_vel_cmd_node" name="test_vel_cmd_node" required="false" output="screen"/>
+
+    <!--  Visualization  -->
+
+    <node name="rviz_traj" pkg="rviz" type="rviz" output="log" args="-d $(find rnw_ros)/config/caging.rviz" />
+
+    <node pkg="rnw_ros" type="visualize_pos_cmd_node" name="pos_cmd_viz" output="screen" required="false">
+        <remap from="~position_cmd" to="/$(arg drone_name)/position_cmd"/>
+    </node>
+
+</launch>
