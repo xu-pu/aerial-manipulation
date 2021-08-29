@@ -13,7 +13,7 @@ rigid_bodies:
       pose2d: mocap_2d/drone2
       child_frame_id: drone2
       parent_frame_id: world
-    '3':
+    '4':
       pose: mocap/cone
       pose2d: mocap_2d/cone
       child_frame_id: cone

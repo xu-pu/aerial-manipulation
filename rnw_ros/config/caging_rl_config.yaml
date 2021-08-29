@@ -1,0 +1,59 @@
+ground_z: -0.015
+flu_T_tcp:
+  x: -0.07
+  y: 0
+  z: -0.114698
+swarm:
+  angle: 120
+cable:
+  drone1: 1.05
+  drone2: 1.1
+caging:
+  desired_grip_depth: 0.06
+rnw:
+  phi_epsi: 5
+  direct_control: false
+  insertion_depth: 0.12
+  desired_nutation: 55
+  desired_grip_depth: 0.06
+  rocking_max_vel: 3
+  rocking_max_acc: 3
+  min_nutation_deg: 5
+  yaw_gain: 0.2
+  lap_ang_vel_deg: 0
+  lap_start: 2
+  enable_steering: true
+  enable_energy_feedback: true
+  specify_energy: true
+  desired_energy: 2
+  EKp: 0.1
+  EKi: 0.02
+  EKd: 0
+  specify_heading: true
+  heading_deg: 90
+  init_threshold: 1.5
+  init_tau: 15
+  init_ang_vel_threshold: 0.3
+  init_min_step_interval: 1
+  tau: 10
+  ang_vel_threshold: 0.8
+  min_step_interval: 0.5
+zigzag:
+  step_forward: 0.1
+  step_sideways: 0.1
+  cycles: 5
+  max_vel: 1
+  max_acc: 0.5
+cone:
+  radius: 0.15
+  base_center:
+    x: -0.000904335
+    y: -0.0400441
+    z: -0.0406036
+  tip:
+    x: 0.143148
+    y: -0.0369111
+    z: 0.960943
+  CoM_x: 0.08
+  CoM_z: 0.05
+  mass: 0.5
