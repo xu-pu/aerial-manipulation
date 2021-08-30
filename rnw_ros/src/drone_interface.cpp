@@ -280,3 +280,7 @@ void drone_interface_t::cmd_pos_vel( const Vector3d & pos, const Vector3d & vel 
   rst.yaw_dot = 0;
   pub_pos_vel_cmd.publish(rst);
 }
+
+double drone_interface_t::yaw() const {
+  return uav_yaw_from_odom(latest_odom);
+}

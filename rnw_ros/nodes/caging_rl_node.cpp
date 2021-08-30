@@ -14,7 +14,7 @@ Vector3d tip_pos_to_drone_pos( Vector3d const & tip_pos, double yaw_rad, Vector3
 
 struct caging_rl_t {
 
-    size_t control_rate = 70;
+    static constexpr int control_rate = 70;
 
     cone_interface_t cone;
 
@@ -30,7 +30,7 @@ struct caging_rl_t {
 
     ros::Subscriber sub_gamepad_RB;
 
-
+    ros::Timer control_loop;
 
     caging_rl_t(): drone("drone1") {
 
@@ -44,7 +44,7 @@ struct caging_rl_t {
 
       sub_gamepad_RB = nh.subscribe<std_msgs::Header>("/gamepad/RB",10,&caging_rl_t::on_stop,this);
 
-
+      control_loop = nh.createTimer(ros::Rate(control_rate),&caging_rl_t::high_freq_ctrl_loop,this,false,false);
 
     }
 
@@ -74,14 +74,24 @@ struct caging_rl_t {
     }
 
     void on_start( std_msgs::HeaderConstPtr const & msg ){
-
+      control_loop.start();
     }
 
     void on_stop( std_msgs::HeaderConstPtr const & msg ){
-
+      control_loop.stop();
     }
 
-    void high_freq_ctrl_loop( ros::TimerEvent const & e ){
+    void high_freq_ctrl_loop( ros::TimerEvent const & e ) const {
+
+      if ( latency(rl_agent.latest_action) > 1 ) {
+        ROS_WARN("[rl] action timeout");
+        return;
+      }
+
+      drone.cmd_pos_vel(
+              tip_pos_to_drone_pos(cone.tip(),drone.yaw(),config.flu_T_tcp),
+              rl_agent.latest_cmd
+      );
 
     }
 

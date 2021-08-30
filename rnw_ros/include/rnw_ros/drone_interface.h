@@ -51,6 +51,8 @@ struct drone_interface_t {
 
     Vector3d position() const;
 
+    double yaw() const;
+
     void set_max_vel( double val );
 
     void set_max_acc( double val );

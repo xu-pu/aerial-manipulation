@@ -55,7 +55,7 @@ void rl_agent_interface_t::on_observation( const ros::TimerEvent & e ) {
   latest_obs.header = cone.latest_cone_state.header;
   latest_obs.axes.resize(6+5);
 
-  latest_obs.axes.at(0) = (float)c.euler_angles.x;
+  latest_obs.axes.at(0) = (float)(c.euler_angles.x-M_PI_2);
   latest_obs.axes.at(1) = (float)c.euler_angles.y;
   latest_obs.axes.at(2) = (float)c.euler_angles.z;
 
