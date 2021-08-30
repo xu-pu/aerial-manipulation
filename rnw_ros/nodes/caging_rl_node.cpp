@@ -6,6 +6,12 @@
 
 #include <sensor_msgs/Joy.h>
 
+Vector3d tip_pos_to_drone_pos( Vector3d const & tip_pos, double yaw_rad, Vector3d const & flu_T_tcp ){
+  Matrix3d R = uav_utils::rotz(yaw_rad);
+  Vector3d offset = - R * flu_T_tcp;
+  return tip_pos + offset;
+}
+
 struct caging_rl_t {
 
     cone_interface_t cone;
@@ -36,6 +42,8 @@ struct caging_rl_t {
 
       ROS_WARN("[caging] topple triggered!");
 
+      double yaw = cone_yaw(cone.latest_cone_state);
+
       vector<Vector3d> tip_wpts;
 
       double cur_nutation = rad2deg * cone.latest_cone_state.euler_angles.y;
@@ -48,10 +56,14 @@ struct caging_rl_t {
       vector<Vector3d> drone_wpts;
       drone_wpts.emplace_back(drone.position());
       for ( auto const pt : tip_wpts ) {
-        drone_wpts.emplace_back( pt - config.flu_T_tcp );
+        drone_wpts.emplace_back(tip_pos_to_drone_pos(pt,yaw,config.flu_T_tcp));
       }
 
-      drone.follow_waypoints(drone_wpts, cone_yaw(cone.latest_cone_state));
+      drone.follow_waypoints(drone_wpts, yaw);
+
+    }
+
+    void high_freq_ctrl_loop( ros::TimerEvent const & e ){
 
     }
 
