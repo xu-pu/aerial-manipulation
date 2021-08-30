@@ -12,7 +12,7 @@
 
 struct rl_agent_interface_t {
 
-    static constexpr size_t obs_rate = 30;
+    static constexpr size_t obs_rate = 10;
 
     Vector3d latest_cmd;
 
@@ -29,6 +29,12 @@ struct rl_agent_interface_t {
     ros::Publisher pub_cmd_vel;
 
     ros::Timer timer_obs;
+
+    double action_scale = 0.5;
+
+    bool enable_x = true;
+
+    bool enable_y = true;
 
     rl_agent_interface_t();
 

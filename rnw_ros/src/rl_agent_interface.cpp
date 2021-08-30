@@ -32,8 +32,11 @@ void rl_agent_interface_t::on_action( const sensor_msgs::JoyConstPtr & msg ) {
 
   latest_action = *msg;
 
-  Eigen::Vector2d action { msg->axes.at(0), msg->axes.at(1) };
-  Eigen::Vector3d cmd_vel = action_to_cmd_vel(cone.latest_cone_state, action);
+  double x = enable_x ? msg->axes.at(0) : 0;
+  double y = enable_y ? msg->axes.at(1) : 0;
+
+  Eigen::Vector2d action { x, y };
+  Eigen::Vector3d cmd_vel = action_to_cmd_vel(cone.latest_cone_state, action*action_scale);
   latest_cmd = cmd_vel;
 
   geometry_msgs::Vector3Stamped rst;
