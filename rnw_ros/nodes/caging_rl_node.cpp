@@ -32,6 +32,8 @@ struct caging_rl_t {
 
     ros::Timer control_loop;
 
+    ros::Time start_ts;
+
     caging_rl_t(): drone("drone1") {
 
       ros::NodeHandle nh("~");
@@ -74,6 +76,7 @@ struct caging_rl_t {
     }
 
     void on_start( std_msgs::HeaderConstPtr const & msg ){
+      start_ts = ros::Time::now();
       control_loop.start();
     }
 
@@ -82,6 +85,10 @@ struct caging_rl_t {
     }
 
     void high_freq_ctrl_loop( ros::TimerEvent const & e ) const {
+
+//      double dt = ( ros::Time::now() - start_ts ).toSec();
+//      double vel = std::sin(dt);
+//      Vector3d fake_cmd = action_to_cmd_vel(cone.latest_cone_state,{0,vel});
 
       if ( latency(rl_agent.latest_action) > 1 ) {
         ROS_WARN("[rl] action timeout");
