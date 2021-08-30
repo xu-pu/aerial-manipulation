@@ -14,6 +14,8 @@ Vector3d tip_pos_to_drone_pos( Vector3d const & tip_pos, double yaw_rad, Vector3
 
 struct caging_rl_t {
 
+    size_t control_rate = 70;
+
     cone_interface_t cone;
 
     drone_interface_t drone;
@@ -28,6 +30,8 @@ struct caging_rl_t {
 
     ros::Subscriber sub_gamepad_RB;
 
+
+
     caging_rl_t(): drone("drone1") {
 
       ros::NodeHandle nh("~");
@@ -35,6 +39,12 @@ struct caging_rl_t {
       config.load_from_ros(nh);
 
       sub_gamepad_Y = nh.subscribe<std_msgs::Header>("/gamepad/Y",10,&caging_rl_t::on_topple,this);
+
+      sub_gamepad_X = nh.subscribe<std_msgs::Header>("/gamepad/X",10,&caging_rl_t::on_start,this);
+
+      sub_gamepad_RB = nh.subscribe<std_msgs::Header>("/gamepad/RB",10,&caging_rl_t::on_stop,this);
+
+
 
     }
 
@@ -60,6 +70,14 @@ struct caging_rl_t {
       }
 
       drone.follow_waypoints(drone_wpts, yaw);
+
+    }
+
+    void on_start( std_msgs::HeaderConstPtr const & msg ){
+
+    }
+
+    void on_stop( std_msgs::HeaderConstPtr const & msg ){
 
     }
 
