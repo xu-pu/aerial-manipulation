@@ -13,12 +13,19 @@ struct caging_rl_t {
 
     rnw_config_t config;
 
+    ros::Subscriber sub_gamepad_Y;
+
+    ros::Subscriber sub_gamepad_X;
+
+    ros::Subscriber sub_gamepad_RB;
+
     caging_rl_t(): drone("drone1") {
 
       ros::NodeHandle nh("~");
 
       config.load_from_ros(nh);
 
+      sub_gamepad_Y = nh.subscribe<std_msgs::Header>("/gamepad/Y",10,&caging_rl_t::on_topple,this);
 
     }
 

@@ -14,7 +14,7 @@ rnw:
   phi_epsi: 5
   direct_control: false
   insertion_depth: 0.12
-  desired_nutation: 55
+  desired_nutation: 25
   desired_grip_depth: 0.06
   rocking_max_vel: 3
   rocking_max_acc: 3
