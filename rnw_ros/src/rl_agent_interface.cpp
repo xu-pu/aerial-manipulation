@@ -53,7 +53,8 @@ void rl_agent_interface_t::on_observation( const ros::TimerEvent & e ) {
   auto const & c = cone.latest_cone_state;
 
   latest_obs.header = cone.latest_cone_state.header;
-  latest_obs.axes.resize(6+5);
+  //latest_obs.axes.resize(6+5);
+  latest_obs.axes.resize(6);
 
   latest_obs.axes.at(0) = (float)(c.euler_angles.x-M_PI_2);
   latest_obs.axes.at(1) = (float)c.euler_angles.y;
@@ -63,11 +64,11 @@ void rl_agent_interface_t::on_observation( const ros::TimerEvent & e ) {
   latest_obs.axes.at(4) = (float)c.euler_angles_velocity.y;
   latest_obs.axes.at(5) = (float)c.euler_angles_velocity.z;
 
-  latest_obs.axes.at(6) = (float)c.radius;
-  latest_obs.axes.at(7) = (float)c.radius;
-  latest_obs.axes.at(8) = 0;
-  latest_obs.axes.at(9) = -(float)c.radius;
-  latest_obs.axes.at(10) = (float)c.height;
+//  latest_obs.axes.at(6) = (float)c.radius;
+//  latest_obs.axes.at(7) = (float)c.radius;
+//  latest_obs.axes.at(8) = 0;
+//  latest_obs.axes.at(9) = -(float)c.radius;
+//  latest_obs.axes.at(10) = (float)c.height;
 
   pub_obs.publish(latest_obs);
 
