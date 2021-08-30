@@ -201,6 +201,7 @@ set(RNW_NODES
         pub_rnw_body_frame_node
         visualize_rl_node
         test_vel_cmd_node
+        caging_rl_node
 )
 
 FOREACH(NODE ${RNW_NODES})
