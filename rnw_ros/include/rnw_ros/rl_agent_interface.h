@@ -30,8 +30,6 @@ struct rl_agent_interface_t {
 
     ros::Timer timer_obs;
 
-    bool action_in_time() const;
-
     rl_agent_interface_t();
 
     void on_action( sensor_msgs::JoyConstPtr const & );

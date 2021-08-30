@@ -2,6 +2,7 @@
 #include "rnw_ros/cone_interface.h"
 #include "rnw_ros/drone_interface.h"
 #include "rnw_ros/rnw_utils.h"
+#include "rnw_ros/rl_agent_interface.h"
 
 #include <sensor_msgs/Joy.h>
 
@@ -10,6 +11,8 @@ struct caging_rl_t {
     cone_interface_t cone;
 
     drone_interface_t drone;
+
+    rl_agent_interface_t rl_agent;
 
     rnw_config_t config;
 
