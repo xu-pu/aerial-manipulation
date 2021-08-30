@@ -56,6 +56,8 @@
 
     <node pkg="rnw_ros" type="caging_rl_node" name="caging_rl_node" required="true" output="screen"/>
 
+    <node pkg="rnw_ros" type="rl_agent.zsh" name="rl_agent" output="log"/>
+
     <!--  Visualization  -->
 
     <node pkg="rnw_ros" type="visualize_pos_cmd_node" name="pos_cmd_viz_$(arg drone_name)" output="screen" required="true">
@@ -78,6 +80,15 @@
         <param name="cone_color_r" type="double" value="0"/>
         <param name="cone_color_g" type="double" value="1"/>
         <param name="cone_color_b" type="double" value="0"/>
+    </node>
+
+    <node pkg="rnw_ros" type="visualize_rl_node" name="visualize_rl_node" output="screen" required="false"/>
+
+    <node pkg="rnw_ros" type="pub_rnw_body_frame_node" name="pub_rnw_body_frame_node" required="false" output="screen"/>
+
+    <node pkg="rnw_ros" type="odom2tf_node" name="odom2tf_action_frame" output="screen" required="false">
+        <remap from="~pose" to="/cone/action_frame"/>
+        <param name="name" value="action_frame" />
     </node>
 
     <node name="rviz_traj" pkg="rviz" type="rviz" output="log" required="false" args="-d $(find rnw_ros)/config/rl.rviz" />
