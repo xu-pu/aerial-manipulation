@@ -95,8 +95,8 @@
 
 <!--    <node name="record" pkg="rosbag" type="record" output="screen" args="-a -x '(.*)visual(.*)|/(.*)viz(.*)'" />-->
 
-<!--    <node pkg="rqt_multiplot" type="rqt_multiplot" name="rqt_multiplot" output="log" required="true"-->
-<!--          args="&#45;&#45;multiplot-config $(find rnw_ros)/config/rqt_multiplot_tuning_drone2.xml &#45;&#45;multiplot-run-all"/>-->
+    <node pkg="rqt_multiplot" type="rqt_multiplot" name="rqt_multiplot" output="log" required="true"
+          args="--multiplot-config $(find rnw_ros)/config/rqt_multiplot_rl.xml --multiplot-run-all"/>
 
 <!--    <node pkg="rqt_reconfigure" type="rqt_reconfigure" name="rqt_reconfigure"/>-->
 
