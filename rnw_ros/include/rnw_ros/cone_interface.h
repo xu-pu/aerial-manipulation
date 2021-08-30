@@ -34,6 +34,8 @@ public:
 
     Vector3d tip_at_nutation( double rad ) const;
 
+    Matrix3d rnw_frame() const;
+
 };
 
 #endif //RNW_ROS_CONE_INTERFACE_H

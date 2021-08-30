@@ -1,5 +1,6 @@
 #include "rnw_ros/cone_interface.h"
 #include "rnw_ros/ros_utils.h"
+#include "rnw_ros/rnw_utils.h"
 
 cone_interface_t::cone_interface_t() {
 
@@ -36,13 +37,12 @@ Vector3d cone_interface_t::tip_at_rest() const {
 }
 
 Vector3d cone_interface_t::tip_at_nutation(double rad) const {
-  Vector3d cur_tip = tip();
-  Vector3d cur_contact = contact_point();
-  Vector3d v = cur_tip - cur_contact;
-  double len = v.norm();
-  Vector3d dir_2d = Vector3d(v.x(),v.y(),0).normalized();
-  double nut_comp = M_PI_2 - rad;
-  Vector3d tip = dir_2d * std::cos(nut_comp) * len;
-  tip.z() = std::sin(nut_comp) * len;
-  return tip + cur_contact;
+  Vector3d fulcrum = latest_cone_state.is_point_contact ? contact_point() : uav_utils::from_point_msg(latest_cone_state.base);
+  Vector3d axis = rnw_frame().col(1);
+  double mag = rad - latest_cone_state.euler_angles.y;
+  return rotate_point_along_axis(tip(),fulcrum,axis,mag);
+}
+
+Matrix3d cone_interface_t::rnw_frame() const {
+  return calc_rnw_body_frame(latest_cone_state);
 }
