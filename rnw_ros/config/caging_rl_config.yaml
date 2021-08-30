@@ -6,7 +6,7 @@ flu_T_tcp:
 rl:
   enable_x: true
   enable_y: true
-  action_scale: 0.5
+  action_scale: 0.2
 swarm:
   angle: 120
 cable:

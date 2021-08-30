@@ -16,6 +16,8 @@ Vector3d tip_pos_to_drone_pos( Vector3d const & tip_pos, double yaw_rad, Vector3
 
 struct caging_rl_t {
 
+    rnw_config_t config;
+
     static constexpr int control_rate = 70;
 
     cone_interface_t cone;
@@ -23,8 +25,6 @@ struct caging_rl_t {
     drone_interface_t drone;
 
     rl_agent_interface_t rl_agent;
-
-    rnw_config_t config;
 
     ros::Subscriber sub_gamepad_Y;
 
@@ -36,7 +36,7 @@ struct caging_rl_t {
 
     ros::Time start_ts;
 
-    caging_rl_t(): drone("drone1") {
+    caging_rl_t(): drone("drone1"), rl_agent(config) {
 
       ros::NodeHandle nh("~");
 
