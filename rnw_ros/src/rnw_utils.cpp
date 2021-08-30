@@ -332,3 +332,9 @@ Eigen::Matrix3d calc_rnw_body_frame( rnw_msgs::ConeState const & cone_state ){
   return (Eigen::AngleAxisd( cone_state.euler_angles.x + M_PI_2, Eigen::Vector3d::UnitZ()) *
           Eigen::AngleAxisd( cone_state.euler_angles.y, Eigen::Vector3d::UnitY())).toRotationMatrix();
 }
+
+Eigen::Vector3d action_to_cmd_vel( rnw_msgs::ConeState const & cone_state, Eigen::Vector2d const & action ){
+  auto R = calc_rnw_body_frame(cone_state);
+  Eigen::Vector3d act( action.x(), action.y(), 0 );
+  return R * act;
+}

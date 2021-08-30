@@ -81,6 +81,7 @@ void cone_state_estimator_t::publish_cone_state( nav_msgs::OdometryConstPtr cons
   msg_cone.tip = uav_utils::to_point_msg(T_tip);
   msg_cone.disc_center = uav_utils::to_point_msg(T_center);
   msg_cone.radius = rnw_config.cone.radius;
+  msg_cone.height = rnw_config.cone.tip.z() - rnw_config.cone.base_center.z();
 
   pub_cone_state.publish(msg_cone);
 }

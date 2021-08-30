@@ -15,6 +15,8 @@
 
 #include "rnw_ros/rnw_config.h"
 
+Eigen::Vector3d action_to_cmd_vel( rnw_msgs::ConeState const & cone_state, Eigen::Vector2d const & action );
+
 Eigen::Matrix3d calc_rnw_body_frame( rnw_msgs::ConeState const & );
 
 Matrix3d intermediate_rotation( nav_msgs::Odometry const & );

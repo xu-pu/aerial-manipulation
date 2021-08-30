@@ -156,6 +156,7 @@ add_library(${PROJECT_NAME}
         src/drone_interface.cpp
         src/cone_interface.cpp
         src/caging_state.cpp
+        src/rl_agent_interface.cpp
 )
 
 ## Add cmake target dependencies of the library
@@ -197,7 +198,6 @@ set(RNW_NODES
         ekf_odom_node
         pub_simulated_sensors
         thrust_test_node
-        rl_controller_node
         pub_rnw_body_frame_node
         visualize_rl_node
         test_vel_cmd_node
