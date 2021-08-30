@@ -7,6 +7,7 @@
 
 #include "rnw_ros/ros_utils.h"
 #include "rnw_ros/RNWConfig.h"
+#include "rnw_ros/RlConfig.h"
 
 struct rnw_config_t {
 
@@ -177,6 +178,30 @@ struct rnw_config_t {
     struct {
         double desired_grip_depth;
     } caging;
+
+    struct {
+
+        bool enable_x = true;
+
+        bool enable_y = true;
+
+        double action_scale = 0.5;
+
+        inline void set( rnw_ros::RlConfig const & cfg ){
+          enable_x = cfg.enable_x;
+          enable_y = cfg.enable_y;
+          action_scale = cfg.action_scale;
+        }
+
+        inline rnw_ros::RlConfig to_config() const {
+          rnw_ros::RlConfig config;
+          config.action_scale = action_scale;
+          config.enable_x = enable_x;
+          config.enable_y = enable_y;
+          return config;
+        }
+
+    } rl;
 
     void load_from_ros( ros::NodeHandle & nh );
 

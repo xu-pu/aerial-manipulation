@@ -205,6 +205,10 @@ void rnw_config_t::load_from_ros( ros::NodeHandle & nh ){
 
   caging.desired_grip_depth = get_param_default<double>(nh, "/caging/desired_grip_depth", 0.06);
 
+  rl.enable_x = get_param_default<bool>(nh, "/rl/enable_x", true);
+  rl.enable_y = get_param_default<bool>(nh, "/rl/enable_y", true);
+  rl.action_scale = get_param_default<double>(nh, "/rl/action_scale", 0.5);
+
 }
 
 double dist( Vector3d const & A, Vector3d const & B ){

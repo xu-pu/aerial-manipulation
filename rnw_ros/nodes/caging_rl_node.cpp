@@ -1,10 +1,12 @@
-#include "ros/ros.h"
+#include <ros/ros.h>
+#include <dynamic_reconfigure/server.h>
+#include <sensor_msgs/Joy.h>
+
 #include "rnw_ros/cone_interface.h"
 #include "rnw_ros/drone_interface.h"
 #include "rnw_ros/rnw_utils.h"
 #include "rnw_ros/rl_agent_interface.h"
-
-#include <sensor_msgs/Joy.h>
+#include "rnw_ros/RlConfig.h"
 
 Vector3d tip_pos_to_drone_pos( Vector3d const & tip_pos, double yaw_rad, Vector3d const & flu_T_tcp ){
   Matrix3d R = uav_utils::rotz(yaw_rad);
@@ -110,6 +112,15 @@ int main( int argc, char** argv ) {
   ros::init(argc,argv,"caging_rl_node");
 
   caging_rl_t node;
+
+  dynamic_reconfigure::Server<rnw_ros::RlConfig> server;
+  server.setConfigDefault(node.config.rl.to_config());
+  server.updateConfig(node.config.rl.to_config());
+  server.setCallback([&]( rnw_ros::RlConfig & config, uint32_t level ){
+      ROS_WARN("RL setting updated");
+      node.config.rl.set(config);
+  });
+  server.updateConfig(node.config.rl.to_config());
 
   ros::spin();
 

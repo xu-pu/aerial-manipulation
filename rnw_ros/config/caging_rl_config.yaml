@@ -3,6 +3,10 @@ flu_T_tcp:
   x: 0.07
   y: 0
   z: -0.114698
+rl:
+  enable_x: true
+  enable_y: true
+  action_scale: 0.5
 swarm:
   angle: 120
 cable:
