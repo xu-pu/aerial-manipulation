@@ -1,6 +1,6 @@
 <launch>
 
-    <param name="/just_checking" type="bool" value="true"/>
+<!--    <param name="/just_checking" type="bool" value="true"/>-->
 
     <arg name="drone_name" default="drone1" />
 
@@ -93,10 +93,10 @@
 
     <node name="rviz_traj" pkg="rviz" type="rviz" output="log" required="false" args="-d $(find rnw_ros)/config/rl.rviz" />
 
-<!--    <node name="record" pkg="rosbag" type="record" output="screen" args="-a -x '(.*)visual(.*)|/(.*)viz(.*)'" />-->
+    <node name="record" pkg="rosbag" type="record" output="screen" args="-a -x '(.*)visual(.*)|/(.*)viz(.*)'" />
 
-    <node pkg="rqt_multiplot" type="rqt_multiplot" name="rqt_multiplot" output="log" required="true"
-          args="--multiplot-config $(find rnw_ros)/config/rqt_multiplot_rl.xml --multiplot-run-all"/>
+<!--    <node pkg="rqt_multiplot" type="rqt_multiplot" name="rqt_multiplot" output="log" required="true"-->
+<!--          args="&#45;&#45;multiplot-config $(find rnw_ros)/config/rqt_multiplot_rl.xml &#45;&#45;multiplot-run-all"/>-->
 
     <node pkg="rqt_reconfigure" type="rqt_reconfigure" name="rqt_reconfigure"/>
 

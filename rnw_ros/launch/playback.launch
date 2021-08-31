@@ -26,7 +26,7 @@
 <!--    </node>-->
 
     <node name="rosbag_play" pkg="rosbag" type="play" respawn="false"
-          args="--clock -s 10 /home/sheep/Dropbox/mphil_bags/2021-07-01-04-24-56.vid2.ground.55.120.bag"/>
+          args="--clock -s 10 /home/sheep/Dropbox/rl_bags/2021-08-31-03-26-52.bag"/>
 
 <!--    <node name="rosbag_reocrd" pkg="rosbag" type="record" respawn="false" args="/rnw/cone_energy_diff"/>-->
 <!--    <node pkg="rnw_ros" type="pub_energy_node" name="pub_energy_node" output="screen" required="true"/>-->
