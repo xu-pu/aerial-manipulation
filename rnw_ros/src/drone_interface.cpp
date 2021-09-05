@@ -281,6 +281,18 @@ void drone_interface_t::cmd_pos_vel( const Vector3d & pos, const Vector3d & vel 
   pub_pos_vel_cmd.publish(rst);
 }
 
+void drone_interface_t::cmd_pos_vel_yaw( const Vector3d & pos, const Vector3d & vel, double yaw ) const {
+  quadrotor_msgs::PositionCommand rst;
+  rst.header.stamp = ros::Time::now();
+  rst.header.frame_id = "world";
+  rst.position = uav_utils::to_point_msg(pos);
+  rst.velocity = uav_utils::to_vector3_msg(vel);
+  rst.acceleration = uav_utils::to_vector3_msg(Vector3d::Zero());
+  rst.yaw = yaw;
+  rst.yaw_dot = 0;
+  pub_pos_vel_cmd.publish(rst);
+}
+
 double drone_interface_t::yaw() const {
   return uav_yaw_from_odom(latest_odom);
 }

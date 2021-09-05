@@ -187,6 +187,8 @@ struct rnw_config_t {
 
         double action_scale = 0.5;
 
+        double yaw = M_PI_2;
+
         inline void set( rnw_ros::RlConfig const & cfg ){
           enable_x = cfg.enable_x;
           enable_y = cfg.enable_y;

@@ -73,7 +73,7 @@ struct caging_rl_t {
         drone_wpts.emplace_back(tip_pos_to_drone_pos(pt,yaw,config.flu_T_tcp));
       }
 
-      drone.follow_waypoints(drone_wpts, yaw);
+      drone.follow_waypoints(drone_wpts,config.rl.yaw);
 
     }
 
@@ -97,9 +97,10 @@ struct caging_rl_t {
         return;
       }
 
-      drone.cmd_pos_vel(
+      drone.cmd_pos_vel_yaw(
               tip_pos_to_drone_pos(cone.tip(),drone.yaw(),config.flu_T_tcp),
-              rl_agent.latest_cmd
+              rl_agent.latest_cmd,
+              config.rl.yaw
       );
 
     }

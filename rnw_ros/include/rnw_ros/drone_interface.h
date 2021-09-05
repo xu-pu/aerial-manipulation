@@ -85,6 +85,8 @@ public: // these methods will take ACTION
 
     void cmd_pos_vel( Vector3d const & pos, Vector3d const & vel ) const;
 
+    void cmd_pos_vel_yaw( Vector3d const & pos, Vector3d const & vel, double yaw ) const;
+
     void execute_trajectory(quadrotor_msgs::PolynomialTrajectory const & traj, bool do_not_check = false ) const;
 
     void go_to_point( Vector3d const & target ) const;
