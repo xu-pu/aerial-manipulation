@@ -112,7 +112,7 @@ void sync_topic( rosbag::Bag & bag, string const & name, std::vector<T> & dst ){
   for (rosbag::MessageInstance const m: view) {
     auto ptr = m.instantiate<T>();
     if ( ptr == nullptr ) continue;
-    if ( ptr->header.stamp >= v_cone_state.at(idx).header.stamp ) {
+    while ( idx < dst.size() && ptr->header.stamp >= v_cone_state.at(idx).header.stamp ) {
       dst.at(idx) = *ptr;
       idx++;
     }
@@ -125,12 +125,10 @@ void sync_topic( rosbag::Bag & bag, string const & name, std::vector<T> & dst ){
 
 }
 
-//void sync_all_data( rosbag::Bag & bag ){
-//  sync_topic<rnw_msgs::ConeState>(bag,"/cone/state",v_cone_state);
-//  sync_topic<nav_msgs::Odometry>(bag,"/drone1/odom",v_drone1_odom);
-//  sync_topic<nav_msgs::Odometry>(bag,"/drone2/odom",v_drone2_odom);
-//}
-//
+void sync_all_data( rosbag::Bag & bag ){
+  sync_topic<sensor_msgs::Joy>(bag,"/rl_agent/action",v_rl_action);
+}
+
 //void gen_csv( string const & name ){
 //
 //  std::string result_dir = "/home/sheep/";
@@ -172,7 +170,7 @@ int main( int argc, char** argv ) {
 
   extract_cone_state(bag);
 
-//  sync_all_data(bag);
+  sync_all_data(bag);
 //
 //  gen_csv(bag_name);
 
