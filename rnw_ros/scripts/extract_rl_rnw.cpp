@@ -129,31 +129,30 @@ void sync_all_data( rosbag::Bag & bag ){
   sync_topic<sensor_msgs::Joy>(bag,"/rl_agent/action",v_rl_action);
 }
 
-//void gen_csv( string const & name ){
-//
-//  std::string result_dir = "/home/sheep/";
-//  stringstream ss; ss << result_dir << "/" << name << ".full.csv";
-//  ofstream ofs(ss.str());
-//
-//  for ( size_t i=0; i<v_rnw_state.size(); i++ ) {
-//    ofs << (v_rnw_state.at(i).header.stamp - start_time).toSec() << ","
-//        << v_cone_state.at(i).euler_angles.x << ","
-//        << v_cone_state.at(i).euler_angles.y << ","
-//        << v_cone_state.at(i).euler_angles.z << ","
-//        << v_cone_state.at(i).euler_angles_velocity.x << ","
-//        << v_cone_state.at(i).euler_angles_velocity.y << ","
-//        << v_cone_state.at(i).euler_angles_velocity.z << ","
-//        << v_cone_state.at(i).contact_point.x << ","
-//        << v_cone_state.at(i).contact_point.y << ",";
-//    if (!v_drone1_ctrl.empty()) {
-//      ofs << "," << v_drone1_ctrl.at(i).axes.at(2);
-//    }
-//    ofs << endl;
-//  }
-//
-//  ofs.close();
-//
-//}
+void gen_csv( string const & name ){
+
+  std::string result_dir = "/home/sheep/am_ws/src/aerial_manip/data";
+  stringstream ss; ss << result_dir << "/" << name << ".full.csv";
+  ofstream ofs(ss.str());
+
+  for ( size_t i=0; i<v_cone_state.size(); i++ ) {
+    ofs << (v_cone_state.at(i).header.stamp - start_time).toSec() << ","
+        << v_cone_state.at(i).euler_angles.x << ","
+        << v_cone_state.at(i).euler_angles.y << ","
+        << v_cone_state.at(i).euler_angles.z << ","
+        << v_cone_state.at(i).euler_angles_velocity.x << ","
+        << v_cone_state.at(i).euler_angles_velocity.y << ","
+        << v_cone_state.at(i).euler_angles_velocity.z << ","
+        << v_cone_state.at(i).contact_point.x << ","
+        << v_cone_state.at(i).contact_point.y << ","
+        << v_rl_action.at(i).axes.at(0) << ","
+        << v_rl_action.at(i).axes.at(1);
+    ofs << endl;
+  }
+
+  ofs.close();
+
+}
 
 int main( int argc, char** argv ) {
 
@@ -171,8 +170,8 @@ int main( int argc, char** argv ) {
   extract_cone_state(bag);
 
   sync_all_data(bag);
-//
-//  gen_csv(bag_name);
+
+  gen_csv(bag_name);
 
   bag.close();
 
