@@ -20,6 +20,32 @@ ros::Time end_time;
 
 vector<rnw_msgs::ConeState> v_cone_state;
 vector<sensor_msgs::Joy> v_rl_action;
+vector<Eigen::Vector2d> v_cp_vel;
+
+Eigen::Vector2d calc_cp_vel( rnw_msgs::ConeState const & cs_pre, rnw_msgs::ConeState const & cs_cur ){
+  Matrix3d R = calc_rnw_body_frame(cs_cur);
+  Vector3d T = uav_utils::from_point_msg(cs_cur.tip);
+  Vector3d X = uav_utils::from_point_msg(cs_pre.tip);
+  Matrix3d R_prime = R.transpose();
+  Vector3d T_prime = -R_prime*T;
+  Vector3d X_prime = R_prime * X + T_prime;
+  double dt = (cs_cur.header.stamp - cs_pre.header.stamp).toSec();
+  Vector3d vel = X_prime / dt;
+  cout << vel << endl;
+  return { vel.x(), vel.y() };
+}
+
+void extract_cp_vel(){
+
+  v_cp_vel.resize(v_cone_state.size());
+
+  v_cp_vel.at(0) = { 0, 0 };
+
+  for ( size_t i=1; i<v_cone_state.size(); i++ ) {
+    v_cp_vel.at(i) = calc_cp_vel(v_cone_state.at(i-1),v_cone_state.at(i));
+  }
+
+}
 
 void extract_start_time( rosbag::Bag & bag ){
 
@@ -146,7 +172,9 @@ void gen_csv( string const & name ){
         << v_cone_state.at(i).contact_point.x << ","
         << v_cone_state.at(i).contact_point.y << ","
         << v_rl_action.at(i).axes.at(0) << ","
-        << v_rl_action.at(i).axes.at(1);
+        << v_rl_action.at(i).axes.at(1) << ","
+        << v_cp_vel.at(i).x() << ","
+        << v_cp_vel.at(i).y();
     ofs << endl;
   }
 
@@ -170,6 +198,8 @@ int main( int argc, char** argv ) {
   extract_cone_state(bag);
 
   sync_all_data(bag);
+
+  extract_cp_vel();
 
   gen_csv(bag_name);
 
