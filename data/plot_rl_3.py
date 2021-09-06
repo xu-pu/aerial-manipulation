@@ -50,25 +50,26 @@ if __name__ == '__main__':
     duration = 80
     t2 = t1+duration
 
-    # action_x
-    axs[0].plot(data[:, 0], data[:, 11], color=plot_color_2)
-    axs[0].plot(data[:, 0], action_scale * data[:, 9], color=plot_color_1)
+    # theta
+    axs[0].plot(data[:, 0], data[:, 2], color=plot_color_1)
     axs[0].set_xlim((t1, t2))
-    axs[0].set_ylim((-0.25,0.25))
-    axs[0].set_yticks([-0.2,0,0.2])
+    axs[0].set_ylim((0,1))
+    axs[0].set_yticks([0,0.5,1])
     axs[0].xaxis.set_ticklabels([])
-    # action_y
-    axs[1].plot(data[:, 0], data[:, 12], color=plot_color_2)
-    axs[1].plot(data[:, 0], action_scale * data[:, 10], color=plot_color_1)
+    axs[0].axhline(np.deg2rad(15), linestyle='--', linewidth=1)
+    axs[0].axhline(np.deg2rad(35), linestyle='--', linewidth=1)
+    # phi
+    axs[1].plot(data[:, 0], data[:, 3], color=plot_color_1)
     axs[1].set_xlim((t1, t2))
-    axs[1].set_ylim((-0.25, 0.25))
-    axs[1].set_yticks([-0.2,0,0.2])
+    axs[1].set_ylim((-2.5, 2.5))
+    # axs[1].set_yticks([-0.2,0,0.2])
     #axs[3].xaxis.set_ticklabels([])
+
 
     # for ax in axs:
     #     #ax.xaxis.set_major_locator(MaxNLocator(integer=True))
     #     ax.xaxis.set_ticklabels([])
 
-    plt.savefig("aerial_cmd_vs_exe.png")
+    plt.savefig("aerial_time_plot.png")
 
     #plt.show()

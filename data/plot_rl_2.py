@@ -85,4 +85,4 @@ if __name__ == '__main__':
     axs[1].set_aspect('equal',adjustable='box')
     # axs[1].xaxis.tick_top()
 
-    plt.savefig("rl_fig_2.png")
+    plt.savefig("aerial_labfloor_vs_foammat.png")
