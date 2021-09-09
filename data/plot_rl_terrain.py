@@ -28,7 +28,8 @@ if __name__ == '__main__':
     foreground_color = 'black'
     plot_color = 'mediumblue'
 
-    data = genfromtxt('2021-09-01-18-10-51.labfloor.01.bag.full.csv', delimiter=',')
+    #data = genfromtxt('2021-09-01-18-10-51.labfloor.01.bag.full.csv', delimiter=',')
+    data = genfromtxt('2021-09-02-02-23-49.foam.02.bag.full.csv', delimiter=',')
     data = time_slice(data,5,math.inf)
 
     box_weight = 3
@@ -75,8 +76,8 @@ if __name__ == '__main__':
     t2 = t1+duration
 
     # contact
-    #axs[0].plot(data[:, 8]+2.2, data[:, 7]-0.25, color="tab:red")
-    axs[0].plot(data[:, 8]+2.8, data[:, 7]-0.05, color="tab:red", linewidth=2)
+    axs[0].plot(data[:, 8]+2.2, data[:, 7]-0.25, color="tab:red", linewidth=2)
+    #axs[0].plot(data[:, 8]+2.8, data[:, 7]-0.05, color="tab:red", linewidth=2)
     #axs[0].xaxis.set_ticklabels([])
     axs[0].set_yticks([-0.2,0,0.2])
     #axs[0].set_xlim((-2.8, 0.7))
