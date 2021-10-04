@@ -21,6 +21,10 @@ ros::Time end_time;
 vector<rnw_msgs::ConeState> v_cone_state;
 vector<sensor_msgs::Joy> v_rl_action;
 vector<Eigen::Vector2d> v_cp_vel;
+vector<double> v_lpf_action_x;
+vector<double> v_lpf_action_y;
+vector<double> v_lpf_exe_x;
+vector<double> v_lpf_exe_y;
 
 Eigen::Vector2d calc_cp_vel( rnw_msgs::ConeState const & cs_pre, rnw_msgs::ConeState const & cs_cur ){
   Matrix3d R = calc_rnw_body_frame(cs_cur);
@@ -31,7 +35,6 @@ Eigen::Vector2d calc_cp_vel( rnw_msgs::ConeState const & cs_pre, rnw_msgs::ConeS
   Vector3d X_prime = R_prime * X + T_prime;
   double dt = (cs_cur.header.stamp - cs_pre.header.stamp).toSec();
   Vector3d vel = X_prime / dt;
-  cout << vel << endl;
   return { vel.x(), vel.y() };
 }
 
@@ -171,10 +174,10 @@ void gen_csv( string const & name ){
         << v_cone_state.at(i).euler_angles_velocity.z << ","
         << v_cone_state.at(i).contact_point.x << ","
         << v_cone_state.at(i).contact_point.y << ","
-        << v_rl_action.at(i).axes.at(0) << ","
-        << v_rl_action.at(i).axes.at(1) << ","
-        << v_cp_vel.at(i).x() << ","
-        << v_cp_vel.at(i).y();
+        << v_lpf_action_x.at(i) << ","
+        << v_lpf_action_y.at(i) << ","
+        << v_lpf_exe_x.at(i) << ","
+        << v_lpf_exe_y.at(i);
     ofs << endl;
   }
 
@@ -182,10 +185,45 @@ void gen_csv( string const & name ){
 
 }
 
+void apply_lpf(){
+
+  double T = 0.1;
+
+  bool enable = true;
+
+  lpf_1st_butterworth_t lpf_action_x(T);
+  lpf_1st_butterworth_t lpf_action_y(T);
+  lpf_1st_butterworth_t lpf_exe_x(T);
+  lpf_1st_butterworth_t lpf_exe_y(T);
+
+  v_lpf_action_x.resize(v_cone_state.size());
+  v_lpf_action_y.resize(v_cone_state.size());
+  v_lpf_exe_x.resize(v_cone_state.size());
+  v_lpf_exe_y.resize(v_cone_state.size());
+
+  if ( enable ) {
+    for ( size_t i=0; i<v_cone_state.size(); i++ ) {
+      v_lpf_action_x.at(i) = lpf_action_x.filter(v_rl_action.at(i).axes.at(0));
+      v_lpf_action_y.at(i) = lpf_action_y.filter(v_rl_action.at(i).axes.at(1));
+      v_lpf_exe_x.at(i) = lpf_exe_x.filter(v_cp_vel.at(i).x());
+      v_lpf_exe_y.at(i) = lpf_exe_y.filter(v_cp_vel.at(i).y());
+    }
+  }
+  else {
+    for ( size_t i=0; i<v_cone_state.size(); i++ ) {
+      v_lpf_action_x.at(i) = v_rl_action.at(i).axes.at(0);
+      v_lpf_action_y.at(i) = v_rl_action.at(i).axes.at(1);
+      v_lpf_exe_x.at(i) = v_cp_vel.at(i).x();
+      v_lpf_exe_y.at(i) = v_cp_vel.at(i).y();
+    }
+  }
+
+}
+
 int main( int argc, char** argv ) {
 
   std::string bag_dir = "/home/sheep/Dropbox/rl_bags";
-  std::string bag_name = "2021-09-01-18-31-38.labfloor.01.bag";
+  std::string bag_name = "2021-09-02-02-23-49.foam.02.bag";
 
   rosbag::Bag bag;
   stringstream ss; ss << bag_dir << "/" << bag_name;
@@ -200,6 +238,8 @@ int main( int argc, char** argv ) {
   sync_all_data(bag);
 
   extract_cp_vel();
+
+  apply_lpf();
 
   gen_csv(bag_name);
 
